@@ -74,8 +74,8 @@ async def healthcheck():
         'timestamp': datetime.utcnow().isoformat()
     }
 
-@app.route('/api/start_session', methods=['POST'])
-def start_session():
+@app.post("/api/start_session")
+async def start_session():
     session_id = str(uuid.uuid4())
     game_state = GameState(session_id)
     game_sessions[session_id] = game_state
@@ -86,11 +86,11 @@ def start_session():
     # Initial narrative
     initial_narrative = f"Te encuentras ante las {game_state.location}. El viento trae susurros de almas condenadas. ¿Qué harás, exorcista?"
     
-    return jsonify({
+    return {
         'session_id': session_id,
         'game_state': game_state.to_dict(),
         'initial_narrative': initial_narrative
-    })
+    }
 
 @app.route('/api/free_input', methods=['POST'])
 def free_input():
