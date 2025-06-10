@@ -1,0 +1,4 @@
+{
+  "fire": { "word": "xârr", "ipa": "χaʁ" },
+  "soul": { "word": "nüel", "ipa": "nyɛl" }
+}

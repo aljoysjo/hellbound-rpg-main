@@ -1,0 +1,14 @@
+[
+  {
+    "name": "apply_player_action",
+    "description": "Interpreta la acción libre del jugador y actualiza el mundo.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "narrative": { "type": "string" },
+        "stateChanges": { "type": "object" }
+      },
+      "required": ["narrative","stateChanges"]
+    }
+  }
+]
