@@ -66,13 +66,13 @@ class GameState:
             'created_at': self.created_at.isoformat()
         }
 
-@app.route('/api/healthcheck', methods=['GET'])
-def healthcheck():
-    return jsonify({
+@app.get("/api/healthcheck")
+async def healthcheck():
+    return {
         'status': 'healthy',
         'message': 'Hellbound RPG backend is running',
         'timestamp': datetime.utcnow().isoformat()
-    })
+    }
 
 @app.route('/api/start_session', methods=['POST'])
 def start_session():
