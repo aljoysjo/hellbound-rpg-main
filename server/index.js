@@ -213,11 +213,11 @@ class GameState {
     this.actionCount = 0;
     // 📖 GESTOR DE HISTORIA AVANZADO
     this.storyAct = 1;
-    this.actProgress = 0; // 0-100% progreso en el acto actual
-    this.majorDecisions = []; // Decisiones importantes que afectan la narrativa
-    this.questObjectives = []; // Objetivos actuales del jugador
-    this.storyFlags = new Set(); // Flags específicos de historia
-    this.companionStatus = new Map(); // Estado de relaciones con compañeros
+    this.actProgress = 0;
+    this.majorDecisions = [];
+    this.questObjectives = [];
+    this.storyFlags = new Set();
+    this.companionStatus = new Map();
   }
 
   toDict() {
@@ -534,14 +534,15 @@ app.post('/api/free_input', async (req, res) => {
 MODO DE HISTORIA: ${storyMode.toUpperCase()}
 CAMPAÑA: "${gameState.campaignMeta.titulo}"
 NIVEL DE TONO: ${gameState.campaignMeta.tone_level || 5}/10
+ACTO ACTUAL: ${gameState.storyAct} de ${gameState.campaignMeta.acto_total}
+PROGRESO DEL ACTO: ${gameState.actProgress}%
 `;
 
       if (storyMode === 'campaign') {
         campaignContext += `
-ACTO ACTUAL: 1 de ${gameState.campaignMeta.acto_total}
 COMPAÑEROS DISPONIBLES: ${gameState.campaignMeta.companions?.join(', ') || 'Ninguno'}
-QUEST_STAGE: I (Inicio de campaña)
-DIVERGENCE_SCORE: 0 (siguiendo trama canónica)
+QUEST_STAGE: ${gameState.questStage}
+DIVERGENCE_SCORE: ${gameState.divergenceScore} (siguiendo trama canónica)
 LOCACIONES DEL MUNDO: ${gameState.campaignMeta.locations?.join(' → ') || 'Desconocidas'}
 
 CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
@@ -560,7 +561,7 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
     // Construir contexto de acciones recientes para mantener continuidad
     let recentContext = '';
     if (gameState.narrativeLog.length > 0) {
-      const lastEntries = gameState.narrativeLog.slice(-3); // Últimas 3 acciones
+      const lastEntries = gameState.narrativeLog.slice(-3);
       recentContext = `
 CONTEXTO DE ACCIONES RECIENTES (mantén continuidad con esto):
 ${lastEntries.map((entry, index) => 
@@ -570,6 +571,18 @@ ${lastEntries.map((entry, index) =>
 
 INSTRUCCIÓN CRÍTICA: La nueva narrativa DEBE continuar directamente desde donde terminó la última acción. NO describas situaciones que deberían haber pasado antes. Mantén coherencia temporal y espacial.
 `;
+    }
+
+    // Construir contexto de objetivos activos
+    let questContext = '';
+    if (gameState.questObjectives.length > 0) {
+      const activeObjectives = gameState.questObjectives.filter(obj => !obj.completed);
+      if (activeObjectives.length > 0) {
+        questContext = `
+OBJETIVOS ACTIVOS:
+${activeObjectives.map(obj => `- ${obj.description} (${obj.progress}%)`).join('\n')}
+`;
+      }
     }
 
     const systemPrompt = `
@@ -591,6 +604,8 @@ INSTRUCCIÓN CRÍTICA: La nueva narrativa DEBE continuar directamente desde dond
     - Habilidades: ${gameState.skills.join(', ')}
     
     ${recentContext}
+    
+    ${questContext}
     
     PROTOCOLO SOMBRA ARCANA:
     1. **Respeta tone_level**: Ajusta la intensidad narrativa (0=luminoso, 10=sombrío)
