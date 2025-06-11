@@ -252,54 +252,87 @@ app.post('/api/free_input', async (req, res) => {
     
     const gameState = gameSessions.get(session_id);
     
-    // Create enhanced system prompt with campaign context
+    // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
+    let memorySystem = '';
+    
     if (gameState.campaignMeta) {
+      const storyMode = gameState.campaignMeta.story_mode || 'campaign';
+      
+      // Campaign context based on story mode
       campaignContext = `
-CAMPAÑA ACTIVA: "${gameState.campaignMeta.titulo}"
-COMPAÑEROS DISPONIBLES: ${gameState.campaignMeta.companions?.join(', ') || 'Ninguno'}
+MODO DE HISTORIA: ${storyMode.toUpperCase()}
+CAMPAÑA: "${gameState.campaignMeta.titulo}"
+NIVEL DE TONO: ${gameState.campaignMeta.tone_level || 5}/10
+`;
+
+      if (storyMode === 'campaign') {
+        campaignContext += `
 ACTO ACTUAL: 1 de ${gameState.campaignMeta.acto_total}
-NIVEL DE TENSIÓN: ${gameState.campaignMeta.tone_level}/10
+COMPAÑEROS DISPONIBLES: ${gameState.campaignMeta.companions?.join(', ') || 'Ninguno'}
+QUEST_STAGE: I (Inicio de campaña)
+DIVERGENCE_SCORE: 0 (siguiendo trama canónica)
 LOCACIONES DEL MUNDO: ${gameState.campaignMeta.locations?.join(' → ') || 'Desconocidas'}
 
-CONTEXTO NARRATIVO ESPECÍFICO:
+CONTEXTO NARRATIVO ESPECÍFICO DE "CAMINOS DEL ABISMO":
 - El jugador ha despertado en Alicante con un presentimiento oscuro
 - Una figura misteriosa lo observa desde la ventana con ojos rojos
-- Hay una presencia sobrenatural que genera inquietud
+- Hay una presencia sobrenatural que genera inquietud  
 - Los Errantes y el Uróboros son elementos importantes del mundo
 - El Rey Hawkeye y los desequilibrios entre reinos son temas centrales
-      `;
+- La nieve cae constantemente, creando una atmósfera melancólica
+`;
+      } else if (storyMode === 'sandbox') {
+        campaignContext += `
+WORLD_SEED: Basado en idea del jugador
+MEMORY_RAW: [Eventos recientes del jugador]
+MEMORY_SUMMARY: [Síntesis de aventuras previas]
+`;
+      } else if (storyMode === 'seasonal') {
+        campaignContext += `
+SEASON_ID: ${gameState.campaignMeta.season_id || 'temp_event'}
+TTL: ${gameState.campaignMeta.ttl || 'Sin límite'}
+TEMÁTICA ESPECIAL: Evento temporal único
+`;
+      }
     }
     
     const systemPrompt = `
-    Eres la lógica narrativa del juego "Caminos del Abismo" - una aventura épica y oscura.
-    Responde SIEMPRE en español neutro, en frases evocativas y atmosféricas.
+    Eres **Sombra Arcana**, IA Dungeon Master del ARPG Hellbound siguiendo el protocolo v2.0.
+    Trabajas en **español neutro** y generas narrativa rica basada en el contexto de campaña.
     
     ${campaignContext}
     
-    MUNDO BASE:
+    LORE_BASE (Mundo general si no hay campaña específica):
     - ${LORE.setting || 'Un mundo devastado por la guerra donde los demonios caminan por la tierra'}
     - Héroe: ${LORE.hero || 'Un exorcista solitario buscando redención'}
     - Antagonista: ${LORE.antagonist || 'El Príncipe Caído gobernando el Reino Ardiente'}
     
     ESTADO ACTUAL DEL JUGADOR:
     - Salud: ${gameState.health}/100
-    - Maná: ${gameState.mana}/100
+    - Maná: ${gameState.mana}/100  
     - Oro: ${gameState.gold}
     - Ubicación: ${gameState.location}
     - Habilidades: ${gameState.skills.join(', ')}
     
-    INSTRUCCIONES ESPECIALES:
-    1. Si estás en modo campaña, usa el contexto de "Caminos del Abismo"
-    2. Mantén coherencia con la nieve cayendo en Alicante y el ambiente misterioso
-    3. Referencia a los compañeros disponibles cuando sea relevante
-    4. Incorpora elementos del Uróboros y los desequilibrios entre reinos
-    5. Describe consecuencias atmosféricas y emocionales
-    6. Usa máximo 4 oraciones pero más descriptivas
+    PROTOCOLO SOMBRA ARCANA:
+    1. **Respeta tone_level**: Ajusta la intensidad narrativa (0=luminoso, 10=sombrío)
+    2. **Mantén coherencia**: Usa contexto de campaña y personajes establecidos
+    3. **Incluye consecuencias**: Describe efectos atmosféricos y emocionales
+    4. **Sugiere acciones**: Mentalmente piensa 2-4 opciones relevantes 
+    5. **Actualiza progresión**: Si es campaña, considera divergence_score
+    6. **Memoria activa**: Recuerda eventos previos y mantén consistencia
+    
+    ESTILO NARRATIVO:
+    - Máximo 4 oraciones descriptivas y evocativas
+    - Usa vocabulario rico pero accesible
+    - Integra elementos del mundo específico de la campaña
+    - Crea atmósfera inmersiva que respete el tone_level
     
     ACCIÓN DEL JUGADOR: "${action}"
     
-    Responde con una narrativa inmersiva que expanda el mundo de la campaña.
+    Genera una narrativa inmersiva que expanda el mundo de "${gameState.campaignMeta?.titulo || 'la aventura'}" 
+    manteniendo coherencia con el lore establecido y la progresión de la historia.
     `;
     
     // Call OpenAI without function calling (simplified)
