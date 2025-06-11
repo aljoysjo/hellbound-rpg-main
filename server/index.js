@@ -206,8 +206,38 @@ app.post('/api/start_session', async (req, res) => {
         gameState.location = camp.map.nodes[0].name;
       }
       
-      // Use intro from campaign.json or first ink text
-      initialNarrative = camp.json.intro || camp.firstText || camp.json.titulo;
+      // Use campaign intro with enhanced context and immersion
+      const bookTitle = "Hellbound: El infierno en la tierra";
+      const campaignTitle = camp.json.titulo || "Aventura Épica";
+      
+      // Create immersive intro in second person
+      let immersiveIntro = '';
+      if (camp.firstText) {
+        // Convert third person text to second person and make it immersive
+        let baseText = camp.firstText;
+        
+        // Transform robotic text to immersive narrative
+        if (baseText.includes("La nieve cae sobre Alicante")) {
+          immersiveIntro = `Despiertas en tu habitación en Alicante, y lo primero que notas es el frío que se filtra por las ventanas. La nieve cae silenciosamente sobre la ciudad, creando un manto blanco que parece sofocar incluso los sonidos más leves. 
+
+Algo no está bien. Un presentimiento oscuro te invade mientras observas por la ventana, y entonces la ves: una figura misteriosa te observa desde la distancia. Sus ojos rojos brillan en la penumbra y una sonrisa imposible se dibuja en su rostro.
+
+Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu aventura comienza aquí, en este momento de inquietud y misterio.`;
+        } else {
+          // For other campaign texts, make them immersive
+          immersiveIntro = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
+
+${baseText.replace(/El jugador/g, 'Tú').replace(/el jugador/g, 'tú')}
+
+Tu historia comienza ahora. ¿Qué harás?`;
+        }
+      } else {
+        immersiveIntro = `Bienvenido a "${campaignTitle}", una campaña épica basada en el universo de ${bookTitle}. 
+
+Tu aventura está a punto de comenzar en un mundo donde cada decisión puede cambiar el curso de la historia.`;
+      }
+      
+      initialNarrative = immersiveIntro;
       
       // Store the ink story for continued interaction
       if (camp.story) {
