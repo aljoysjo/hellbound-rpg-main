@@ -435,6 +435,21 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
       }
     }
     
+    // Construir contexto de acciones recientes para mantener continuidad
+    let recentContext = '';
+    if (gameState.narrativeLog.length > 0) {
+      const lastEntries = gameState.narrativeLog.slice(-3); // Últimas 3 acciones
+      recentContext = `
+CONTEXTO DE ACCIONES RECIENTES (mantén continuidad con esto):
+${lastEntries.map((entry, index) => 
+  `${index + 1}. Acción: "${entry.player_action}"
+   Resultado: "${entry.narrative}"`
+).join('\n')}
+
+INSTRUCCIÓN CRÍTICA: La nueva narrativa DEBE continuar directamente desde donde terminó la última acción. NO describas situaciones que deberían haber pasado antes. Mantén coherencia temporal y espacial.
+`;
+    }
+
     const systemPrompt = `
     Eres **Sombra Arcana**, IA Dungeon Master del ARPG Hellbound siguiendo el protocolo v2.0.
     Trabajas en **español neutro** y generas narrativa rica basada en el contexto de campaña.
@@ -453,12 +468,15 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
     - Ubicación: ${gameState.location}
     - Habilidades: ${gameState.skills.join(', ')}
     
+    ${recentContext}
+    
     PROTOCOLO SOMBRA ARCANA:
     1. **Respeta tone_level**: Ajusta la intensidad narrativa (0=luminoso, 10=sombrío)
     2. **Mantén coherencia**: Usa contexto de campaña y personajes establecidos
-    3. **Incluye consecuencias**: Describe efectos atmosféricos y emocionales
-    4. **Actualiza progresión**: Si es campaña, considera divergence_score
-    5. **Memoria activa**: Recuerda eventos previos y mantén consistencia
+    3. **Continuidad OBLIGATORIA**: Continúa directamente desde la última situación
+    4. **Incluye consecuencias**: Describe efectos atmosféricos y emocionales
+    5. **Actualiza progresión**: Si es campaña, considera divergence_score
+    6. **Memoria activa**: Recuerda eventos previos y mantén consistencia
     
     ESTILO NARRATIVO:
     - Máximo 4 oraciones descriptivas y evocativas
@@ -466,10 +484,11 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
     - Integra elementos del mundo específico de la campaña
     - Crea atmósfera inmersiva que respete el tone_level
     - SIEMPRE en segunda persona ("tú", nunca "el jugador")
+    - MANTÉN CONTINUIDAD TEMPORAL: No retrocedas ni saltes en el tiempo
     
     ACCIÓN DEL JUGADOR: "${action}"
     
-    Genera una narrativa inmersiva que expanda el mundo de "${gameState.campaignMeta?.titulo || 'la aventura'}" 
+    Genera una narrativa inmersiva que continúe DIRECTAMENTE desde la última situación, expandiendo el mundo de "${gameState.campaignMeta?.titulo || 'la aventura'}" 
     manteniendo coherencia con el lore establecido y la progresión de la historia.
     `;
     
