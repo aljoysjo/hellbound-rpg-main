@@ -179,17 +179,62 @@ class GameState {
       skills: this.skills,
       location: this.location,
       inventory: this.inventory,
-      narrativeLog: this.narrativeLog.slice(-10),
+      narrativeLog: this.narrativeLog.slice(-5), // Solo últimas 5 entradas
       mode: this.mode,
       campaignMeta: this.campaignMeta,
       map: this.map,
       questStage: this.questStage,
       divergenceScore: this.divergenceScore,
-      memoryRaw: this.memoryRaw.slice(-20), // Keep last 20 events
+      memoryRaw: this.memoryRaw.slice(-10), // Solo últimas 10 entradas
       memorySummary: this.memorySummary,
+      sessionSummaries: this.sessionSummaries,
+      eventFlags: Array.from(this.eventFlags),
+      actionCount: this.actionCount,
       seasonId: this.seasonId,
       createdAt: this.createdAt.toISOString()
     };
+  }
+
+  // 🧠 SISTEMA DE MEMORIA MEJORADO
+  addEventFlag(flagType, description) {
+    const flag = `${flagType}:${description}:${new Date().toISOString()}`;
+    this.eventFlags.add(flag);
+    console.log(`🏷️ Flag añadido: ${flag}`);
+  }
+
+  async generateSessionSummary(openaiClient) {
+    if (this.narrativeLog.length < 10) return;
+
+    try {
+      const recentActions = this.narrativeLog.slice(-10).map(entry => 
+        `${entry.player_action} → ${entry.narrative}`
+      ).join('\n');
+
+      const summaryPrompt = `Crea un resumen conciso (máximo 3 oraciones) de las últimas acciones del jugador en español:
+${recentActions}`;
+
+      const response = await openaiClient.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: summaryPrompt }],
+        temperature: 0.3,
+        max_tokens: 100
+      });
+
+      const summary = {
+        summary: response.choices[0].message.content,
+        actions_covered: 10,
+        timestamp: new Date().toISOString()
+      };
+
+      this.sessionSummaries.push(summary);
+      console.log(`📝 Resumen generado: ${summary.summary.substring(0, 50)}...`);
+      
+      // Limpiar narrativeLog manteniendo solo las últimas 3 entradas
+      this.narrativeLog = this.narrativeLog.slice(-3);
+      
+    } catch (error) {
+      console.error('Error generando resumen:', error);
+    }
   }
 }
 
