@@ -7,7 +7,6 @@ import OpenAI from 'openai';
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { Story } from 'inkjs';
 
 // Load environment variables
 dotenv.config();
@@ -46,12 +45,12 @@ function loadJsonFile(filename) {
   }
 }
 
-// Unified campaign loader with inkjs
+// Unified campaign loader
 function loadFullCampaign(name) {
   const base = '/app/campaigns';
   const campaignFile = path.join(base, 'campaign.json');
   const mapFile = path.join(base, 'map.json');
-  const inkFile = path.join(base, 'scenes', `${name}.ink`);
+  const scenesFile = path.join(base, 'scenes', `${name}.ink`);
   
   console.log(`🔍 Loading full campaign: ${name}`);
   
@@ -69,8 +68,8 @@ function loadFullCampaign(name) {
     // Load and parse ink file (as text, not compiled)
     let firstText = '';
     
-    if (existsSync(inkFile)) {
-      const inkText = readFileSync(inkFile, 'utf8');
+    if (existsSync(scenesFile)) {
+      const inkText = readFileSync(scenesFile, 'utf8');
       
       // Parse ink text manually to get first narrative
       const lines = inkText.split('\n');
@@ -87,7 +86,7 @@ function loadFullCampaign(name) {
       console.log(`✅ Map with ${map.nodes?.length || 0} locations`);
       console.log(`✅ Ink text parsed, first narrative: "${firstText.substring(0, 50)}..."`);
     } else {
-      console.log(`❌ Ink file not found: ${inkFile}`);
+      console.log(`❌ Ink file not found: ${scenesFile}`);
     }
     
     return { 
@@ -102,13 +101,46 @@ function loadFullCampaign(name) {
   }
 }
 
+// Generate suggested actions based on context
+function generateSuggestedActions(gameState, narrative) {
+  const baseActions = [];
+  
+  if (gameState.mode === 'campaign') {
+    // Campaign-specific suggested actions
+    if (gameState.location === 'Alicante') {
+      baseActions.push(
+        "Investigar la figura misteriosa",
+        "Buscar a uno de mis compañeros",
+        "Explorar la ciudad nevada",
+        "Meditar sobre el presentimiento"
+      );
+    } else {
+      baseActions.push(
+        "Examinar el entorno",
+        "Usar una habilidad",
+        "Buscar pistas",
+        "Avanzar con cautela"
+      );
+    }
+  } else {
+    // Generic sandbox actions
+    baseActions.push(
+      "Explorar los alrededores",
+      "Usar una habilidad",
+      "Buscar información",
+      "Tomar un descanso"
+    );
+  }
+  
+  return baseActions.slice(0, 4);
+}
+
 const LORE = loadJsonFile('lore.json');
 const FUNCTIONS = loadJsonFile('functions.json');
 const LEXICON = loadJsonFile('lexicon.json');
 
 // Game state management
 const gameSessions = new Map();
-const activeStories = new Map(); // Store ink stories
 
 class GameState {
   constructor(sessionId) {
@@ -189,6 +221,7 @@ app.post('/api/start_session', async (req, res) => {
     gameSessions.set(sessionId, gameState);
     
     let initialNarrative;
+    let suggestedActions = [];
     
     // Handle campaign mode with full loading
     if (mode === 'campaign') {
@@ -206,43 +239,24 @@ app.post('/api/start_session', async (req, res) => {
         gameState.location = camp.map.nodes[0].name;
       }
       
-      // Use campaign intro with enhanced context and immersion
+      // Create immersive intro
       const bookTitle = "Hellbound: El infierno en la tierra";
       const campaignTitle = camp.json.titulo || "Aventura Épica";
       
-      // Create immersive intro in second person
-      let immersiveIntro = '';
-      if (camp.firstText) {
-        // Convert third person text to second person and make it immersive
-        let baseText = camp.firstText;
-        
-        // Transform robotic text to immersive narrative
-        if (baseText.includes("La nieve cae sobre Alicante")) {
-          immersiveIntro = `Despiertas en tu habitación en Alicante, y lo primero que notas es el frío que se filtra por las ventanas. La nieve cae silenciosamente sobre la ciudad, creando un manto blanco que parece sofocar incluso los sonidos más leves. 
+      if (camp.firstText && camp.firstText.includes("La nieve cae sobre Alicante")) {
+        initialNarrative = `Despiertas en tu habitación en Alicante, y lo primero que notas es el frío que se filtra por las ventanas. La nieve cae silenciosamente sobre la ciudad, creando un manto blanco que parece sofocar incluso los sonidos más leves. 
 
 Algo no está bien. Un presentimiento oscuro te invade mientras observas por la ventana, y entonces la ves: una figura misteriosa te observa desde la distancia. Sus ojos rojos brillan en la penumbra y una sonrisa imposible se dibuja en su rostro.
 
 Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu aventura comienza aquí, en este momento de inquietud y misterio.`;
-        } else {
-          // For other campaign texts, make them immersive
-          immersiveIntro = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
-
-${baseText.replace(/El jugador/g, 'Tú').replace(/el jugador/g, 'tú')}
-
-Tu historia comienza ahora. ¿Qué harás?`;
-        }
       } else {
-        immersiveIntro = `Bienvenido a "${campaignTitle}", una campaña épica basada en el universo de ${bookTitle}. 
+        initialNarrative = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
 
-Tu aventura está a punto de comenzar en un mundo donde cada decisión puede cambiar el curso de la historia.`;
+${camp.firstText || 'Tu historia comienza ahora.'}`;
       }
       
-      initialNarrative = immersiveIntro;
-      
-      // Store the ink story for continued interaction
-      if (camp.story) {
-        activeStories.set(sessionId, camp.story);
-      }
+      // Generate initial suggested actions
+      suggestedActions = generateSuggestedActions(gameState, initialNarrative);
       
       // Add to narrative log
       gameState.narrativeLog.push({
@@ -260,6 +274,7 @@ Tu aventura está a punto de comenzar en un mundo donde cada decisión puede cam
         default: // sandbox
           initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. En este mundo abierto, tu destino es tuyo. ¿Qué harás, exorcista?`;
       }
+      suggestedActions = generateSuggestedActions(gameState, initialNarrative);
     }
     
     // Save to MongoDB
@@ -271,6 +286,7 @@ Tu aventura está a punto de comenzar en un mundo donde cada decisión puede cam
       session_id: sessionId,
       game_state: gameState.toDict(),
       initial_narrative: initialNarrative,
+      suggested_actions: suggestedActions,
       mode: mode
     });
   } catch (error) {
@@ -295,12 +311,10 @@ app.post('/api/free_input', async (req, res) => {
     
     // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
-    let memorySystem = '';
     
     if (gameState.campaignMeta) {
       const storyMode = gameState.campaignMeta.story_mode || 'campaign';
       
-      // Campaign context based on story mode
       campaignContext = `
 MODO DE HISTORIA: ${storyMode.toUpperCase()}
 CAMPAÑA: "${gameState.campaignMeta.titulo}"
@@ -324,18 +338,6 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
 - El Rey Hawkeye y los desequilibrios entre reinos son temas centrales
 - La nieve cae constantemente, creando una atmósfera melancólica
 - SIEMPRE HABLA EN SEGUNDA PERSONA: Dirígete al jugador como "tú", nunca "el jugador"
-`;
-      } else if (storyMode === 'sandbox') {
-        campaignContext += `
-WORLD_SEED: Basado en idea del jugador
-MEMORY_RAW: [Eventos recientes del jugador]
-MEMORY_SUMMARY: [Síntesis de aventuras previas]
-`;
-      } else if (storyMode === 'seasonal') {
-        campaignContext += `
-SEASON_ID: ${gameState.campaignMeta.season_id || 'temp_event'}
-TTL: ${gameState.campaignMeta.ttl || 'Sin límite'}
-TEMÁTICA ESPECIAL: Evento temporal único
 `;
       }
     }
@@ -362,15 +364,15 @@ TEMÁTICA ESPECIAL: Evento temporal único
     1. **Respeta tone_level**: Ajusta la intensidad narrativa (0=luminoso, 10=sombrío)
     2. **Mantén coherencia**: Usa contexto de campaña y personajes establecidos
     3. **Incluye consecuencias**: Describe efectos atmosféricos y emocionales
-    4. **Sugiere acciones**: Mentalmente piensa 2-4 opciones relevantes 
-    5. **Actualiza progresión**: Si es campaña, considera divergence_score
-    6. **Memoria activa**: Recuerda eventos previos y mantén consistencia
+    4. **Actualiza progresión**: Si es campaña, considera divergence_score
+    5. **Memoria activa**: Recuerda eventos previos y mantén consistencia
     
     ESTILO NARRATIVO:
     - Máximo 4 oraciones descriptivas y evocativas
     - Usa vocabulario rico pero accesible
     - Integra elementos del mundo específico de la campaña
     - Crea atmósfera inmersiva que respete el tone_level
+    - SIEMPRE en segunda persona ("tú", nunca "el jugador")
     
     ACCIÓN DEL JUGADOR: "${action}"
     
@@ -378,7 +380,7 @@ TEMÁTICA ESPECIAL: Evento temporal único
     manteniendo coherencia con el lore establecido y la progresión de la historia.
     `;
     
-    // Call OpenAI without function calling (simplified)
+    // Call OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -386,17 +388,14 @@ TEMÁTICA ESPECIAL: Evento temporal único
         { role: "user", content: `El jugador dice: '${action}'` }
       ],
       temperature: 0.8,
-      max_tokens: 200
+      max_tokens: 300
     });
     
-    console.log('🔍 DEBUG - OpenAI response:', response.choices[0]);
-    
     const message = response.choices[0].message;
-    console.log('🔍 GPT RAW:', JSON.stringify(message, null, 2));
-    
     let narrative = message.content || "El eco de tu acción resuena en la oscuridad...";
     
-    console.log('🔍 DEBUG - Final narrative:', narrative);
+    // Generate new suggested actions based on the narrative and context
+    const suggestedActions = generateSuggestedActions(gameState, narrative);
     
     // Add to narrative log
     gameState.narrativeLog.push({
@@ -417,12 +416,14 @@ TEMÁTICA ESPECIAL: Evento temporal único
     io.to(session_id).emit('game_update', {
       session_id: session_id,
       game_state: gameState.toDict(),
-      new_narrative: narrative
+      new_narrative: narrative,
+      suggested_actions: suggestedActions
     });
     
     res.json({
       success: true,
       narrative: narrative,
+      suggested_actions: suggestedActions,
       game_state: gameState.toDict()
     });
     

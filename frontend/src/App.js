@@ -56,7 +56,7 @@ const GoldCounter = ({ gold }) => (
   </div>
 );
 
-const ActionInput = ({ onSubmit, disabled }) => {
+const ActionInput = ({ onSubmit, disabled, suggestedActions = [] }) => {
   const [action, setAction] = useState('');
   
   const handleSubmit = (e) => {
@@ -67,26 +67,57 @@ const ActionInput = ({ onSubmit, disabled }) => {
     }
   };
 
+  const handleSuggestedAction = (suggestedAction) => {
+    if (!disabled) {
+      onSubmit(suggestedAction);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="relative">
-        <input
-          type="text"
-          value={action}
-          onChange={(e) => setAction(e.target.value)}
-          placeholder="Escribe tu acción..."
-          disabled={disabled}
-          className="w-full px-4 py-3 bg-gray-900 border-2 border-red-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={disabled || !action.trim()}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
-        >
-          Actuar
-        </button>
+    <div className="w-full space-y-4">
+      {/* Suggested Actions */}
+      {suggestedActions && suggestedActions.length > 0 && (
+        <div>
+          <h4 className="text-yellow-400 font-semibold mb-2 text-sm">Acciones Sugeridas:</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {suggestedActions.slice(0, 4).map((suggestion, index) => (
+              <button
+                key={index}
+                onClick={() => handleSuggestedAction(suggestion)}
+                disabled={disabled}
+                className="px-3 py-2 bg-yellow-700 hover:bg-yellow-600 disabled:bg-gray-600 text-white text-sm rounded transition-colors border border-yellow-500 hover:border-yellow-400"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Free Text Input */}
+      <div>
+        <h4 className="text-yellow-400 font-semibold mb-2 text-sm">O escribe tu propia acción:</h4>
+        <form onSubmit={handleSubmit} className="w-full">
+          <div className="relative">
+            <input
+              type="text"
+              value={action}
+              onChange={(e) => setAction(e.target.value)}
+              placeholder="Escribe tu acción..."
+              disabled={disabled}
+              className="w-full px-4 py-3 bg-gray-900 border-2 border-red-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={disabled || !action.trim()}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+            >
+              Actuar
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 
@@ -131,6 +162,7 @@ function App() {
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [mode, setMode] = useState(null);
+  const [suggestedActions, setSuggestedActions] = useState([]);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
@@ -155,6 +187,9 @@ function App() {
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
         setGameState(data.game_state);
+        if (data.suggested_actions) {
+          setSuggestedActions(data.suggested_actions);
+        }
       }
     });
 
@@ -193,6 +228,11 @@ function App() {
       const data = await response.json();
       setSessionId(data.session_id);
       setGameState(data.game_state);
+      
+      // Set initial suggested actions if provided
+      if (data.suggested_actions) {
+        setSuggestedActions(data.suggested_actions);
+      }
       
       // Join socket room
       if (socket) {
@@ -264,6 +304,11 @@ function App() {
         }
         
         setGameState(updatedGameState);
+        
+        // Update suggested actions if provided
+        if (data.suggested_actions) {
+          setSuggestedActions(data.suggested_actions);
+        }
       } else {
         setError('Error en la acción: ' + data.error);
       }
@@ -407,7 +452,11 @@ function App() {
               {/* Action Input */}
               <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
                 <h3 className="text-red-400 font-bold mb-4">¿Qué harás?</h3>
-                <ActionInput onSubmit={submitAction} disabled={loading} />
+                <ActionInput 
+                  onSubmit={submitAction} 
+                  disabled={loading} 
+                  suggestedActions={suggestedActions}
+                />
                 {loading && (
                   <p className="text-yellow-400 text-sm mt-2">
                     El destino se está escribiendo...
