@@ -1,0 +1,268 @@
+/* Import Google Fonts for medieval feel */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Creepster&display=swap');
+
+/* Custom CSS Variables */
+:root {
+  --hellbound-red: #dc2626;
+  --hellbound-dark-red: #991b1b;
+  --hellbound-gold: #fbbf24;
+  --hellbound-dark-gold: #d97706;
+  --hellbound-gray: #374151;
+  --hellbound-dark-gray: #1f2937;
+  --hellbound-black: #0f172a;
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #1f2937 0%, #991b1b 50%, #0f172a 100%);
+  overflow-x: hidden;
+}
+
+.font-medieval {
+  font-family: 'Cinzel', serif;
+}
+
+.font-creepy {
+  font-family: 'Creepster', cursive;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hellbound-dark-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hellbound-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hellbound-dark-red);
+}
+
+/* Custom Animations */
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+  }
+}
+
+/* Orb Animations */
+.life-orb, .mana-orb {
+  animation: pulse-red 3s ease-in-out infinite;
+}
+
+.life-orb:hover, .mana-orb:hover {
+  animation: glow 1s ease-in-out infinite;
+}
+
+/* Button Hover Effects */
+button:not(:disabled) {
+  transition: all 0.3s ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Focus Effects */
+input:focus {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Text Shadows for Readability */
+h1, h2, h3 {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Background Pattern Animation */
+.bg-pattern {
+  animation: flicker 5s ease-in-out infinite;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Skill Bar Hover Effects */
+.skill-slot {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.skill-slot:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+}
+
+.skill-slot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, rgba(251, 191, 36, 0.3), transparent);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: -1;
+}
+
+.skill-slot:hover::after {
+  opacity: 1;
+}
+
+/* Narrative Log Styling */
+.narrative-entry {
+  border-left: 3px solid var(--hellbound-red);
+  padding-left: 12px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.narrative-entry:hover {
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+/* Action Input Enhancement */
+.action-input-container {
+  position: relative;
+}
+
+.action-input-container::before {
+  content: '>';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--hellbound-red);
+  font-weight: bold;
+  font-size: 18px;
+  z-index: 1;
+}
+
+.action-input {
+  padding-left: 32px;
+}
+
+/* Error Message Animation */
+.error-message {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Connection Status Indicator */
+.connection-indicator {
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+/* Medieval Border Effects */
+.medieval-border {
+  position: relative;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--hellbound-black), var(--hellbound-black)) padding-box,
+              linear-gradient(45deg, var(--hellbound-red), var(--hellbound-gold)) border-box;
+}
+
+.medieval-border::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, var(--hellbound-red), var(--hellbound-gold));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.medieval-border:hover::before {
+  opacity: 0.3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .orb-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .skill-bar {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print Styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}
