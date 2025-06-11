@@ -5,23 +5,26 @@ import ModeSelector from './components/ModeSelector';
 
 // 🎮 HEADER COMPONENT
 const GameHeader = ({ connectionStatus, gameOver }) => (
-  <header className="bg-panel-light border-b-2 border-primary sticky top-0 z-50">
-    <div className="container">
-      <div className="flex items-center justify-between py-4">
-        <h1 className="text-title text-2xl md:text-3xl text-primary">
+  <header className="panel" style={{ borderRadius: '0', borderLeft: 'none', borderRight: 'none', borderTop: 'none', marginBottom: 'var(--space-lg)' }}>
+    <div className="game-container">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.5rem', color: 'var(--color-primary)', fontWeight: '700' }}>
           🔥 HELLBOUND RPG v2.0
         </h1>
-        <div className="flex items-center gap-4">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
           {gameOver && (
-            <span className="text-danger font-bold animate-pulse">
+            <span style={{ color: 'var(--color-danger)', fontWeight: 'bold', animation: 'pulse 2s infinite' }}>
               💀 GAME OVER
             </span>
           )}
-          <div className="flex items-center gap-2 text-sm">
-            <div className={`w-3 h-3 rounded-full ${
-              connectionStatus === 'connected' ? 'bg-success' : 'bg-danger'
-            }`} />
-            <span className="text-medium hidden sm:inline">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', fontSize: '0.8rem' }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: connectionStatus === 'connected' ? 'var(--color-success)' : 'var(--color-danger)'
+            }} />
+            <span style={{ color: 'var(--text-medium)' }}>
               {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
             </span>
           </div>
@@ -38,44 +41,56 @@ const AICanvas = ({ location, gameMode, loading }) => {
   useEffect(() => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
-      // Placeholder background with gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvasRef.current.height);
+      const canvas = canvasRef.current;
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
       gradient.addColorStop(0, '#8C5E2A');
       gradient.addColorStop(1, '#5B3A1D');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Add location text
+      // Location text
       ctx.fillStyle = '#F3E7C6';
-      ctx.font = '24px Cinzel';
+      ctx.font = 'bold 20px Cinzel';
       ctx.textAlign = 'center';
       ctx.fillText(
-        `🖼️ Ilustración AI: ${location || 'Ubicación Desconocida'}`,
-        canvasRef.current.width / 2,
-        canvasRef.current.height / 2 - 10
+        `🖼️ ILUSTRACIÓN AI: ${location || 'Ubicación Desconocida'}`,
+        canvas.width / 2,
+        canvas.height / 2 - 10
       );
-      ctx.font = '16px Cormorant Garamond';
+      
+      ctx.font = '14px Cormorant Garamond';
       ctx.fillText(
         `Modo: ${gameMode || 'RPG'} ${loading ? '(Generando...)' : ''}`,
-        canvasRef.current.width / 2,
-        canvasRef.current.height / 2 + 20
+        canvas.width / 2,
+        canvas.height / 2 + 20
       );
     }
   }, [location, gameMode, loading]);
 
   return (
-    <div className="panel col-span-full lg:col-span-2">
-      <div className="relative">
+    <div className="canvas-container">
+      <div className="panel" style={{ position: 'relative' }}>
         <canvas
           ref={canvasRef}
           width={800}
           height={450}
-          className="w-full h-auto rounded-lg border-2 border-primary"
-          style={{ aspectRatio: '16/9' }}
+          className="ai-canvas"
         />
         {loading && (
-          <div className="absolute inset-0 bg-panel-dark rounded-lg flex items-center justify-center">
-            <div className="text-light animate-pulse">🎨 Generando ilustración...</div>
+          <div style={{
+            position: 'absolute',
+            inset: '0',
+            background: 'var(--bg-panel-dark)',
+            borderRadius: 'var(--border-radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-light)',
+            animation: 'pulse 2s infinite'
+          }}>
+            🎨 Generando ilustración...
           </div>
         )}
       </div>
@@ -83,126 +98,122 @@ const AICanvas = ({ location, gameMode, loading }) => {
   );
 };
 
-// 💗 STAT ORBS COMPONENT
-const StatOrbs = ({ vitals = {} }) => {
-  const getOrbConfig = (type) => {
-    const configs = {
-      health: { icon: '❤️', color: 'text-red-500', bgColor: 'from-red-500 to-red-700' },
-      mana: { icon: '🔮', color: 'text-blue-500', bgColor: 'from-blue-500 to-blue-700' },
-      stamina: { icon: '⚡', color: 'text-green-500', bgColor: 'from-green-500 to-green-700' }
+// 📍 UBICACIÓN + STATS COMPACTOS
+const CompactHUD = ({ gameState }) => {
+  const vitals = gameState?.vitals || {};
+  const emotionalStates = gameState?.emotionalStates || {};
+  const location = gameState?.location;
+
+  const activeEmotions = Object.entries(emotionalStates).filter(([, value]) => value > 20);
+
+  const getEmotionIcon = (emotion) => {
+    const icons = {
+      miedo: '😰', alerta: '⚠️', euforia: '😄', fatiga: '😴', 
+      ira: '😡', serenidad: '😌'
     };
-    return configs[type] || configs.health;
+    return icons[emotion] || '😐';
   };
 
   return (
-    <div className="panel panel-dark">
-      <h3 className="panel-title text-light">Estado Vital</h3>
-      <div className="space-y-4">
+    <div className="panel panel-dark panel-compact">
+      {/* Ubicación */}
+      {location && (
+        <div className="location-compact">
+          <span>📍</span>
+          <span style={{ fontFamily: 'var(--font-title)', fontWeight: '600' }}>{location}</span>
+        </div>
+      )}
+
+      {/* Stats Vitales */}
+      <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div className="panel-title">Estado Vital</div>
         {Object.entries(vitals).map(([type, value]) => {
-          const config = getOrbConfig(type);
+          const icons = { health: '❤️', mana: '🔮', stamina: '⚡' };
           const percentage = (value / 100) * 100;
           
           return (
-            <div key={type} className="space-y-2">
-              <div className="flex items-center justify-between text-light">
-                <span className="flex items-center gap-2 font-title">
-                  <span>{config.icon}</span>
-                  <span className="capitalize">{type}</span>
-                </span>
-                <span className="font-bold">{value}/100</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-3 border border-primary">
-                <div
-                  className={`bg-gradient-to-r ${config.bgColor} h-3 rounded-full transition-all duration-500 border-r border-gray-600`}
+            <div key={type} className="stat-bar-container">
+              <span className="stat-icon">{icons[type] || '📊'}</span>
+              <span className="stat-name">{type}</span>
+              <div className="stat-bar">
+                <div 
+                  className={`stat-fill ${type}`}
                   style={{ width: `${percentage}%` }}
                 />
               </div>
+              <span className="stat-value">{value}%</span>
             </div>
           );
         })}
       </div>
-    </div>
-  );
-};
 
-// 😊 EMOTION CHIPS COMPONENT
-const EmotionChips = ({ emotionalStates = {} }) => {
-  const activeEmotions = Object.entries(emotionalStates).filter(([, value]) => value > 20);
-  
-  if (activeEmotions.length === 0) return null;
-
-  const getEmotionConfig = (emotion, value) => {
-    const configs = {
-      miedo: { icon: '😰', color: 'bg-red-100 text-red-800 border-red-300' },
-      alerta: { icon: '⚠️', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
-      euforia: { icon: '😄', color: 'bg-green-100 text-green-800 border-green-300' },
-      fatiga: { icon: '😴', color: 'bg-gray-100 text-gray-800 border-gray-300' },
-      ira: { icon: '😡', color: 'bg-red-100 text-red-800 border-red-300' },
-      serenidad: { icon: '😌', color: 'bg-blue-100 text-blue-800 border-blue-300' }
-    };
-    return configs[emotion] || configs.serenidad;
-  };
-
-  return (
-    <div className="panel panel-dark">
-      <h3 className="panel-title text-light">Estado Mental</h3>
-      <div className="flex flex-wrap gap-2">
-        {activeEmotions.map(([emotion, value]) => {
-          const config = getEmotionConfig(emotion, value);
-          return (
-            <div
-              key={emotion}
-              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full border text-sm font-medium ${config.color}`}
-            >
-              <span>{config.icon}</span>
-              <span className="capitalize">{emotion}</span>
-              <span className="font-bold">{Math.round(value)}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// 🎯 SKILLS GRID COMPONENT
-const SkillsGrid = ({ skills = [] }) => {
-  if (skills.length === 0) {
-    return (
-      <div className="panel panel-dark">
-        <h3 className="panel-title text-light">Habilidades</h3>
-        <div className="text-center py-8 text-light opacity-75 italic">
-          Las habilidades aparecerán según tus acciones
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="panel panel-dark">
-      <h3 className="panel-title text-light">Habilidades</h3>
-      <div className="grid grid-cols-3 gap-3">
-        {skills.slice(0, 6).map((skill, index) => (
-          <div
-            key={skill.id || index}
-            className="relative group bg-primary bg-opacity-20 border border-primary rounded-lg p-3 hover:bg-opacity-30 transition-all cursor-pointer"
-            title={skill.description || skill.id}
-          >
-            <div className="text-center">
-              <div className="text-primary font-title font-bold text-sm">
-                {index + 1}
+      {/* Estados Emocionales */}
+      {activeEmotions.length > 0 && (
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <div className="panel-title">Estado Mental</div>
+          <div className="emotion-list">
+            {activeEmotions.map(([emotion, value]) => (
+              <div key={emotion} className="emotion-item">
+                <span className="emotion-icon">{getEmotionIcon(emotion)}</span>
+                <span className="emotion-name">{emotion}</span>
+                <span className="emotion-value">{Math.round(value)}%</span>
               </div>
-              {skill.level && (
-                <div className="text-light text-xs">
-                  Nv.{skill.level}
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Habilidades */}
+      <div>
+        <div className="panel-title">🎯 Habilidades</div>
+        {(!gameState?.skills || gameState.skills.length === 0) ? (
+          <div style={{ textAlign: 'center', padding: 'var(--space-md)', color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.8rem' }}>
+            Las habilidades aparecerán según tus acciones
+          </div>
+        ) : (
+          <div className="skills-grid">
+            {gameState.skills.slice(0, 6).map((skill, index) => (
+              <div
+                key={skill.id || index}
+                className="skill-slot"
+                title={skill.description || skill.id}
+              >
+                <div style={{ fontFamily: 'var(--font-title)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                  {index + 1}
                 </div>
-              )}
-            </div>
-            
-            {/* Tooltip */}
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-panel-dark text-light text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-              {typeof skill === 'object' ? skill.id : skill}
-            </div>
+                {skill.level && (
+                  <div style={{ fontSize: '0.6rem', color: 'var(--text-light)' }}>
+                    Nv.{skill.level}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// 🎯 OBJETIVOS SIDEBAR
+const ObjectivesSidebar = ({ gameState }) => {
+  // Objetivos simulados basados en el contexto de la campaña
+  const defaultObjectives = [
+    "Investigar la figura misteriosa",
+    "Encontrar a los compañeros",
+    "Explorar Alicante nevada"
+  ];
+
+  const objectives = gameState?.questObjectives || defaultObjectives.map(desc => ({ description: desc }));
+
+  return (
+    <div className="panel panel-dark panel-compact">
+      <div className="panel-title">🎯 Objetivos</div>
+      <div className="objectives-list">
+        {objectives.slice(0, 4).map((objective, index) => (
+          <div key={index} className="objective-item">
+            <span className="objective-checkbox">☐</span>
+            <span>{objective.description || objective}</span>
           </div>
         ))}
       </div>
@@ -210,7 +221,32 @@ const SkillsGrid = ({ skills = [] }) => {
   );
 };
 
-// 📜 NARRATIVE PANEL COMPONENT
+// 🎒 INVENTARIO SIDEBAR
+const InventorySidebar = ({ gameState }) => {
+  // Items simulados - en el futuro vendrán del gameState
+  const items = ['🗡️', '🛡️', '🧪', '📜', '💰', '🔑'];
+  const emptySlots = 6 - items.length;
+
+  return (
+    <div className="panel panel-dark panel-compact">
+      <div className="panel-title">🎒 Inventario</div>
+      <div className="inventory-grid">
+        {items.map((item, index) => (
+          <div key={index} className="inventory-slot" title={`Item ${index + 1}`}>
+            {item}
+          </div>
+        ))}
+        {Array.from({ length: emptySlots }, (_, index) => (
+          <div key={`empty-${index}`} className="inventory-slot empty">
+            •
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// 📜 NARRATIVA EXPANDIBLE
 const NarrativePanel = ({ narrativeLog = [], gameMode, isExpanded, onToggle }) => {
   const logRef = useRef(null);
 
@@ -229,53 +265,49 @@ const NarrativePanel = ({ narrativeLog = [], gameMode, isExpanded, onToggle }) =
   };
 
   return (
-    <div className="panel bg-card col-span-full">
+    <div className="narrative-panel">
       <div 
-        className="flex items-center justify-between cursor-pointer"
+        className="narrative-header"
         onClick={onToggle}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
       >
-        <h3 className="panel-title text-dark">{getTitle(gameMode)}</h3>
-        <span className="text-primary text-xl font-bold lg:hidden">
+        <h3 style={{ fontFamily: 'var(--font-title)', color: 'var(--color-primary)', fontSize: '1rem', fontWeight: '600' }}>
+          📜 {getTitle(gameMode)}
+        </h3>
+        <span style={{ color: 'var(--color-primary)', fontSize: '1.2rem', fontWeight: 'bold' }}>
           {isExpanded ? '▲' : '▼'}
         </span>
       </div>
       
       <div 
-        className={`overflow-hidden transition-all duration-300 ${
-          isExpanded ? 'max-h-96' : 'max-h-24 lg:max-h-96'
-        }`}
+        ref={logRef}
+        className={`narrative-content ${!isExpanded ? 'collapsed' : ''}`}
       >
-        <div 
-          ref={logRef}
-          className="custom-scrollbar overflow-y-auto"
-          style={{ maxHeight: isExpanded ? '300px' : '80px' }}
-        >
-          {narrativeLog.length === 0 ? (
-            <p className="text-center py-8 text-muted italic">
-              Tu historia comienza aquí...
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {narrativeLog.map((entry, index) => (
-                <div key={`${entry.timestamp}-${index}`} className="border-b border-gray-200 pb-3 last:border-b-0">
-                  <p className="text-primary font-title font-semibold mb-2 text-sm">
-                    ▶ {entry.player_action}
-                  </p>
-                  <p className="text-dark leading-relaxed">
-                    {entry.narrative}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {narrativeLog.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            Tu historia comienza aquí...
+          </p>
+        ) : (
+          <div>
+            {narrativeLog.map((entry, index) => (
+              <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
+                <p className="narrative-action">
+                  ▶ {entry.player_action}
+                </p>
+                <p className="narrative-text">
+                  {entry.narrative}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// 🎮 ACTION INPUT COMPONENT
-const ActionInput = ({ onSubmit, disabled, loading }) => {
+// 🎮 INPUT GRANDE + ACCIONES RÁPIDAS
+const ActionControls = ({ onSubmit, suggestedActions = [], disabled, loading }) => {
   const [action, setAction] = useState('');
 
   const handleSubmit = (e) => {
@@ -286,105 +318,65 @@ const ActionInput = ({ onSubmit, disabled, loading }) => {
     }
   };
 
+  const handleSuggestedAction = (suggestedAction) => {
+    if (!disabled && !loading) {
+      onSubmit(suggestedAction);
+    }
+  };
+
+  const getActionIcon = (action) => {
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes('atacar') || actionLower.includes('luchar')) return '⚔️';
+    if (actionLower.includes('magia') || actionLower.includes('hechizo')) return '🔮';
+    if (actionLower.includes('huir') || actionLower.includes('escapar')) return '🏃';
+    if (actionLower.includes('buscar') || actionLower.includes('examinar') || actionLower.includes('observar')) return '👁️';
+    if (actionLower.includes('hablar') || actionLower.includes('conversar')) return '🗣️';
+    if (actionLower.includes('defender') || actionLower.includes('proteger')) return '🛡️';
+    if (actionLower.includes('usar') || actionLower.includes('activar')) return '🎒';
+    if (actionLower.includes('preparar') || actionLower.includes('ritual')) return '📿';
+    if (actionLower.includes('salir') || actionLower.includes('moverse')) return '🚪';
+    return '⚡';
+  };
+
   return (
-    <div className="panel col-span-full">
-      <form onSubmit={handleSubmit} className="flex gap-4">
+    <div>
+      {/* Input Principal */}
+      <form onSubmit={handleSubmit} className="action-input-container">
         <input
           type="text"
           value={action}
           onChange={(e) => setAction(e.target.value)}
           placeholder="Escribe lo que quieres que suceda..."
           disabled={disabled || loading}
-          className="flex-1 px-4 py-3 border-2 border-primary rounded-lg bg-card text-dark placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
+          className="action-input"
         />
         <button
           type="submit"
           disabled={disabled || loading || !action.trim()}
-          className="btn btn-primary px-8 py-3 text-lg font-bold"
+          className="action-button"
         >
-          {loading ? (
-            <span className="animate-pulse">...</span>
-          ) : (
-            'ACTUAR'
-          )}
+          {loading ? '...' : 'ACTUAR'}
         </button>
       </form>
-    </div>
-  );
-};
 
-// 🗡️ ACTION BUTTONS COMPONENT
-const ActionButtons = ({ suggestedActions = [], onAction, disabled }) => {
-  const actionIcons = {
-    'atacar': '⚔️', 'magia': '🔮', 'huir': '🏃', 'buscar': '👁️', 
-    'hablar': '🗣️', 'defender': '🛡️', 'examinar': '🔍', 'usar': '🎒'
-  };
-
-  const getActionIcon = (action) => {
-    const actionLower = action.toLowerCase();
-    for (const [key, icon] of Object.entries(actionIcons)) {
-      if (actionLower.includes(key)) return icon;
-    }
-    return '⚡';
-  };
-
-  if (suggestedActions.length === 0) return null;
-
-  return (
-    <div className="panel col-span-full">
-      <h3 className="panel-title text-dark mb-4">Acciones Rápidas</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {suggestedActions.slice(0, 6).map((action, index) => (
-          <button
-            key={index}
-            onClick={() => onAction(action)}
-            disabled={disabled}
-            className="btn btn-secondary flex-col h-20 text-sm hover:bg-primary hover:text-dark transition-all"
-          >
-            <span className="text-2xl mb-1">{getActionIcon(action)}</span>
-            <span className="text-center leading-tight">{action}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// 📦 SIDEBAR COMPONENT
-const Sidebar = ({ gameState }) => {
-  return (
-    <div className="space-y-6">
-      {/* Inventario Placeholder */}
-      <div className="panel panel-dark">
-        <h3 className="panel-title text-light">Inventario</h3>
-        <div className="text-center py-4 text-light opacity-75 italic text-sm">
-          Los objetos aparecerán aquí
-        </div>
-      </div>
-
-      {/* Objetivos Placeholder */}
-      <div className="panel panel-dark">
-        <h3 className="panel-title text-light">Objetivos</h3>
-        <div className="text-light text-sm space-y-2">
-          {gameState?.questObjectives?.slice(0, 3).map((objective, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span className="text-primary">□</span>
-              <span>{objective.description}</span>
-            </div>
-          )) || (
-            <div className="text-center py-4 opacity-75 italic">
-              Sin objetivos activos
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Ubicación */}
-      {gameState?.location && (
-        <div className="panel panel-dark">
-          <h3 className="panel-title text-light">Ubicación</h3>
-          <div className="text-center">
-            <span className="text-light text-lg">📍 {gameState.location}</span>
+      {/* Acciones Rápidas */}
+      {suggestedActions.length > 0 && (
+        <div className="quick-actions">
+          <h4 style={{ fontFamily: 'var(--font-title)', color: 'var(--color-primary)', fontSize: '0.9rem', marginBottom: 'var(--space-md)' }}>
+            🎮 Acciones Rápidas:
+          </h4>
+          <div className="quick-actions-grid">
+            {suggestedActions.slice(0, 6).map((suggestedAction, index) => (
+              <button
+                key={index}
+                onClick={() => handleSuggestedAction(suggestedAction)}
+                disabled={disabled || loading}
+                className="quick-action-btn"
+              >
+                <span className="quick-action-icon">{getActionIcon(suggestedAction)}</span>
+                <span className="quick-action-text">{suggestedAction}</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -392,7 +384,64 @@ const Sidebar = ({ gameState }) => {
   );
 };
 
-// 🎮 MAIN APP COMPONENT
+// 🎨 FORMULARIO SANDBOX
+const SandboxConceptForm = ({ onSubmit, loading }) => {
+  const [concept, setConcept] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (concept.trim() && !loading) {
+      onSubmit(concept.trim());
+    }
+  };
+
+  return (
+    <div className="game-container" style={{ maxWidth: '600px', margin: '0 auto', paddingTop: 'var(--space-xl)' }}>
+      <div className="panel" style={{ background: 'var(--bg-card)', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '2rem', color: 'var(--color-primary)', marginBottom: 'var(--space-lg)' }}>
+          Modo Sandbox - Historia Libre
+        </h2>
+        <p style={{ fontSize: '1.1rem', color: 'var(--text-medium)', marginBottom: 'var(--space-xl)' }}>
+          Describe la historia que quieres vivir. Desde aventuras épicas hasta historias cotidianas con toques sobrenaturales.
+        </p>
+        
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+          <textarea
+            value={concept}
+            onChange={(e) => setConcept(e.target.value)}
+            placeholder="Ejemplo: 'Detective paranormal investigando desapariciones' o 'Mago aprendiz en academia flotante'..."
+            disabled={loading}
+            rows={4}
+            style={{
+              width: '100%',
+              padding: 'var(--space-md)',
+              border: 'var(--border-width) solid var(--color-primary)',
+              borderRadius: 'var(--border-radius-lg)',
+              background: 'var(--bg-card)',
+              color: 'var(--text-dark)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '1rem',
+              resize: 'none'
+            }}
+            required
+            minLength={20}
+          />
+          
+          <button
+            type="submit"
+            disabled={loading || concept.trim().length < 20}
+            className="action-button"
+            style={{ alignSelf: 'center', fontSize: '1.1rem' }}
+          >
+            {loading ? 'Creando historia...' : 'Comenzar Aventura'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// 🎮 COMPONENTE PRINCIPAL
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -539,65 +588,19 @@ function App() {
     }
   };
 
-  // Sandbox concept form
-  const SandboxConceptForm = ({ onSubmit, loading }) => {
-    const [concept, setConcept] = useState('');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (concept.trim() && !loading) {
-        onSubmit(concept.trim());
-      }
-    };
-
-    return (
-      <div className="container max-w-2xl mx-auto py-12">
-        <div className="panel bg-card text-center">
-          <h2 className="text-title text-3xl text-primary mb-6">
-            Modo Sandbox - Historia Libre
-          </h2>
-          <p className="text-lg text-medium mb-8">
-            Describe la historia que quieres vivir. Desde aventuras épicas hasta historias cotidianas con toques sobrenaturales.
-          </p>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <textarea
-              value={concept}
-              onChange={(e) => setConcept(e.target.value)}
-              placeholder="Ejemplo: 'Detective paranormal investigando desapariciones' o 'Mago aprendiz en academia flotante'..."
-              disabled={loading}
-              rows={4}
-              className="w-full px-4 py-3 border-2 border-primary rounded-lg bg-card text-dark placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              required
-              minLength={20}
-            />
-            
-            <button
-              type="submit"
-              disabled={loading || concept.trim().length < 20}
-              className="btn btn-primary text-lg px-8 py-4"
-            >
-              {loading ? 'Creando historia...' : 'Comenzar Aventura'}
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div style={{ background: 'var(--color-bg)', minHeight: '100vh' }}>
       <GameHeader connectionStatus={connectionStatus} gameOver={gameOver} />
 
       {!sessionId ? (
-        // Start Screen
-        <div className="container py-12">
+        // Pantalla de inicio
+        <div className="game-container" style={{ paddingTop: 'var(--space-xl)' }}>
           {!mode ? (
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-title text-4xl text-primary mb-6">
+            <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+              <h2 style={{ fontFamily: 'var(--font-title)', fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: 'var(--space-lg)' }}>
                 Bienvenido al Infierno
               </h2>
-              <p className="text-xl text-medium mb-8">
+              <p style={{ fontSize: '1.2rem', color: 'var(--text-medium)', marginBottom: 'var(--space-xl)' }}>
                 Elige tu camino en una aventura épica donde cada decisión forja tu destino.
               </p>
               <ModeSelector onSelect={setMode} />
@@ -608,20 +611,21 @@ function App() {
               loading={loading}
             />
           ) : (
-            <div className="text-center max-w-xl mx-auto">
-              <div className="panel bg-card">
-                <p className="text-lg text-medium mb-6">
-                  Modo seleccionado: <span className="text-title text-primary">
+            <div style={{ textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
+              <div className="panel" style={{ background: 'var(--bg-card)' }}>
+                <p style={{ fontSize: '1.1rem', color: 'var(--text-medium)', marginBottom: 'var(--space-lg)' }}>
+                  Modo seleccionado: <span style={{ fontFamily: 'var(--font-title)', color: 'var(--color-primary)' }}>
                     {mode === 'sandbox' ? 'Sandbox' : 
                      mode === 'campaign' ? 'Campaña' : 
                      'Campaña Temporal'}
                   </span>
                 </p>
-                <div className="space-y-4">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
                   <button
                     onClick={() => startNewSession(mode, 'scenes_act1')}
                     disabled={loading}
-                    className="btn btn-primary text-lg px-8 py-4 w-full"
+                    className="action-button"
+                    style={{ fontSize: '1.1rem' }}
                   >
                     {loading ? 'Iniciando...' : `Iniciar ${
                       mode === 'sandbox' ? 'Sandbox' : 
@@ -635,7 +639,14 @@ function App() {
                       setShowSandboxForm(false);
                     }}
                     disabled={loading}
-                    className="btn btn-secondary px-4 py-2"
+                    style={{
+                      background: 'var(--color-secondary)',
+                      color: 'var(--text-light)',
+                      border: 'none',
+                      padding: 'var(--space-sm) var(--space-md)',
+                      borderRadius: 'var(--border-radius)',
+                      cursor: 'pointer'
+                    }}
                   >
                     Cambiar Modo
                   </button>
@@ -645,32 +656,35 @@ function App() {
           )}
         </div>
       ) : gameOver ? (
-        // Game Over Screen
-        <div className="container py-12">
-          <div className="panel bg-card text-center max-w-xl mx-auto">
-            <h3 className="text-title text-2xl text-danger mb-4">💀 GAME OVER 💀</h3>
-            <p className="text-medium mb-6">Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
+        // Game Over
+        <div className="game-container" style={{ paddingTop: 'var(--space-xl)' }}>
+          <div className="panel" style={{ background: 'var(--bg-card)', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
+            <h3 style={{ fontFamily: 'var(--font-title)', fontSize: '1.8rem', color: 'var(--color-danger)', marginBottom: 'var(--space-md)' }}>
+              💀 GAME OVER 💀
+            </h3>
+            <p style={{ color: 'var(--text-medium)', marginBottom: 'var(--space-lg)' }}>
+              Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?
+            </p>
             <button
               onClick={() => window.location.reload()}
-              className="btn btn-primary text-lg px-8 py-4"
+              className="action-button"
+              style={{ fontSize: '1.1rem' }}
             >
               Reiniciar Partida
             </button>
           </div>
         </div>
       ) : (
-        // Game Interface
-        <div className="container py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Left Sidebar - HUD */}
-            <div className="lg:col-span-1 space-y-6">
-              <StatOrbs vitals={gameState?.vitals} />
-              <EmotionChips emotionalStates={gameState?.emotionalStates} />
-              <SkillsGrid skills={gameState?.skills} />
+        // Interfaz del juego
+        <div className="game-container">
+          <div className="game-grid">
+            {/* HUD Izquierdo */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+              <CompactHUD gameState={gameState} />
             </div>
 
-            {/* Main Content Area */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* Contenido Central */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
               <AICanvas 
                 location={gameState?.location} 
                 gameMode={gameState?.mode}
@@ -682,21 +696,18 @@ function App() {
                 isExpanded={narrativeExpanded}
                 onToggle={() => setNarrativeExpanded(!narrativeExpanded)}
               />
-              <ActionInput 
+              <ActionControls 
                 onSubmit={submitAction} 
+                suggestedActions={suggestedActions}
                 disabled={loading || gameOver} 
                 loading={loading}
               />
-              <ActionButtons 
-                suggestedActions={suggestedActions}
-                onAction={submitAction}
-                disabled={loading || gameOver}
-              />
             </div>
 
-            {/* Right Sidebar */}
-            <div className="lg:col-span-1">
-              <Sidebar gameState={gameState} />
+            {/* Sidebar Derecho */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+              <ObjectivesSidebar gameState={gameState} />
+              <InventorySidebar gameState={gameState} />
             </div>
           </div>
         </div>
@@ -704,7 +715,18 @@ function App() {
 
       {/* Error Display */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-danger text-light px-4 py-2 rounded-lg shadow-lg z-50">
+        <div style={{
+          position: 'fixed',
+          bottom: 'var(--space-md)',
+          right: 'var(--space-md)',
+          background: 'var(--color-danger)',
+          color: 'var(--text-light)',
+          padding: 'var(--space-md)',
+          borderRadius: 'var(--border-radius)',
+          zIndex: '50',
+          maxWidth: '300px',
+          fontSize: '0.9rem'
+        }}>
           {error}
         </div>
       )}
