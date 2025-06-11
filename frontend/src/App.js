@@ -1,35 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
+import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🎯 COMPONENTE GENÉRICO PARA STATS DINÁMICOS con nueva paleta
+// 🎯 COMPONENTE STAT ORB - Mobile First
 const StatOrb = ({ type, value, max = 100 }) => {
-  const getOrbStyle = (statType) => {
-    const styles = {
-      health: { border: 'var(--c-health)', icon: '❤️' },
-      mana: { border: 'var(--c-mana)', icon: '🔮' },
-      stamina: { border: 'var(--c-stamina)', icon: '⚡' },
-      default: { border: 'var(--c-cedar)', icon: '📊' }
+  const getStatConfig = (statType) => {
+    const configs = {
+      health: { icon: '❤️', class: 'health' },
+      mana: { icon: '🔮', class: 'mana' },
+      stamina: { icon: '⚡', class: 'stamina' },
+      default: { icon: '📊', class: 'default' }
     };
-    return styles[statType] || styles.default;
+    return configs[statType] || configs.default;
   };
 
-  const style = getOrbStyle(type);
-  const percentage = (value / max) * 100;
+  const config = getStatConfig(type);
+  const percentage = Math.max(0, Math.min(100, (value / max) * 100));
 
   return (
-    <div className={`stat-orb stat-orb-${type}`}>
-      <div className="flex justify-between text-sm mb-2">
-        <span className="font-medieval font-semibold capitalize flex items-center gap-1" style={{color: 'var(--c-text)'}}>
-          <span>{style.icon}</span>
-          {type}
+    <div className="stat-orb">
+      <div className="stat-header">
+        <span className="stat-name">
+          <span>{config.icon}</span>
+          <span>{type}</span>
         </span>
-        <span style={{color: 'var(--c-text)'}}>{value}/{max}</span>
+        <span>{value}/{max}</span>
       </div>
-      <div className="w-full bg-gray-300 rounded-full h-3 border" style={{borderColor: style.border, backgroundColor: 'rgba(140, 91, 44, 0.2)'}}>
+      <div className="stat-bar-container">
         <div 
-          className="stat-bar h-3 rounded-full transition-all duration-500"
+          className={`stat-bar ${config.class}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -37,8 +37,8 @@ const StatOrb = ({ type, value, max = 100 }) => {
   );
 };
 
-// 🏷️ COMPONENTE PARA ESTADOS EMOCIONALES con paleta pergamino
-const StatusChip = ({ label, value, type = 'emotion' }) => {
+// 🏷️ COMPONENTE EMOTION CHIP - Mobile First
+const EmotionChip = ({ label, value }) => {
   const getChipClass = (val) => {
     if (val > 70) return 'emotion-high';
     if (val > 50) return 'emotion-medium';
@@ -58,13 +58,13 @@ const StatusChip = ({ label, value, type = 'emotion' }) => {
   return (
     <div className={`emotion-chip ${getChipClass(value)}`}>
       <span>{getIcon(label)}</span>
-      <span className="capitalize">{label}</span>
-      <span className="font-bold">{Math.round(value)}</span>
+      <span>{label}</span>
+      <span>{Math.round(value)}</span>
     </div>
   );
 };
 
-// 📊 COMPONENTE PARA RECURSOS Y ATRIBUTOS con estilo pergamino
+// 📊 COMPONENTE RESOURCE GRID - Mobile First
 const ResourceGrid = ({ title, data, icons = {} }) => {
   if (!data || Object.keys(data).length === 0) return null;
 
@@ -77,16 +77,16 @@ const ResourceGrid = ({ title, data, icons = {} }) => {
   };
 
   return (
-    <div className="hud-panel">
-      <h3>{title}</h3>
-      <div className="grid grid-cols-2 gap-2 text-sm">
+    <div className="panel">
+      <h3 className="panel-title">{title}</h3>
+      <div className="resource-grid">
         {Object.entries(data).map(([key, value]) => (
-          <div key={key} className="flex items-center justify-between">
-            <span className="flex items-center gap-1" style={{color: 'var(--c-cedar)'}}>
+          <div key={key} className="resource-item">
+            <span className="resource-label">
               <span>{getIcon(key)}</span>
-              <span className="capitalize">{key}</span>
+              <span>{key}</span>
             </span>
-            <span className="font-semibold" style={{color: 'var(--c-text)'}}>{value}</span>
+            <span className="resource-value">{value}</span>
           </div>
         ))}
       </div>
@@ -94,132 +94,48 @@ const ResourceGrid = ({ title, data, icons = {} }) => {
   );
 };
 
-// 🎯 COMPONENTE DE HABILIDADES DINÁMICO con nuevo diseño
-const DynamicSkillBar = ({ skills = [], gameMode = 'rpg' }) => {
+// 🎯 COMPONENTE SKILLS - Mobile First
+const SkillsGrid = ({ skills = [], gameMode = 'rpg' }) => {
   if (skills.length === 0) {
     const placeholder = gameMode === 'sandbox' ? 
       'Las habilidades emergerán según tus acciones' : 
       'Sin habilidades específicas';
     
     return (
-      <div className="text-center py-4">
-        <span style={{color: 'var(--c-cedar)'}} className="text-sm italic">{placeholder}</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="skills-grid">
-      {skills.map((skill, index) => (
-        <div key={skill.id || index} className="skill-slot group">
-          <div className="text-center">
-            <div style={{color: 'var(--c-border)'}} className="text-xs font-bold">{index + 1}</div>
-            {skill.level && (
-              <div style={{color: 'var(--c-text)'}} className="text-xs">Nv.{skill.level}</div>
-            )}
-          </div>
-          <div className="skill-tooltip">
-            <div className="font-bold">{typeof skill === 'object' ? skill.id : skill}</div>
-            {skill.description && (
-              <div className="text-gray-300">{skill.description}</div>
-            )}
-            {skill.tags && (
-              <div className="text-blue-300 text-xs mt-1">{skill.tags.join(', ')}</div>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = false }) => {
-  const [action, setAction] = useState('');
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (action.trim() && !disabled) {
-      onSubmit(action.trim());
-      setAction('');
-    }
-  };
-
-  const handleSuggestedAction = (suggestedAction) => {
-    if (!disabled) {
-      onSubmit(suggestedAction);
-    }
-  };
-
-  if (gameOver) {
-    return (
-      <div className="w-full space-y-4 text-center">
-        <div className="hud-panel" style={{background: 'rgba(220, 38, 38, 0.1)', borderColor: '#dc2626'}}>
-          <h3 style={{color: '#dc2626'}} className="text-xl mb-4">💀 GAME OVER 💀</h3>
-          <p style={{color: 'var(--c-text)'}} className="mb-4">Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="btn-primary"
-          >
-            Reiniciar Partida
-          </button>
+      <div className="panel">
+        <h3 className="panel-title">{gameMode === 'sandbox' ? 'Capacidades' : 'Habilidades'}</h3>
+        <div style={{ textAlign: 'center', padding: '1rem', fontStyle: 'italic', color: 'var(--c-cedar)' }}>
+          {placeholder}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-4">
-      {suggestedActions && suggestedActions.length > 0 && (
-        <div>
-          <h4 style={{color: 'var(--c-border)'}} className="font-semibold mb-2 text-sm font-medieval">Acciones Sugeridas:</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {suggestedActions.slice(0, 4).map((suggestion, index) => (
-              <button
-                key={index}
-                onClick={() => handleSuggestedAction(suggestion)}
-                disabled={disabled}
-                className="btn-suggested"
-              >
-                {suggestion}
-              </button>
-            ))}
+    <div className="panel">
+      <h3 className="panel-title">{gameMode === 'sandbox' ? 'Capacidades' : 'Habilidades'}</h3>
+      <div className="skills-grid">
+        {skills.map((skill, index) => (
+          <div key={skill.id || index} className="skill-slot" title={skill.description || skill.id || skill}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '0.6rem', fontWeight: 'bold', color: 'var(--c-border)' }}>
+                {index + 1}
+              </div>
+              {skill.level && (
+                <div style={{ fontSize: '0.5rem', color: 'var(--c-text)' }}>
+                  Nv.{skill.level}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-
-      <div>
-        <h4 style={{color: 'var(--c-border)'}} className="font-semibold mb-2 text-sm font-medieval">O escribe tu propia acción:</h4>
-        <form onSubmit={handleSubmit} className="w-full">
-          <div className="relative">
-            <input
-              type="text"
-              value={action}
-              onChange={(e) => setAction(e.target.value)}
-              placeholder="Escribe tu acción..."
-              disabled={disabled}
-              className="w-full px-4 py-3 border-2 rounded-lg font-narrative placeholder-gray-500 focus:outline-none disabled:opacity-50 transition-all"
-              style={{
-                background: 'var(--c-bg)',
-                borderColor: 'var(--c-border)',
-                color: 'var(--c-text)'
-              }}
-            />
-            <button
-              type="submit"
-              disabled={disabled || !action.trim()}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary text-sm"
-            >
-              Actuar
-            </button>
-          </div>
-        </form>
+        ))}
       </div>
     </div>
   );
 };
 
-// 📜 LOG FEED MEJORADO con estilo pergamino
-const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
+// 📜 COMPONENTE NARRATIVA - Mobile First
+const NarrativeArea = ({ narrativeLog, gameMode }) => {
   const logRef = useRef(null);
 
   useEffect(() => {
@@ -228,7 +144,7 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
     }
   }, [narrativeLog]);
 
-  const getLogTitle = (mode) => {
+  const getTitle = (mode) => {
     if (mode === 'sandbox') return 'Tu Historia';
     if (mode === 'campaign') return 'Crónica de la Aventura';
     return 'Registro de Eventos';
@@ -236,20 +152,19 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
 
   return (
     <div className="narrative-area">
-      <h3 className="font-medieval text-lg mb-4" style={{color: 'var(--c-border)'}}>{getLogTitle(gameMode)}</h3>
-      <div 
-        ref={logRef}
-        className="h-64 max-h-[50vh] overflow-y-auto scrollbar-thin"
-      >
+      <h3 className="panel-title">{getTitle(gameMode)}</h3>
+      <div ref={logRef} className="narrative-log">
         {narrativeLog.length === 0 ? (
-          <p className="italic" style={{color: 'var(--c-cedar)'}}>Tu historia comienza aquí...</p>
+          <p style={{ fontStyle: 'italic', color: 'var(--c-cedar)', textAlign: 'center' }}>
+            Tu historia comienza aquí...
+          </p>
         ) : (
           narrativeLog.map((entry, index) => (
-            <div key={`${entry.timestamp}-${index}`} className="mb-4 border-b pb-3 last:border-b-0" style={{borderColor: 'rgba(140, 91, 44, 0.3)'}}>
-              <p className="text-sm font-semibold mb-2 font-medieval" style={{color: 'var(--c-border)'}}>
+            <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
+              <p className="player-action">
                 &gt; {entry.player_action}
               </p>
-              <p className="narrative-text font-narrative">
+              <p className="narrative-text">
                 {entry.narrative}
               </p>
             </div>
@@ -260,7 +175,32 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   );
 };
 
-// 🎨 COMPONENTE SANDBOX CONCEPT-FIRST con nueva paleta
+// 🎮 COMPONENTE ACCIONES SUGERIDAS - Mobile First
+const SuggestedActions = ({ actions, onAction, disabled }) => {
+  if (!actions || actions.length === 0) return null;
+
+  return (
+    <div>
+      <h4 className="panel-title" style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.875rem' }}>
+        Acciones Sugeridas:
+      </h4>
+      <div className="suggested-actions">
+        {actions.slice(0, 4).map((action, index) => (
+          <button
+            key={index}
+            onClick={() => onAction(action)}
+            disabled={disabled}
+            className="btn-suggested"
+          >
+            {action}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// 🎨 COMPONENTE SANDBOX FORM - Mobile First
 const SandboxConceptForm = ({ onSubmit, loading }) => {
   const [concept, setConcept] = useState('');
 
@@ -272,30 +212,34 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto text-center">
-      <h2 className="text-4xl font-bold mb-4 font-medieval" style={{color: 'var(--c-border)'}}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', padding: 'var(--spacing-lg)' }}>
+      <h2 style={{ fontSize: '2rem', fontFamily: 'var(--font-title)', color: 'var(--c-border)', marginBottom: 'var(--spacing-lg)' }}>
         Modo Sandbox - Historia Libre
       </h2>
-      <p className="text-xl mb-8 font-narrative" style={{color: 'var(--c-text)'}}>
-        Describe la historia que quieres vivir. Puede ser cualquier cosa: desde una aventura épica hasta una historia de la vida cotidiana con toques sobrenaturales.
+      <p style={{ fontSize: '1.1rem', marginBottom: 'var(--spacing-xl)', color: 'var(--c-text)' }}>
+        Describe la historia que quieres vivir. Cualquier cosa: aventura épica, vida cotidiana con toques sobrenaturales...
       </p>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
         <div>
-          <label className="block font-semibold mb-2 text-lg font-medieval" style={{color: 'var(--c-border)'}}>
+          <label style={{ display: 'block', fontFamily: 'var(--font-title)', color: 'var(--c-border)', marginBottom: 'var(--spacing-sm)' }}>
             ¿Qué historia quieres contar?
           </label>
           <textarea
             value={concept}
             onChange={(e) => setConcept(e.target.value)}
-            placeholder="Ejemplo: 'Quiero ser un detective paranormal investigando desapariciones misteriosas en una ciudad moderna' o 'Soy un mago aprendiz en una academia flotante llena de secretos'..."
+            placeholder="Ejemplo: 'Detective paranormal investigando desapariciones' o 'Mago aprendiz en academia flotante'..."
             disabled={loading}
             rows={4}
-            className="w-full px-4 py-3 border-2 rounded-lg font-narrative placeholder-gray-500 focus:outline-none disabled:opacity-50 resize-none"
             style={{
+              width: '100%',
+              padding: 'var(--spacing-md)',
+              border: '2px solid var(--c-border)',
+              borderRadius: '8px',
               background: 'var(--c-bg)',
-              borderColor: 'var(--c-border)',
-              color: 'var(--c-text)'
+              color: 'var(--c-text)',
+              fontFamily: 'var(--font-body)',
+              resize: 'none'
             }}
             required
             minLength={20}
@@ -305,21 +249,17 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
         <button
           type="submit"
           disabled={loading || concept.trim().length < 20}
-          className="btn-primary text-lg px-8 py-4"
+          className="btn-action"
+          style={{ alignSelf: 'center', fontSize: '1.1rem' }}
         >
-          {loading ? 'Creando tu historia...' : 'Comenzar Aventura'}
+          {loading ? 'Creando historia...' : 'Comenzar Aventura'}
         </button>
       </form>
-      
-      <div className="mt-6 text-sm" style={{color: 'var(--c-cedar)'}}>
-        <p>💡 <strong>Tip:</strong> Sé específico sobre el tipo de personaje, el mundo, y la situación inicial que te interesa.</p>
-        <p className="mt-2">⚠️ <strong>Advertencia:</strong> Las decisiones peligrosas pueden tener consecuencias mortales.</p>
-      </div>
     </div>
   );
 };
 
-// Componente para mostrar cambios de estado
+// 🔔 COMPONENTE NOTIFICACIÓN - Mobile First
 const StateChangeNotification = ({ stateChanges, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 5000);
@@ -329,48 +269,45 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
   if (!stateChanges || Object.keys(stateChanges).length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 hud-panel max-w-sm z-50 shadow-xl">
-      <div className="flex justify-between items-start mb-2">
-        <h4 style={{color: 'var(--c-border)'}} className="font-bold text-sm font-medieval">Cambios Detectados</h4>
-        <button onClick={onClose} style={{color: 'var(--c-cedar)'}} className="hover:text-white">✕</button>
+    <div style={{
+      position: 'fixed',
+      top: '80px',
+      right: 'var(--spacing-md)',
+      background: 'var(--c-panel)',
+      border: '2px solid var(--c-border)',
+      borderRadius: '8px',
+      padding: 'var(--spacing-md)',
+      maxWidth: '280px',
+      zIndex: 60,
+      fontSize: '0.75rem'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
+        <h4 style={{ fontFamily: 'var(--font-title)', color: 'var(--c-border)', fontSize: '0.875rem' }}>
+          Cambios Detectados
+        </h4>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--c-cedar)', cursor: 'pointer' }}>
+          ✕
+        </button>
       </div>
       
-      <div className="space-y-1 text-xs">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
         {stateChanges.vitalDelta && Object.entries(stateChanges.vitalDelta).map(([vital, delta]) => (
-          <div key={vital} className={delta > 0 ? 'text-green-600' : 'text-red-600'}>
+          <div key={vital} style={{ color: delta > 0 ? '#22c55e' : '#ef4444' }}>
             💗 {vital}: {delta > 0 ? '+' : ''}{delta}
           </div>
         ))}
         
-        {stateChanges.statusSet && Object.entries(stateChanges.statusSet).map(([emotion, value]) => (
-          <div key={emotion} className="text-purple-600">
-            😊 {emotion}: {value}%
-          </div>
-        ))}
-        
-        {stateChanges.locationChange && (
-          <div className="text-blue-600">
-            📍 Ubicación: {stateChanges.locationChange}
-          </div>
-        )}
-        
         {stateChanges.newSkill && stateChanges.newSkill.id && (
-          <div style={{color: 'var(--c-emerald)'}}>
+          <div style={{ color: 'var(--c-emerald)' }}>
             ⭐ Nueva habilidad: {stateChanges.newSkill.id}
           </div>
         )}
-        
-        {stateChanges.resourceDelta && Object.entries(stateChanges.resourceDelta).map(([resource, delta]) => (
-          <div key={resource} className={delta > 0 ? 'text-green-600' : 'text-red-600'}>
-            💰 {resource}: {delta > 0 ? '+' : ''}{delta}
-          </div>
-        ))}
       </div>
     </div>
   );
 };
 
-// Main App Component
+// 🎮 COMPONENTE PRINCIPAL - Mobile First
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -383,6 +320,7 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [stateChangeNotification, setStateChangeNotification] = useState(null);
   const [gameOver, setGameOver] = useState(false);
+  const [action, setAction] = useState('');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -485,7 +423,7 @@ function App() {
   };
 
   // Submit player action
-  const submitAction = async (action) => {
+  const submitAction = async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
     setLoading(true);
@@ -499,7 +437,7 @@ function App() {
         },
         body: JSON.stringify({
           session_id: sessionId,
-          action: action
+          action: actionText
         }),
       });
 
@@ -534,8 +472,20 @@ function App() {
     }
   };
 
+  const handleActionSubmit = (e) => {
+    e.preventDefault();
+    if (action.trim()) {
+      submitAction(action.trim());
+      setAction('');
+    }
+  };
+
+  const handleSuggestedAction = (suggestedAction) => {
+    submitAction(suggestedAction);
+  };
+
   return (
-    <div className="min-h-screen main-background font-narrative">
+    <div className="app-container">
       {/* State Change Notifications */}
       {stateChangeNotification && (
         <StateChangeNotification 
@@ -544,183 +494,201 @@ function App() {
         />
       )}
 
-      {/* Header */}
-      <header className="border-b-2 hud-panel relative z-10 mb-6 rounded-none border-l-0 border-r-0 border-t-0">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold font-medieval tracking-wider" style={{color: 'var(--c-border)'}}>
-              🔥 HELLBOUND RPG v2.0
-            </h1>
-            <div className="flex items-center space-x-4">
-              {gameOver && (
-                <div className="text-red-600 font-bold animate-pulse font-medieval">
-                  💀 GAME OVER
-                </div>
-              )}
-              <div className={`w-3 h-3 rounded-full ${
-                connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
-              }`} />
-              <span className="text-sm" style={{color: 'var(--c-cedar)'}}>
-                {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+      {/* Header fijo */}
+      <header className="app-header">
+        <div className="header-content">
+          <h1 className="app-logo">🔥 HELLBOUND RPG v2.0</h1>
+          <div className="connection-status">
+            {gameOver && (
+              <span style={{ color: '#ef4444', fontWeight: 'bold', marginRight: 'var(--spacing-sm)' }}>
+                💀 GAME OVER
               </span>
-            </div>
+            )}
+            <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
+            <span>{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
           </div>
         </div>
       </header>
 
-      {/* Main Game Area */}
-      <main className="relative z-10 container mx-auto px-4">
-        {!sessionId ? (
-          // Start Screen
-          <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            {!mode ? (
-              <div className="text-center">
-                <h2 className="text-5xl font-bold mb-4 font-medieval" style={{color: 'var(--c-border)'}}>
-                  Bienvenido al Infierno
-                </h2>
-                <p className="text-xl mb-8 max-w-2xl font-narrative" style={{color: 'var(--c-text)'}}>
-                  Elige tu camino en una aventura épica donde cada decisión forja tu destino. 
-                  Tres modos diferentes te esperan para explorar mundos únicos.
-                </p>
-                <div className="w-full">
-                  <ModeSelector onSelect={setMode} />
-                </div>
+      {/* Contenido principal */}
+      {!sessionId ? (
+        // Pantalla de inicio
+        <div style={{ padding: 'var(--spacing-lg)', minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {!mode ? (
+            <div style={{ textAlign: 'center', maxWidth: '600px' }}>
+              <h2 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-title)', color: 'var(--c-border)', marginBottom: 'var(--spacing-lg)' }}>
+                Bienvenido al Infierno
+              </h2>
+              <p style={{ fontSize: '1.2rem', marginBottom: 'var(--spacing-xl)', color: 'var(--c-text)' }}>
+                Elige tu camino en una aventura épica donde cada decisión forja tu destino.
+              </p>
+              <ModeSelector onSelect={setMode} />
+            </div>
+          ) : showSandboxForm && mode === 'sandbox' ? (
+            <SandboxConceptForm 
+              onSubmit={(concept) => startNewSession('sandbox', null, concept)}
+              loading={loading}
+            />
+          ) : (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: '1.1rem', marginBottom: 'var(--spacing-lg)', color: 'var(--c-text)' }}>
+                Modo seleccionado: <span style={{ fontFamily: 'var(--font-title)', color: 'var(--c-border)' }}>
+                  {mode === 'sandbox' ? 'Sandbox' : mode === 'campaign' ? 'Campaña' : 'Campaña Temporal'}
+                </span>
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', alignItems: 'center' }}>
+                <button
+                  onClick={() => startNewSession(mode, 'scenes_act1')}
+                  disabled={loading}
+                  className="btn-action"
+                  style={{ fontSize: '1.1rem' }}
+                >
+                  {loading ? 'Iniciando...' : `Iniciar ${mode === 'sandbox' ? 'Sandbox' : mode === 'campaign' ? 'Campaña' : 'Campaña Temporal'}`}
+                </button>
+                <button
+                  onClick={() => {
+                    setMode(null);
+                    setShowSandboxForm(false);
+                  }}
+                  disabled={loading}
+                  style={{
+                    background: 'var(--c-cedar)',
+                    color: 'var(--c-bg)',
+                    border: 'none',
+                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cambiar Modo
+                </button>
               </div>
-            ) : showSandboxForm && mode === 'sandbox' ? (
-              <SandboxConceptForm 
-                onSubmit={(concept) => startNewSession('sandbox', null, concept)}
-                loading={loading}
-              />
+            </div>
+          )}
+        </div>
+      ) : (
+        // Interfaz del juego - Mobile First Layout
+        <div className="game-layout">
+          {/* Contenido principal */}
+          <div className="main-content">
+            {/* Área de ilustración AI (solo desktop) */}
+            <div className="illustration-area">
+              <span>Ilustración AI generada según ubicación y contexto</span>
+            </div>
+
+            {/* Narrativa */}
+            <NarrativeArea 
+              narrativeLog={gameState?.narrativeLog || []} 
+              gameMode={gameState?.mode} 
+            />
+
+            {/* Acciones sugeridas */}
+            <SuggestedActions 
+              actions={suggestedActions}
+              onAction={handleSuggestedAction}
+              disabled={loading || gameOver}
+            />
+
+            {/* Barra de acción */}
+            {gameOver ? (
+              <div className="panel" style={{ textAlign: 'center', background: 'rgba(220, 38, 38, 0.1)', borderColor: '#dc2626' }}>
+                <h3 style={{ color: '#dc2626', marginBottom: 'var(--spacing-md)' }}>💀 GAME OVER 💀</h3>
+                <p style={{ marginBottom: 'var(--spacing-md)' }}>Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="btn-action"
+                >
+                  Reiniciar Partida
+                </button>
+              </div>
             ) : (
-              <div className="text-center">
-                <p className="text-lg mb-4 font-narrative" style={{color: 'var(--c-text)'}}>
-                  Modo seleccionado: <span className="font-bold" style={{color: 'var(--c-border)'}}>
-                    {mode === 'sandbox' ? 'Sandbox' : 
-                     mode === 'campaign' ? 'Campaña' : 
-                     'Campaña Temporal'}
-                  </span>
-                </p>
-                <div className="space-y-4">
-                  <button
-                    onClick={() => startNewSession(mode, 'scenes_act1')}
+              <div className="action-bar">
+                <form onSubmit={handleActionSubmit} className="action-input-container">
+                  <input
+                    type="text"
+                    value={action}
+                    onChange={(e) => setAction(e.target.value)}
+                    placeholder="Escribe tu acción..."
                     disabled={loading}
-                    className="btn-primary text-lg px-8 py-4"
-                  >
-                    {loading ? 'Iniciando...' : `Iniciar ${
-                      mode === 'sandbox' ? 'Sandbox' : 
-                      mode === 'campaign' ? 'Campaña' : 
-                      'Campaña Temporal'
-                    }`}
-                  </button>
+                    className="action-input"
+                  />
                   <button
-                    onClick={() => {
-                      setMode(null);
-                      setShowSandboxForm(false);
-                    }}
-                    disabled={loading}
-                    className="block mx-auto btn-secondary text-sm"
+                    type="submit"
+                    disabled={loading || !action.trim()}
+                    className="btn-action"
                   >
-                    Cambiar Modo
+                    {loading ? (
+                      <span className="loading-pulse">...</span>
+                    ) : (
+                      'Actuar'
+                    )}
                   </button>
-                </div>
+                </form>
               </div>
             )}
           </div>
-        ) : (
-          // Game Interface con nuevo layout
-          <div className="game-layout">
-            {/* Left Panel - HUD DINÁMICO */}
-            <div className="space-y-4">
-              {/* Vitales Dinámicos */}
-              {gameState?.vitals && Object.keys(gameState.vitals).length > 0 && (
-                <div className="hud-panel">
-                  <h3>Estado Vital</h3>
-                  <div className="space-y-3">
-                    {Object.entries(gameState.vitals).map(([type, value]) => (
-                      <StatOrb key={type} type={type} value={value} max={100} />
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {/* Estados Emocionales Dinámicos */}
-              {gameState?.emotionalStates && Object.entries(gameState.emotionalStates).some(([,v]) => v > 20) && (
-                <div className="hud-panel">
-                  <h3>Estado Mental</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {Object.entries(gameState.emotionalStates).map(([emotion, value]) => (
-                      <StatusChip key={emotion} label={emotion} value={value} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Habilidades Dinámicas */}
-              <div className="hud-panel">
-                <h3>{gameState?.mode === 'sandbox' ? 'Capacidades' : 'Habilidades'}</h3>
-                <DynamicSkillBar skills={gameState?.skills || []} gameMode={gameState?.mode} />
+          {/* Sidebar HUD */}
+          <div className="hud-sidebar">
+            {/* Vitales */}
+            {gameState?.vitals && Object.keys(gameState.vitals).length > 0 && (
+              <div className="panel">
+                <h3 className="panel-title">Estado Vital</h3>
+                {Object.entries(gameState.vitals).map(([type, value]) => (
+                  <StatOrb key={type} type={type} value={value} max={100} />
+                ))}
               </div>
+            )}
 
-              {/* Recursos Dinámicos */}
-              <ResourceGrid 
-                title="Recursos" 
-                data={gameState?.resources} 
-              />
-
-              {/* Atributos Dinámicos */}
-              <ResourceGrid 
-                title="Atributos" 
-                data={gameState?.attributes} 
-              />
-
-              {/* Ubicación Dinámica */}
-              {gameState?.location && (
-                <div className="hud-panel">
-                  <h3>{gameState?.mode === 'sandbox' ? 'Lugar Actual' : 'Ubicación'}</h3>
-                  <p className="text-center" style={{color: 'var(--c-text)'}}>{gameState.location}</p>
+            {/* Estados emocionales */}
+            {gameState?.emotionalStates && Object.entries(gameState.emotionalStates).some(([,v]) => v > 20) && (
+              <div className="panel">
+                <h3 className="panel-title">Estado Mental</h3>
+                <div className="emotion-chips">
+                  {Object.entries(gameState.emotionalStates).map(([emotion, value]) => (
+                    <EmotionChip key={emotion} label={emotion} value={value} />
+                  ))}
                 </div>
-              )}
-            </div>
-
-            {/* Right Panel - Narrativa y Acciones */}
-            <div className="space-y-4">
-              {/* Log Feed */}
-              <LogFeed 
-                narrativeLog={gameState?.narrativeLog || []} 
-                gameMode={gameState?.mode} 
-              />
-
-              {/* Action Input */}
-              <div className="hud-panel">
-                <h3>
-                  {gameOver ? '💀 Partida Terminada' :
-                   gameState?.mode === 'sandbox' ? '¿Qué haces ahora?' : '¿Qué harás?'}
-                </h3>
-                <ActionInput 
-                  onSubmit={submitAction} 
-                  disabled={loading} 
-                  suggestedActions={suggestedActions}
-                  gameOver={gameOver}
-                />
-                {loading && !gameOver && (
-                  <p className="text-sm mt-2" style={{color: 'var(--c-border)'}}>
-                    {gameState?.mode === 'sandbox' ? 
-                      'Tu historia se está escribiendo...' : 
-                      'El destino se está escribiendo...'}
-                  </p>
-                )}
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Error Display */}
-        {error && (
-          <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
-            {error}
+            {/* Habilidades */}
+            <SkillsGrid skills={gameState?.skills || []} gameMode={gameState?.mode} />
+
+            {/* Recursos */}
+            <ResourceGrid title="Recursos" data={gameState?.resources} />
+
+            {/* Atributos */}
+            <ResourceGrid title="Atributos" data={gameState?.attributes} />
+
+            {/* Ubicación */}
+            {gameState?.location && (
+              <div className="panel">
+                <h3 className="panel-title">{gameState?.mode === 'sandbox' ? 'Lugar Actual' : 'Ubicación'}</h3>
+                <p style={{ textAlign: 'center', color: 'var(--c-text)' }}>{gameState.location}</p>
+              </div>
+            )}
           </div>
-        )}
-      </main>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div style={{
+          position: 'fixed',
+          bottom: 'var(--spacing-md)',
+          right: 'var(--spacing-md)',
+          background: '#ef4444',
+          color: 'white',
+          padding: 'var(--spacing-md)',
+          borderRadius: '8px',
+          zIndex: 50,
+          maxWidth: '300px',
+          fontSize: '0.875rem'
+        }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }
