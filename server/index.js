@@ -258,7 +258,7 @@ class GameState {
     // 🎯 SISTEMA DE HABILIDADES DINÁMICO ILIMITADO
     this.skills = []; // Array de objetos {id, level, tags, description}
     
-    this.location = "Puertas de Ceniza";
+    this.location = "Punto de Inicio";
     this.inventory = [];
     this.narrativeLog = [];
     this.mode = 'sandbox';
@@ -292,6 +292,10 @@ class GameState {
     
     // 🎨 SANDBOX CONCEPT-FIRST
     this.sandboxConcept = null; // Para modo sandbox: idea inicial del usuario
+    
+    // 💀 SISTEMA DE MUERTE
+    this.isAlive = true;
+    this.deathReason = null;
   }
 
   toDict() {
@@ -314,7 +318,7 @@ class GameState {
       
       location: this.location,
       inventory: this.inventory,
-      narrativeLog: this.narrativeLog.slice(-5),
+      narrativeLog: this.narrativeLog,
       mode: this.mode,
       campaignMeta: this.campaignMeta,
       map: this.map,
@@ -342,6 +346,10 @@ class GameState {
       // 🎨 SANDBOX
       sandboxConcept: this.sandboxConcept,
       
+      // 💀 SISTEMA DE MUERTE
+      isAlive: this.isAlive,
+      deathReason: this.deathReason,
+      
       seasonId: this.seasonId,
       createdAt: this.createdAt.toISOString()
     };
@@ -357,6 +365,13 @@ class GameState {
         if (this.vitals[vital] !== undefined) {
           this.vitals[vital] = Math.max(0, Math.min(100, this.vitals[vital] + delta));
           console.log(`💗 ${vital}: ${this.vitals[vital]}`);
+          
+          // 💀 VERIFICAR MUERTE
+          if (vital === 'health' && this.vitals[vital] <= 0) {
+            this.isAlive = false;
+            this.deathReason = 'Has perdido toda tu salud';
+            console.log('💀 JUGADOR HA MUERTO');
+          }
         }
       });
     }
@@ -399,6 +414,12 @@ class GameState {
       });
     }
     
+    // Cambiar ubicación
+    if (stateChanges.locationChange) {
+      this.location = stateChanges.locationChange;
+      console.log(`📍 Nueva ubicación: ${this.location}`);
+    }
+    
     // Añadir nueva habilidad
     if (stateChanges.newSkill) {
       const existingSkill = this.skills.find(s => s.id === stateChanges.newSkill.id);
@@ -433,6 +454,13 @@ class GameState {
         this.knowledge.set(topic, Math.max(0, Math.min(100, current + delta)));
         console.log(`🧠 Conocimiento de ${topic}: ${this.knowledge.get(topic)}%`);
       });
+    }
+    
+    // 💀 VERIFICAR MUERTE POR OTROS FACTORES
+    if (stateChanges.forceDeathCheck) {
+      this.isAlive = false;
+      this.deathReason = stateChanges.deathReason || 'Has muerto por circunstancias fatales';
+      console.log(`💀 MUERTE FORZADA: ${this.deathReason}`);
     }
   }
 
@@ -585,6 +613,9 @@ ${recentActions}`;
         { id: "exorcismo", level: 2, tags: ["luz", "espiritual"], description: "Purificar entidades demoníacas" },
         { id: "percepcion_sobrenatural", level: 1, tags: ["detección", "mística"], description: "Detectar presencias sobrenaturales" }
       ];
+      
+      // Ubicación inicial de campaña
+      this.location = "Alicante";
 
       console.log(`📜 Objetivos de campaña inicializados: ${this.questObjectives.length} objetivos`);
     }
@@ -599,62 +630,84 @@ ${recentActions}`;
     this.vitals.mana = 50; // Menos maná inicial en sandbox
     this.resources.gold = 20; // Menos oro inicial
     
+    // Ubicación inicial basada en el concepto
+    if (concept.toLowerCase().includes('restaurante')) {
+      this.location = 'Tu Restaurante';
+    } else if (concept.toLowerCase().includes('ciudad')) {
+      this.location = 'Ciudad';
+    } else if (concept.toLowerCase().includes('casa') || concept.toLowerCase().includes('habitación')) {
+      this.location = 'Tu Hogar';
+    } else {
+      this.location = 'Lugar de Inicio';
+    }
+    
     console.log(`🎨 Sandbox inicializado con concepto: "${concept.substring(0, 50)}..."`);
   }
 }
 
-// Analyze narrative for dynamic state changes
+// 💀 ANÁLISIS MEJORADO PARA DETECTAR CAMBIOS Y MUERTE
 async function analyzeNarrativeForStateChanges(action, narrative, gameState, openaiClient) {
   try {
     const analysisPrompt = `
-Analiza esta acción y narrativa de un RPG para determinar cambios en el estado del personaje.
+Analiza esta acción y narrativa de un RPG para determinar cambios REALES en el estado del personaje.
 
 ACCIÓN: "${action}"
 NARRATIVA: "${narrative}"
 
 ESTADO ACTUAL:
 - Salud: ${gameState.vitals.health}/100
+- Ubicación actual: ${gameState.location}
 - Miedo: ${gameState.emotionalStates.miedo}/100
 - Alerta: ${gameState.emotionalStates.alerta}/100
 
-Responde SOLO con un JSON válido con los cambios necesarios. Usa estos campos:
+IMPORTANTE: Analiza la narrativa REALMENTE y detecta:
+1. DAÑO FÍSICO real (caídas, ataques, heridas)
+2. GASTO DE ENERGÍA (magia, esfuerzo físico)
+3. CAMBIOS DE UBICACIÓN explícitos
+4. ESTADOS EMOCIONALES por situaciones intensas
+5. MUERTE si la situación es mortal
+
+Responde SOLO con un JSON válido:
 
 {
-  "vitalDelta": {"health": -5, "mana": -10, "stamina": -15},
-  "statusSet": {"miedo": 30, "alerta": 80, "fatiga": 20},
-  "statusClear": ["euforia"],
-  "newSkill": {"id": "nombre_habilidad", "level": 1, "tags": ["tag1"], "description": "Descripción"},
-  "relationshipDelta": {"Nombre Persona": +10},
-  "knowledgeDelta": {"Tema": +15},
-  "toneBiasChange": -1
+  "vitalDelta": {"health": -15, "mana": -20, "stamina": -10},
+  "statusSet": {"miedo": 70, "alerta": 90, "fatiga": 30},
+  "locationChange": "Nueva Ubicación Específica",
+  "newSkill": {"id": "nueva_habilidad", "level": 1, "tags": ["tag"], "description": "desc"},
+  "resourceDelta": {"gold": +10, "rations": -1},
+  "relationshipDelta": {"Persona": +15},
+  "knowledgeDelta": {"Tema": +20},
+  "forceDeathCheck": true,
+  "deathReason": "Razón específica de muerte"
 }
 
-CRITERIOS:
-- Daño físico = health -5 a -20
-- Usar magia = mana -5 a -15
-- Actividad intensa = stamina -10 a -20
-- Miedo: situaciones terroríficas = 40-80
-- Alerta: peligro = 60-90
-- Fatiga: esfuerzo = 20-60
-- Nuevas habilidades: solo si aprende algo específico
-- Conocimiento: +10 a +30 si descubre algo importante
+CRITERIOS ESPECÍFICOS:
+- Combate/Daño = health -10 a -30
+- Magia/Hechizos = mana -10 a -25
+- Correr/Esfuerzo = stamina -15 a -30
+- Situaciones aterradoras = miedo 40-90
+- Peligro inminente = alerta 70-95
+- Mover entre lugares = locationChange obligatorio
+- Acciones mortales (caer de acantilado, explosión, veneno letal) = forceDeathCheck: true
 
-Si no hay cambios significativos, responde: {}
+Si NO hay cambios evidentes, responde: {}
 `;
 
     const response = await openaiClient.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: analysisPrompt }],
-      temperature: 0.3,
-      max_tokens: 300
+      temperature: 0.2,
+      max_tokens: 400
     });
 
     const stateChangesText = response.choices[0].message.content.trim();
+    console.log('🔍 Análisis IA raw:', stateChangesText);
     
     // Limpiar respuesta para asegurar JSON válido
     const jsonMatch = stateChangesText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const stateChanges = JSON.parse(jsonMatch[0]);
+      console.log('📊 Cambios detectados:', stateChanges);
       return stateChanges;
     }
     
@@ -744,10 +797,8 @@ Responde SOLO con la narrativa, sin explicaciones.
       gameState.campaignMeta = camp.json;
       gameState.map = camp.map;
       
-      // Use campaign location or first map node
-      if (camp.map.nodes && camp.map.nodes.length > 0) {
-        gameState.location = camp.map.nodes[0].name;
-      }
+      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO
+      gameState.initializeCampaignObjectives();
       
       // Create immersive intro
       const bookTitle = "Hellbound: El infierno en la tierra";
@@ -765,9 +816,6 @@ Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTit
 ${camp.firstText || 'Tu historia comienza ahora.'}`;
       }
       
-      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO
-      gameState.initializeCampaignObjectives();
-      
     } else {
       // Seasonal mode
       initialNarrative = `¡Evento especial activo! Las energías cósmicas se alinean de manera inusual, alterando las reglas conocidas del mundo. Te encuentras en ${gameState.location} durante esta época de cambios místicos, donde nuevas oportunidades y peligros aguardan.`;
@@ -784,12 +832,12 @@ ${camp.firstText || 'Tu historia comienza ahora.'}`;
     // Generate initial suggested actions with AI
     suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
     
-    // Add to narrative log
-    gameState.narrativeLog.push({
+    // Add to narrative log - SIN DUPLICACIÓN
+    gameState.narrativeLog = [{
       timestamp: new Date().toISOString(),
       player_action: `[Inicio de ${mode}]`,
       narrative: initialNarrative
-    });
+    }];
     
     // Save to MongoDB
     if (db) {
@@ -822,6 +870,17 @@ app.post('/api/free_input', async (req, res) => {
     }
     
     const gameState = gameSessions.get(session_id);
+    
+    // 💀 VERIFICAR SI EL JUGADOR ESTÁ VIVO
+    if (!gameState.isAlive) {
+      return res.json({
+        success: false,
+        narrative: `💀 GAME OVER 💀\n\n${gameState.deathReason}\n\nTu aventura ha llegado a su fin. Las decisiones tienen consecuencias... y algunas son fatales.`,
+        suggested_actions: ["Reiniciar partida"],
+        game_state: gameState.toDict(),
+        game_over: true
+      });
+    }
     
     // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
@@ -860,6 +919,7 @@ SESGO DE TONO ACTUAL: ${gameState.toneBias} (-5=luminoso, +5=oscuro)
 - Desarrolla la historia según la visión del usuario
 - Los stats y habilidades emergen orgánicamente
 - Tono natural y adaptativo
+- LAS ACCIONES PELIGROSAS PUEDEN SER MORTALES
 `;
     }
     
@@ -945,6 +1005,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     4. **Realismo Emocional**: Los estados intensos influyen sutilmente en la narrativa
     5. **Coherencia**: Mantén consistencia con el mundo establecido
     6. **Progresión Orgánica**: Los cambios emergen naturalmente de las acciones
+    7. **CONSECUENCIAS REALES**: Las acciones peligrosas pueden ser mortales
     
     ESTILO NARRATIVO:
     - Máximo 4 oraciones descriptivas y fluidas
@@ -953,6 +1014,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     - Segunda persona ("tú")
     - NO repetir descripciones de elementos ya establecidos
     - Enfoque en avanzar la acción y situación
+    - SER REALISTA: acciones estúpidas tienen consecuencias graves
     
     ACCIÓN DEL JUGADOR: "${action}"
     
@@ -973,12 +1035,24 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const message = response.choices[0].message;
     let narrative = message.content || "El eco de tu acción resuena en el silencio...";
     
-    // 📊 ANALIZAR CAMBIOS DE ESTADO DINÁMICOS
+    // 📊 ANALIZAR CAMBIOS DE ESTADO DINÁMICOS (MEJORADO)
     const stateChanges = await analyzeNarrativeForStateChanges(action, narrative, gameState, openai);
     
     // Aplicar cambios de estado
     if (Object.keys(stateChanges).length > 0) {
       gameState.applyStateChanges(stateChanges);
+    }
+    
+    // 💀 VERIFICAR MUERTE DESPUÉS DE APLICAR CAMBIOS
+    if (!gameState.isAlive) {
+      return res.json({
+        success: false,
+        narrative: `${narrative}\n\n💀 GAME OVER 💀\n\n${gameState.deathReason}`,
+        suggested_actions: ["Reiniciar partida"],
+        game_state: gameState.toDict(),
+        state_changes: stateChanges,
+        game_over: true
+      });
     }
     
     // Actualizar historial de frases usadas para evitar repetición
@@ -997,12 +1071,16 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     // Generate new suggested actions based on the narrative and context with AI
     const suggestedActions = await generateSuggestedActions(gameState, narrative, openai);
     
-    // Add to narrative log
-    gameState.narrativeLog.push({
+    // Add to narrative log - EVITAR DUPLICACIÓN
+    const newEntry = {
       timestamp: new Date().toISOString(),
       player_action: action,
       narrative: narrative
-    });
+    };
+    
+    gameState.narrativeLog.push(newEntry);
+    // Mantener solo las últimas 10 entradas para evitar acumulación
+    gameState.narrativeLog = gameState.narrativeLog.slice(-10);
 
     // 🧠 SISTEMA DE MEMORIA MEJORADO - Detectar eventos importantes
     gameState.actionCount++;
