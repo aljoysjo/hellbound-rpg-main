@@ -130,7 +130,7 @@ function App() {
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
   // Initialize socket connection
   useEffect(() => {
