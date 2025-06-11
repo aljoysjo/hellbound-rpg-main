@@ -211,6 +211,13 @@ class GameState {
     this.eventFlags = new Set();
     this.sessionSummaries = [];
     this.actionCount = 0;
+    // 📖 GESTOR DE HISTORIA AVANZADO
+    this.storyAct = 1;
+    this.actProgress = 0; // 0-100% progreso en el acto actual
+    this.majorDecisions = []; // Decisiones importantes que afectan la narrativa
+    this.questObjectives = []; // Objetivos actuales del jugador
+    this.storyFlags = new Set(); // Flags específicos de historia
+    this.companionStatus = new Map(); // Estado de relaciones con compañeros
   }
 
   toDict() {
