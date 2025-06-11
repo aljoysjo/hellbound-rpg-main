@@ -241,6 +241,13 @@ class GameState {
       sessionSummaries: this.sessionSummaries,
       eventFlags: Array.from(this.eventFlags),
       actionCount: this.actionCount,
+      // 📖 GESTOR DE HISTORIA AVANZADO
+      storyAct: this.storyAct,
+      actProgress: this.actProgress,
+      majorDecisions: this.majorDecisions,
+      questObjectives: this.questObjectives,
+      storyFlags: Array.from(this.storyFlags),
+      companionStatus: Object.fromEntries(this.companionStatus),
       seasonId: this.seasonId,
       createdAt: this.createdAt.toISOString()
     };
@@ -285,6 +292,111 @@ ${recentActions}`;
       
     } catch (error) {
       console.error('Error generando resumen:', error);
+    }
+  }
+
+  // 📖 GESTOR DE HISTORIA AVANZADO
+  addMajorDecision(decision, impact) {
+    const decisionEntry = {
+      decision: decision,
+      impact: impact,
+      timestamp: new Date().toISOString(),
+      storyAct: this.storyAct,
+      actProgress: this.actProgress
+    };
+    this.majorDecisions.push(decisionEntry);
+    console.log(`⚡ Decisión mayor registrada: ${decision} - Impacto: ${impact}`);
+  }
+
+  updateQuestProgress(action, narrative) {
+    // Analizar si la acción avanza objetivos
+    if (this.questObjectives.length > 0) {
+      this.questObjectives.forEach(objective => {
+        if (narrative.toLowerCase().includes(objective.keyword) || 
+            action.toLowerCase().includes(objective.keyword)) {
+          objective.progress = Math.min(100, objective.progress + 20);
+          console.log(`📋 Objetivo actualizado: ${objective.description} - ${objective.progress}%`);
+        }
+      });
+    }
+
+    // Avanzar progreso del acto basado en eventos clave
+    const progressEvents = ['compañero', 'iglesia', 'errante', 'figura misteriosa', 'plaza'];
+    const foundEvent = progressEvents.find(event => 
+      narrative.toLowerCase().includes(event) || action.toLowerCase().includes(event)
+    );
+    
+    if (foundEvent && this.actProgress < 100) {
+      this.actProgress = Math.min(100, this.actProgress + 15);
+      console.log(`📈 Progreso del Acto ${this.storyAct}: ${this.actProgress}%`);
+      
+      // Cambiar de acto si se completa
+      if (this.actProgress >= 100 && this.storyAct < (this.campaignMeta?.acto_total || 3)) {
+        this.storyAct++;
+        this.actProgress = 0;
+        this.addStoryFlag('ACT_COMPLETED', `Acto ${this.storyAct - 1} completado`);
+        console.log(`🎭 ¡Nuevo Acto! Ahora en Acto ${this.storyAct}`);
+      }
+    }
+  }
+
+  addStoryFlag(flagType, description) {
+    const flag = `${flagType}:${description}:${new Date().toISOString()}`;
+    this.storyFlags.add(flag);
+    console.log(`🏛️ Story Flag añadido: ${flag}`);
+  }
+
+  updateCompanionStatus(companionName, relationship, value) {
+    if (!this.companionStatus.has(companionName)) {
+      this.companionStatus.set(companionName, { trust: 50, met: false });
+    }
+    
+    const companion = this.companionStatus.get(companionName);
+    if (relationship === 'trust') {
+      companion.trust = Math.max(0, Math.min(100, companion.trust + value));
+    } else if (relationship === 'met') {
+      companion.met = true;
+    }
+    
+    this.companionStatus.set(companionName, companion);
+    console.log(`👥 ${companionName}: ${relationship} = ${companion[relationship]}`);
+  }
+
+  initializeCampaignObjectives() {
+    if (this.mode === 'campaign' && this.campaignMeta) {
+      // Objetivos iniciales del Acto I
+      this.questObjectives = [
+        {
+          id: 'investigate_figure',
+          description: 'Investigar la figura misteriosa',
+          keyword: 'figura',
+          progress: 0,
+          completed: false
+        },
+        {
+          id: 'find_companions',
+          description: 'Encontrar a los compañeros',
+          keyword: 'compañero',
+          progress: 0,
+          completed: false
+        },
+        {
+          id: 'explore_alicante',
+          description: 'Explorar Alicante nevada',
+          keyword: 'alicante',
+          progress: 0,
+          completed: false
+        }
+      ];
+
+      // Inicializar estado de compañeros
+      if (this.campaignMeta.companions) {
+        this.campaignMeta.companions.forEach(companion => {
+          this.companionStatus.set(companion, { trust: 50, met: false });
+        });
+      }
+
+      console.log(`📜 Objetivos de campaña inicializados: ${this.questObjectives.length} objetivos`);
     }
   }
 }
