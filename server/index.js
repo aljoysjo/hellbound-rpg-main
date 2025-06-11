@@ -54,8 +54,28 @@ function loadCampaign(campaignName) {
   }
   try {
     const content = readFileSync(file, 'utf8');
+    const lines = content.split('\n');
+    
+    // Find the first substantial narrative text (skip headers and empty lines)
+    let intro = '';
+    let foundNarrative = false;
+    
+    for (let line of lines) {
+      line = line.trim();
+      // Skip headers (===), empty lines, and markdown headers (#)
+      if (line.startsWith('===') || line.startsWith('#') || line === '') {
+        continue;
+      }
+      // This is our first narrative paragraph
+      if (!foundNarrative && line.length > 20) {
+        intro = line;
+        foundNarrative = true;
+        break;
+      }
+    }
+    
     return { 
-      intro: content.split('\n')[0] || 'Campaña cargada',
+      intro: intro || 'Comienza tu campaña épica en las Puertas de Ceniza.',
       content: content 
     };
   } catch (error) {
