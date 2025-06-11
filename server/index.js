@@ -470,6 +470,9 @@ ${camp.firstText || 'Tu historia comienza ahora.'}`;
       // Generate initial suggested actions with AI
       suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
       
+      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO
+      gameState.initializeCampaignObjectives();
+      
       // Add to narrative log
       gameState.narrativeLog.push({
         timestamp: new Date().toISOString(),
