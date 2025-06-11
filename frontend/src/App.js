@@ -3,7 +3,7 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🎮 MAIN APP COMPONENT - FIXED FUNCTIONALITY
+// 🎮 MAIN APP COMPONENT - FINAL VERSION CON CAMBIOS IMPLEMENTADOS
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -21,6 +21,7 @@ function App() {
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
+  const [showEmotionsModal, setShowEmotionsModal] = useState(false); // NUEVO
   const [action, setAction] = useState('');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
@@ -178,14 +179,18 @@ function App() {
     }
   };
 
-  // FIXED: Event handlers
+  // FIXED: Event handlers con prevención correcta
   const handleActionSubmit = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     if (action.trim()) {
       submitAction(action.trim());
       setAction('');
     }
+  };
+
+  // FIXED: Input change sin preventDefault
+  const handleInputChange = (e) => {
+    setAction(e.target.value);
   };
 
   const handleSuggestedAction = (suggestedAction) => {
@@ -205,6 +210,12 @@ function App() {
     setShowInventory(!showInventory);
   };
 
+  const toggleEmotionsModal = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowEmotionsModal(!showEmotionsModal);
+  };
+
   const toggleNarrativeModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -217,7 +228,7 @@ function App() {
     setNarrativeVisible(!narrativeVisible);
   };
 
-  // Helper functions
+  // Helper functions - FIXED getSkillIcon
   const getActionIcon = (action) => {
     const actionLower = action.toLowerCase();
     if (actionLower.includes('atacar') || actionLower.includes('luchar')) return '⚔️';
@@ -240,14 +251,26 @@ function App() {
     return icons[emotion] || '😐';
   };
 
+  // FIXED: getSkillIcon con verificación
   const getSkillIcon = (skill) => {
-    const skillName = (typeof skill === 'object' ? skill.id : skill).toLowerCase();
+    const skillName = (skill?.id || skill || '').toString().toLowerCase();
     if (skillName.includes('exorcismo')) return '🔥';
     if (skillName.includes('percep')) return '⚡';
     if (skillName.includes('combate')) return '⚔️';
     if (skillName.includes('magia')) return '🔮';
     if (skillName.includes('social')) return '🗣️';
     return '✨';
+  };
+
+  // FIXED: getDominantEmotionIcon para botón estados
+  const getDominantEmotionIcon = () => {
+    const emotionalStates = gameState?.emotionalStates || {};
+    const sortedEmotions = Object.entries(emotionalStates)
+      .filter(([, value]) => value > 30)
+      .sort((a, b) => b[1] - a[1]);
+    
+    if (sortedEmotions.length === 0) return '😐';
+    return getEmotionIcon(sortedEmotions[0][0]);
   };
 
   // Componente Canvas Integrado - FIXED
@@ -345,14 +368,18 @@ function App() {
     );
   };
 
-  // Componente Header Compacto - FIXED
+  // Componente Header Compacto - FIXED MOBILE
   const CompactHeader = () => {
     const vitals = gameState?.vitals || {};
     
     return (
       <header className="compact-header">
         <div className="header-left">
-          <h1 className="header-title">🔥 HELLBOUND RPG v2.0</h1>
+          <h1 className="header-title">
+            {/* FIXED: Header mobile compacto */}
+            <span className="hidden sm:inline">🔥 HELLBOUND RPG v2.0</span>
+            <span className="sm:hidden">HELLBOUND</span>
+          </h1>
           {gameState?.location && (
             <div className="header-location">
               <span>📍</span>
@@ -375,57 +402,100 @@ function App() {
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span>{value}%</span>
+                <span className="hidden sm:inline">{value}%</span>
+                <span className="sm:hidden">{value}</span>
               </div>
             );
           })}
           
           <div className="connection-status">
             <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-            <span>{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+            <span className="hidden sm:inline">{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+            <span className="sm:hidden">{connectionStatus === 'connected' ? '● On' : '● Off'}</span>
           </div>
         </div>
       </header>
     );
   };
 
-  // Componente Skills Bar Dinámico - FIXED
+  // NUEVO: Acciones Bar Mobile
+  const MobileActionsBar = () => (
+    <div className="mobile-actions-bar">
+      <div className="mobile-quick-actions">
+        {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestedAction(suggestedAction)}
+            disabled={loading || gameOver}
+            className="quick-action clickable"
+            title={suggestedAction}
+          >
+            {getActionIcon(suggestedAction)}
+          </button>
+        ))}
+      </div>
+      
+      <div className="mobile-modal-triggers">
+        <button 
+          className="modal-trigger clickable"
+          onClick={toggleObjectives}
+        >
+          🎯 <span>{gameState?.questObjectives?.length || 3}</span>
+        </button>
+        <button 
+          className="modal-trigger clickable"
+          onClick={toggleInventory}
+        >
+          📦 <span>{gameState?.inventory?.length || 0}</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // Componente Skills Bar REORGANIZADO
   const SkillsBar = () => {
     const skills = gameState?.skills || [];
-    const emotionalStates = gameState?.emotionalStates || {};
-    const activeEmotions = Object.entries(emotionalStates).filter(([, value]) => value > 30);
 
     return (
       <div className="skills-bar">
-        <div className="skills-list">
+        <div className="skills-section">
           {skills.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
               Las habilidades aparecerán según tus acciones
             </div>
           ) : (
             skills.map((skill, index) => (
-              <div key={skill.id || index} className="skill-item clickable">
+              <div key={skill?.id || index} className="skill-item clickable">
                 <span className="skill-icon">{getSkillIcon(skill)}</span>
                 <div className="skill-info">
                   <div className="skill-name">
-                    {typeof skill === 'object' ? skill.id : skill}
+                    {skill?.id || skill || 'Habilidad'}
                   </div>
-                  {skill.level && (
+                  {skill?.level && (
                     <div className="skill-level">Nv.{skill.level}</div>
                   )}
                 </div>
               </div>
             ))
           )}
-          
-          {activeEmotions.map(([emotion, value]) => (
-            <div key={emotion} className="emotion-item">
-              <span>{getEmotionIcon(emotion)}</span>
-              <span>{emotion} {Math.round(value)}%</span>
-            </div>
+        </div>
+        
+        {/* NUEVO: Acciones rápidas con texto en DESKTOP */}
+        <div className="desktop-actions-section">
+          {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestedAction(suggestedAction)}
+              disabled={loading || gameOver}
+              className="action-with-text clickable"
+            >
+              <span>{getActionIcon(suggestedAction)}</span>
+              <span>{suggestedAction}</span>
+            </button>
           ))}
         </div>
         
+        {/* Modales - Solo desktop */}
         <div className="modal-triggers">
           <button 
             className="modal-trigger clickable"
@@ -444,14 +514,14 @@ function App() {
     );
   };
 
-  // Componente Controls Bar - FIXED MOBILE
+  // Componente Controls Bar - FIXED CON BOTÓN ESTADOS
   const ControlsBar = () => (
     <div className="controls-bar">
       <form onSubmit={handleActionSubmit} className="input-group">
         <input
           type="text"
           value={action}
-          onChange={(e) => setAction(e.target.value)}
+          onChange={handleInputChange} // FIXED: Sin preventDefault
           placeholder="Escribe lo que quieres que suceda..."
           disabled={loading || gameOver}
           className="main-input clickable"
@@ -467,23 +537,66 @@ function App() {
         >
           {loading ? '...' : 'ACTUAR'}
         </button>
+        
+        {/* NUEVO: Botón Estados Emocionales */}
+        <button
+          type="button"
+          onClick={toggleEmotionsModal}
+          disabled={loading || gameOver}
+          className="emotions-button clickable"
+          title="Ver estados emocionales"
+        >
+          <span>{getDominantEmotionIcon()}</span>
+          <span className="hidden sm:inline">Estados</span>
+        </button>
       </form>
-      
-      <div className="quick-actions">
-        {suggestedActions.slice(0, 4).map((suggestedAction, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestedAction(suggestedAction)}
-            disabled={loading || gameOver}
-            className="quick-action clickable"
-            title={suggestedAction}
-          >
-            {getActionIcon(suggestedAction)}
-          </button>
-        ))}
-      </div>
     </div>
   );
+
+  // NUEVO: Modal Estados Emocionales
+  const EmotionsModal = () => {
+    const emotionalStates = gameState?.emotionalStates || {};
+    const allEmotions = [
+      'serenidad', 'alerta', 'miedo', 'euforia', 'fatiga', 'ira'
+    ];
+
+    return (
+      <>
+        <div 
+          className={`modal-overlay ${showEmotionsModal ? 'show' : ''}`}
+          onClick={() => setShowEmotionsModal(false)}
+        />
+        <div className={`slide-modal ${showEmotionsModal ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>😌 Estados Mentales</span>
+            <button 
+              className="modal-close clickable" 
+              onClick={() => setShowEmotionsModal(false)}
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-content">
+            <div className="emotions-list">
+              {allEmotions.map((emotion) => {
+                const value = emotionalStates[emotion] || 0;
+                return (
+                  <div key={emotion} className="emotion-row">
+                    <div className="emotion-icon">{getEmotionIcon(emotion)}</div>
+                    <div className="emotion-info">
+                      <div className="emotion-name">{emotion}</div>
+                      <div className="emotion-value">{Math.round(value)}%</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
 
   // Modal Objetivos - FIXED
   const ObjectivesModal = () => {
@@ -807,16 +920,18 @@ function App() {
           </div>
         </div>
       ) : (
-        // Interfaz del juego - FIXED
+        // Interfaz del juego - LAYOUT REORGANIZADO
         <>
           <CompactHeader />
           <IntegratedCanvas />
-          <SkillsBar />
+          <MobileActionsBar /> {/* Solo en móvil */}
           <ControlsBar />
+          <SkillsBar />
           
-          {/* Modales - FIXED */}
+          {/* Modales - TODOS FIXED */}
           <ObjectivesModal />
           <InventoryModal />
+          <EmotionsModal />
           <NarrativeModal />
         </>
       )}
