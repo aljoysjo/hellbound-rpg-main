@@ -164,7 +164,7 @@ function App() {
   }, [BACKEND_URL, sessionId]);
 
   // Start new game session
-  const startNewSession = async () => {
+  const startNewSession = async (selectedMode = mode) => {
     setLoading(true);
     setError(null);
     
@@ -174,6 +174,9 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          mode: selectedMode || 'sandbox'
+        }),
       });
 
       if (!response.ok) {
