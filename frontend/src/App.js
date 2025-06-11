@@ -312,8 +312,8 @@ function App() {
               Bienvenido al Infierno
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl">
-              Un mundo devastado por la guerra donde los demonios caminan por la tierra. 
-              Eres un exorcista solitario buscando redención en el Reino Ardiente.
+              Elige tu camino en una aventura épica donde cada decisión forja tu destino. 
+              Tres modos diferentes te esperan para explorar mundos únicos.
             </p>
             
             {!mode ? (
