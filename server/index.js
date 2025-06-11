@@ -164,9 +164,9 @@ class GameState {
     this.seasonId = null;
     this.createdAt = new Date();
     // 🧠 SISTEMA DE MEMORIA MEJORADO
-    this.eventFlags = new Set(); // Flags de eventos importantes
-    this.sessionSummaries = []; // Resúmenes de bloques de 10 acciones
-    this.actionCount = 0; // Contador para activar resúmenes
+    this.eventFlags = new Set();
+    this.sessionSummaries = [];
+    this.actionCount = 0;
   }
 
   toDict() {
@@ -179,13 +179,13 @@ class GameState {
       skills: this.skills,
       location: this.location,
       inventory: this.inventory,
-      narrativeLog: this.narrativeLog.slice(-5), // Solo últimas 5 entradas
+      narrativeLog: this.narrativeLog.slice(-5),
       mode: this.mode,
       campaignMeta: this.campaignMeta,
       map: this.map,
       questStage: this.questStage,
       divergenceScore: this.divergenceScore,
-      memoryRaw: this.memoryRaw.slice(-10), // Solo últimas 10 entradas
+      memoryRaw: this.memoryRaw.slice(-10),
       memorySummary: this.memorySummary,
       sessionSummaries: this.sessionSummaries,
       eventFlags: Array.from(this.eventFlags),
@@ -193,48 +193,6 @@ class GameState {
       seasonId: this.seasonId,
       createdAt: this.createdAt.toISOString()
     };
-  }
-
-  // 🧠 SISTEMA DE MEMORIA MEJORADO
-  addEventFlag(flagType, description) {
-    const flag = `${flagType}:${description}:${new Date().toISOString()}`;
-    this.eventFlags.add(flag);
-    console.log(`🏷️ Flag añadido: ${flag}`);
-  }
-
-  async generateSessionSummary(openaiClient) {
-    if (this.narrativeLog.length < 10) return;
-
-    try {
-      const recentActions = this.narrativeLog.slice(-10).map(entry => 
-        `${entry.player_action} → ${entry.narrative}`
-      ).join('\n');
-
-      const summaryPrompt = `Crea un resumen conciso (máximo 3 oraciones) de las últimas acciones del jugador en español:
-${recentActions}`;
-
-      const response = await openaiClient.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: summaryPrompt }],
-        temperature: 0.3,
-        max_tokens: 100
-      });
-
-      const summary = {
-        summary: response.choices[0].message.content,
-        actions_covered: 10,
-        timestamp: new Date().toISOString()
-      };
-
-      this.sessionSummaries.push(summary);
-      console.log(`📝 Resumen generado: ${summary.summary.substring(0, 50)}...`);
-      
-      // Limpiar narrativeLog manteniendo solo las últimas 3 entradas
-      this.narrativeLog = this.narrativeLog.slice(-3);
-      
-    } catch (error) {
-      console.error('Error generando resumen:', error);
-    }
   }
 
   // 🧠 SISTEMA DE MEMORIA MEJORADO
@@ -494,31 +452,6 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
       player_action: action,
       narrative: narrative
     });
-
-    // 🧠 SISTEMA DE MEMORIA MEJORADO - Detectar eventos importantes
-    gameState.actionCount++;
-    
-    // Detectar flags de eventos importantes basados en palabras clave
-    const actionLower = action.toLowerCase();
-    const narrativeLower = narrative.toLowerCase();
-    
-    if (actionLower.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
-      gameState.addEventFlag('MUERTE', 'Evento de muerte detectado');
-    }
-    if (actionLower.includes('combate') || actionLower.includes('atacar') || narrativeLower.includes('batalla')) {
-      gameState.addEventFlag('COMBATE', `Combate en ${gameState.location}`);
-    }
-    if (actionLower.includes('compañero') || narrativeLower.includes('compañero') || narrativeLower.includes('aliado')) {
-      gameState.addEventFlag('COMPAÑERO', 'Interacción con compañero detectada');
-    }
-    if (narrativeLower.includes('quest') || narrativeLower.includes('misión') || narrativeLower.includes('objetivo')) {
-      gameState.addEventFlag('QUEST', 'Progreso de misión detectado');
-    }
-
-    // Generar resumen automático cada 10 acciones
-    if (gameState.actionCount % 10 === 0) {
-      await gameState.generateSessionSummary(openai);
-    }
 
     // 🧠 SISTEMA DE MEMORIA MEJORADO - Detectar eventos importantes
     gameState.actionCount++;
