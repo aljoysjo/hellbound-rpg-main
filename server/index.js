@@ -171,6 +171,9 @@ app.post('/api/free_input', async (req, res) => {
     - Héroe: ${LORE.hero || 'Un exorcista solitario buscando redención'}
     - Antagonista: ${LORE.antagonist || 'El Príncipe Caído gobernando el Reino Ardiente'}
     
+    MODO DE JUEGO: ${gameState.mode}
+    ${gameState.mode === 'campaign' ? 'NOTA: Usa la estructura de campaña definida en los archivos de escenarios.' : ''}
+    
     ESTADO ACTUAL DEL JUGADOR:
     - Salud: ${gameState.health}/100
     - Maná: ${gameState.mana}/100
@@ -184,6 +187,7 @@ app.post('/api/free_input', async (req, res) => {
     3. Ajusta los stats del jugador según lo que pase
     4. Usa máximo 3 oraciones
     5. Describe consecuencias de la acción
+    ${gameState.mode === 'campaign' ? '6. Sigue la estructura narrativa de la campaña definida' : ''}
     
     ACCIÓN DEL JUGADOR: "${action}"
     
