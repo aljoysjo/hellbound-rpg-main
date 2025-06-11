@@ -136,7 +136,7 @@ const DynamicSkillBar = ({ skills = [], gameMode = 'rpg' }) => {
   );
 };
 
-const ActionInput = ({ onSubmit, disabled, suggestedActions = [] }) => {
+const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = false }) => {
   const [action, setAction] = useState('');
   
   const handleSubmit = (e) => {
@@ -152,6 +152,24 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [] }) => {
       onSubmit(suggestedAction);
     }
   };
+
+  // 💀 UI especial para Game Over
+  if (gameOver) {
+    return (
+      <div className="w-full space-y-4 text-center">
+        <div className="bg-red-900 border-2 border-red-600 rounded-lg p-6">
+          <h3 className="text-red-400 font-bold text-xl mb-4">💀 GAME OVER 💀</h3>
+          <p className="text-gray-300 mb-4">Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors"
+          >
+            Reiniciar Partida
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-4">
@@ -201,7 +219,7 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [] }) => {
   );
 };
 
-// 📜 LOG FEED LIMITADO Y LEGIBLE
+// 📜 LOG FEED MEJORADO SIN DUPLICACIÓN
 const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   const logRef = useRef(null);
 
@@ -210,9 +228,6 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [narrativeLog]);
-
-  // Limitar a las últimas 15 entradas
-  const limitedLog = narrativeLog.slice(-15);
 
   const getLogTitle = (mode) => {
     if (mode === 'sandbox') return 'Tu Historia';
@@ -227,11 +242,11 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
         ref={logRef}
         className="h-64 max-h-[50vh] overflow-y-auto text-gray-300 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
       >
-        {limitedLog.length === 0 ? (
+        {narrativeLog.length === 0 ? (
           <p className="italic text-gray-500">Tu historia comienza aquí...</p>
         ) : (
-          limitedLog.map((entry, index) => (
-            <div key={index} className="mb-3 border-b border-gray-800 pb-2 last:border-b-0">
+          narrativeLog.map((entry, index) => (
+            <div key={`${entry.timestamp}-${index}`} className="mb-3 border-b border-gray-800 pb-2 last:border-b-0">
               <p className="text-yellow-400 text-sm font-semibold mb-1">
                 &gt; {entry.player_action}
               </p>
@@ -294,6 +309,7 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
       
       <div className="mt-6 text-sm text-gray-400">
         <p>💡 <strong>Tip:</strong> Sé específico sobre el tipo de personaje, el mundo, y la situación inicial que te interesa.</p>
+        <p className="mt-2">⚠️ <strong>Advertencia:</strong> Las decisiones peligrosas pueden tener consecuencias mortales.</p>
       </div>
     </div>
   );
@@ -302,7 +318,7 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
 // Componente para mostrar cambios de estado en tiempo real
 const StateChangeNotification = ({ stateChanges, onClose }) => {
   useEffect(() => {
-    const timer = setTimeout(onClose, 4000);
+    const timer = setTimeout(onClose, 5000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -311,7 +327,7 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
   return (
     <div className="fixed top-4 right-4 bg-black bg-opacity-95 border border-yellow-600 rounded-lg p-4 max-w-sm z-50 shadow-xl">
       <div className="flex justify-between items-start mb-2">
-        <h4 className="text-yellow-400 font-bold text-sm">Cambios de Estado</h4>
+        <h4 className="text-yellow-400 font-bold text-sm">Cambios Detectados</h4>
         <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
       </div>
       
@@ -328,17 +344,35 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
           </div>
         ))}
         
+        {stateChanges.locationChange && (
+          <div className="text-blue-400">
+            📍 Ubicación: {stateChanges.locationChange}
+          </div>
+        )}
+        
         {stateChanges.newSkill && stateChanges.newSkill.id && (
           <div className="text-yellow-400">
             ⭐ Nueva habilidad: {stateChanges.newSkill.id}
           </div>
         )}
         
+        {stateChanges.resourceDelta && Object.entries(stateChanges.resourceDelta).map(([resource, delta]) => (
+          <div key={resource} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+            💰 {resource}: {delta > 0 ? '+' : ''}{delta}
+          </div>
+        ))}
+        
         {stateChanges.relationshipDelta && Object.entries(stateChanges.relationshipDelta).map(([person, delta]) => (
           <div key={person} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
             👥 {person}: {delta > 0 ? '+' : ''}{delta}
           </div>
         ))}
+        
+        {stateChanges.forceDeathCheck && (
+          <div className="text-red-500 font-bold">
+            💀 ¡Muerte inminente!
+          </div>
+        )}
       </div>
     </div>
   );
@@ -356,6 +390,7 @@ function App() {
   const [suggestedActions, setSuggestedActions] = useState([]);
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [stateChangeNotification, setStateChangeNotification] = useState(null);
+  const [gameOver, setGameOver] = useState(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
@@ -379,12 +414,23 @@ function App() {
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
         console.log('🔄 Actualizando estado del juego:', data.game_state);
-        setGameState(data.game_state);
+        
+        // Evitar duplicación: solo actualizar si es realmente nuevo
+        setGameState(prevState => {
+          if (!prevState || data.game_state.actionCount > prevState.actionCount) {
+            return data.game_state;
+          }
+          return prevState;
+        });
+        
         if (data.suggested_actions) {
           setSuggestedActions(data.suggested_actions);
         }
         if (data.state_changes) {
           setStateChangeNotification(data.state_changes);
+        }
+        if (data.game_over) {
+          setGameOver(true);
         }
       }
     });
@@ -398,6 +444,7 @@ function App() {
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
     setLoading(true);
     setError(null);
+    setGameOver(false);
     
     try {
       const requestBody = {
@@ -447,23 +494,6 @@ function App() {
         socket.emit('join_session', { session_id: data.session_id });
       }
 
-      // Add initial narrative to log - LIMITADO A 15 ENTRADAS
-      if (data.initial_narrative) {
-        setGameState(prev => {
-          const currentLog = prev?.narrativeLog || [];
-          const newLog = [...currentLog, {
-            player_action: '[Inicio del juego]',
-            narrative: data.initial_narrative,
-            timestamp: new Date().toISOString()
-          }].slice(-15); // LÍMITE DE 15 ENTRADAS
-          
-          return {
-            ...prev,
-            narrativeLog: newLog
-          };
-        });
-      }
-
     } catch (err) {
       setError('Error al iniciar sesión: ' + err.message);
     } finally {
@@ -473,7 +503,7 @@ function App() {
 
   // Submit player action
   const submitAction = async (action) => {
-    if (!sessionId || loading) return;
+    if (!sessionId || loading || gameOver) return;
 
     setLoading(true);
     setError(null);
@@ -497,27 +527,9 @@ function App() {
       const data = await response.json();
       console.log('🚚 Datos recibidos en frontend:', data);
       
-      if (data.success) {
-        const updatedGameState = {
-          ...data.game_state,
-          narrativeLog: data.game_state.narrativeLog || []
-        };
-        
-        if (data.narrative) {
-          const newEntry = {
-            timestamp: new Date().toISOString(),
-            player_action: action,
-            narrative: data.narrative
-          };
-          
-          // LIMITAR LOG A 15 ENTRADAS
-          updatedGameState.narrativeLog = [
-            ...updatedGameState.narrativeLog,
-            newEntry
-          ].slice(-15);
-        }
-        
-        setGameState(updatedGameState);
+      if (data.success || data.game_over) {
+        // Actualizar estado del juego SIN duplicar
+        setGameState(data.game_state);
         
         if (data.suggested_actions) {
           setSuggestedActions(data.suggested_actions);
@@ -525,6 +537,10 @@ function App() {
         
         if (data.state_changes && Object.keys(data.state_changes).length > 0) {
           setStateChangeNotification(data.state_changes);
+        }
+        
+        if (data.game_over) {
+          setGameOver(true);
         }
       } else {
         setError('Error en la acción: ' + data.error);
@@ -562,6 +578,11 @@ function App() {
               🔥 HELLBOUND RPG v2.0
             </h1>
             <div className="flex items-center space-x-4">
+              {gameOver && (
+                <div className="text-red-400 font-bold animate-pulse">
+                  💀 GAME OVER
+                </div>
+              )}
               <div className={`w-3 h-3 rounded-full ${
                 connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
               }`} />
@@ -694,9 +715,9 @@ function App() {
               )}
             </div>
 
-            {/* Center Panel - Narrative Log Limitado */}
+            {/* Center Panel - Narrative Log Sin Duplicación */}
             <div className="lg:col-span-2 space-y-4">
-              {/* Log Feed Dinámico y Limitado */}
+              {/* Log Feed Dinámico y Sin Duplicación */}
               <LogFeed 
                 narrativeLog={gameState?.narrativeLog || []} 
                 gameMode={gameState?.mode} 
@@ -705,14 +726,16 @@ function App() {
               {/* Action Input */}
               <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
                 <h3 className="text-red-400 font-bold mb-4">
-                  {gameState?.mode === 'sandbox' ? '¿Qué haces ahora?' : '¿Qué harás?'}
+                  {gameOver ? '💀 Partida Terminada' :
+                   gameState?.mode === 'sandbox' ? '¿Qué haces ahora?' : '¿Qué harás?'}
                 </h3>
                 <ActionInput 
                   onSubmit={submitAction} 
                   disabled={loading} 
                   suggestedActions={suggestedActions}
+                  gameOver={gameOver}
                 />
-                {loading && (
+                {loading && !gameOver && (
                   <p className="text-yellow-400 text-sm mt-2">
                     {gameState?.mode === 'sandbox' ? 
                       'Tu historia se está escribiendo...' : 
