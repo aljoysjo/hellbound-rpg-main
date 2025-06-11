@@ -348,7 +348,7 @@ Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTit
 ${camp.firstText || 'Tu historia comienza ahora.'}`;
       }
       
-      // Generate initial suggested actions
+      // Generate initial suggested actions with AI
       suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
       
       // Add to narrative log
@@ -487,8 +487,8 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
     const message = response.choices[0].message;
     let narrative = message.content || "El eco de tu acción resuena en la oscuridad...";
     
-    // Generate new suggested actions based on the narrative and context
-    const suggestedActions = generateSuggestedActions(gameState, narrative);
+    // Generate new suggested actions based on the narrative and context with AI
+    const suggestedActions = await generateSuggestedActions(gameState, narrative, openai);
     
     // Add to narrative log
     gameState.narrativeLog.push({
