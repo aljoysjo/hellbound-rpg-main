@@ -1,0 +1,24 @@
+name: Hellbound RPG
+description: >
+  Procedural narrative RPG (Godot Web + InkJS + Tracery) with
+  free-text player input powered by GPT-4o.
+stack:
+  frontend: react-tailwind
+  backend: node-express
+  db: mongo
+assets:
+  git_import: https://github.com/aljoysjo/hellbound-rpg-main
+tasks:
+  - run: cd frontend && npm ci
+  - build_godot_web: godot/
+  - endpoints:
+      - /api/free_input
+      - /api/healthcheck
+  - websocket: true
+  - openai_function_calling:
+      schema_file: functions.json
+      system_prompt_file: lore.json
+  - ci_cd: vercel
+env:
+  MONGODB_URI: ${{ secrets.MONGODB_URI }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
