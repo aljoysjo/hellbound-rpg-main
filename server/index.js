@@ -641,6 +641,28 @@ INSTRUCCIÓN CRÍTICA: La nueva narrativa DEBE continuar directamente desde dond
     // 🧠 SISTEMA DE MEMORIA MEJORADO - Detectar eventos importantes
     gameState.actionCount++;
     
+    // 📖 GESTOR DE HISTORIA AVANZADO - Actualizar progreso
+    gameState.updateQuestProgress(action, narrative);
+    
+    // Detectar decisiones importantes
+    const importantDecisionKeywords = ['matar', 'salvar', 'elegir', 'rechazar', 'aceptar', 'traicionar'];
+    if (importantDecisionKeywords.some(keyword => action.toLowerCase().includes(keyword))) {
+      gameState.addMajorDecision(action, 'media');
+    }
+    
+    // Detectar interacciones con compañeros
+    if (gameState.campaignMeta && gameState.campaignMeta.companions) {
+      gameState.campaignMeta.companions.forEach(companion => {
+        const companionFirst = companion.split(' ')[0].toLowerCase();
+        if (action.toLowerCase().includes(companionFirst) || narrative.toLowerCase().includes(companionFirst)) {
+          gameState.updateCompanionStatus(companion, 'met', true);
+          if (action.toLowerCase().includes('hablar') || action.toLowerCase().includes('conversar')) {
+            gameState.updateCompanionStatus(companion, 'trust', 10);
+          }
+        }
+      });
+    }
+    
     // Detectar flags de eventos importantes basados en palabras clave
     const actionLower = action.toLowerCase();
     const narrativeLower = narrative.toLowerCase();
