@@ -124,6 +124,12 @@ class GameState {
     this.mode = 'sandbox';
     this.campaignMeta = null;
     this.map = null;
+    // Sombra Arcana DM fields
+    this.questStage = 'I';
+    this.divergenceScore = 0;
+    this.memoryRaw = [];
+    this.memorySummary = '';
+    this.seasonId = null;
     this.createdAt = new Date();
   }
 
@@ -141,6 +147,11 @@ class GameState {
       mode: this.mode,
       campaignMeta: this.campaignMeta,
       map: this.map,
+      questStage: this.questStage,
+      divergenceScore: this.divergenceScore,
+      memoryRaw: this.memoryRaw.slice(-20), // Keep last 20 events
+      memorySummary: this.memorySummary,
+      seasonId: this.seasonId,
       createdAt: this.createdAt.toISOString()
     };
   }
