@@ -189,32 +189,6 @@ app.post('/api/free_input', async (req, res) => {
     
     console.log('🔍 DEBUG - Final narrative:', narrative);
     
-    // Handle function calling if present
-    if (message.function_call) {
-      const functionCall = message.function_call;
-      if (functionCall.name === "apply_player_action") {
-        const functionArgs = JSON.parse(functionCall.arguments);
-        narrative = functionArgs.narrative || narrative;
-        const stateChanges = functionArgs.stateChanges || {};
-        
-        // Apply state changes
-        if (stateChanges.health !== undefined) {
-          gameState.health = Math.max(0, Math.min(100, stateChanges.health));
-        }
-        if (stateChanges.mana !== undefined) {
-          gameState.mana = Math.max(0, Math.min(100, stateChanges.mana));
-        }
-        if (stateChanges.gold !== undefined) {
-          gameState.gold = Math.max(0, stateChanges.gold);
-        }
-        if (stateChanges.location) {
-          gameState.location = stateChanges.location;
-        }
-      }
-    } else if (message.content) {
-      narrative = message.content;
-    }
-    
     // Add to narrative log
     gameState.narrativeLog.push({
       timestamp: new Date().toISOString(),
