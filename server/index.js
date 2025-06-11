@@ -50,13 +50,13 @@ function loadCampaign(campaignName) {
   const campaignDir = `/app/campaigns`;
   const campaignFile = `${campaignDir}/campaign.json`;
   const mapFile = `${campaignDir}/map.json`;
-  const scenesFile = `${campaignDir}/${campaignName}.ink`;
+  const scenesFile = `${campaignDir}/scenes/${campaignName}.ink`;
   
   console.log(`🔍 Loading campaign: ${campaignName}`);
   console.log(`🔍 Looking for files:`);
   console.log(`   - campaign.json: ${existsSync(campaignFile)}`);
   console.log(`   - map.json: ${existsSync(mapFile)}`);
-  console.log(`   - ${campaignName}.ink: ${existsSync(scenesFile)}`);
+  console.log(`   - scenes/${campaignName}.ink: ${existsSync(scenesFile)}`);
   
   try {
     let campaign = {};
@@ -66,50 +66,48 @@ function loadCampaign(campaignName) {
     // Load campaign.json if exists
     if (existsSync(campaignFile)) {
       campaign = JSON.parse(readFileSync(campaignFile, 'utf8'));
-      console.log(`✅ Loaded campaign.json`);
+      console.log(`✅ Loaded campaign.json: ${campaign.titulo || campaign.title}`);
     } else {
       console.log(`⚠️ campaign.json not found, using default`);
       campaign = {
-        title: "Las Puertas de Ceniza",
-        description: "Campaña épica del Reino Ardiente",
-        intro: "Te encuentras ante las imponentes Puertas de Ceniza, donde comienza tu destino como exorcista."
+        titulo: "Caminos del Abismo",
+        intro: "Una aventura épica te espera en los dominios oscuros."
       };
     }
     
     // Load map.json if exists
     if (existsSync(mapFile)) {
       map = JSON.parse(readFileSync(mapFile, 'utf8'));
-      console.log(`✅ Loaded map.json`);
+      console.log(`✅ Loaded map.json with ${map.nodes?.length || 0} locations`);
     }
     
     // Load scenes file if exists
     if (existsSync(scenesFile)) {
       scenes = readFileSync(scenesFile, 'utf8');
-      console.log(`✅ Loaded ${campaignName}.ink`);
-      
-      // Extract intro from scenes if campaign.json doesn't have one
-      if (!campaign.intro && scenes) {
-        const lines = scenes.split('\n');
-        for (let line of lines) {
-          line = line.trim();
-          if (line.startsWith('===') || line.startsWith('#') || line === '') {
-            continue;
-          }
-          if (line.length > 20) {
-            campaign.intro = line;
-            break;
-          }
+      console.log(`✅ Loaded scenes/${campaignName}.ink`);
+    } else {
+      console.log(`⚠️ scenes/${campaignName}.ink not found`);
+    }
+    
+    // Extract intro from campaign or scenes
+    let intro = campaign.intro || "Comienza tu aventura épica.";
+    if (!intro && scenes) {
+      const lines = scenes.split('\n');
+      for (let line of lines) {
+        line = line.trim();
+        if (line.startsWith('==') || line === '') continue;
+        if (line.length > 20) {
+          intro = line;
+          break;
         }
       }
-    } else {
-      console.log(`⚠️ ${campaignName}.ink not found`);
     }
     
     return {
       campaign,
       map,
       scenes,
-      intro: campaign.intro || "Comienza tu campaña épica en las Puertas de Ceniza."
+      intro: intro
     };
     
   } catch (error) {
