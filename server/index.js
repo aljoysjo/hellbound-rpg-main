@@ -367,7 +367,7 @@ ${camp.firstText || 'Tu historia comienza ahora.'}`;
         default: // sandbox
           initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. En este mundo abierto, tu destino es tuyo. ¿Qué harás, exorcista?`;
       }
-      suggestedActions = generateSuggestedActions(gameState, initialNarrative);
+      suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
     }
     
     // Save to MongoDB
