@@ -1,0 +1,25 @@
+{
+  "regions": [
+    {
+      "id": "puertas_ceniza",
+      "name": "Puertas de Ceniza",
+      "description": "La frontera entre el mundo mortal y los dominios infernales",
+      "coordinates": { "x": 0, "y": 0 },
+      "type": "entrance"
+    },
+    {
+      "id": "pasillo_sombras",
+      "name": "Pasillo de Sombras", 
+      "description": "Un corredor oscuro iluminado por antorchas verdes",
+      "coordinates": { "x": 1, "y": 0 },
+      "type": "corridor"
+    }
+  ],
+  "connections": [
+    {
+      "from": "puertas_ceniza",
+      "to": "pasillo_sombras",
+      "requirement": "Abrir las Puertas de Ceniza"
+    }
+  ]
+}
