@@ -494,6 +494,31 @@ CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
       player_action: action,
       narrative: narrative
     });
+
+    // 🧠 SISTEMA DE MEMORIA MEJORADO - Detectar eventos importantes
+    gameState.actionCount++;
+    
+    // Detectar flags de eventos importantes basados en palabras clave
+    const actionLower = action.toLowerCase();
+    const narrativeLower = narrative.toLowerCase();
+    
+    if (actionLower.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
+      gameState.addEventFlag('MUERTE', 'Evento de muerte detectado');
+    }
+    if (actionLower.includes('combate') || actionLower.includes('atacar') || narrativeLower.includes('batalla')) {
+      gameState.addEventFlag('COMBATE', `Combate en ${gameState.location}`);
+    }
+    if (actionLower.includes('compañero') || narrativeLower.includes('compañero') || narrativeLower.includes('aliado')) {
+      gameState.addEventFlag('COMPAÑERO', 'Interacción con compañero detectada');
+    }
+    if (narrativeLower.includes('quest') || narrativeLower.includes('misión') || narrativeLower.includes('objetivo')) {
+      gameState.addEventFlag('QUEST', 'Progreso de misión detectado');
+    }
+
+    // Generar resumen automático cada 10 acciones
+    if (gameState.actionCount % 10 === 0) {
+      await gameState.generateSessionSummary(openai);
+    }
     
     // Update in MongoDB
     if (db) {
