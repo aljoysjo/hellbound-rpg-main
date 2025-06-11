@@ -163,6 +163,10 @@ class GameState {
     this.memorySummary = '';
     this.seasonId = null;
     this.createdAt = new Date();
+    // 🧠 SISTEMA DE MEMORIA MEJORADO
+    this.eventFlags = new Set(); // Flags de eventos importantes
+    this.sessionSummaries = []; // Resúmenes de bloques de 10 acciones
+    this.actionCount = 0; // Contador para activar resúmenes
   }
 
   toDict() {
