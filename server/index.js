@@ -101,16 +101,61 @@ function loadFullCampaign(name) {
   }
 }
 
-// Generate suggested actions based on context
-function generateSuggestedActions(gameState, narrative) {
+// Generate suggested actions based on context using AI
+async function generateSuggestedActions(gameState, narrative, openaiClient) {
+  try {
+    // Crear un prompt contextual para generar acciones relevantes
+    const contextPrompt = `
+Eres un maestro de juego para Hellbound RPG. Basándote en la narrativa actual, genera exactamente 4 acciones sugeridas breves y específicas que el jugador pueda realizar.
+
+CONTEXTO ACTUAL:
+- Ubicación: ${gameState.location}
+- Narrativa actual: "${narrative}"
+- Modo de juego: ${gameState.mode}
+- Salud: ${gameState.health}/100
+- Maná: ${gameState.mana}/100
+
+INSTRUCCIONES:
+1. Las acciones deben ser específicas a la situación actual
+2. Máximo 4-6 palabras por acción
+3. En español
+4. Que tengan sentido con lo que acaba de pasar en la narrativa
+5. Incluir variedad: exploración, interacción, combate, habilidades
+
+Responde SOLO con 4 acciones separadas por comas, sin numeración ni explicaciones.
+
+Ejemplo de formato: "Hablar con Darius, Examinar la fuente helada, Usar Exorcismo, Buscar pistas en la plaza"
+`;
+
+    const response = await openaiClient.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: contextPrompt }],
+      temperature: 0.7,
+      max_tokens: 80
+    });
+
+    const suggestedActionsText = response.choices[0].message.content.trim();
+    const actions = suggestedActionsText.split(',').map(action => action.trim()).slice(0, 4);
+    
+    console.log(`🎯 Acciones dinámicas generadas: ${actions.join(', ')}`);
+    return actions;
+
+  } catch (error) {
+    console.error('Error generando acciones sugeridas:', error);
+    // Fallback a acciones genéricas
+    return generateFallbackActions(gameState);
+  }
+}
+
+// Fallback actions when AI fails
+function generateFallbackActions(gameState) {
   const baseActions = [];
   
   if (gameState.mode === 'campaign') {
-    // Campaign-specific suggested actions
     if (gameState.location === 'Alicante') {
       baseActions.push(
         "Investigar la figura misteriosa",
-        "Buscar a uno de mis compañeros",
+        "Buscar a un compañero",
         "Explorar la ciudad nevada",
         "Meditar sobre el presentimiento"
       );
@@ -123,7 +168,6 @@ function generateSuggestedActions(gameState, narrative) {
       );
     }
   } else {
-    // Generic sandbox actions
     baseActions.push(
       "Explorar los alrededores",
       "Usar una habilidad",
