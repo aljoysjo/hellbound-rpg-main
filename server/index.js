@@ -185,6 +185,8 @@ app.post('/api/free_input', async (req, res) => {
     console.log('🔍 DEBUG - OpenAI response:', response.choices[0]);
     
     const message = response.choices[0].message;
+    console.log('🔍 GPT RAW:', JSON.stringify(message, null, 2));
+    
     let narrative = message.content || "El eco de tu acción resuena en la oscuridad...";
     
     console.log('🔍 DEBUG - Final narrative:', narrative);
