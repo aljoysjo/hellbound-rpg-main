@@ -1,0 +1,15 @@
+{
+  "title": "Las Puertas de Ceniza",
+  "description": "Campaña épica del Reino Ardiente donde el exorcista debe enfrentar al Príncipe Caído",
+  "intro": "Te encuentras ante las imponentes Puertas de Ceniza, estructura colosal que marca la frontera entre el mundo mortal y los dominios infernales. El viento nocturno arrastra consigo cenizas que brillan con un fuego sobrenatural.",
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Las Puertas de Ceniza",
+      "description": "El exorcista debe superar las pruebas iniciales para demostrar su valor",
+      "sceneInicial": "Puertas de Ceniza"
+    }
+  ],
+  "difficulty": "normal",
+  "estimated_duration": "2-3 horas"
+}
