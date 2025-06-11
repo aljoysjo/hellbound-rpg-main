@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    {"id": "alicante", "name": "Alicante", "type": "urbano"},
+    {"id": "mirage", "name": "Mirage City", "type": "ciudad"},
+    {"id": "fractarwing", "name": "Castillo Fractarwing", "type": "fortaleza"},
+    {"id": "plaza", "name": "Plaza Primaveral", "type": "social"},
+    {"id": "iglesia", "name": "Iglesia Helada", "type": "reliquia"}
+  ],
+  "edges": [
+    {"from": "alicante", "to": "mirage"},
+    {"from": "mirage", "to": "fractarwing"},
+    {"from": "mirage", "to": "plaza"},
+    {"from": "fractarwing", "to": "iglesia"}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "titulo": "Caminos del Abismo",
+  "story_mode": "campaign",
+  "tone_level": 8,
+  "acto_total": 5,
+  "mapa_interactivo": true,
+  "companions": ["Near Bakewell", "Clarity Churchbale", "Darius Blackwater", "Sebastian Swansea"],
+  "locations": ["Alicante", "Mirage City", "Castillo Fractarwing", "Plaza Primaveral", "Iglesia Helada"]
+}
