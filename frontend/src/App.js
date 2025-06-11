@@ -3,7 +3,7 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🎮 MAIN APP COMPONENT
+// 🎮 MAIN APP COMPONENT - FIXED FUNCTIONALITY
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -16,7 +16,7 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   
-  // UI States
+  // UI States - FIXED
   const [narrativeVisible, setNarrativeVisible] = useState(true);
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
@@ -26,7 +26,7 @@ function App() {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
 
-  // Auto-fade narrativa después de 5 segundos
+  // Auto-fade narrativa después de 5 segundos - FIXED
   useEffect(() => {
     if (narrativeVisible && gameState?.narrativeLog?.length > 0) {
       if (fadeTimeoutRef.current) {
@@ -133,7 +133,7 @@ function App() {
     }
   };
 
-  // Submit action
+  // Submit action - FIXED
   const submitAction = async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
@@ -178,8 +178,10 @@ function App() {
     }
   };
 
+  // FIXED: Event handlers
   const handleActionSubmit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (action.trim()) {
       submitAction(action.trim());
       setAction('');
@@ -190,6 +192,32 @@ function App() {
     submitAction(suggestedAction);
   };
 
+  // FIXED: Modal handlers
+  const toggleObjectives = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowObjectives(!showObjectives);
+  };
+
+  const toggleInventory = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowInventory(!showInventory);
+  };
+
+  const toggleNarrativeModal = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowNarrativeModal(!showNarrativeModal);
+  };
+
+  const toggleNarrativeVisible = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setNarrativeVisible(!narrativeVisible);
+  };
+
+  // Helper functions
   const getActionIcon = (action) => {
     const actionLower = action.toLowerCase();
     if (actionLower.includes('atacar') || actionLower.includes('luchar')) return '⚔️';
@@ -222,7 +250,7 @@ function App() {
     return '✨';
   };
 
-  // Componente Canvas Integrado
+  // Componente Canvas Integrado - FIXED
   const IntegratedCanvas = () => {
     const canvasRef = useRef(null);
     
@@ -266,13 +294,17 @@ function App() {
 
     return (
       <div className="integrated-canvas-container">
-        <canvas ref={canvasRef} className="ai-canvas" />
+        <canvas 
+          ref={canvasRef} 
+          className="ai-canvas clickable" 
+          onClick={toggleNarrativeModal}
+        />
         
-        {/* Narrativa Overlay */}
+        {/* Narrativa Overlay - FIXED */}
         {narrativeVisible && latestEntry && (
           <div 
-            className={`narrative-overlay ${!narrativeVisible ? 'fading' : ''}`}
-            onClick={() => setShowNarrativeModal(true)}
+            className="narrative-overlay clickable"
+            onClick={toggleNarrativeModal}
           >
             <div className="narrative-title">
               📜 {gameState.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}
@@ -281,8 +313,8 @@ function App() {
               <strong>▶ {latestEntry.player_action}</strong>
             </div>
             <div className="narrative-preview">
-              {latestEntry.narrative.length > 150 
-                ? latestEntry.narrative.substring(0, 150) + '...' 
+              {latestEntry.narrative.length > 120 
+                ? latestEntry.narrative.substring(0, 120) + '...' 
                 : latestEntry.narrative
               }
             </div>
@@ -292,18 +324,20 @@ function App() {
           </div>
         )}
         
+        {/* Botón para reabrir narrativa - FIXED */}
+        {!narrativeVisible && gameState?.narrativeLog?.length > 0 && (
+          <button 
+            className="narrative-toggle clickable"
+            onClick={toggleNarrativeVisible}
+            title="Mostrar narrativa"
+          >
+            📜
+          </button>
+        )}
+        
+        {/* Loading indicator - FIXED */}
         {loading && (
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'var(--bg-overlay)',
-            color: 'var(--text-light)',
-            padding: 'var(--space-md)',
-            borderRadius: 'var(--border-radius)',
-            animation: 'pulse 2s infinite'
-          }}>
+          <div className="loading-indicator">
             🎨 Generando respuesta...
           </div>
         )}
@@ -311,7 +345,7 @@ function App() {
     );
   };
 
-  // Componente Header Compacto
+  // Componente Header Compacto - FIXED
   const CompactHeader = () => {
     const vitals = gameState?.vitals || {};
     
@@ -355,7 +389,7 @@ function App() {
     );
   };
 
-  // Componente Skills Bar Dinámico
+  // Componente Skills Bar Dinámico - FIXED
   const SkillsBar = () => {
     const skills = gameState?.skills || [];
     const emotionalStates = gameState?.emotionalStates || {};
@@ -365,12 +399,12 @@ function App() {
       <div className="skills-bar">
         <div className="skills-list">
           {skills.length === 0 ? (
-            <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.8rem' }}>
+            <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
               Las habilidades aparecerán según tus acciones
             </div>
           ) : (
             skills.map((skill, index) => (
-              <div key={skill.id || index} className="skill-item">
+              <div key={skill.id || index} className="skill-item clickable">
                 <span className="skill-icon">{getSkillIcon(skill)}</span>
                 <div className="skill-info">
                   <div className="skill-name">
@@ -394,14 +428,14 @@ function App() {
         
         <div className="modal-triggers">
           <button 
-            className="modal-trigger"
-            onClick={() => setShowObjectives(true)}
+            className="modal-trigger clickable"
+            onClick={toggleObjectives}
           >
             🎯 <span>{gameState?.questObjectives?.length || 3}</span>
           </button>
           <button 
-            className="modal-trigger"
-            onClick={() => setShowInventory(true)}
+            className="modal-trigger clickable"
+            onClick={toggleInventory}
           >
             📦 <span>{gameState?.inventory?.length || 0}</span>
           </button>
@@ -410,7 +444,7 @@ function App() {
     );
   };
 
-  // Componente Controls Bar
+  // Componente Controls Bar - FIXED MOBILE
   const ControlsBar = () => (
     <div className="controls-bar">
       <form onSubmit={handleActionSubmit} className="input-group">
@@ -420,12 +454,16 @@ function App() {
           onChange={(e) => setAction(e.target.value)}
           placeholder="Escribe lo que quieres que suceda..."
           disabled={loading || gameOver}
-          className="main-input"
+          className="main-input clickable"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
         />
         <button
           type="submit"
           disabled={loading || gameOver || !action.trim()}
-          className="action-button"
+          className="action-button clickable"
         >
           {loading ? '...' : 'ACTUAR'}
         </button>
@@ -437,7 +475,7 @@ function App() {
             key={index}
             onClick={() => handleSuggestedAction(suggestedAction)}
             disabled={loading || gameOver}
-            className="quick-action"
+            className="quick-action clickable"
             title={suggestedAction}
           >
             {getActionIcon(suggestedAction)}
@@ -447,7 +485,7 @@ function App() {
     </div>
   );
 
-  // Modal Objetivos
+  // Modal Objetivos - FIXED
   const ObjectivesModal = () => {
     const defaultObjectives = [
       { description: "Investigar la figura misteriosa", completed: false },
@@ -466,7 +504,11 @@ function App() {
         <div className={`slide-modal ${showObjectives ? 'show' : ''}`}>
           <div className="modal-header">
             <span>🎯 Objetivos</span>
-            <button className="modal-close" onClick={() => setShowObjectives(false)}>
+            <button 
+              className="modal-close clickable" 
+              onClick={() => setShowObjectives(false)}
+              type="button"
+            >
               ✕
             </button>
           </div>
@@ -490,7 +532,7 @@ function App() {
     );
   };
 
-  // Modal Inventario
+  // Modal Inventario - FIXED
   const InventoryModal = () => {
     const items = gameState?.inventory || [];
     const totalSlots = 9;
@@ -505,14 +547,18 @@ function App() {
         <div className={`slide-modal right ${showInventory ? 'show' : ''}`}>
           <div className="modal-header">
             <span>📦 Inventario</span>
-            <button className="modal-close" onClick={() => setShowInventory(false)}>
+            <button 
+              className="modal-close clickable" 
+              onClick={() => setShowInventory(false)}
+              type="button"
+            >
               ✕
             </button>
           </div>
           <div className="modal-content">
             <div className="inventory-grid">
               {items.map((item, index) => (
-                <div key={index} className="inventory-slot">
+                <div key={index} className="inventory-slot clickable">
                   <div className="slot-icon">{item.icon || '📦'}</div>
                   <div className="slot-name">{item.name || `Item ${index + 1}`}</div>
                 </div>
@@ -530,7 +576,7 @@ function App() {
     );
   };
 
-  // Modal Narrativa Expandida
+  // Modal Narrativa Expandida - FIXED
   const NarrativeModal = () => (
     <>
       <div 
@@ -540,7 +586,11 @@ function App() {
       <div className={`narrative-modal ${showNarrativeModal ? 'show' : ''}`}>
         <div className="modal-header">
           <span>📜 {gameState?.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}</span>
-          <button className="modal-close" onClick={() => setShowNarrativeModal(false)}>
+          <button 
+            className="modal-close clickable" 
+            onClick={() => setShowNarrativeModal(false)}
+            type="button"
+          >
             ✕
           </button>
         </div>
@@ -566,12 +616,13 @@ function App() {
     </>
   );
 
-  // Formulario Sandbox
+  // Formulario Sandbox - FIXED
   const SandboxConceptForm = ({ onSubmit, loading }) => {
     const [concept, setConcept] = useState('');
 
     const handleSubmit = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (concept.trim() && !loading) {
         onSubmit(concept.trim());
       }
@@ -610,6 +661,7 @@ function App() {
                 placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
                 disabled={loading}
                 rows={4}
+                className="clickable"
                 style={{
                   width: '100%',
                   padding: 'var(--space-md)',
@@ -628,7 +680,7 @@ function App() {
               <button
                 type="submit"
                 disabled={loading || concept.trim().length < 20}
-                className="action-button"
+                className="action-button clickable"
                 style={{ fontSize: '1.1rem' }}
               >
                 {loading ? 'Creando historia...' : 'Comenzar Aventura'}
@@ -690,7 +742,7 @@ function App() {
                   <button
                     onClick={() => startNewSession(mode, 'scenes_act1')}
                     disabled={loading}
-                    className="action-button"
+                    className="action-button clickable"
                     style={{ fontSize: '1.1rem' }}
                   >
                     {loading ? 'Iniciando...' : `Iniciar ${
@@ -705,13 +757,15 @@ function App() {
                       setShowSandboxForm(false);
                     }}
                     disabled={loading}
+                    className="clickable"
                     style={{
                       background: 'var(--color-secondary)',
                       color: 'var(--text-light)',
                       border: 'none',
                       padding: 'var(--space-sm) var(--space-md)',
                       borderRadius: 'var(--border-radius)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      fontSize: '1rem'
                     }}
                   >
                     Cambiar Modo
@@ -745,7 +799,7 @@ function App() {
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="action-button"
+              className="action-button clickable"
               style={{ fontSize: '1.1rem' }}
             >
               Reiniciar Partida
@@ -753,21 +807,21 @@ function App() {
           </div>
         </div>
       ) : (
-        // Interfaz del juego
+        // Interfaz del juego - FIXED
         <>
           <CompactHeader />
           <IntegratedCanvas />
           <SkillsBar />
           <ControlsBar />
           
-          {/* Modales */}
+          {/* Modales - FIXED */}
           <ObjectivesModal />
           <InventoryModal />
           <NarrativeModal />
         </>
       )}
 
-      {/* Error Display */}
+      {/* Error Display - FIXED */}
       {error && (
         <div style={{
           position: 'fixed',
@@ -779,7 +833,7 @@ function App() {
           borderRadius: 'var(--border-radius)',
           zIndex: '200',
           maxWidth: '300px',
-          fontSize: '0.9rem'
+          fontSize: '1rem'
         }}>
           {error}
         </div>
