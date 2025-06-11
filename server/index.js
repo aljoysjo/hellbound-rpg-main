@@ -48,7 +48,6 @@ const LORE = loadJsonFile('lore.json');
 const FUNCTIONS = loadJsonFile('functions.json');
 const LEXICON = loadJsonFile('lexicon.json');
 const CAMPAIGNS = loadJsonFile('campaigns/scenes_act1.ink') || {};
-const CAMPAIGNS = loadJsonFile('campaigns/scenes_act1.ink') || {};
 
 // Game state management
 const gameSessions = new Map();
