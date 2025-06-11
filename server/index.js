@@ -45,41 +45,75 @@ function loadJsonFile(filename) {
   }
 }
 
-// Load campaign helper
+// Load campaign helper - loads complete campaign data
 function loadCampaign(campaignName) {
-  const file = `/app/campaigns/${campaignName}.ink`;
-  if (!existsSync(file)) {
-    console.log(`Campaign file not found: ${file}`);
-    return null;
-  }
+  const campaignDir = `/app/campaigns`;
+  const campaignFile = `${campaignDir}/campaign.json`;
+  const mapFile = `${campaignDir}/map.json`;
+  const scenesFile = `${campaignDir}/${campaignName}.ink`;
+  
+  console.log(`🔍 Loading campaign: ${campaignName}`);
+  console.log(`🔍 Looking for files:`);
+  console.log(`   - campaign.json: ${existsSync(campaignFile)}`);
+  console.log(`   - map.json: ${existsSync(mapFile)}`);
+  console.log(`   - ${campaignName}.ink: ${existsSync(scenesFile)}`);
+  
   try {
-    const content = readFileSync(file, 'utf8');
-    const lines = content.split('\n');
+    let campaign = {};
+    let map = {};
+    let scenes = '';
     
-    // Find the first substantial narrative text (skip headers and empty lines)
-    let intro = '';
-    let foundNarrative = false;
-    
-    for (let line of lines) {
-      line = line.trim();
-      // Skip headers (===), empty lines, and markdown headers (#)
-      if (line.startsWith('===') || line.startsWith('#') || line === '') {
-        continue;
-      }
-      // This is our first narrative paragraph
-      if (!foundNarrative && line.length > 20) {
-        intro = line;
-        foundNarrative = true;
-        break;
-      }
+    // Load campaign.json if exists
+    if (existsSync(campaignFile)) {
+      campaign = JSON.parse(readFileSync(campaignFile, 'utf8'));
+      console.log(`✅ Loaded campaign.json`);
+    } else {
+      console.log(`⚠️ campaign.json not found, using default`);
+      campaign = {
+        title: "Las Puertas de Ceniza",
+        description: "Campaña épica del Reino Ardiente",
+        intro: "Te encuentras ante las imponentes Puertas de Ceniza, donde comienza tu destino como exorcista."
+      };
     }
     
-    return { 
-      intro: intro || 'Comienza tu campaña épica en las Puertas de Ceniza.',
-      content: content 
+    // Load map.json if exists
+    if (existsSync(mapFile)) {
+      map = JSON.parse(readFileSync(mapFile, 'utf8'));
+      console.log(`✅ Loaded map.json`);
+    }
+    
+    // Load scenes file if exists
+    if (existsSync(scenesFile)) {
+      scenes = readFileSync(scenesFile, 'utf8');
+      console.log(`✅ Loaded ${campaignName}.ink`);
+      
+      // Extract intro from scenes if campaign.json doesn't have one
+      if (!campaign.intro && scenes) {
+        const lines = scenes.split('\n');
+        for (let line of lines) {
+          line = line.trim();
+          if (line.startsWith('===') || line.startsWith('#') || line === '') {
+            continue;
+          }
+          if (line.length > 20) {
+            campaign.intro = line;
+            break;
+          }
+        }
+      }
+    } else {
+      console.log(`⚠️ ${campaignName}.ink not found`);
+    }
+    
+    return {
+      campaign,
+      map,
+      scenes,
+      intro: campaign.intro || "Comienza tu campaña épica en las Puertas de Ceniza."
     };
+    
   } catch (error) {
-    console.log(`Error loading campaign ${campaignName}:`, error.message);
+    console.log(`❌ Error loading campaign ${campaignName}:`, error.message);
     return null;
   }
 }
