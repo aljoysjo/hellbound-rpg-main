@@ -13,12 +13,10 @@
     "socket.io-client": "^4.7.2",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "start": "HOST=0.0.0.0 PORT=3000 DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+ "scripts": {
+  "build": "react-scripts build",
+  "start": "npm run build && npx serve -s build -l 8001"
+},
   "eslintConfig": {
     "extends": [
       "react-app",
