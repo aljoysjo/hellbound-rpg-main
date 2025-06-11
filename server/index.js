@@ -105,8 +105,12 @@ app.get('/api/healthcheck', (req, res) => {
 
 app.post('/api/start_session', async (req, res) => {
   try {
+    const { mode = 'sandbox' } = req.body; // Obtener modo del request
     const sessionId = crypto.randomUUID();
     const gameState = new GameState(sessionId);
+    
+    // Configurar el estado inicial según el modo
+    gameState.mode = mode;
     gameSessions.set(sessionId, gameState);
     
     // Save to MongoDB
@@ -114,13 +118,24 @@ app.post('/api/start_session', async (req, res) => {
       await db.collection('sessions').insertOne(gameState.toDict());
     }
     
-    // Initial narrative
-    const initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. ¿Qué harás, exorcista?`;
+    // Initial narrative según el modo
+    let initialNarrative;
+    switch (mode) {
+      case 'campaign':
+        initialNarrative = `Comienza tu campaña épica. Te encuentras ante las ${gameState.location}, el primer paso de tu destino predeterminado. Los vientos del destino susurran tu nombre, exorcista.`;
+        break;
+      case 'seasonal':
+        initialNarrative = `¡Evento especial activo! Las estrellas se alinean de manera extraña, otorgando poderes temporales. Te encuentras ante las ${gameState.location} durante esta época mística.`;
+        break;
+      default: // sandbox
+        initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. En este mundo abierto, tu destino es tuyo. ¿Qué harás, exorcista?`;
+    }
     
     res.json({
       session_id: sessionId,
       game_state: gameState.toDict(),
-      initial_narrative: initialNarrative
+      initial_narrative: initialNarrative,
+      mode: mode
     });
   } catch (error) {
     console.error('Error starting session:', error);
