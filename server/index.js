@@ -66,22 +66,26 @@ function loadFullCampaign(name) {
       JSON.parse(readFileSync(mapFile, 'utf8')) : 
       { nodes: [] };
     
-    // Load and parse ink file
-    let story = null;
+    // Load and parse ink file (as text, not compiled)
     let firstText = '';
     
     if (existsSync(inkFile)) {
       const inkText = readFileSync(inkFile, 'utf8');
-      story = new Story(inkText);
       
-      // Get first narrative text
-      if (story.canContinue) {
-        firstText = story.Continue().trim();
+      // Parse ink text manually to get first narrative
+      const lines = inkText.split('\n');
+      for (let line of lines) {
+        line = line.trim();
+        if (line.startsWith('==') || line === '' || line.includes('suggestedActions')) continue;
+        if (line.length > 30) {
+          firstText = line;
+          break;
+        }
       }
       
       console.log(`✅ Loaded campaign: "${json.titulo}"`);
       console.log(`✅ Map with ${map.nodes?.length || 0} locations`);
-      console.log(`✅ Ink story loaded, first text: "${firstText.substring(0, 50)}..."`);
+      console.log(`✅ Ink text parsed, first narrative: "${firstText.substring(0, 50)}..."`);
     } else {
       console.log(`❌ Ink file not found: ${inkFile}`);
     }
