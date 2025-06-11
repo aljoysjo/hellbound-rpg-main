@@ -315,13 +315,15 @@ QUEST_STAGE: I (Inicio de campaña)
 DIVERGENCE_SCORE: 0 (siguiendo trama canónica)
 LOCACIONES DEL MUNDO: ${gameState.campaignMeta.locations?.join(' → ') || 'Desconocidas'}
 
-CONTEXTO NARRATIVO ESPECÍFICO DE "CAMINOS DEL ABISMO":
+CONTEXTO NARRATIVO ESPECÍFICO DE "${gameState.campaignMeta.titulo}":
+- BASADO EN: "Hellbound: El infierno en la tierra"
 - El jugador ha despertado en Alicante con un presentimiento oscuro
 - Una figura misteriosa lo observa desde la ventana con ojos rojos
 - Hay una presencia sobrenatural que genera inquietud  
 - Los Errantes y el Uróboros son elementos importantes del mundo
 - El Rey Hawkeye y los desequilibrios entre reinos son temas centrales
 - La nieve cae constantemente, creando una atmósfera melancólica
+- SIEMPRE HABLA EN SEGUNDA PERSONA: Dirígete al jugador como "tú", nunca "el jugador"
 `;
       } else if (storyMode === 'sandbox') {
         campaignContext += `
