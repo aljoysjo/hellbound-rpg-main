@@ -93,7 +93,6 @@ function loadFullCampaign(name) {
     return { 
       json, 
       map, 
-      story, 
       firstText: firstText || json.titulo || 'Aventura épica te espera'
     };
     
