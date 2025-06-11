@@ -131,6 +131,9 @@ function App() {
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+  
+  console.log('🔍 DEBUG - BACKEND_URL:', BACKEND_URL);
+  console.log('🔍 DEBUG - process.env.REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
 
   // Initialize socket connection
   useEffect(() => {
