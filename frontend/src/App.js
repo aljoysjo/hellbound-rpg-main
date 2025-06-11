@@ -230,9 +230,22 @@ function App() {
       }
 
       const data = await response.json();
+      console.log('🚚 Datos recibidos en frontend:', data);   // DEBUG
       
       if (data.success) {
         setGameState(data.game_state);
+        
+        // Actualizar el log narrativo con la nueva narrativa
+        if (data.narrative) {
+          setGameState(prev => ({
+            ...prev,
+            narrative_log: [...(prev?.narrative_log || []), {
+              timestamp: new Date().toISOString(),
+              player_action: action,
+              narrative: data.narrative
+            }]
+          }));
+        }
       } else {
         setError('Error en la acción: ' + data.error);
       }
