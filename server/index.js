@@ -90,13 +90,13 @@ function loadCampaign(campaignName) {
     }
     
     // Extract intro from campaign or scenes
-    let intro = campaign.intro || "Comienza tu aventura épica.";
+    let intro = campaign.intro || campaign.description || "Comienza tu aventura épica.";
     if (!intro && scenes) {
       const lines = scenes.split('\n');
       for (let line of lines) {
         line = line.trim();
         if (line.startsWith('==') || line === '') continue;
-        if (line.length > 20) {
+        if (line.length > 30 && !line.includes('suggestedActions')) {
           intro = line;
           break;
         }
