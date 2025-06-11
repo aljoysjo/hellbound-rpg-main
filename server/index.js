@@ -349,7 +349,7 @@ ${camp.firstText || 'Tu historia comienza ahora.'}`;
       }
       
       // Generate initial suggested actions
-      suggestedActions = generateSuggestedActions(gameState, initialNarrative);
+      suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
       
       // Add to narrative log
       gameState.narrativeLog.push({
