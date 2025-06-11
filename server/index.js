@@ -4,7 +4,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { MongoClient } from 'mongodb';
 import OpenAI from 'openai';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import path from 'path';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -44,10 +45,28 @@ function loadJsonFile(filename) {
   }
 }
 
+// Load campaign helper
+function loadCampaign(campaignName) {
+  const file = `/app/campaigns/${campaignName}.ink`;
+  if (!existsSync(file)) {
+    console.log(`Campaign file not found: ${file}`);
+    return null;
+  }
+  try {
+    const content = readFileSync(file, 'utf8');
+    return { 
+      intro: content.split('\n')[0] || 'Campaña cargada',
+      content: content 
+    };
+  } catch (error) {
+    console.log(`Error loading campaign ${campaignName}:`, error.message);
+    return null;
+  }
+}
+
 const LORE = loadJsonFile('lore.json');
 const FUNCTIONS = loadJsonFile('functions.json');
 const LEXICON = loadJsonFile('lexicon.json');
-const CAMPAIGNS = loadJsonFile('campaigns/scenes_act1.ink') || {};
 
 // Game state management
 const gameSessions = new Map();
@@ -63,7 +82,7 @@ class GameState {
     this.location = "Puertas de Ceniza";
     this.inventory = [];
     this.narrativeLog = [];
-    this.mode = 'sandbox'; // Modo de juego por defecto
+    this.mode = 'sandbox';
     this.createdAt = new Date();
   }
 
@@ -77,7 +96,7 @@ class GameState {
       skills: this.skills,
       location: this.location,
       inventory: this.inventory,
-      narrativeLog: this.narrativeLog.slice(-10), // Last 10 entries
+      narrativeLog: this.narrativeLog.slice(-10),
       mode: this.mode,
       createdAt: this.createdAt.toISOString()
     };
@@ -108,30 +127,43 @@ app.get('/api/healthcheck', (req, res) => {
 
 app.post('/api/start_session', async (req, res) => {
   try {
-    const { mode = 'sandbox' } = req.body; // Obtener modo del request
+    const { mode = 'sandbox', campaign } = req.body;
     const sessionId = crypto.randomUUID();
     const gameState = new GameState(sessionId);
     
-    // Configurar el estado inicial según el modo
     gameState.mode = mode;
     gameSessions.set(sessionId, gameState);
+    
+    let initialNarrative;
+    
+    // Handle campaign mode
+    if (mode === 'campaign') {
+      const camp = loadCampaign(campaign || 'scenes_act1');
+      if (!camp) {
+        return res.status(404).json({ error: 'Campaña no encontrada' });
+      }
+      
+      // Use campaign intro
+      initialNarrative = `[CAMPAÑA CARGADA] ${camp.intro}`;
+      gameState.narrativeLog.push({
+        timestamp: new Date().toISOString(),
+        player_action: '[Inicio de Campaña]',
+        narrative: camp.intro
+      });
+    } else {
+      // Default narratives for other modes
+      switch (mode) {
+        case 'seasonal':
+          initialNarrative = `¡Evento especial activo! Las estrellas se alinean de manera extraña, otorgando poderes temporales. Te encuentras ante las ${gameState.location} durante esta época mística.`;
+          break;
+        default: // sandbox
+          initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. En este mundo abierto, tu destino es tuyo. ¿Qué harás, exorcista?`;
+      }
+    }
     
     // Save to MongoDB
     if (db) {
       await db.collection('sessions').insertOne(gameState.toDict());
-    }
-    
-    // Initial narrative según el modo
-    let initialNarrative;
-    switch (mode) {
-      case 'campaign':
-        initialNarrative = `Comienza tu campaña épica. Te encuentras ante las ${gameState.location}, el primer paso de tu destino predeterminado. Los vientos del destino susurran tu nombre, exorcista.`;
-        break;
-      case 'seasonal':
-        initialNarrative = `¡Evento especial activo! Las estrellas se alinean de manera extraña, otorgando poderes temporales. Te encuentras ante las ${gameState.location} durante esta época mística.`;
-        break;
-      default: // sandbox
-        initialNarrative = `Te encuentras ante las ${gameState.location}. El viento trae susurros de almas condenadas. En este mundo abierto, tu destino es tuyo. ¿Qué harás, exorcista?`;
     }
     
     res.json({

@@ -130,7 +130,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  const [mode, setMode] = useState(null); // Nuevo estado para el modo seleccionado
+  const [mode, setMode] = useState(null);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
@@ -164,19 +164,26 @@ function App() {
   }, [BACKEND_URL, sessionId]);
 
   // Start new game session
-  const startNewSession = async (selectedMode = mode) => {
+  const startNewSession = async (selectedMode = mode, campaignName) => {
     setLoading(true);
     setError(null);
     
     try {
+      const requestBody = {
+        mode: selectedMode || 'sandbox'
+      };
+      
+      // Add campaign name for campaign mode
+      if (selectedMode === 'campaign') {
+        requestBody.campaign = campaignName || 'scenes_act1';
+      }
+      
       const response = await fetch(`${BACKEND_URL}/api/start_session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          mode: selectedMode || 'sandbox'
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -235,7 +242,7 @@ function App() {
       }
 
       const data = await response.json();
-      console.log('🚚 Datos recibidos en frontend:', data);   // DEBUG
+      console.log('🚚 Datos recibidos en frontend:', data);
       
       if (data.success) {
         // Actualizar el game state con la nueva narrativa incluida
@@ -326,7 +333,7 @@ function App() {
                 </p>
                 <div className="space-y-4">
                   <button
-                    onClick={() => startNewSession(mode)}
+                    onClick={() => startNewSession(mode, 'scenes_act1')}
                     disabled={loading}
                     className="px-8 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-lg font-bold rounded-lg transition-colors shadow-lg"
                   >
