@@ -233,19 +233,25 @@ function App() {
       console.log('🚚 Datos recibidos en frontend:', data);   // DEBUG
       
       if (data.success) {
-        setGameState(data.game_state);
+        // Actualizar el game state con la nueva narrativa incluida
+        const updatedGameState = {
+          ...data.game_state,
+          narrative_log: data.game_state.narrative_log || []
+        };
         
-        // Actualizar el log narrativo con la nueva narrativa
+        // Si hay narrativa nueva, agregarla al log
         if (data.narrative) {
-          setGameState(prev => ({
-            ...prev,
-            narrative_log: [...(prev?.narrative_log || []), {
+          updatedGameState.narrative_log = [
+            ...updatedGameState.narrative_log,
+            {
               timestamp: new Date().toISOString(),
               player_action: action,
               narrative: data.narrative
-            }]
-          }));
+            }
+          ];
         }
+        
+        setGameState(updatedGameState);
       } else {
         setError('Error en la acción: ' + data.error);
       }
