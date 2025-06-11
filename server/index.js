@@ -23,6 +23,17 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ------- FRONTEND ESTÁTICO ----------
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
+app.get('*', (_, res) =>
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'build', 'index.html'))
+);
+
 // MongoDB setup
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/';
 const client = new MongoClient(MONGO_URL);
