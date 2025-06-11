@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import io from 'socket.io-client';
+import ModeSelector from './components/ModeSelector';
 
 // HUD Components
 const LifeOrb = ({ health }) => (
