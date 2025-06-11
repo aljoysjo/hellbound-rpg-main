@@ -7,6 +7,7 @@ import OpenAI from 'openai';
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import { Story } from 'inkjs';
 
 // Load environment variables
 dotenv.config();
@@ -45,73 +46,55 @@ function loadJsonFile(filename) {
   }
 }
 
-// Load campaign helper - loads complete campaign data
-function loadCampaign(campaignName) {
-  const campaignDir = `/app/campaigns`;
-  const campaignFile = `${campaignDir}/campaign.json`;
-  const mapFile = `${campaignDir}/map.json`;
-  const scenesFile = `${campaignDir}/scenes/${campaignName}.ink`;
+// Unified campaign loader with inkjs
+function loadFullCampaign(name) {
+  const base = '/app/campaigns';
+  const campaignFile = path.join(base, 'campaign.json');
+  const mapFile = path.join(base, 'map.json');
+  const inkFile = path.join(base, 'scenes', `${name}.ink`);
   
-  console.log(`🔍 Loading campaign: ${campaignName}`);
-  console.log(`🔍 Looking for files:`);
-  console.log(`   - campaign.json: ${existsSync(campaignFile)}`);
-  console.log(`   - map.json: ${existsSync(mapFile)}`);
-  console.log(`   - scenes/${campaignName}.ink: ${existsSync(scenesFile)}`);
+  console.log(`🔍 Loading full campaign: ${name}`);
   
   try {
-    let campaign = {};
-    let map = {};
-    let scenes = '';
+    // Load campaign.json
+    const json = existsSync(campaignFile) ? 
+      JSON.parse(readFileSync(campaignFile, 'utf8')) : 
+      { titulo: 'Campaña Predeterminada' };
     
-    // Load campaign.json if exists
-    if (existsSync(campaignFile)) {
-      campaign = JSON.parse(readFileSync(campaignFile, 'utf8'));
-      console.log(`✅ Loaded campaign.json: ${campaign.titulo || campaign.title}`);
-    } else {
-      console.log(`⚠️ campaign.json not found, using default`);
-      campaign = {
-        titulo: "Caminos del Abismo",
-        intro: "Una aventura épica te espera en los dominios oscuros."
-      };
-    }
+    // Load map.json
+    const map = existsSync(mapFile) ? 
+      JSON.parse(readFileSync(mapFile, 'utf8')) : 
+      { nodes: [] };
     
-    // Load map.json if exists
-    if (existsSync(mapFile)) {
-      map = JSON.parse(readFileSync(mapFile, 'utf8'));
-      console.log(`✅ Loaded map.json with ${map.nodes?.length || 0} locations`);
-    }
+    // Load and parse ink file
+    let story = null;
+    let firstText = '';
     
-    // Load scenes file if exists
-    if (existsSync(scenesFile)) {
-      scenes = readFileSync(scenesFile, 'utf8');
-      console.log(`✅ Loaded scenes/${campaignName}.ink`);
-    } else {
-      console.log(`⚠️ scenes/${campaignName}.ink not found`);
-    }
-    
-    // Extract intro from campaign or scenes
-    let intro = campaign.intro || campaign.description || "Comienza tu aventura épica.";
-    if (!intro && scenes) {
-      const lines = scenes.split('\n');
-      for (let line of lines) {
-        line = line.trim();
-        if (line.startsWith('==') || line === '') continue;
-        if (line.length > 30 && !line.includes('suggestedActions')) {
-          intro = line;
-          break;
-        }
+    if (existsSync(inkFile)) {
+      const inkText = readFileSync(inkFile, 'utf8');
+      story = new Story(inkText);
+      
+      // Get first narrative text
+      if (story.canContinue) {
+        firstText = story.Continue().trim();
       }
+      
+      console.log(`✅ Loaded campaign: "${json.titulo}"`);
+      console.log(`✅ Map with ${map.nodes?.length || 0} locations`);
+      console.log(`✅ Ink story loaded, first text: "${firstText.substring(0, 50)}..."`);
+    } else {
+      console.log(`❌ Ink file not found: ${inkFile}`);
     }
     
-    return {
-      campaign,
-      map,
-      scenes,
-      intro: intro
+    return { 
+      json, 
+      map, 
+      story, 
+      firstText: firstText || json.titulo || 'Aventura épica te espera'
     };
     
   } catch (error) {
-    console.log(`❌ Error loading campaign ${campaignName}:`, error.message);
+    console.log(`❌ Error loading campaign: ${error.message}`);
     return null;
   }
 }
@@ -122,6 +105,7 @@ const LEXICON = loadJsonFile('lexicon.json');
 
 // Game state management
 const gameSessions = new Map();
+const activeStories = new Map(); // Store ink stories
 
 class GameState {
   constructor(sessionId) {
@@ -135,6 +119,8 @@ class GameState {
     this.inventory = [];
     this.narrativeLog = [];
     this.mode = 'sandbox';
+    this.campaignMeta = null;
+    this.map = null;
     this.createdAt = new Date();
   }
 
@@ -150,6 +136,8 @@ class GameState {
       inventory: this.inventory,
       narrativeLog: this.narrativeLog.slice(-10),
       mode: this.mode,
+      campaignMeta: this.campaignMeta,
+      map: this.map,
       createdAt: this.createdAt.toISOString()
     };
   }
@@ -188,20 +176,37 @@ app.post('/api/start_session', async (req, res) => {
     
     let initialNarrative;
     
-    // Handle campaign mode
+    // Handle campaign mode with full loading
     if (mode === 'campaign') {
-      const camp = loadCampaign(campaign || 'scenes_act1');
+      const camp = loadFullCampaign(campaign || 'scenes_act1');
       if (!camp) {
         return res.status(404).json({ error: 'Campaña no encontrada' });
       }
       
-      // Use campaign intro
-      initialNarrative = `[CAMPAÑA CARGADA] ${camp.intro}`;
+      // Set campaign data in game state
+      gameState.campaignMeta = camp.json;
+      gameState.map = camp.map;
+      
+      // Use campaign location or first map node
+      if (camp.map.nodes && camp.map.nodes.length > 0) {
+        gameState.location = camp.map.nodes[0].name;
+      }
+      
+      // Use intro from campaign.json or first ink text
+      initialNarrative = camp.json.intro || camp.firstText || camp.json.titulo;
+      
+      // Store the ink story for continued interaction
+      if (camp.story) {
+        activeStories.set(sessionId, camp.story);
+      }
+      
+      // Add to narrative log
       gameState.narrativeLog.push({
         timestamp: new Date().toISOString(),
         player_action: '[Inicio de Campaña]',
-        narrative: camp.intro
+        narrative: initialNarrative
       });
+      
     } else {
       // Default narratives for other modes
       switch (mode) {
@@ -245,6 +250,9 @@ app.post('/api/free_input', async (req, res) => {
     const gameState = gameSessions.get(session_id);
     
     // Create the system prompt in Spanish
+    const campaignContext = gameState.campaignMeta ? 
+      `CAMPAÑA: ${gameState.campaignMeta.titulo}\nUBICACIONES DISPONIBLES: ${gameState.map?.nodes?.map(n => n.name).join(', ') || 'N/A'}` : '';
+    
     const systemPrompt = `
     Eres la lógica narrativa del juego Hellbound RPG. 
     Responde SIEMPRE en español neutro, en frases cortas y oscuras.
@@ -255,6 +263,7 @@ app.post('/api/free_input', async (req, res) => {
     - Antagonista: ${LORE.antagonist || 'El Príncipe Caído gobernando el Reino Ardiente'}
     
     MODO DE JUEGO: ${gameState.mode}
+    ${campaignContext}
     ${gameState.mode === 'campaign' ? 'NOTA: Usa la estructura de campaña definida en los archivos de escenarios.' : ''}
     
     ESTADO ACTUAL DEL JUGADOR:
