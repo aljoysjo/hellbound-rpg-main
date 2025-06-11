@@ -252,22 +252,35 @@ app.post('/api/free_input', async (req, res) => {
     
     const gameState = gameSessions.get(session_id);
     
-    // Create the system prompt in Spanish
-    const campaignContext = gameState.campaignMeta ? 
-      `CAMPAÑA: ${gameState.campaignMeta.titulo}\nUBICACIONES DISPONIBLES: ${gameState.map?.nodes?.map(n => n.name).join(', ') || 'N/A'}` : '';
+    // Create enhanced system prompt with campaign context
+    let campaignContext = '';
+    if (gameState.campaignMeta) {
+      campaignContext = `
+CAMPAÑA ACTIVA: "${gameState.campaignMeta.titulo}"
+COMPAÑEROS DISPONIBLES: ${gameState.campaignMeta.companions?.join(', ') || 'Ninguno'}
+ACTO ACTUAL: 1 de ${gameState.campaignMeta.acto_total}
+NIVEL DE TENSIÓN: ${gameState.campaignMeta.tone_level}/10
+LOCACIONES DEL MUNDO: ${gameState.campaignMeta.locations?.join(' → ') || 'Desconocidas'}
+
+CONTEXTO NARRATIVO ESPECÍFICO:
+- El jugador ha despertado en Alicante con un presentimiento oscuro
+- Una figura misteriosa lo observa desde la ventana con ojos rojos
+- Hay una presencia sobrenatural que genera inquietud
+- Los Errantes y el Uróboros son elementos importantes del mundo
+- El Rey Hawkeye y los desequilibrios entre reinos son temas centrales
+      `;
+    }
     
     const systemPrompt = `
-    Eres la lógica narrativa del juego Hellbound RPG. 
-    Responde SIEMPRE en español neutro, en frases cortas y oscuras.
+    Eres la lógica narrativa del juego "Caminos del Abismo" - una aventura épica y oscura.
+    Responde SIEMPRE en español neutro, en frases evocativas y atmosféricas.
     
-    CONTEXTO DEL MUNDO:
+    ${campaignContext}
+    
+    MUNDO BASE:
     - ${LORE.setting || 'Un mundo devastado por la guerra donde los demonios caminan por la tierra'}
     - Héroe: ${LORE.hero || 'Un exorcista solitario buscando redención'}
     - Antagonista: ${LORE.antagonist || 'El Príncipe Caído gobernando el Reino Ardiente'}
-    
-    MODO DE JUEGO: ${gameState.mode}
-    ${campaignContext}
-    ${gameState.mode === 'campaign' ? 'NOTA: Usa la estructura de campaña definida en los archivos de escenarios.' : ''}
     
     ESTADO ACTUAL DEL JUGADOR:
     - Salud: ${gameState.health}/100
@@ -276,17 +289,17 @@ app.post('/api/free_input', async (req, res) => {
     - Ubicación: ${gameState.location}
     - Habilidades: ${gameState.skills.join(', ')}
     
-    INSTRUCCIONES:
-    1. Interpreta la acción del jugador de forma creativa
-    2. Mantén el tono oscuro y atmosférico
-    3. Ajusta los stats del jugador según lo que pase
-    4. Usa máximo 3 oraciones
-    5. Describe consecuencias de la acción
-    ${gameState.mode === 'campaign' ? '6. Sigue la estructura narrativa de la campaña definida' : ''}
+    INSTRUCCIONES ESPECIALES:
+    1. Si estás en modo campaña, usa el contexto de "Caminos del Abismo"
+    2. Mantén coherencia con la nieve cayendo en Alicante y el ambiente misterioso
+    3. Referencia a los compañeros disponibles cuando sea relevante
+    4. Incorpora elementos del Uróboros y los desequilibrios entre reinos
+    5. Describe consecuencias atmosféricas y emocionales
+    6. Usa máximo 4 oraciones pero más descriptivas
     
     ACCIÓN DEL JUGADOR: "${action}"
     
-    Responde con una narrativa inmersiva y actualiza el estado del juego.
+    Responde con una narrativa inmersiva que expanda el mundo de la campaña.
     `;
     
     // Call OpenAI without function calling (simplified)
