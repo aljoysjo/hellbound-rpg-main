@@ -3,132 +3,91 @@ import './App.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🔄 COMPONENTES DE STATS DINÁMICOS
-const VitalBars = ({ vitals = {} }) => (
-  <div className="space-y-3">
-    <div className="relative">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="text-red-400 font-bold">Vida</span>
-        <span className="text-white">{vitals.health || 100}/100</span>
-      </div>
-      <div className="w-full bg-gray-800 rounded-full h-3 border border-red-600">
-        <div 
-          className="bg-gradient-to-r from-red-600 to-red-400 h-3 rounded-full transition-all duration-300"
-          style={{ width: `${vitals.health || 100}%` }}
-        />
-      </div>
-    </div>
-    
-    <div className="relative">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="text-blue-400 font-bold">Maná</span>
-        <span className="text-white">{vitals.mana || 100}/100</span>
-      </div>
-      <div className="w-full bg-gray-800 rounded-full h-3 border border-blue-600">
-        <div 
-          className="bg-gradient-to-r from-blue-600 to-blue-400 h-3 rounded-full transition-all duration-300"
-          style={{ width: `${vitals.mana || 100}%` }}
-        />
-      </div>
-    </div>
-    
-    <div className="relative">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="text-green-400 font-bold">Stamina</span>
-        <span className="text-white">{vitals.stamina || 100}/100</span>
-      </div>
-      <div className="w-full bg-gray-800 rounded-full h-3 border border-green-600">
-        <div 
-          className="bg-gradient-to-r from-green-600 to-green-400 h-3 rounded-full transition-all duration-300"
-          style={{ width: `${vitals.stamina || 100}%` }}
-        />
-      </div>
-    </div>
-  </div>
-);
-
-const ResourceDisplay = ({ resources = {} }) => (
-  <div className="grid grid-cols-2 gap-2 text-sm">
-    <div className="flex items-center space-x-2">
-      <span className="text-yellow-400">💰</span>
-      <span className="text-white">{resources.gold || 0}</span>
-    </div>
-    <div className="flex items-center space-x-2">
-      <span className="text-amber-400">🍞</span>
-      <span className="text-white">{resources.rations || 0}</span>
-    </div>
-    <div className="flex items-center space-x-2">
-      <span className="text-purple-400">💎</span>
-      <span className="text-white">{resources.gemas || 0}</span>
-    </div>
-    <div className="flex items-center space-x-2">
-      <span className="text-orange-400">⚱️</span>
-      <span className="text-white">{resources.reliquias || 0}</span>
-    </div>
-  </div>
-);
-
-const AttributeDisplay = ({ attributes = {} }) => (
-  <div className="grid grid-cols-2 gap-2 text-sm">
-    <div className="flex justify-between">
-      <span className="text-red-400">💪 Fuerza</span>
-      <span className="text-white font-bold">{attributes.fuerza || 5}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="text-green-400">🏃 Agilidad</span>
-      <span className="text-white font-bold">{attributes.agilidad || 5}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="text-blue-400">🧠 Sabiduría</span>
-      <span className="text-white font-bold">{attributes.sabiduría || 5}</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="text-yellow-400">💬 Carisma</span>
-      <span className="text-white font-bold">{attributes.carisma || 5}</span>
-    </div>
-  </div>
-);
-
-// 😊 COMPONENTE DE ESTADOS EMOCIONALES
-const EmotionalStates = ({ emotionalStates = {} }) => {
-  const emotionIcons = {
-    miedo: '😰',
-    alerta: '⚡',
-    euforia: '😄',
-    fatiga: '😴',
-    ira: '😡',
-    serenidad: '😌'
+// 🎯 COMPONENTE GENÉRICO PARA STATS DINÁMICOS
+const StatOrb = ({ type, value, max = 100 }) => {
+  const getOrbStyle = (statType) => {
+    const styles = {
+      health: { bg: 'from-red-600 to-red-900', border: 'border-red-500', icon: '❤️' },
+      mana: { bg: 'from-blue-600 to-blue-900', border: 'border-blue-500', icon: '🔮' },
+      stamina: { bg: 'from-green-600 to-green-900', border: 'border-green-500', icon: '⚡' },
+      default: { bg: 'from-gray-600 to-gray-900', border: 'border-gray-500', icon: '📊' }
+    };
+    return styles[statType] || styles.default;
   };
 
-  const strongEmotions = Object.entries(emotionalStates)
-    .filter(([emotion, value]) => value > 50)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 3);
-
-  if (strongEmotions.length === 0) return null;
+  const style = getOrbStyle(type);
+  const percentage = (value / max) * 100;
 
   return (
-    <div className="bg-black bg-opacity-60 p-3 rounded-lg border border-purple-800">
-      <h4 className="text-purple-400 font-bold mb-2 text-sm">Estado Emocional</h4>
-      <div className="space-y-2">
-        {strongEmotions.map(([emotion, value]) => (
-          <div key={emotion} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg">{emotionIcons[emotion] || '😐'}</span>
-              <span className="text-white text-sm capitalize">{emotion}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-16 bg-gray-800 rounded-full h-2">
-                <div 
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    value > 80 ? 'bg-red-500' :
-                    value > 60 ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}
-                  style={{ width: `${value}%` }}
-                />
-              </div>
-              <span className="text-xs text-gray-400">{Math.round(value)}%</span>
-            </div>
+    <div className="relative">
+      <div className="flex justify-between text-sm mb-1">
+        <span className="font-bold capitalize flex items-center gap-1">
+          <span>{style.icon}</span>
+          {type}
+        </span>
+        <span className="text-white">{value}/{max}</span>
+      </div>
+      <div className={`w-full bg-gray-800 rounded-full h-3 border ${style.border}`}>
+        <div 
+          className={`bg-gradient-to-r ${style.bg} h-3 rounded-full transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// 🏷️ COMPONENTE PARA ESTADOS EMOCIONALES
+const StatusChip = ({ label, value, type = 'emotion' }) => {
+  const getChipStyle = (val) => {
+    if (val > 80) return 'bg-red-600 border-red-400 text-red-100';
+    if (val > 60) return 'bg-yellow-600 border-yellow-400 text-yellow-100';
+    if (val > 40) return 'bg-blue-600 border-blue-400 text-blue-100';
+    return 'bg-gray-600 border-gray-400 text-gray-100';
+  };
+
+  const getIcon = (emotion) => {
+    const icons = {
+      miedo: '😰', alerta: '⚠️', euforia: '😄', fatiga: '😴', 
+      ira: '😡', serenidad: '😌', default: '😐'
+    };
+    return icons[emotion] || icons.default;
+  };
+
+  if (value < 20) return null; // No mostrar estados muy bajos
+
+  return (
+    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-medium ${getChipStyle(value)}`}>
+      <span>{getIcon(label)}</span>
+      <span className="capitalize">{label}</span>
+      <span className="font-bold">{Math.round(value)}</span>
+    </div>
+  );
+};
+
+// 📊 COMPONENTE PARA RECURSOS Y ATRIBUTOS
+const ResourceGrid = ({ title, data, icons = {} }) => {
+  if (!data || Object.keys(data).length === 0) return null;
+
+  const getIcon = (key) => {
+    const defaultIcons = {
+      gold: '💰', rations: '🍞', gemas: '💎', reliquias: '⚱️',
+      fuerza: '💪', agilidad: '🏃', sabiduría: '🧠', carisma: '💬'
+    };
+    return icons[key] || defaultIcons[key] || '📄';
+  };
+
+  return (
+    <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
+      <h3 className="text-red-400 font-bold mb-3">{title}</h3>
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        {Object.entries(data).map(([key, value]) => (
+          <div key={key} className="flex items-center justify-between">
+            <span className="flex items-center gap-1 text-gray-300">
+              <span>{getIcon(key)}</span>
+              <span className="capitalize">{key}</span>
+            </span>
+            <span className="text-white font-bold">{value}</span>
           </div>
         ))}
       </div>
@@ -136,12 +95,16 @@ const EmotionalStates = ({ emotionalStates = {} }) => {
   );
 };
 
-// 🎯 COMPONENTE DE HABILIDADES DINÁMICO ILIMITADO
-const DynamicSkillBar = ({ skills = [] }) => {
+// 🎯 COMPONENTE DE HABILIDADES DINÁMICO MEJORADO
+const DynamicSkillBar = ({ skills = [], gameMode = 'rpg' }) => {
   if (skills.length === 0) {
+    const placeholder = gameMode === 'sandbox' ? 
+      'Las habilidades emergerán según tus acciones' : 
+      'Sin habilidades específicas';
+    
     return (
       <div className="text-center py-4">
-        <span className="text-gray-400 text-sm italic">Sin habilidades específicas</span>
+        <span className="text-gray-400 text-sm italic">{placeholder}</span>
       </div>
     );
   }
@@ -238,7 +201,8 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [] }) => {
   );
 };
 
-const LogFeed = ({ narrativeLog }) => {
+// 📜 LOG FEED LIMITADO Y LEGIBLE
+const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   const logRef = useRef(null);
 
   useEffect(() => {
@@ -247,25 +211,37 @@ const LogFeed = ({ narrativeLog }) => {
     }
   }, [narrativeLog]);
 
+  // Limitar a las últimas 15 entradas
+  const limitedLog = narrativeLog.slice(-15);
+
+  const getLogTitle = (mode) => {
+    if (mode === 'sandbox') return 'Tu Historia';
+    if (mode === 'campaign') return 'Crónica de la Aventura';
+    return 'Registro de Eventos';
+  };
+
   return (
-    <div 
-      ref={logRef}
-      className="h-64 bg-black bg-opacity-80 border-2 border-gray-700 rounded-lg p-4 overflow-y-auto text-gray-300"
-    >
-      {narrativeLog.length === 0 ? (
-        <p className="italic text-gray-500">El silencio reina en la oscuridad...</p>
-      ) : (
-        narrativeLog.map((entry, index) => (
-          <div key={index} className="mb-3 border-b border-gray-800 pb-2">
-            <p className="text-yellow-400 text-sm font-semibold mb-1">
-              &gt; {entry.player_action}
-            </p>
-            <p className="text-gray-200 leading-relaxed">
-              {entry.narrative}
-            </p>
-          </div>
-        ))
-      )}
+    <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
+      <h3 className="text-red-400 font-bold mb-4">{getLogTitle(gameMode)}</h3>
+      <div 
+        ref={logRef}
+        className="h-64 max-h-[50vh] overflow-y-auto text-gray-300 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+      >
+        {limitedLog.length === 0 ? (
+          <p className="italic text-gray-500">Tu historia comienza aquí...</p>
+        ) : (
+          limitedLog.map((entry, index) => (
+            <div key={index} className="mb-3 border-b border-gray-800 pb-2 last:border-b-0">
+              <p className="text-yellow-400 text-sm font-semibold mb-1">
+                &gt; {entry.player_action}
+              </p>
+              <p className="text-gray-200 leading-relaxed text-sm">
+                {entry.narrative}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };
@@ -333,7 +309,7 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
   if (!stateChanges || Object.keys(stateChanges).length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 bg-black bg-opacity-90 border border-yellow-600 rounded-lg p-4 max-w-sm z-50">
+    <div className="fixed top-4 right-4 bg-black bg-opacity-95 border border-yellow-600 rounded-lg p-4 max-w-sm z-50 shadow-xl">
       <div className="flex justify-between items-start mb-2">
         <h4 className="text-yellow-400 font-bold text-sm">Cambios de Estado</h4>
         <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
@@ -342,21 +318,27 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
       <div className="space-y-1 text-xs">
         {stateChanges.vitalDelta && Object.entries(stateChanges.vitalDelta).map(([vital, delta]) => (
           <div key={vital} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {vital}: {delta > 0 ? '+' : ''}{delta}
+            💗 {vital}: {delta > 0 ? '+' : ''}{delta}
           </div>
         ))}
         
         {stateChanges.statusSet && Object.entries(stateChanges.statusSet).map(([emotion, value]) => (
           <div key={emotion} className="text-purple-400">
-            {emotion}: {value}%
+            😊 {emotion}: {value}%
           </div>
         ))}
         
-        {stateChanges.newSkill && (
+        {stateChanges.newSkill && stateChanges.newSkill.id && (
           <div className="text-yellow-400">
             ⭐ Nueva habilidad: {stateChanges.newSkill.id}
           </div>
         )}
+        
+        {stateChanges.relationshipDelta && Object.entries(stateChanges.relationshipDelta).map(([person, delta]) => (
+          <div key={person} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+            👥 {person}: {delta > 0 ? '+' : ''}{delta}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -396,6 +378,7 @@ function App() {
 
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
+        console.log('🔄 Actualizando estado del juego:', data.game_state);
         setGameState(data.game_state);
         if (data.suggested_actions) {
           setSuggestedActions(data.suggested_actions);
@@ -464,16 +447,21 @@ function App() {
         socket.emit('join_session', { session_id: data.session_id });
       }
 
-      // Add initial narrative to log
+      // Add initial narrative to log - LIMITADO A 15 ENTRADAS
       if (data.initial_narrative) {
-        setGameState(prev => ({
-          ...prev,
-          narrativeLog: [...(prev?.narrativeLog || []), {
+        setGameState(prev => {
+          const currentLog = prev?.narrativeLog || [];
+          const newLog = [...currentLog, {
             player_action: '[Inicio del juego]',
             narrative: data.initial_narrative,
             timestamp: new Date().toISOString()
-          }]
-        }));
+          }].slice(-15); // LÍMITE DE 15 ENTRADAS
+          
+          return {
+            ...prev,
+            narrativeLog: newLog
+          };
+        });
       }
 
     } catch (err) {
@@ -516,14 +504,17 @@ function App() {
         };
         
         if (data.narrative) {
+          const newEntry = {
+            timestamp: new Date().toISOString(),
+            player_action: action,
+            narrative: data.narrative
+          };
+          
+          // LIMITAR LOG A 15 ENTRADAS
           updatedGameState.narrativeLog = [
             ...updatedGameState.narrativeLog,
-            {
-              timestamp: new Date().toISOString(),
-              player_action: action,
-              narrative: data.narrative
-            }
-          ];
+            newEntry
+          ].slice(-15);
         }
         
         setGameState(updatedGameState);
@@ -644,54 +635,78 @@ function App() {
             )}
           </div>
         ) : (
-          // Game Interface
+          // Game Interface - HUD COMPLETAMENTE DINÁMICO
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel - Enhanced HUD */}
+            {/* Left Panel - HUD DINÁMICO */}
             <div className="space-y-4">
-              {/* Vitals */}
+              {/* Vitales Dinámicos */}
+              {gameState?.vitals && Object.keys(gameState.vitals).length > 0 && (
+                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
+                  <h3 className="text-red-400 font-bold mb-4">Estado Vital</h3>
+                  <div className="space-y-3">
+                    {Object.entries(gameState.vitals).map(([type, value]) => (
+                      <StatOrb key={type} type={type} value={value} max={100} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Estados Emocionales Dinámicos */}
+              {gameState?.emotionalStates && Object.entries(gameState.emotionalStates).some(([,v]) => v > 20) && (
+                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-purple-800">
+                  <h3 className="text-purple-400 font-bold mb-3">Estado Mental</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {Object.entries(gameState.emotionalStates).map(([emotion, value]) => (
+                      <StatusChip key={emotion} label={emotion} value={value} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Habilidades Dinámicas */}
               <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">Estado Vital</h3>
-                <VitalBars vitals={gameState?.vitals} />
+                <h3 className="text-red-400 font-bold mb-4">
+                  {gameState?.mode === 'sandbox' ? 'Capacidades' : 'Habilidades'}
+                </h3>
+                <DynamicSkillBar skills={gameState?.skills || []} gameMode={gameState?.mode} />
               </div>
 
-              {/* Emotional States */}
-              <EmotionalStates emotionalStates={gameState?.emotionalStates} />
+              {/* Recursos Dinámicos */}
+              <ResourceGrid 
+                title="Recursos" 
+                data={gameState?.resources} 
+              />
 
-              {/* Skills */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">Habilidades</h3>
-                <DynamicSkillBar skills={gameState?.skills} />
-              </div>
+              {/* Atributos Dinámicos */}
+              <ResourceGrid 
+                title="Atributos" 
+                data={gameState?.attributes} 
+              />
 
-              {/* Resources */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">Recursos</h3>
-                <ResourceDisplay resources={gameState?.resources} />
-              </div>
-
-              {/* Attributes */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">Atributos</h3>
-                <AttributeDisplay attributes={gameState?.attributes} />
-              </div>
-
-              {/* Location */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-2">Ubicación</h3>
-                <p className="text-gray-300 text-center">{gameState?.location || 'Desconocido'}</p>
-              </div>
+              {/* Ubicación Dinámica */}
+              {gameState?.location && (
+                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
+                  <h3 className="text-red-400 font-bold mb-2">
+                    {gameState?.mode === 'sandbox' ? 'Lugar Actual' : 'Ubicación'}
+                  </h3>
+                  <p className="text-gray-300 text-center">{gameState.location}</p>
+                </div>
+              )}
             </div>
 
-            {/* Center Panel - Narrative Log */}
+            {/* Center Panel - Narrative Log Limitado */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">Crónica del Exorcista</h3>
-                <LogFeed narrativeLog={gameState?.narrativeLog || []} />
-              </div>
+              {/* Log Feed Dinámico y Limitado */}
+              <LogFeed 
+                narrativeLog={gameState?.narrativeLog || []} 
+                gameMode={gameState?.mode} 
+              />
 
               {/* Action Input */}
               <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">¿Qué harás?</h3>
+                <h3 className="text-red-400 font-bold mb-4">
+                  {gameState?.mode === 'sandbox' ? '¿Qué haces ahora?' : '¿Qué harás?'}
+                </h3>
                 <ActionInput 
                   onSubmit={submitAction} 
                   disabled={loading} 
@@ -699,7 +714,9 @@ function App() {
                 />
                 {loading && (
                   <p className="text-yellow-400 text-sm mt-2">
-                    El destino se está escribiendo...
+                    {gameState?.mode === 'sandbox' ? 
+                      'Tu historia se está escribiendo...' : 
+                      'El destino se está escribiendo...'}
                   </p>
                 )}
               </div>
