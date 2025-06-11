@@ -308,13 +308,44 @@ function App() {
               Un mundo devastado por la guerra donde los demonios caminan por la tierra. 
               Eres un exorcista solitario buscando redención en el Reino Ardiente.
             </p>
-            <button
-              onClick={startNewSession}
-              disabled={loading}
-              className="px-8 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-lg font-bold rounded-lg transition-colors shadow-lg"
-            >
-              {loading ? 'Iniciando...' : 'Comenzar Aventura'}
-            </button>
+            
+            {!mode ? (
+              // Mode Selection
+              <div className="w-full">
+                <ModeSelector onSelect={setMode} />
+              </div>
+            ) : (
+              // Start Button after mode selection
+              <div className="text-center">
+                <p className="text-lg text-gray-300 mb-4">
+                  Modo seleccionado: <span className="text-red-400 font-bold">
+                    {mode === 'sandbox' ? 'Sandbox' : 
+                     mode === 'campaign' ? 'Campaña' : 
+                     'Campaña Temporal'}
+                  </span>
+                </p>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => startNewSession(mode)}
+                    disabled={loading}
+                    className="px-8 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-lg font-bold rounded-lg transition-colors shadow-lg"
+                  >
+                    {loading ? 'Iniciando...' : `Iniciar ${
+                      mode === 'sandbox' ? 'Sandbox' : 
+                      mode === 'campaign' ? 'Campaña' : 
+                      'Campaña Temporal'
+                    }`}
+                  </button>
+                  <button
+                    onClick={() => setMode(null)}
+                    disabled={loading}
+                    className="block mx-auto px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+                  >
+                    Cambiar Modo
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           // Game Interface
