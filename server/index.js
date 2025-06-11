@@ -171,21 +171,23 @@ app.post('/api/free_input', async (req, res) => {
     Responde con una narrativa inmersiva y actualiza el estado del juego.
     `;
     
-    // Call OpenAI with function calling
+    // Call OpenAI without function calling (simplified)
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `El jugador dice: '${action}'` }
       ],
-      functions: FUNCTIONS,
-      function_call: "auto",
       temperature: 0.8,
-      max_tokens: 500
+      max_tokens: 200
     });
     
+    console.log('🔍 DEBUG - OpenAI response:', response.choices[0]);
+    
     const message = response.choices[0].message;
-    let narrative = "El eco de tu acción resuena en la oscuridad...";
+    let narrative = message.content || "El eco de tu acción resuena en la oscuridad...";
+    
+    console.log('🔍 DEBUG - Final narrative:', narrative);
     
     // Handle function calling if present
     if (message.function_call) {
