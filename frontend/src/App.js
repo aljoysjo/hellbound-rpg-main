@@ -130,6 +130,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const [mode, setMode] = useState(null); // Nuevo estado para el modo seleccionado
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   
