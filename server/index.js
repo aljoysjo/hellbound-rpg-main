@@ -62,6 +62,7 @@ class GameState {
     this.location = "Puertas de Ceniza";
     this.inventory = [];
     this.narrativeLog = [];
+    this.mode = 'sandbox'; // Modo de juego por defecto
     this.createdAt = new Date();
   }
 
@@ -76,6 +77,7 @@ class GameState {
       location: this.location,
       inventory: this.inventory,
       narrativeLog: this.narrativeLog.slice(-10), // Last 10 entries
+      mode: this.mode,
       createdAt: this.createdAt.toISOString()
     };
   }
