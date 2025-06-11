@@ -1,1 +1,58 @@
-404: Not Found
+{
+  "title": "Mapa del Reino Ardiente",
+  "regions": [
+    {
+      "id": "puertas_ceniza",
+      "name": "Puertas de Ceniza",
+      "description": "Imponentes puertas que marcan la frontera entre el mundo mortal y los dominios infernales",
+      "coordinates": { "x": 0, "y": 0 },
+      "type": "entrance",
+      "dangers": ["Runas demoníacas", "Energía infernal"],
+      "items": [],
+      "npcs": [],
+      "exits": ["pasillo_sombras"]
+    },
+    {
+      "id": "pasillo_sombras",
+      "name": "Pasillo de Sombras",
+      "description": "Un corredor oscuro iluminado por antorchas que arden con llamas verdes sobrenaturales",
+      "coordinates": { "x": 1, "y": 0 },
+      "type": "corridor",
+      "dangers": ["Sombras vivientes", "Susurros demoníacos"],
+      "items": ["Antorcha sagrada"],
+      "npcs": [],
+      "exits": ["puertas_ceniza", "camara_ardiente"]
+    },
+    {
+      "id": "camara_ardiente", 
+      "name": "Cámara Ardiente",
+      "description": "El corazón del Reino Ardiente donde reside el Príncipe Caído",
+      "coordinates": { "x": 2, "y": 0 },
+      "type": "boss_room",
+      "dangers": ["Fuego eterno", "El Príncipe Caído"],
+      "items": ["Corona de Cenizas", "Espada Sagrada"],
+      "npcs": ["Príncipe Caído"],
+      "exits": ["pasillo_sombras"]
+    }
+  ],
+  "connections": [
+    {
+      "from": "puertas_ceniza",
+      "to": "pasillo_sombras",
+      "requirement": "Abrir las Puertas de Ceniza",
+      "difficulty": "medium"
+    },
+    {
+      "from": "pasillo_sombras", 
+      "to": "camara_ardiente",
+      "requirement": "Superar las sombras vivientes",
+      "difficulty": "hard"
+    }
+  ],
+  "legend": {
+    "entrance": "Punto de entrada",
+    "corridor": "Pasillo o túnel",
+    "boss_room": "Sala del jefe final",
+    "safe_zone": "Zona segura para descansar"
+  }
+}

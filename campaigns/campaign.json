@@ -1,1 +1,45 @@
-404: Not Found
+{
+  "title": "Pacto de Cenizas",
+  "description": "Una campaña épica donde el exorcista debe enfrentar al Príncipe Caído en el Reino Ardiente",
+  "intro": "Las Puertas de Ceniza se alzan ante ti, exorcista. Este es el umbral entre los mundos, donde tu destino se escribirá en fuego y sangre demoníaca.",
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Las Puertas de Ceniza",
+      "description": "El exorcista debe superar las pruebas iniciales",
+      "scenes": [
+        "act1_scene1",
+        "examine_runes", 
+        "touch_gates",
+        "prayer"
+      ],
+      "objective": "Abrir las Puertas de Ceniza y demostrar tu valor",
+      "rewards": {
+        "experience": 100,
+        "gold": 25
+      }
+    },
+    {
+      "id": "act2", 
+      "title": "El Pasillo de Sombras",
+      "description": "Navegar por los corredores infernales",
+      "objective": "Encontrar la entrada al Reino Ardiente",
+      "rewards": {
+        "experience": 150,
+        "gold": 50
+      }
+    }
+  ],
+  "world": {
+    "setting": "Reino Ardiente - Dominios Infernales",
+    "hero": "Exorcista solitario en busca de redención",
+    "antagonist": "El Príncipe Caído, señor de las llamas eternas",
+    "tone": "Oscuro, atmosférico, épico"
+  },
+  "mechanics": {
+    "suggestedActions": true,
+    "statChanges": true,
+    "branching": true,
+    "timeLimit": false
+  }
+}
