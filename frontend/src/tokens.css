@@ -1,0 +1,59 @@
+/* Paleta Pergamino Áureo - Hellbound RPG v2.0 */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colores principales */
+  --c-bg: #F3E7C6;           /* Crema Viejo - Fondo principal */
+  --c-border: #D1A438;       /* Dorado Imperial - Bordes, botones primarios */
+  --c-text: #5B3A1D;         /* Marrón Oscuro - Texto principal */
+  --c-panel: #B98746CC;      /* Caramelo Claro 80% - Paneles */
+  --c-hover: #D1A438;        /* Dorado hover */
+  --c-emerald: #3F7251;      /* Esmeralda - Confirmaciones/éxito */
+  --c-cedar: #8C5B2C;        /* Marrón Cedro - Texto secundario, iconos */
+  
+  /* Colores de stats (mantener lógica original) */
+  --c-health: #dc2626;       /* Rojo para salud */
+  --c-mana: #2563eb;         /* Azul para maná */
+  --c-stamina: #16a34a;      /* Verde para stamina */
+  
+  /* Tipografías */
+  --font-title: 'Cinzel', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  
+  /* Sombras y efectos */
+  --shadow-soft: 0 4px 12px rgba(91, 58, 29, 0.15);
+  --shadow-strong: 0 8px 25px rgba(91, 58, 29, 0.25);
+}
+
+/* Utilidades globales */
+.font-medieval { font-family: var(--font-title); }
+.font-narrative { font-family: var(--font-body); }
+
+/* Scrollbar personalizada */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--c-panel);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--c-hover);
+}
+
+/* Animaciones suaves */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efectos de partículas sutil */
+.paper-texture {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(209, 164, 56, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(140, 91, 44, 0.05) 0%, transparent 50%);
+  background-size: 100px 100px, 150px 150px;
+}

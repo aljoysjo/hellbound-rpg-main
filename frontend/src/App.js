@@ -3,14 +3,14 @@ import './App.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🎯 COMPONENTE GENÉRICO PARA STATS DINÁMICOS
+// 🎯 COMPONENTE GENÉRICO PARA STATS DINÁMICOS con nueva paleta
 const StatOrb = ({ type, value, max = 100 }) => {
   const getOrbStyle = (statType) => {
     const styles = {
-      health: { bg: 'from-red-600 to-red-900', border: 'border-red-500', icon: '❤️' },
-      mana: { bg: 'from-blue-600 to-blue-900', border: 'border-blue-500', icon: '🔮' },
-      stamina: { bg: 'from-green-600 to-green-900', border: 'border-green-500', icon: '⚡' },
-      default: { bg: 'from-gray-600 to-gray-900', border: 'border-gray-500', icon: '📊' }
+      health: { border: 'var(--c-health)', icon: '❤️' },
+      mana: { border: 'var(--c-mana)', icon: '🔮' },
+      stamina: { border: 'var(--c-stamina)', icon: '⚡' },
+      default: { border: 'var(--c-cedar)', icon: '📊' }
     };
     return styles[statType] || styles.default;
   };
@@ -19,17 +19,17 @@ const StatOrb = ({ type, value, max = 100 }) => {
   const percentage = (value / max) * 100;
 
   return (
-    <div className="relative">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="font-bold capitalize flex items-center gap-1">
+    <div className={`stat-orb stat-orb-${type}`}>
+      <div className="flex justify-between text-sm mb-2">
+        <span className="font-medieval font-semibold capitalize flex items-center gap-1" style={{color: 'var(--c-text)'}}>
           <span>{style.icon}</span>
           {type}
         </span>
-        <span className="text-white">{value}/{max}</span>
+        <span style={{color: 'var(--c-text)'}}>{value}/{max}</span>
       </div>
-      <div className={`w-full bg-gray-800 rounded-full h-3 border ${style.border}`}>
+      <div className="w-full bg-gray-300 rounded-full h-3 border" style={{borderColor: style.border, backgroundColor: 'rgba(140, 91, 44, 0.2)'}}>
         <div 
-          className={`bg-gradient-to-r ${style.bg} h-3 rounded-full transition-all duration-300`}
+          className="stat-bar h-3 rounded-full transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -37,13 +37,12 @@ const StatOrb = ({ type, value, max = 100 }) => {
   );
 };
 
-// 🏷️ COMPONENTE PARA ESTADOS EMOCIONALES
+// 🏷️ COMPONENTE PARA ESTADOS EMOCIONALES con paleta pergamino
 const StatusChip = ({ label, value, type = 'emotion' }) => {
-  const getChipStyle = (val) => {
-    if (val > 80) return 'bg-red-600 border-red-400 text-red-100';
-    if (val > 60) return 'bg-yellow-600 border-yellow-400 text-yellow-100';
-    if (val > 40) return 'bg-blue-600 border-blue-400 text-blue-100';
-    return 'bg-gray-600 border-gray-400 text-gray-100';
+  const getChipClass = (val) => {
+    if (val > 70) return 'emotion-high';
+    if (val > 50) return 'emotion-medium';
+    return 'emotion-low';
   };
 
   const getIcon = (emotion) => {
@@ -54,10 +53,10 @@ const StatusChip = ({ label, value, type = 'emotion' }) => {
     return icons[emotion] || icons.default;
   };
 
-  if (value < 20) return null; // No mostrar estados muy bajos
+  if (value < 20) return null;
 
   return (
-    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-medium ${getChipStyle(value)}`}>
+    <div className={`emotion-chip ${getChipClass(value)}`}>
       <span>{getIcon(label)}</span>
       <span className="capitalize">{label}</span>
       <span className="font-bold">{Math.round(value)}</span>
@@ -65,7 +64,7 @@ const StatusChip = ({ label, value, type = 'emotion' }) => {
   );
 };
 
-// 📊 COMPONENTE PARA RECURSOS Y ATRIBUTOS
+// 📊 COMPONENTE PARA RECURSOS Y ATRIBUTOS con estilo pergamino
 const ResourceGrid = ({ title, data, icons = {} }) => {
   if (!data || Object.keys(data).length === 0) return null;
 
@@ -78,16 +77,16 @@ const ResourceGrid = ({ title, data, icons = {} }) => {
   };
 
   return (
-    <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-      <h3 className="text-red-400 font-bold mb-3">{title}</h3>
+    <div className="hud-panel">
+      <h3>{title}</h3>
       <div className="grid grid-cols-2 gap-2 text-sm">
         {Object.entries(data).map(([key, value]) => (
           <div key={key} className="flex items-center justify-between">
-            <span className="flex items-center gap-1 text-gray-300">
+            <span className="flex items-center gap-1" style={{color: 'var(--c-cedar)'}}>
               <span>{getIcon(key)}</span>
               <span className="capitalize">{key}</span>
             </span>
-            <span className="text-white font-bold">{value}</span>
+            <span className="font-semibold" style={{color: 'var(--c-text)'}}>{value}</span>
           </div>
         ))}
       </div>
@@ -95,7 +94,7 @@ const ResourceGrid = ({ title, data, icons = {} }) => {
   );
 };
 
-// 🎯 COMPONENTE DE HABILIDADES DINÁMICO MEJORADO
+// 🎯 COMPONENTE DE HABILIDADES DINÁMICO con nuevo diseño
 const DynamicSkillBar = ({ skills = [], gameMode = 'rpg' }) => {
   if (skills.length === 0) {
     const placeholder = gameMode === 'sandbox' ? 
@@ -104,24 +103,22 @@ const DynamicSkillBar = ({ skills = [], gameMode = 'rpg' }) => {
     
     return (
       <div className="text-center py-4">
-        <span className="text-gray-400 text-sm italic">{placeholder}</span>
+        <span style={{color: 'var(--c-cedar)'}} className="text-sm italic">{placeholder}</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="skills-grid">
       {skills.map((skill, index) => (
-        <div key={skill.id || index} className="relative group">
-          <div className="min-w-12 h-12 bg-gray-800 border-2 border-yellow-600 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors cursor-pointer p-1">
-            <div className="text-center">
-              <div className="text-yellow-400 text-xs font-bold">{index + 1}</div>
-              {skill.level && (
-                <div className="text-white text-xs">Nv.{skill.level}</div>
-              )}
-            </div>
+        <div key={skill.id || index} className="skill-slot group">
+          <div className="text-center">
+            <div style={{color: 'var(--c-border)'}} className="text-xs font-bold">{index + 1}</div>
+            {skill.level && (
+              <div style={{color: 'var(--c-text)'}} className="text-xs">Nv.{skill.level}</div>
+            )}
           </div>
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 max-w-48">
+          <div className="skill-tooltip">
             <div className="font-bold">{typeof skill === 'object' ? skill.id : skill}</div>
             {skill.description && (
               <div className="text-gray-300">{skill.description}</div>
@@ -153,16 +150,15 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = fal
     }
   };
 
-  // 💀 UI especial para Game Over
   if (gameOver) {
     return (
       <div className="w-full space-y-4 text-center">
-        <div className="bg-red-900 border-2 border-red-600 rounded-lg p-6">
-          <h3 className="text-red-400 font-bold text-xl mb-4">💀 GAME OVER 💀</h3>
-          <p className="text-gray-300 mb-4">Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
+        <div className="hud-panel" style={{background: 'rgba(220, 38, 38, 0.1)', borderColor: '#dc2626'}}>
+          <h3 style={{color: '#dc2626'}} className="text-xl mb-4">💀 GAME OVER 💀</h3>
+          <p style={{color: 'var(--c-text)'}} className="mb-4">Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors"
+            className="btn-primary"
           >
             Reiniciar Partida
           </button>
@@ -173,17 +169,16 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = fal
 
   return (
     <div className="w-full space-y-4">
-      {/* Suggested Actions */}
       {suggestedActions && suggestedActions.length > 0 && (
         <div>
-          <h4 className="text-yellow-400 font-semibold mb-2 text-sm">Acciones Sugeridas:</h4>
+          <h4 style={{color: 'var(--c-border)'}} className="font-semibold mb-2 text-sm font-medieval">Acciones Sugeridas:</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {suggestedActions.slice(0, 4).map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedAction(suggestion)}
                 disabled={disabled}
-                className="px-3 py-2 bg-yellow-700 hover:bg-yellow-600 disabled:bg-gray-600 text-white text-sm rounded transition-colors border border-yellow-500 hover:border-yellow-400"
+                className="btn-suggested"
               >
                 {suggestion}
               </button>
@@ -192,9 +187,8 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = fal
         </div>
       )}
 
-      {/* Free Text Input */}
       <div>
-        <h4 className="text-yellow-400 font-semibold mb-2 text-sm">O escribe tu propia acción:</h4>
+        <h4 style={{color: 'var(--c-border)'}} className="font-semibold mb-2 text-sm font-medieval">O escribe tu propia acción:</h4>
         <form onSubmit={handleSubmit} className="w-full">
           <div className="relative">
             <input
@@ -203,12 +197,17 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = fal
               onChange={(e) => setAction(e.target.value)}
               placeholder="Escribe tu acción..."
               disabled={disabled}
-              className="w-full px-4 py-3 bg-gray-900 border-2 border-red-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 disabled:opacity-50"
+              className="w-full px-4 py-3 border-2 rounded-lg font-narrative placeholder-gray-500 focus:outline-none disabled:opacity-50 transition-all"
+              style={{
+                background: 'var(--c-bg)',
+                borderColor: 'var(--c-border)',
+                color: 'var(--c-text)'
+              }}
             />
             <button
               type="submit"
               disabled={disabled || !action.trim()}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-sm rounded transition-colors"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary text-sm"
             >
               Actuar
             </button>
@@ -219,7 +218,7 @@ const ActionInput = ({ onSubmit, disabled, suggestedActions = [], gameOver = fal
   );
 };
 
-// 📜 LOG FEED MEJORADO SIN DUPLICACIÓN
+// 📜 LOG FEED MEJORADO con estilo pergamino
 const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   const logRef = useRef(null);
 
@@ -236,21 +235,21 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   };
 
   return (
-    <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-      <h3 className="text-red-400 font-bold mb-4">{getLogTitle(gameMode)}</h3>
+    <div className="narrative-area">
+      <h3 className="font-medieval text-lg mb-4" style={{color: 'var(--c-border)'}}>{getLogTitle(gameMode)}</h3>
       <div 
         ref={logRef}
-        className="h-64 max-h-[50vh] overflow-y-auto text-gray-300 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+        className="h-64 max-h-[50vh] overflow-y-auto scrollbar-thin"
       >
         {narrativeLog.length === 0 ? (
-          <p className="italic text-gray-500">Tu historia comienza aquí...</p>
+          <p className="italic" style={{color: 'var(--c-cedar)'}}>Tu historia comienza aquí...</p>
         ) : (
           narrativeLog.map((entry, index) => (
-            <div key={`${entry.timestamp}-${index}`} className="mb-3 border-b border-gray-800 pb-2 last:border-b-0">
-              <p className="text-yellow-400 text-sm font-semibold mb-1">
+            <div key={`${entry.timestamp}-${index}`} className="mb-4 border-b pb-3 last:border-b-0" style={{borderColor: 'rgba(140, 91, 44, 0.3)'}}>
+              <p className="text-sm font-semibold mb-2 font-medieval" style={{color: 'var(--c-border)'}}>
                 &gt; {entry.player_action}
               </p>
-              <p className="text-gray-200 leading-relaxed text-sm">
+              <p className="narrative-text font-narrative">
                 {entry.narrative}
               </p>
             </div>
@@ -261,7 +260,7 @@ const LogFeed = ({ narrativeLog, gameMode = 'rpg' }) => {
   );
 };
 
-// 🎨 COMPONENTE SANDBOX CONCEPT-FIRST
+// 🎨 COMPONENTE SANDBOX CONCEPT-FIRST con nueva paleta
 const SandboxConceptForm = ({ onSubmit, loading }) => {
   const [concept, setConcept] = useState('');
 
@@ -274,25 +273,30 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
 
   return (
     <div className="max-w-2xl mx-auto text-center">
-      <h2 className="text-4xl font-bold text-red-400 mb-4">
+      <h2 className="text-4xl font-bold mb-4 font-medieval" style={{color: 'var(--c-border)'}}>
         Modo Sandbox - Historia Libre
       </h2>
-      <p className="text-xl text-gray-300 mb-8">
+      <p className="text-xl mb-8 font-narrative" style={{color: 'var(--c-text)'}}>
         Describe la historia que quieres vivir. Puede ser cualquier cosa: desde una aventura épica hasta una historia de la vida cotidiana con toques sobrenaturales.
       </p>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-yellow-400 font-semibold mb-2 text-lg">
+          <label className="block font-semibold mb-2 text-lg font-medieval" style={{color: 'var(--c-border)'}}>
             ¿Qué historia quieres contar?
           </label>
           <textarea
             value={concept}
             onChange={(e) => setConcept(e.target.value)}
-            placeholder="Ejemplo: 'Quiero ser un detective paranormal investigando desapariciones misteriosas en una ciudad moderna' o 'Soy un mago aprendiz en una academia flotante llena de secretos' o 'Un superviviente en un apocalipsis zombie que busca a su familia'..."
+            placeholder="Ejemplo: 'Quiero ser un detective paranormal investigando desapariciones misteriosas en una ciudad moderna' o 'Soy un mago aprendiz en una academia flotante llena de secretos'..."
             disabled={loading}
             rows={4}
-            className="w-full px-4 py-3 bg-gray-900 border-2 border-red-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 disabled:opacity-50 resize-none"
+            className="w-full px-4 py-3 border-2 rounded-lg font-narrative placeholder-gray-500 focus:outline-none disabled:opacity-50 resize-none"
+            style={{
+              background: 'var(--c-bg)',
+              borderColor: 'var(--c-border)',
+              color: 'var(--c-text)'
+            }}
             required
             minLength={20}
           />
@@ -301,13 +305,13 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
         <button
           type="submit"
           disabled={loading || concept.trim().length < 20}
-          className="px-8 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-lg font-bold rounded-lg transition-colors shadow-lg"
+          className="btn-primary text-lg px-8 py-4"
         >
           {loading ? 'Creando tu historia...' : 'Comenzar Aventura'}
         </button>
       </form>
       
-      <div className="mt-6 text-sm text-gray-400">
+      <div className="mt-6 text-sm" style={{color: 'var(--c-cedar)'}}>
         <p>💡 <strong>Tip:</strong> Sé específico sobre el tipo de personaje, el mundo, y la situación inicial que te interesa.</p>
         <p className="mt-2">⚠️ <strong>Advertencia:</strong> Las decisiones peligrosas pueden tener consecuencias mortales.</p>
       </div>
@@ -315,7 +319,7 @@ const SandboxConceptForm = ({ onSubmit, loading }) => {
   );
 };
 
-// Componente para mostrar cambios de estado en tiempo real
+// Componente para mostrar cambios de estado
 const StateChangeNotification = ({ stateChanges, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 5000);
@@ -325,54 +329,42 @@ const StateChangeNotification = ({ stateChanges, onClose }) => {
   if (!stateChanges || Object.keys(stateChanges).length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 bg-black bg-opacity-95 border border-yellow-600 rounded-lg p-4 max-w-sm z-50 shadow-xl">
+    <div className="fixed top-4 right-4 hud-panel max-w-sm z-50 shadow-xl">
       <div className="flex justify-between items-start mb-2">
-        <h4 className="text-yellow-400 font-bold text-sm">Cambios Detectados</h4>
-        <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
+        <h4 style={{color: 'var(--c-border)'}} className="font-bold text-sm font-medieval">Cambios Detectados</h4>
+        <button onClick={onClose} style={{color: 'var(--c-cedar)'}} className="hover:text-white">✕</button>
       </div>
       
       <div className="space-y-1 text-xs">
         {stateChanges.vitalDelta && Object.entries(stateChanges.vitalDelta).map(([vital, delta]) => (
-          <div key={vital} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <div key={vital} className={delta > 0 ? 'text-green-600' : 'text-red-600'}>
             💗 {vital}: {delta > 0 ? '+' : ''}{delta}
           </div>
         ))}
         
         {stateChanges.statusSet && Object.entries(stateChanges.statusSet).map(([emotion, value]) => (
-          <div key={emotion} className="text-purple-400">
+          <div key={emotion} className="text-purple-600">
             😊 {emotion}: {value}%
           </div>
         ))}
         
         {stateChanges.locationChange && (
-          <div className="text-blue-400">
+          <div className="text-blue-600">
             📍 Ubicación: {stateChanges.locationChange}
           </div>
         )}
         
         {stateChanges.newSkill && stateChanges.newSkill.id && (
-          <div className="text-yellow-400">
+          <div style={{color: 'var(--c-emerald)'}}>
             ⭐ Nueva habilidad: {stateChanges.newSkill.id}
           </div>
         )}
         
         {stateChanges.resourceDelta && Object.entries(stateChanges.resourceDelta).map(([resource, delta]) => (
-          <div key={resource} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <div key={resource} className={delta > 0 ? 'text-green-600' : 'text-red-600'}>
             💰 {resource}: {delta > 0 ? '+' : ''}{delta}
           </div>
         ))}
-        
-        {stateChanges.relationshipDelta && Object.entries(stateChanges.relationshipDelta).map(([person, delta]) => (
-          <div key={person} className={`${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
-            👥 {person}: {delta > 0 ? '+' : ''}{delta}
-          </div>
-        ))}
-        
-        {stateChanges.forceDeathCheck && (
-          <div className="text-red-500 font-bold">
-            💀 ¡Muerte inminente!
-          </div>
-        )}
       </div>
     </div>
   );
@@ -393,8 +385,6 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
-  
-  console.log('🔍 DEBUG - BACKEND_URL:', BACKEND_URL);
 
   // Initialize socket connection
   useEffect(() => {
@@ -413,9 +403,6 @@ function App() {
 
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
-        console.log('🔄 Actualizando estado del juego:', data.game_state);
-        
-        // Evitar duplicación: solo actualizar si es realmente nuevo
         setGameState(prevState => {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             return data.game_state;
@@ -451,12 +438,10 @@ function App() {
         mode: selectedMode || 'sandbox'
       };
       
-      // Add campaign name for campaign mode
       if (selectedMode === 'campaign') {
         requestBody.campaign = campaignName || 'scenes_act1';
       }
       
-      // Add sandbox concept for sandbox mode
       if (selectedMode === 'sandbox') {
         if (!sandboxConcept) {
           setShowSandboxForm(true);
@@ -484,12 +469,10 @@ function App() {
       setGameState(data.game_state);
       setShowSandboxForm(false);
       
-      // Set initial suggested actions if provided
       if (data.suggested_actions) {
         setSuggestedActions(data.suggested_actions);
       }
       
-      // Join socket room
       if (socket) {
         socket.emit('join_session', { session_id: data.session_id });
       }
@@ -525,10 +508,8 @@ function App() {
       }
 
       const data = await response.json();
-      console.log('🚚 Datos recibidos en frontend:', data);
       
       if (data.success || data.game_over) {
-        // Actualizar estado del juego SIN duplicar
         setGameState(data.game_state);
         
         if (data.suggested_actions) {
@@ -554,14 +535,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-black text-white font-medieval">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-repeat" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zM10 30c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }} />
-      </div>
-
+    <div className="min-h-screen main-background font-narrative">
       {/* State Change Notifications */}
       {stateChangeNotification && (
         <StateChangeNotification 
@@ -571,22 +545,22 @@ function App() {
       )}
 
       {/* Header */}
-      <header className="relative z-10 border-b-2 border-red-800 bg-black bg-opacity-50 backdrop-blur">
+      <header className="border-b-2 hud-panel relative z-10 mb-6 rounded-none border-l-0 border-r-0 border-t-0">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-red-400 tracking-wider">
+            <h1 className="text-3xl font-bold font-medieval tracking-wider" style={{color: 'var(--c-border)'}}>
               🔥 HELLBOUND RPG v2.0
             </h1>
             <div className="flex items-center space-x-4">
               {gameOver && (
-                <div className="text-red-400 font-bold animate-pulse">
+                <div className="text-red-600 font-bold animate-pulse font-medieval">
                   💀 GAME OVER
                 </div>
               )}
               <div className={`w-3 h-3 rounded-full ${
                 connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
               }`} />
-              <span className="text-sm text-gray-400">
+              <span className="text-sm" style={{color: 'var(--c-cedar)'}}>
                 {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
               </span>
             </div>
@@ -595,17 +569,16 @@ function App() {
       </header>
 
       {/* Main Game Area */}
-      <main className="relative z-10 container mx-auto px-4 py-6">
+      <main className="relative z-10 container mx-auto px-4">
         {!sessionId ? (
           // Start Screen
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             {!mode ? (
-              // Mode Selection
               <div className="text-center">
-                <h2 className="text-5xl font-bold text-red-400 mb-4">
+                <h2 className="text-5xl font-bold mb-4 font-medieval" style={{color: 'var(--c-border)'}}>
                   Bienvenido al Infierno
                 </h2>
-                <p className="text-xl text-gray-300 mb-8 max-w-2xl">
+                <p className="text-xl mb-8 max-w-2xl font-narrative" style={{color: 'var(--c-text)'}}>
                   Elige tu camino en una aventura épica donde cada decisión forja tu destino. 
                   Tres modos diferentes te esperan para explorar mundos únicos.
                 </p>
@@ -614,16 +587,14 @@ function App() {
                 </div>
               </div>
             ) : showSandboxForm && mode === 'sandbox' ? (
-              // Sandbox Concept Form
               <SandboxConceptForm 
                 onSubmit={(concept) => startNewSession('sandbox', null, concept)}
                 loading={loading}
               />
             ) : (
-              // Start Button after mode selection
               <div className="text-center">
-                <p className="text-lg text-gray-300 mb-4">
-                  Modo seleccionado: <span className="text-red-400 font-bold">
+                <p className="text-lg mb-4 font-narrative" style={{color: 'var(--c-text)'}}>
+                  Modo seleccionado: <span className="font-bold" style={{color: 'var(--c-border)'}}>
                     {mode === 'sandbox' ? 'Sandbox' : 
                      mode === 'campaign' ? 'Campaña' : 
                      'Campaña Temporal'}
@@ -633,7 +604,7 @@ function App() {
                   <button
                     onClick={() => startNewSession(mode, 'scenes_act1')}
                     disabled={loading}
-                    className="px-8 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white text-lg font-bold rounded-lg transition-colors shadow-lg"
+                    className="btn-primary text-lg px-8 py-4"
                   >
                     {loading ? 'Iniciando...' : `Iniciar ${
                       mode === 'sandbox' ? 'Sandbox' : 
@@ -647,7 +618,7 @@ function App() {
                       setShowSandboxForm(false);
                     }}
                     disabled={loading}
-                    className="block mx-auto px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+                    className="block mx-auto btn-secondary text-sm"
                   >
                     Cambiar Modo
                   </button>
@@ -656,14 +627,14 @@ function App() {
             )}
           </div>
         ) : (
-          // Game Interface - HUD COMPLETAMENTE DINÁMICO
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          // Game Interface con nuevo layout
+          <div className="game-layout">
             {/* Left Panel - HUD DINÁMICO */}
             <div className="space-y-4">
               {/* Vitales Dinámicos */}
               {gameState?.vitals && Object.keys(gameState.vitals).length > 0 && (
-                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                  <h3 className="text-red-400 font-bold mb-4">Estado Vital</h3>
+                <div className="hud-panel">
+                  <h3>Estado Vital</h3>
                   <div className="space-y-3">
                     {Object.entries(gameState.vitals).map(([type, value]) => (
                       <StatOrb key={type} type={type} value={value} max={100} />
@@ -674,8 +645,8 @@ function App() {
 
               {/* Estados Emocionales Dinámicos */}
               {gameState?.emotionalStates && Object.entries(gameState.emotionalStates).some(([,v]) => v > 20) && (
-                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-purple-800">
-                  <h3 className="text-purple-400 font-bold mb-3">Estado Mental</h3>
+                <div className="hud-panel">
+                  <h3>Estado Mental</h3>
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(gameState.emotionalStates).map(([emotion, value]) => (
                       <StatusChip key={emotion} label={emotion} value={value} />
@@ -685,10 +656,8 @@ function App() {
               )}
 
               {/* Habilidades Dinámicas */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">
-                  {gameState?.mode === 'sandbox' ? 'Capacidades' : 'Habilidades'}
-                </h3>
+              <div className="hud-panel">
+                <h3>{gameState?.mode === 'sandbox' ? 'Capacidades' : 'Habilidades'}</h3>
                 <DynamicSkillBar skills={gameState?.skills || []} gameMode={gameState?.mode} />
               </div>
 
@@ -706,26 +675,24 @@ function App() {
 
               {/* Ubicación Dinámica */}
               {gameState?.location && (
-                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                  <h3 className="text-red-400 font-bold mb-2">
-                    {gameState?.mode === 'sandbox' ? 'Lugar Actual' : 'Ubicación'}
-                  </h3>
-                  <p className="text-gray-300 text-center">{gameState.location}</p>
+                <div className="hud-panel">
+                  <h3>{gameState?.mode === 'sandbox' ? 'Lugar Actual' : 'Ubicación'}</h3>
+                  <p className="text-center" style={{color: 'var(--c-text)'}}>{gameState.location}</p>
                 </div>
               )}
             </div>
 
-            {/* Center Panel - Narrative Log Sin Duplicación */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Log Feed Dinámico y Sin Duplicación */}
+            {/* Right Panel - Narrativa y Acciones */}
+            <div className="space-y-4">
+              {/* Log Feed */}
               <LogFeed 
                 narrativeLog={gameState?.narrativeLog || []} 
                 gameMode={gameState?.mode} 
               />
 
               {/* Action Input */}
-              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-800">
-                <h3 className="text-red-400 font-bold mb-4">
+              <div className="hud-panel">
+                <h3>
                   {gameOver ? '💀 Partida Terminada' :
                    gameState?.mode === 'sandbox' ? '¿Qué haces ahora?' : '¿Qué harás?'}
                 </h3>
@@ -736,7 +703,7 @@ function App() {
                   gameOver={gameOver}
                 />
                 {loading && !gameOver && (
-                  <p className="text-yellow-400 text-sm mt-2">
+                  <p className="text-sm mt-2" style={{color: 'var(--c-border)'}}>
                     {gameState?.mode === 'sandbox' ? 
                       'Tu historia se está escribiendo...' : 
                       'El destino se está escribiendo...'}
