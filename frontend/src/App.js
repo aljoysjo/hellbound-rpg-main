@@ -688,7 +688,10 @@ function App() {
                     <div className="skill-icon-large">{getSkillIcon(skill)}</div>
                     <div className="skill-detailed-info">
                       <div className="skill-detailed-name">
-                        {skill?.id || skill || 'Habilidad'}
+                        {/* FIX: Asegurar que siempre sea string */}
+                        {typeof (skill?.id || skill) === 'string' 
+                          ? (skill?.id || skill) 
+                          : 'Habilidad'}
                         {skill?.isNew && <span className="new-badge">NEW</span>}
                       </div>
                       {skill?.level && (
