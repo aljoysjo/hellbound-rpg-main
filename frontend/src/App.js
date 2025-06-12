@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - FIXED: Object rendering errors
+// 🎮 MAIN APP COMPONENT - SISTEMA POPUPS "VIVOS" COMPLETO
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -17,7 +17,7 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   
-  // UI States - REORGANIZADO
+  // UI States
   const [narrativeVisible, setNarrativeVisible] = useState(true);
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
@@ -25,11 +25,21 @@ function App() {
   const [showEmotionsModal, setShowEmotionsModal] = useState(false);
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
 
-  // BADGES para notificaciones
-  const [newItems, setNewItems] = useState(0);
-  const [newObjectives, setNewObjectives] = useState(0);
-  const [newSkills, setNewSkills] = useState(0);
-  const [newEmotions, setNewEmotions] = useState(0);
+  // SISTEMA BADGES "VIVOS" MEJORADO
+  const [badges, setBadges] = useState({
+    inventory: { count: 0, newItems: [] },
+    objectives: { count: 0, newObjectives: [], completedObjectives: [] },
+    skills: { count: 0, newSkills: [], levelUps: [] },
+    emotions: { count: 0, significantChanges: [] }
+  });
+
+  // Persistencia de elementos "NEW"
+  const [newElements, setNewElements] = useState({
+    inventory: new Set(),
+    objectives: new Set(), 
+    skills: new Set(),
+    emotions: new Set()
+  });
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
@@ -46,7 +56,89 @@ function App() {
     return String(value);
   };
 
-  // Auto-fade narrativa después de 5 segundos
+  // SISTEMA DE DETECCIÓN DE CAMBIOS ROBUSTO
+  const detectInventoryChanges = (prevInventory, currentInventory) => {
+    const prev = Array.isArray(prevInventory) ? prevInventory : [];
+    const current = Array.isArray(currentInventory) ? currentInventory : [];
+    
+    const prevIds = prev.map(item => item?.id || item?.name || JSON.stringify(item));
+    const currentIds = current.map(item => item?.id || item?.name || JSON.stringify(item));
+    
+    return {
+      newItems: current.filter((item, index) => !prevIds.includes(currentIds[index])),
+      totalCount: Math.max(0, current.length - prev.length)
+    };
+  };
+
+  const detectObjectivesChanges = (prevObjectives, currentObjectives) => {
+    const prev = Array.isArray(prevObjectives) ? prevObjectives : [];
+    const current = Array.isArray(currentObjectives) ? currentObjectives : [];
+    
+    const prevCompleted = prev.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
+    const currentCompleted = current.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
+    
+    const prevIds = prev.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
+    const currentIds = current.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
+    
+    return {
+      newObjectives: current.filter((obj, index) => !prevIds.includes(currentIds[index])),
+      completedObjectives: currentCompleted.filter(id => !prevCompleted.includes(id)),
+      totalCount: Math.max(0, (current.length - prev.length) + (currentCompleted.length - prevCompleted.length))
+    };
+  };
+
+  const detectSkillsChanges = (prevSkills, currentSkills) => {
+    const prev = Array.isArray(prevSkills) ? prevSkills : [];
+    const current = Array.isArray(currentSkills) ? currentSkills : [];
+    
+    const prevIds = prev.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
+    const currentIds = current.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
+    
+    const newSkills = current.filter((skill, index) => !prevIds.includes(currentIds[index]));
+    
+    // Detectar level ups
+    const levelUps = [];
+    current.forEach(currentSkill => {
+      const prevSkill = prev.find(p => (p?.id || p?.name) === (currentSkill?.id || currentSkill?.name));
+      if (prevSkill && currentSkill?.level && prevSkill?.level && currentSkill.level > prevSkill.level) {
+        levelUps.push(currentSkill);
+      }
+    });
+    
+    return {
+      newSkills,
+      levelUps,
+      totalCount: newSkills.length + levelUps.length
+    };
+  };
+
+  const detectEmotionsChanges = (prevEmotions, currentEmotions) => {
+    const prev = prevEmotions || {};
+    const current = currentEmotions || {};
+    
+    const significantChanges = [];
+    
+    Object.keys(current).forEach(emotion => {
+      const prevValue = prev[emotion] || 0;
+      const currentValue = current[emotion] || 0;
+      
+      // Cambio significativo: ±15 puntos
+      if (Math.abs(currentValue - prevValue) >= 15) {
+        significantChanges.push({
+          emotion,
+          change: currentValue - prevValue,
+          current: currentValue
+        });
+      }
+    });
+    
+    return {
+      significantChanges,
+      totalCount: significantChanges.length
+    };
+  };
+
+  // Auto-fade narrativa
   useEffect(() => {
     if (narrativeVisible && gameState?.narrativeLog?.length > 0) {
       if (fadeTimeoutRef.current) {
@@ -64,7 +156,7 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
-  // Socket initialization - OPTIMIZADO
+  // Socket initialization CON DETECCIÓN AVANZADA
   useEffect(() => {
     const newSocket = io(BACKEND_URL);
     setSocket(newSocket);
@@ -83,27 +175,78 @@ function App() {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
             
-            // BADGES AUTOMÁTICOS - detectar cambios
+            // SISTEMA DE BADGES AVANZADO
             if (prevState) {
-              // Nuevos items
-              const prevItems = prevState.inventory?.length || 0;
-              const newItemsCount = data.game_state.inventory?.length || 0;
-              if (newItemsCount > prevItems) {
-                setNewItems(prev => prev + (newItemsCount - prevItems));
-              }
-
-              // Nuevos objetivos
-              const prevObjectives = prevState.questObjectives?.length || 0;
-              const newObjectivesCount = data.game_state.questObjectives?.length || 0;
-              if (newObjectivesCount > prevObjectives) {
-                setNewObjectives(prev => prev + (newObjectivesCount - prevObjectives));
-              }
-
-              // Nuevas skills
-              const prevSkills = prevState.skills?.length || 0;
-              const newSkillsCount = data.game_state.skills?.length || 0;
-              if (newSkillsCount > prevSkills) {
-                setNewSkills(prev => prev + (newSkillsCount - prevSkills));
+              // Detectar cambios en inventario
+              const inventoryChanges = detectInventoryChanges(
+                prevState.inventory, 
+                data.game_state.inventory
+              );
+              
+              // Detectar cambios en objetivos
+              const objectivesChanges = detectObjectivesChanges(
+                prevState.questObjectives,
+                data.game_state.questObjectives
+              );
+              
+              // Detectar cambios en skills
+              const skillsChanges = detectSkillsChanges(
+                prevState.skills,
+                data.game_state.skills
+              );
+              
+              // Detectar cambios en estados emocionales
+              const emotionsChanges = detectEmotionsChanges(
+                prevState.emotionalStates,
+                data.game_state.emotionalStates
+              );
+              
+              // Actualizar badges si hay cambios
+              if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+                  skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
+                
+                setBadges(prevBadges => ({
+                  inventory: {
+                    count: prevBadges.inventory.count + inventoryChanges.totalCount,
+                    newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
+                  },
+                  objectives: {
+                    count: prevBadges.objectives.count + objectivesChanges.totalCount,
+                    newObjectives: [...prevBadges.objectives.newObjectives, ...objectivesChanges.newObjectives],
+                    completedObjectives: [...prevBadges.objectives.completedObjectives, ...objectivesChanges.completedObjectives]
+                  },
+                  skills: {
+                    count: prevBadges.skills.count + skillsChanges.totalCount,
+                    newSkills: [...prevBadges.skills.newSkills, ...skillsChanges.newSkills],
+                    levelUps: [...prevBadges.skills.levelUps, ...skillsChanges.levelUps]
+                  },
+                  emotions: {
+                    count: prevBadges.emotions.count + emotionsChanges.totalCount,
+                    significantChanges: [...prevBadges.emotions.significantChanges, ...emotionsChanges.significantChanges]
+                  }
+                }));
+                
+                // Actualizar elementos NEW
+                setNewElements(prevNew => ({
+                  inventory: new Set([
+                    ...prevNew.inventory,
+                    ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+                  ]),
+                  objectives: new Set([
+                    ...prevNew.objectives,
+                    ...objectivesChanges.newObjectives.map(obj => obj?.id || obj?.description || JSON.stringify(obj)),
+                    ...objectivesChanges.completedObjectives
+                  ]),
+                  skills: new Set([
+                    ...prevNew.skills,
+                    ...skillsChanges.newSkills.map(skill => skill?.id || skill?.name || JSON.stringify(skill)),
+                    ...skillsChanges.levelUps.map(skill => `${skill?.id || skill?.name}-levelup`)
+                  ]),
+                  emotions: new Set([
+                    ...prevNew.emotions,
+                    ...emotionsChanges.significantChanges.map(change => change.emotion)
+                  ])
+                }));
               }
             }
             
@@ -135,6 +278,21 @@ function App() {
     setLoading(true);
     setError(null);
     setGameOver(false);
+    
+    // Reset badges y elementos new
+    setBadges({
+      inventory: { count: 0, newItems: [] },
+      objectives: { count: 0, newObjectives: [], completedObjectives: [] },
+      skills: { count: 0, newSkills: [], levelUps: [] },
+      emotions: { count: 0, significantChanges: [] }
+    });
+    
+    setNewElements({
+      inventory: new Set(),
+      objectives: new Set(),
+      skills: new Set(),
+      emotions: new Set()
+    });
     
     try {
       const requestBody = { mode: selectedMode || 'sandbox' };
@@ -184,7 +342,7 @@ function App() {
     }
   };
 
-  // Submit action - OPTIMIZADO
+  // Submit action
   const submitAction = useCallback(async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
@@ -233,20 +391,17 @@ function App() {
     submitAction(suggestedAction);
   }, [submitAction]);
 
-  // HELPER: Force blur AGRESIVO para móvil
+  // Force blur para móvil
   const forceBlurAll = () => {
-    // Blur elemento activo
     if (document.activeElement) {
       document.activeElement.blur();
     }
     
-    // Timeout para asegurar blur de todos los inputs
     setTimeout(() => {
       document.querySelectorAll('input, textarea').forEach(el => {
         if (el.blur) el.blur();
       });
       
-      // Forzar hide keyboard en móvil
       if (window.innerWidth <= 767) {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
@@ -254,13 +409,16 @@ function App() {
     }, 100);
   };
 
-  // Modal handlers CON FORCE BLUR
+  // Modal handlers CON RESET DE BADGES
   const toggleObjectives = (e) => {
     e.preventDefault();
     e.stopPropagation();
     forceBlurAll();
     setShowObjectives(!showObjectives);
-    if (!showObjectives) setNewObjectives(0);
+    if (!showObjectives) {
+      // Reset badge al abrir
+      setBadges(prev => ({ ...prev, objectives: { count: 0, newObjectives: [], completedObjectives: [] } }));
+    }
   };
 
   const toggleInventory = (e) => {
@@ -268,7 +426,10 @@ function App() {
     e.stopPropagation();
     forceBlurAll();
     setShowInventory(!showInventory);
-    if (!showInventory) setNewItems(0);
+    if (!showInventory) {
+      // Reset badge al abrir
+      setBadges(prev => ({ ...prev, inventory: { count: 0, newItems: [] } }));
+    }
   };
 
   const toggleSkills = (e) => {
@@ -276,7 +437,10 @@ function App() {
     e.stopPropagation();
     forceBlurAll();
     setShowSkills(!showSkills);
-    if (!showSkills) setNewSkills(0);
+    if (!showSkills) {
+      // Reset badge al abrir
+      setBadges(prev => ({ ...prev, skills: { count: 0, newSkills: [], levelUps: [] } }));
+    }
   };
 
   const toggleEmotionsModal = (e) => {
@@ -284,7 +448,10 @@ function App() {
     e.stopPropagation();
     forceBlurAll();
     setShowEmotionsModal(!showEmotionsModal);
-    if (!showEmotionsModal) setNewEmotions(0);
+    if (!showEmotionsModal) {
+      // Reset badge al abrir
+      setBadges(prev => ({ ...prev, emotions: { count: 0, significantChanges: [] } }));
+    }
   };
 
   const toggleNarrativeModal = (e) => {
@@ -298,12 +465,24 @@ function App() {
     e.preventDefault();
     e.stopPropagation();
     if (narrativeVisible) {
-      // Si está visible, abrir modal completo
       toggleNarrativeModal(e);
     } else {
-      // Si no está visible, mostrar overlay
       setNarrativeVisible(true);
     }
+  };
+
+  // Helper para verificar si elemento es nuevo
+  const isElementNew = (category, elementId) => {
+    return newElements[category]?.has(elementId);
+  };
+
+  // Helper para limpiar elemento nuevo al verlo
+  const markElementSeen = (category, elementId) => {
+    setNewElements(prev => {
+      const newSet = new Set(prev[category]);
+      newSet.delete(elementId);
+      return { ...prev, [category]: newSet };
+    });
   };
 
   // Helper functions
@@ -330,7 +509,6 @@ function App() {
     return icons[emotion] || '😐';
   };
 
-  // CRITICAL FIX: getSkillIcon con verificación robusta
   const getSkillIcon = (skill) => {
     const skillName = safeStringify(skill?.id || skill, '').toLowerCase();
     if (!skillName) return '✨';
@@ -343,7 +521,7 @@ function App() {
     return '✨';
   };
 
-  // Canvas - UN SOLO PERGAMINO INTELIGENTE
+  // Canvas
   const IntegratedCanvas = () => {
     const canvasRef = useRef(null);
     
@@ -387,7 +565,6 @@ function App() {
         <canvas 
           ref={canvasRef} 
           className="ai-canvas" 
-          // SIN onClick - solo visual
         />
         
         {narrativeVisible && latestEntry && (
@@ -412,7 +589,6 @@ function App() {
           </div>
         )}
         
-        {/* UN SOLO PERGAMINO INTELIGENTE */}
         {gameState?.narrativeLog?.length > 0 && (
           <button 
             className="narrative-smart-toggle clickable"
@@ -432,7 +608,7 @@ function App() {
     );
   };
 
-  // Header con stats VERDADERAMENTE HORIZONTALES
+  // Header
   const CompactHeader = () => {
     const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
@@ -440,17 +616,14 @@ function App() {
       <header className="compact-header">
         <div className="header-left">
           <h1 className="header-title">
-            {/* MOBILE: Header ultra-compacto con ubicación */}
             <span className="mobile-ultra-compact">
               HELLBOUND | ❤️{vitals.health} 🔮{vitals.mana} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
             </span>
-            {/* DESKTOP: Header completo */}
             <span className="desktop-full">
               🔥 HELLBOUND RPG v2.0
             </span>
           </h1>
           
-          {/* UBICACIÓN SIEMPRE VISIBLE */}
           {gameState?.location && (
             <div className="header-location">
               <span>📍</span>
@@ -459,7 +632,6 @@ function App() {
           )}
         </div>
         
-        {/* DESKTOP: Stats REALMENTE HORIZONTALES */}
         <div className="header-stats-real-horizontal desktop-only">
           <div className="stats-row">
             <div className="stat-item">
@@ -505,7 +677,7 @@ function App() {
     );
   };
 
-  // DESKTOP: Acciones rápidas ARRIBA del input - LÍNEA SEPARADA
+  // Desktop Actions
   const DesktopActionsSection = () => (
     <div className="desktop-actions-top">
       <div className="actions-label">Acciones Sugeridas:</div>
@@ -531,7 +703,7 @@ function App() {
     </div>
   );
 
-  // MOBILE: Acciones CON TEXTO debajo del input
+  // Mobile Actions
   const MobileActionsPanel = () => (
     <div className="mobile-actions-panel">
       <div className="mobile-actions-scroll">
@@ -556,7 +728,7 @@ function App() {
     </div>
   );
 
-  // BARRA POPUPS UNIFICADA
+  // BARRA POPUPS CON BADGES VIVOS
   const PopupsBar = () => (
     <div className="popups-bar">
       <button 
@@ -566,7 +738,11 @@ function App() {
       >
         📦
         <span className="popup-label">Inv.</span>
-        {newItems > 0 && <div className="notification-badge">{newItems}</div>}
+        {badges.inventory.count > 0 && (
+          <div className="notification-badge pulse-animation">
+            {badges.inventory.count}
+          </div>
+        )}
       </button>
       
       <button 
@@ -576,7 +752,11 @@ function App() {
       >
         🎯
         <span className="popup-label">Obj.</span>
-        {newObjectives > 0 && <div className="notification-badge">{newObjectives}</div>}
+        {badges.objectives.count > 0 && (
+          <div className="notification-badge pulse-animation">
+            {badges.objectives.count}
+          </div>
+        )}
       </button>
       
       <button 
@@ -586,7 +766,11 @@ function App() {
       >
         📚
         <span className="popup-label">Skills</span>
-        {newSkills > 0 && <div className="notification-badge">{newSkills}</div>}
+        {badges.skills.count > 0 && (
+          <div className="notification-badge pulse-animation">
+            {badges.skills.count}
+          </div>
+        )}
       </button>
       
       <button 
@@ -596,12 +780,16 @@ function App() {
       >
         😌
         <span className="popup-label">Estados</span>
-        {newEmotions > 0 && <div className="notification-badge">{newEmotions}</div>}
+        {badges.emotions.count > 0 && (
+          <div className="notification-badge pulse-animation">
+            {badges.emotions.count}
+          </div>
+        )}
       </button>
     </div>
   );
 
-  // Controls Bar SIMPLIFICADO - sin acciones
+  // Controls Bar
   const ControlsBar = () => (
     <div className="controls-bar">
       <div className="controls-content-clean">
@@ -627,7 +815,6 @@ function App() {
           {loading ? '...' : 'ACTUAR'}
         </button>
         
-        {/* DESKTOP: Solo Popups bar */}
         <div className="desktop-only desktop-popups-only">
           <PopupsBar />
         </div>
@@ -635,12 +822,11 @@ function App() {
     </div>
   );
 
-  // Modal Skills AVANZADO con tabs
+  // MODAL SKILLS CON BADGES Y ELEMENTOS NEW
   const SkillsModal = () => {
     const skills = gameState?.skills || [];
     const [activeTab, setActiveTab] = useState('activas');
 
-    // Categorizar skills
     const categorizedSkills = {
       activas: skills.filter(skill => skill?.type === 'active' || !skill?.type),
       magia: skills.filter(skill => skill?.type === 'magic'),
@@ -673,20 +859,26 @@ function App() {
             </button>
           </div>
           
-          {/* TABS HORIZONTALES */}
           <div className="skills-tabs">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                className={`skill-tab ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-                {tab.skills.length > 0 && (
-                  <span className="tab-count">({tab.skills.length})</span>
-                )}
-              </button>
-            ))}
+            {tabs.map(tab => {
+              const hasNewSkills = tab.skills.some(skill => 
+                isElementNew('skills', skill?.id || skill?.name || JSON.stringify(skill))
+              );
+              
+              return (
+                <button
+                  key={tab.id}
+                  className={`skill-tab ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                  {tab.skills.length > 0 && (
+                    <span className="tab-count">({tab.skills.length})</span>
+                  )}
+                  {hasNewSkills && <span className="tab-new-indicator">●</span>}
+                </button>
+              );
+            })}
           </div>
           
           <div className="modal-content">
@@ -696,29 +888,42 @@ function App() {
               </p>
             ) : (
               <div className="skills-detailed-list">
-                {currentSkills.map((skill, index) => (
-                  <div key={skill?.id || index} className="skill-detailed-item">
-                    <div className="skill-icon-large">{getSkillIcon(skill)}</div>
-                    <div className="skill-detailed-info">
-                      <div className="skill-detailed-name">
-                        {/* FIX: Asegurar que siempre sea string */}
-                        {safeStringify(skill?.id || skill, 'Habilidad')}
-                        {skill?.isNew && <span className="new-badge">NEW</span>}
-                      </div>
-                      {skill?.level && (
-                        <div className="skill-detailed-level">Nivel {skill.level}</div>
-                      )}
-                      {skill?.description && (
-                        <div className="skill-detailed-desc">{safeStringify(skill.description, '')}</div>
-                      )}
-                      {skill?.effects && (
-                        <div className="skill-effects">
-                          Efectos: {safeStringify(skill.effects, '')}
+                {currentSkills.map((skill, index) => {
+                  const skillId = skill?.id || skill?.name || JSON.stringify(skill);
+                  const isNew = isElementNew('skills', skillId);
+                  const isLevelUp = isElementNew('skills', `${skillId}-levelup`);
+                  
+                  return (
+                    <div 
+                      key={skillId || index} 
+                      className={`skill-detailed-item ${isNew || isLevelUp ? 'highlight-new' : ''}`}
+                      onClick={() => {
+                        if (isNew) markElementSeen('skills', skillId);
+                        if (isLevelUp) markElementSeen('skills', `${skillId}-levelup`);
+                      }}
+                    >
+                      <div className="skill-icon-large">{getSkillIcon(skill)}</div>
+                      <div className="skill-detailed-info">
+                        <div className="skill-detailed-name">
+                          {safeStringify(skill?.id || skill, 'Habilidad')}
+                          {isNew && <span className="new-badge fade-in">NEW</span>}
+                          {isLevelUp && <span className="levelup-badge fade-in">LEVEL UP!</span>}
                         </div>
-                      )}
+                        {skill?.level && (
+                          <div className="skill-detailed-level">Nivel {skill.level}</div>
+                        )}
+                        {skill?.description && (
+                          <div className="skill-detailed-desc">{safeStringify(skill.description, '')}</div>
+                        )}
+                        {skill?.effects && (
+                          <div className="skill-effects">
+                            Efectos: {safeStringify(skill.effects, '')}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -727,7 +932,7 @@ function App() {
     );
   };
 
-  // Modal Estados Emocionales - POPUP
+  // MODAL ESTADOS CON CAMBIOS SIGNIFICATIVOS
   const EmotionsModal = () => {
     const emotionalStates = gameState?.emotionalStates || {};
     const allEmotions = [
@@ -755,11 +960,20 @@ function App() {
             <div className="emotions-list">
               {allEmotions.map((emotion) => {
                 const value = emotionalStates[emotion] || 0;
+                const hasRecentChange = isElementNew('emotions', emotion);
+                
                 return (
-                  <div key={emotion} className="emotion-row">
+                  <div 
+                    key={emotion} 
+                    className={`emotion-row ${hasRecentChange ? 'highlight-change' : ''}`}
+                    onClick={() => hasRecentChange && markElementSeen('emotions', emotion)}
+                  >
                     <div className="emotion-icon">{getEmotionIcon(emotion)}</div>
                     <div className="emotion-info">
-                      <div className="emotion-name">{emotion}</div>
+                      <div className="emotion-name">
+                        {emotion}
+                        {hasRecentChange && <span className="change-indicator fade-in">!</span>}
+                      </div>
                       <div className="emotion-value">{Math.round(value)}%</div>
                     </div>
                     <div className="emotion-bar">
@@ -778,7 +992,7 @@ function App() {
     );
   };
 
-  // Modal Objetivos - POPUP
+  // MODAL OBJETIVOS CON NUEVOS Y COMPLETADOS
   const ObjectivesModal = () => {
     const defaultObjectives = [
       { description: "Investigar la figura misteriosa", completed: false },
@@ -807,21 +1021,27 @@ function App() {
           </div>
           <div className="modal-content">
             <div className="objective-list">
-              {objectives.map((objective, index) => (
-                <div 
-                  key={index} 
-                  className={`objective-item ${objective.completed ? 'objective-completed' : ''}`}
-                >
-                  <span className="objective-checkbox">
-                    {objective.completed ? '☑️' : '☐'}
-                  </span>
-                  <span className="objective-text">
-                    {/* FIX: Asegurar que description siempre sea string */}
-                    {safeStringify(objective?.description || objective, 'Objetivo sin descripción')}
-                    {objective?.isNew && <span className="new-badge">NEW</span>}
-                  </span>
-                </div>
-              ))}
+              {objectives.map((objective, index) => {
+                const objectiveId = objective?.id || objective?.description || JSON.stringify(objective);
+                const isNew = isElementNew('objectives', objectiveId);
+                
+                return (
+                  <div 
+                    key={index} 
+                    className={`objective-item ${objective.completed ? 'objective-completed' : ''} ${isNew ? 'highlight-new' : ''}`}
+                    onClick={() => isNew && markElementSeen('objectives', objectiveId)}
+                  >
+                    <span className="objective-checkbox">
+                      {objective.completed ? '☑️' : '☐'}
+                    </span>
+                    <span className="objective-text">
+                      {safeStringify(objective?.description || objective, 'Objetivo sin descripción')}
+                      {isNew && <span className="new-badge fade-in">NEW</span>}
+                      {objective.completed && isNew && <span className="completed-badge fade-in">COMPLETADO</span>}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -829,7 +1049,7 @@ function App() {
     );
   };
 
-  // Modal Inventario - POPUP
+  // MODAL INVENTARIO CON NUEVOS ITEMS
   const InventoryModal = () => {
     const items = gameState?.inventory || [];
     const totalSlots = 9;
@@ -854,13 +1074,22 @@ function App() {
           </div>
           <div className="modal-content">
             <div className="inventory-grid">
-              {items.map((item, index) => (
-                <div key={index} className="inventory-slot clickable">
-                  <div className="slot-icon">{item.icon || '📦'}</div>
-                  <div className="slot-name">{safeStringify(item.name, `Item ${index + 1}`)}</div>
-                  {item.isNew && <div className="item-new-indicator">NEW</div>}
-                </div>
-              ))}
+              {items.map((item, index) => {
+                const itemId = item?.id || item?.name || JSON.stringify(item);
+                const isNew = isElementNew('inventory', itemId);
+                
+                return (
+                  <div 
+                    key={index} 
+                    className={`inventory-slot clickable ${isNew ? 'highlight-new' : ''}`}
+                    onClick={() => isNew && markElementSeen('inventory', itemId)}
+                  >
+                    <div className="slot-icon">{item.icon || '📦'}</div>
+                    <div className="slot-name">{safeStringify(item.name, `Item ${index + 1}`)}</div>
+                    {isNew && <div className="item-new-indicator fade-in">NEW</div>}
+                  </div>
+                );
+              })}
               {Array.from({ length: emptySlots }, (_, index) => (
                 <div key={`empty-${index}`} className="inventory-slot empty">
                   <div className="slot-icon">+</div>
@@ -874,7 +1103,7 @@ function App() {
     );
   };
 
-  // Modal Narrativa Expandida - POPUP
+  // Modal Narrativa
   const NarrativeModal = () => (
     <>
       <div 
@@ -916,7 +1145,7 @@ function App() {
     </>
   );
 
-  // BOTÓN CAMPAÑA ORIGINAL RESTAURADO
+  // Components para pantallas de inicio
   const CampaignButton = ({ onClick, disabled, loading, children }) => (
     <button
       onClick={onClick}
@@ -927,7 +1156,6 @@ function App() {
     </button>
   );
 
-  // Formulario Sandbox
   const SandboxConceptForm = ({ onSubmit, loading }) => {
     const [concept, setConcept] = useState('');
 
@@ -979,7 +1207,6 @@ function App() {
   return (
     <div className="app-container">
       {!sessionId ? (
-        // Pantalla de inicio
         !mode ? (
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
             <div style={{ textAlign: 'center', maxWidth: '500px' }}>
@@ -1036,7 +1263,6 @@ function App() {
           </div>
         )
       ) : gameOver ? (
-        // Game Over
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
           <div className="game-over-container">
             <h3 className="game-over-title">
@@ -1054,25 +1280,21 @@ function App() {
           </div>
         </div>
       ) : (
-        // LAYOUT FINAL CORREGIDO
         <>
           <CompactHeader />
           <IntegratedCanvas />
           
-          {/* MOBILE LAYOUT */}
           <div className="mobile-only">
             <ControlsBar />
             <MobileActionsPanel />
             <PopupsBar />
           </div>
           
-          {/* DESKTOP LAYOUT - Acciones ARRIBA */}
           <div className="desktop-only">
             <DesktopActionsSection />
             <ControlsBar />
           </div>
           
-          {/* TODOS LOS MODALES */}
           <SkillsModal />
           <ObjectivesModal />
           <InventoryModal />
@@ -1081,7 +1303,6 @@ function App() {
         </>
       )}
 
-      {/* Error Display */}
       {error && (
         <div className="error-display">
           {safeStringify(error, 'Error desconocido')}
