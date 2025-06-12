@@ -139,7 +139,8 @@ test_plan:
     - "Input fluido"
     - "Modal objetivos e inventario"
     - "Narrativa expandible"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Input fluido"
   test_all: true
   test_priority: "high_first"
 
