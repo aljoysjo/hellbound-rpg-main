@@ -920,13 +920,17 @@ function App() {
           </div>
         </div>
       ) : (
-        // Interfaz del juego - LAYOUT REORGANIZADO
+        // Interfaz del juego - LAYOUT REORGANIZADO CON ORDEN ESPECÍFICO
         <>
           <CompactHeader />
           <IntegratedCanvas />
-          <MobileActionsBar /> {/* Solo en móvil */}
-          <ControlsBar />
-          <SkillsBar />
+          
+          {/* ORDEN ESPECÍFICO PARA MOBILE: acciones arriba, controls medio, skills abajo */}
+          <div className="mobile-layout-container">
+            <MobileActionsBar /> {/* Solo en móvil - ARRIBA */}
+            <ControlsBar />      {/* MEDIO */}
+            <SkillsBar />        {/* ABAJO en mobile, normal en desktop */}
+          </div>
           
           {/* Modales - TODOS FIXED */}
           <ObjectivesModal />
