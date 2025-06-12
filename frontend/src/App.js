@@ -150,6 +150,8 @@ function App() {
     const prev = prevEmotions || {};
     const current = currentEmotions || {};
     
+    console.log('🔍 EMOTIONS DEBUG:', { prev, current });
+    
     const significantChanges = [];
     
     Object.keys(current).forEach(emotion => {
@@ -165,6 +167,8 @@ function App() {
         });
       }
     });
+    
+    console.log('😊 EMOTIONS CHANGES:', { significantChanges });
     
     return {
       significantChanges,
