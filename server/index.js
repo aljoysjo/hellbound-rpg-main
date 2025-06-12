@@ -661,11 +661,13 @@ ESTADO ACTUAL:
 - Alerta: ${gameState.emotionalStates.alerta}/100
 
 IMPORTANTE: Analiza la narrativa REALMENTE y detecta:
-1. DAÑO FÍSICO real (caídas, ataques, heridas)
-2. GASTO DE ENERGÍA (magia, esfuerzo físico)
-3. CAMBIOS DE UBICACIÓN explícitos
-4. ESTADOS EMOCIONALES por situaciones intensas
-5. MUERTE si la situación es mortal
+1. OBTENER OBJETOS (encontrar, tomar, recoger libros, armas, pociones, llaves, etc.)
+2. NUEVAS HABILIDADES (aprender, entrenar, dominar nuevas técnicas)
+3. DAÑO FÍSICO real (caídas, ataques, heridas)
+4. GASTO DE ENERGÍA (magia, esfuerzo físico)
+5. CAMBIOS DE UBICACIÓN explícitos
+6. ESTADOS EMOCIONALES por situaciones intensas
+7. MUERTE si la situación es mortal
 
 Responde SOLO con un JSON válido:
 
