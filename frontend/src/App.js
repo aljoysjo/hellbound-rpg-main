@@ -56,17 +56,27 @@ function App() {
     return String(value);
   };
 
-  // SISTEMA DE DETECCIÓN DE CAMBIOS ROBUSTO
+  // SISTEMA DE DETECCIÓN DE CAMBIOS ROBUSTO CORREGIDO
   const detectInventoryChanges = (prevInventory, currentInventory) => {
     const prev = Array.isArray(prevInventory) ? prevInventory : [];
     const current = Array.isArray(currentInventory) ? currentInventory : [];
     
+    console.log('🔍 INVENTORY DEBUG:', { prev: prev.length, current: current.length });
+    
     const prevIds = prev.map(item => item?.id || item?.name || JSON.stringify(item));
     const currentIds = current.map(item => item?.id || item?.name || JSON.stringify(item));
     
+    // CORRECCIÓN: Filtrar items que NO están en prevIds
+    const newItems = current.filter(item => {
+      const itemId = item?.id || item?.name || JSON.stringify(item);
+      return !prevIds.includes(itemId);
+    });
+    
+    console.log('📦 INVENTORY CHANGES:', { prevIds, currentIds, newItems });
+    
     return {
-      newItems: current.filter((item, index) => !prevIds.includes(currentIds[index])),
-      totalCount: Math.max(0, current.length - prev.length)
+      newItems,
+      totalCount: newItems.length
     };
   };
 
