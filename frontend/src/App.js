@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO: Stats horizontales + Acciones arriba
+// 🎮 MAIN APP COMPONENT - FIXED: Object rendering errors
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -34,6 +34,17 @@ function App() {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
   const inputRef = useRef(null);
+
+  // HELPER: Safe string conversion
+  const safeStringify = (value, fallback = '') => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value.toString();
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'object') {
+      return value.name || value.id || value.description || fallback;
+    }
+    return String(value);
+  };
 
   // Auto-fade narrativa después de 5 segundos
   useEffect(() => {
@@ -321,7 +332,7 @@ function App() {
 
   // CRITICAL FIX: getSkillIcon con verificación robusta
   const getSkillIcon = (skill) => {
-    const skillName = (skill?.id || skill || '').toString().toLowerCase();
+    const skillName = safeStringify(skill?.id || skill, '').toLowerCase();
     if (!skillName) return '✨';
     
     if (skillName.includes('exorcismo')) return '🔥';
@@ -355,14 +366,14 @@ function App() {
         ctx.font = 'bold 24px Cinzel';
         ctx.textAlign = 'center';
         ctx.fillText(
-          `🖼️ ILUSTRACIÓN AI: ${gameState.location || 'Ubicación Desconocida'}`,
+          `🖼️ ILUSTRACIÓN AI: ${safeStringify(gameState.location, 'Ubicación Desconocida')}`,
           canvas.width / 2,
           canvas.height / 2 - 15
         );
         
         ctx.font = '16px Cormorant Garamond';
         ctx.fillText(
-          `Modo: ${gameState.mode || 'RPG'} ${loading ? '(Generando...)' : ''}`,
+          `Modo: ${safeStringify(gameState.mode, 'RPG')} ${loading ? '(Generando...)' : ''}`,
           canvas.width / 2,
           canvas.height / 2 + 15
         );
@@ -385,13 +396,15 @@ function App() {
               📜 {gameState.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}
             </div>
             <div className="narrative-preview">
-              <strong>▶ {latestEntry.player_action}</strong>
+              <strong>▶ {safeStringify(latestEntry.player_action, 'Acción del jugador')}</strong>
             </div>
             <div className="narrative-preview">
-              {latestEntry.narrative.length > 120 
-                ? latestEntry.narrative.substring(0, 120) + '...' 
-                : latestEntry.narrative
-              }
+              {(() => {
+                const narrative = safeStringify(latestEntry.narrative, '');
+                return narrative.length > 120 
+                  ? narrative.substring(0, 120) + '...' 
+                  : narrative;
+              })()}
             </div>
             <div className="narrative-hint">
               Click en 📜 para ver historia completa
@@ -441,7 +454,7 @@ function App() {
           {gameState?.location && (
             <div className="header-location">
               <span>📍</span>
-              <span>{gameState.location}</span>
+              <span>{safeStringify(gameState.location, '')}</span>
             </div>
           )}
         </div>
@@ -510,7 +523,7 @@ function App() {
               className="desktop-action-full clickable"
             >
               <span>{getActionIcon(suggestedAction)}</span>
-              <span>{suggestedAction}</span>
+              <span>{safeStringify(suggestedAction, 'Acción')}</span>
             </button>
           ))
         )}
@@ -535,7 +548,7 @@ function App() {
               className="mobile-action-with-text clickable"
             >
               <span>{getActionIcon(suggestedAction)}</span>
-              <span>{suggestedAction}</span>
+              <span>{safeStringify(suggestedAction, 'Acción')}</span>
             </button>
           ))
         )}
@@ -689,20 +702,18 @@ function App() {
                     <div className="skill-detailed-info">
                       <div className="skill-detailed-name">
                         {/* FIX: Asegurar que siempre sea string */}
-                        {typeof (skill?.id || skill) === 'string' 
-                          ? (skill?.id || skill) 
-                          : 'Habilidad'}
+                        {safeStringify(skill?.id || skill, 'Habilidad')}
                         {skill?.isNew && <span className="new-badge">NEW</span>}
                       </div>
                       {skill?.level && (
                         <div className="skill-detailed-level">Nivel {skill.level}</div>
                       )}
                       {skill?.description && (
-                        <div className="skill-detailed-desc">{skill.description}</div>
+                        <div className="skill-detailed-desc">{safeStringify(skill.description, '')}</div>
                       )}
                       {skill?.effects && (
                         <div className="skill-effects">
-                          Efectos: {skill.effects}
+                          Efectos: {safeStringify(skill.effects, '')}
                         </div>
                       )}
                     </div>
@@ -806,11 +817,7 @@ function App() {
                   </span>
                   <span className="objective-text">
                     {/* FIX: Asegurar que description siempre sea string */}
-                    {typeof objective?.description === 'string' 
-                      ? objective.description 
-                      : typeof objective === 'string' 
-                        ? objective 
-                        : 'Objetivo sin descripción'}
+                    {safeStringify(objective?.description || objective, 'Objetivo sin descripción')}
                     {objective?.isNew && <span className="new-badge">NEW</span>}
                   </span>
                 </div>
@@ -850,7 +857,7 @@ function App() {
               {items.map((item, index) => (
                 <div key={index} className="inventory-slot clickable">
                   <div className="slot-icon">{item.icon || '📦'}</div>
-                  <div className="slot-name">{item.name || `Item ${index + 1}`}</div>
+                  <div className="slot-name">{safeStringify(item.name, `Item ${index + 1}`)}</div>
                   {item.isNew && <div className="item-new-indicator">NEW</div>}
                 </div>
               ))}
@@ -895,10 +902,10 @@ function App() {
               {gameState?.narrativeLog?.map((entry, index) => (
                 <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
                   <p className="narrative-action">
-                    ▶ {entry.player_action}
+                    ▶ {safeStringify(entry.player_action, 'Acción del jugador')}
                   </p>
                   <p className="narrative-text">
-                    {entry.narrative}
+                    {safeStringify(entry.narrative, 'Narrativa')}
                   </p>
                 </div>
               ))}
@@ -1077,7 +1084,7 @@ function App() {
       {/* Error Display */}
       {error && (
         <div className="error-display">
-          {error}
+          {safeStringify(error, 'Error desconocido')}
         </div>
       )}
     </div>
