@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - UX REORGANIZADA CON BARRA POPUPS UNIFICADA
+// 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO: Stats horizontales + Acciones arriba
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -222,50 +222,64 @@ function App() {
     submitAction(suggestedAction);
   }, [submitAction]);
 
-  // HELPER: input.blur() antes de abrir popups
-  const blurInput = () => {
-    if (inputRef.current) {
-      inputRef.current.blur();
+  // HELPER: Force blur AGRESIVO para móvil
+  const forceBlurAll = () => {
+    // Blur elemento activo
+    if (document.activeElement) {
+      document.activeElement.blur();
     }
+    
+    // Timeout para asegurar blur de todos los inputs
+    setTimeout(() => {
+      document.querySelectorAll('input, textarea').forEach(el => {
+        if (el.blur) el.blur();
+      });
+      
+      // Forzar hide keyboard en móvil
+      if (window.innerWidth <= 767) {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+      }
+    }, 100);
   };
 
-  // Modal handlers CON BLUR Y BADGE RESET
+  // Modal handlers CON FORCE BLUR
   const toggleObjectives = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    blurInput();
+    forceBlurAll();
     setShowObjectives(!showObjectives);
-    if (!showObjectives) setNewObjectives(0); // Reset badge
+    if (!showObjectives) setNewObjectives(0);
   };
 
   const toggleInventory = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    blurInput();
+    forceBlurAll();
     setShowInventory(!showInventory);
-    if (!showInventory) setNewItems(0); // Reset badge
+    if (!showInventory) setNewItems(0);
   };
 
   const toggleSkills = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    blurInput();
+    forceBlurAll();
     setShowSkills(!showSkills);
-    if (!showSkills) setNewSkills(0); // Reset badge
+    if (!showSkills) setNewSkills(0);
   };
 
   const toggleEmotionsModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    blurInput();
+    forceBlurAll();
     setShowEmotionsModal(!showEmotionsModal);
-    if (!showEmotionsModal) setNewEmotions(0); // Reset badge
+    if (!showEmotionsModal) setNewEmotions(0);
   };
 
   const toggleNarrativeModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    blurInput();
+    forceBlurAll();
     setShowNarrativeModal(!showNarrativeModal);
   };
 
@@ -405,7 +419,7 @@ function App() {
     );
   };
 
-  // Header con stats HORIZONTALES
+  // Header con stats VERDADERAMENTE HORIZONTALES
   const CompactHeader = () => {
     const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
@@ -432,34 +446,77 @@ function App() {
           )}
         </div>
         
-        {/* DESKTOP: Stats HORIZONTALES compactos */}
-        <div className="header-stats-horizontal desktop-only">
-          {Object.entries(vitals).map(([type, value]) => {
-            const icons = { health: '❤️', mana: '🔮', stamina: '⚡' };
-            const percentage = Math.max(0, Math.min(100, value));
-            
-            return (
-              <div key={type} className="stat-horizontal">
-                <span className="stat-icon">{icons[type]}</span>
-                <div className="stat-bar-horizontal">
-                  <div 
-                    className={`stat-fill ${type}`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <span className="stat-value">{percentage}</span>
+        {/* DESKTOP: Stats REALMENTE HORIZONTALES */}
+        <div className="header-stats-real-horizontal desktop-only">
+          <div className="stats-row">
+            <div className="stat-item">
+              <span className="stat-icon">❤️</span>
+              <div className="stat-bar-inline">
+                <div 
+                  className="stat-fill health"
+                  style={{ width: `${Math.max(0, Math.min(100, vitals.health))}%` }}
+                />
               </div>
-            );
-          })}
-          
-          <div className="connection-indicator">
-            <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-            <span>Conectado</span>
+              <span className="stat-text">{vitals.health}</span>
+            </div>
+            
+            <div className="stat-item">
+              <span className="stat-icon">🔮</span>
+              <div className="stat-bar-inline">
+                <div 
+                  className="stat-fill mana"
+                  style={{ width: `${Math.max(0, Math.min(100, vitals.mana))}%` }}
+                />
+              </div>
+              <span className="stat-text">{vitals.mana}</span>
+            </div>
+            
+            <div className="stat-item">
+              <span className="stat-icon">⚡</span>
+              <div className="stat-bar-inline">
+                <div 
+                  className="stat-fill stamina"
+                  style={{ width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%` }}
+                />
+              </div>
+              <span className="stat-text">{vitals.stamina || 80}</span>
+            </div>
+            
+            <div className="connection-item">
+              <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
+              <span className="status-text">Conectado</span>
+            </div>
           </div>
         </div>
       </header>
     );
   };
+
+  // DESKTOP: Acciones rápidas ARRIBA del input - LÍNEA SEPARADA
+  const DesktopActionsSection = () => (
+    <div className="desktop-actions-top">
+      <div className="actions-label">Acciones Sugeridas:</div>
+      <div className="actions-buttons">
+        {suggestedActions.length === 0 ? (
+          <div className="no-actions-text">
+            Las acciones aparecerán aquí según el contexto...
+          </div>
+        ) : (
+          suggestedActions.map((suggestedAction, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestedAction(suggestedAction)}
+              disabled={loading || gameOver}
+              className="desktop-action-full clickable"
+            >
+              <span>{getActionIcon(suggestedAction)}</span>
+              <span>{suggestedAction}</span>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
 
   // MOBILE: Acciones CON TEXTO debajo del input
   const MobileActionsPanel = () => (
@@ -531,33 +588,10 @@ function App() {
     </div>
   );
 
-  // DESKTOP: Acciones centradas responsivas
-  const DesktopActionsSection = () => (
-    <div className="desktop-actions-section">
-      {suggestedActions.length === 0 ? (
-        <div className="no-actions-placeholder">
-          Acciones disponibles...
-        </div>
-      ) : (
-        suggestedActions.slice(0, 3).map((suggestedAction, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestedAction(suggestedAction)}
-            disabled={loading || gameOver}
-            className="desktop-action-button clickable"
-          >
-            <span>{getActionIcon(suggestedAction)}</span>
-            <span className="action-text">{suggestedAction}</span>
-          </button>
-        ))
-      )}
-    </div>
-  );
-
-  // Controls Bar REORGANIZADO
+  // Controls Bar SIMPLIFICADO - sin acciones
   const ControlsBar = () => (
     <div className="controls-bar">
-      <div className="controls-content">
+      <div className="controls-content-clean">
         <StoryInput 
           ref={inputRef}
           onSubmit={submitAction}
@@ -569,7 +603,7 @@ function App() {
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            const form = e.target.closest('.controls-content').querySelector('form');
+            const form = e.target.closest('.controls-bar').querySelector('form');
             if (form) {
               form.requestSubmit();
             }
@@ -580,9 +614,8 @@ function App() {
           {loading ? '...' : 'ACTUAR'}
         </button>
         
-        {/* DESKTOP: Acciones centradas + Popups bar */}
-        <div className="desktop-only desktop-extensions">
-          <DesktopActionsSection />
+        {/* DESKTOP: Solo Popups bar */}
+        <div className="desktop-only desktop-popups-only">
           <PopupsBar />
         </div>
       </div>
@@ -868,6 +901,17 @@ function App() {
     </>
   );
 
+  // BOTÓN CAMPAÑA ORIGINAL RESTAURADO
+  const CampaignButton = ({ onClick, disabled, loading, children }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="campaign-button clickable"
+    >
+      {loading ? 'Iniciando...' : children}
+    </button>
+  );
+
   // Formulario Sandbox
   const SandboxConceptForm = ({ onSubmit, loading }) => {
     const [concept, setConcept] = useState('');
@@ -883,48 +927,22 @@ function App() {
     return (
       <div className="app-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ maxWidth: '500px', width: '100%', padding: 'var(--space-lg)' }}>
-          <div style={{ 
-            background: 'var(--bg-card)', 
-            border: 'var(--border-width) solid var(--color-primary)',
-            borderRadius: 'var(--border-radius)',
-            padding: 'var(--space-lg)',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ 
-              fontFamily: 'var(--font-title)', 
-              fontSize: '2rem', 
-              color: 'var(--color-primary)', 
-              marginBottom: 'var(--space-lg)' 
-            }}>
+          <div className="sandbox-form-container">
+            <h2 className="sandbox-title">
               Modo Sandbox - Historia Libre
             </h2>
-            <p style={{ 
-              fontSize: '1.1rem', 
-              color: 'var(--text-medium)', 
-              marginBottom: 'var(--space-lg)' 
-            }}>
+            <p className="sandbox-subtitle">
               Describe la historia que quieres vivir.
             </p>
             
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+            <form onSubmit={handleSubmit} className="sandbox-form">
               <textarea
                 value={concept}
                 onChange={(e) => setConcept(e.target.value)}
                 placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
                 disabled={loading}
                 rows={4}
-                className="clickable"
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-md)',
-                  border: 'var(--border-width) solid var(--color-primary)',
-                  borderRadius: 'var(--border-radius)',
-                  background: 'var(--bg-card)',
-                  color: 'var(--text-dark)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '1rem',
-                  resize: 'none'
-                }}
+                className="sandbox-textarea clickable"
                 required
                 minLength={20}
               />
@@ -932,8 +950,7 @@ function App() {
               <button
                 type="submit"
                 disabled={loading || concept.trim().length < 20}
-                className="action-button clickable"
-                style={{ fontSize: '1.1rem' }}
+                className="campaign-button clickable"
               >
                 {loading ? 'Creando historia...' : 'Comenzar Aventura'}
               </button>
@@ -951,19 +968,10 @@ function App() {
         !mode ? (
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
             <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-              <h2 style={{ 
-                fontFamily: 'var(--font-title)', 
-                fontSize: '2.5rem', 
-                color: 'var(--color-primary)', 
-                marginBottom: 'var(--space-lg)' 
-              }}>
+              <h2 className="welcome-title">
                 Bienvenido al Infierno
               </h2>
-              <p style={{ 
-                fontSize: '1.2rem', 
-                color: 'var(--text-medium)', 
-                marginBottom: 'var(--space-lg)' 
-              }}>
+              <p className="welcome-subtitle">
                 Elige tu camino en una aventura épica donde cada decisión forja tu destino.
               </p>
               <ModeSelector onSelect={setMode} />
@@ -977,48 +985,33 @@ function App() {
         ) : (
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
             <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-              <div style={{ 
-                background: 'var(--bg-card)', 
-                border: 'var(--border-width) solid var(--color-primary)',
-                borderRadius: 'var(--border-radius)',
-                padding: 'var(--space-lg)'
-              }}>
-                <p style={{ fontSize: '1.1rem', color: 'var(--text-medium)', marginBottom: 'var(--space-lg)' }}>
-                  Modo seleccionado: <span style={{ fontFamily: 'var(--font-title)', color: 'var(--color-primary)' }}>
+              <div className="mode-selection-container">
+                <p className="mode-selected-text">
+                  Modo seleccionado: <span className="mode-name">
                     {mode === 'sandbox' ? 'Sandbox' : 
                      mode === 'campaign' ? 'Campaña' : 
                      'Campaña Temporal'}
                   </span>
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                  <button
+                <div className="mode-buttons">
+                  <CampaignButton
                     onClick={() => startNewSession(mode, 'scenes_act1')}
                     disabled={loading}
-                    className="action-button clickable"
-                    style={{ fontSize: '1.1rem' }}
+                    loading={loading}
                   >
-                    {loading ? 'Iniciando...' : `Iniciar ${
+                    {`Iniciar ${
                       mode === 'sandbox' ? 'Sandbox' : 
                       mode === 'campaign' ? 'Campaña' : 
                       'Campaña Temporal'
                     }`}
-                  </button>
+                  </CampaignButton>
                   <button
                     onClick={() => {
                       setMode(null);
                       setShowSandboxForm(false);
                     }}
                     disabled={loading}
-                    className="clickable"
-                    style={{
-                      background: 'var(--color-secondary)',
-                      color: 'var(--text-light)',
-                      border: 'none',
-                      padding: 'var(--space-sm) var(--space-md)',
-                      borderRadius: 'var(--border-radius)',
-                      cursor: 'pointer',
-                      fontSize: '1rem'
-                    }}
+                    className="mode-change-button clickable"
                   >
                     Cambiar Modo
                   </button>
@@ -1030,36 +1023,23 @@ function App() {
       ) : gameOver ? (
         // Game Over
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-          <div style={{ 
-            background: 'var(--bg-card)', 
-            border: 'var(--border-width) solid var(--color-danger)',
-            borderRadius: 'var(--border-radius)',
-            padding: 'var(--space-lg)',
-            textAlign: 'center',
-            maxWidth: '400px'
-          }}>
-            <h3 style={{ 
-              fontFamily: 'var(--font-title)', 
-              fontSize: '1.8rem', 
-              color: 'var(--color-danger)', 
-              marginBottom: 'var(--space-md)' 
-            }}>
+          <div className="game-over-container">
+            <h3 className="game-over-title">
               💀 GAME OVER 💀
             </h3>
-            <p style={{ color: 'var(--text-medium)', marginBottom: 'var(--space-lg)' }}>
+            <p className="game-over-text">
               Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="action-button clickable"
-              style={{ fontSize: '1.1rem' }}
+              className="campaign-button clickable"
             >
               Reiniciar Partida
             </button>
           </div>
         </div>
       ) : (
-        // LAYOUT FINAL REORGANIZADO
+        // LAYOUT FINAL CORREGIDO
         <>
           <CompactHeader />
           <IntegratedCanvas />
@@ -1071,8 +1051,9 @@ function App() {
             <PopupsBar />
           </div>
           
-          {/* DESKTOP LAYOUT */}
+          {/* DESKTOP LAYOUT - Acciones ARRIBA */}
           <div className="desktop-only">
+            <DesktopActionsSection />
             <ControlsBar />
           </div>
           
@@ -1087,18 +1068,7 @@ function App() {
 
       {/* Error Display */}
       {error && (
-        <div style={{
-          position: 'fixed',
-          bottom: 'var(--space-md)',
-          right: 'var(--space-md)',
-          background: 'var(--color-danger)',
-          color: 'var(--text-light)',
-          padding: 'var(--space-md)',
-          borderRadius: 'var(--border-radius)',
-          zIndex: '200',
-          maxWidth: '300px',
-          fontSize: '1rem'
-        }}>
+        <div className="error-display">
           {error}
         </div>
       )}
