@@ -388,62 +388,6 @@ function App() {
       }
     };
   }, [sessionId, BACKEND_URL]);
-  // SISTEMA DE POLLING FORZADO para badges (independiente de WebSocket)
-  useEffect(() => {
-    let pollingInterval;
-    
-    if (sessionId) {
-      console.log('🔄 Iniciando polling forzado para badges, connectionStatus:', connectionStatus);
-      pollingInterval = setInterval(async () => {
-        try {
-          const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
-          if (response.ok) {
-            const data = await response.json();
-            
-            setGameState(prevState => {
-              if (!prevState || data.game_state.actionCount > prevState.actionCount) {
-                console.log('🔄 POLLING UPDATE:', data.game_state);
-                setNarrativeVisible(true);
-                
-                // Aplicar misma lógica de badges
-                if (prevState) {
-                  const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
-                  const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
-                  const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
-                  const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
-                  
-                  console.log('🎯 POLLING CHANGES:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
-                  
-                  if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
-                      skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
-                    
-                    console.log('✨ POLLING BADGES UPDATE');
-                    setBadges(prev => ({
-                      inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
-                      objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
-                      skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
-                      emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
-                    }));
-                  }
-                }
-                
-                return data.game_state;
-              }
-              return prevState;
-            });
-          }
-        } catch (error) {
-          console.error('❌ Error en polling:', error);
-        }
-      }, 2000); // Poll cada 2 segundos
-    }
-    
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [sessionId, BACKEND_URL]);
 
   // Start new session
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
