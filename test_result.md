@@ -2,11 +2,11 @@
 frontend:
   - task: "Input fluido"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -20,6 +20,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verificado que el problema ha sido corregido. La función handleInputChange en línea 192 ahora incluye e.stopPropagation() en lugar de e.preventDefault(), lo que permite el input fluido. El código ahora tiene un comentario 'CRITICAL FIX: Input change completamente limpio'."
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada en la URL especificada (dark-chronicles-1.preview.emergentagent.com). A pesar de los cambios implementados (textarea, eliminación de stopPropagation, useRef y useEffect para mantener foco), el input sigue sin funcionar correctamente. En desktop no se registra ningún texto y en móvil solo se registra la primera letra 'E'. El cursor pierde el foco durante la escritura y Enter no envía la acción correctamente."
 
   - task: "Inicio de sesión"
     implemented: true
