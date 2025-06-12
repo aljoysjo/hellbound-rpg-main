@@ -432,6 +432,17 @@ class GameState {
       }
     }
     
+    // Añadir nuevo item al inventario
+    if (stateChanges.newInventoryItem) {
+      const newItem = {
+        name: stateChanges.newInventoryItem.name,
+        icon: stateChanges.newInventoryItem.icon || '📦',
+        description: stateChanges.newInventoryItem.description || ''
+      };
+      this.inventory.push(newItem);
+      console.log(`📦 Nuevo item obtenido: ${newItem.name} ${newItem.icon}`);
+    }
+    
     // Remover habilidad
     if (stateChanges.removeSkill) {
       this.skills = this.skills.filter(s => s.id !== stateChanges.removeSkill);
