@@ -188,20 +188,10 @@ function App() {
     }
   };
 
-  // CRITICAL FIX: Input completamente limpio sin interferencias
+  // CRITICAL FIX: Input change completamente limpio
   const handleInputChange = (e) => {
-    setAction(e.target.value); // SIN preventDefault ni stopPropagation
-  };
-
-  // Handler para Enter sin interferir con el foco
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Solo para evitar salto de línea
-      if (action.trim()) {
-        submitAction(action.trim());
-        setAction('');
-      }
-    }
+    e.stopPropagation(); // Evitar interferencias
+    setAction(e.target.value);
   };
 
   const handleSuggestedAction = (suggestedAction) => {
