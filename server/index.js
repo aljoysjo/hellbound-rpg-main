@@ -676,6 +676,7 @@ Responde SOLO con un JSON válido:
   "statusSet": {"miedo": 70, "alerta": 90, "fatiga": 30},
   "locationChange": "Nueva Ubicación Específica",
   "newSkill": {"id": "nueva_habilidad", "level": 1, "tags": ["tag"], "description": "desc"},
+  "newInventoryItem": {"name": "Libro de Hechizos", "icon": "📖", "description": "Manual de conjuros básicos"},
   "resourceDelta": {"gold": +10, "rations": -1},
   "relationshipDelta": {"Persona": +15},
   "knowledgeDelta": {"Tema": +20},
