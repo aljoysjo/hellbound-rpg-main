@@ -46,6 +46,13 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
+  // CRITICAL FIX: Foco inicial al textarea para input fluido
+  useEffect(() => {
+    if (sessionId && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [sessionId]); // Dar foco cuando inicie sesión
+
   // Socket initialization
   useEffect(() => {
     const newSocket = io(BACKEND_URL);
