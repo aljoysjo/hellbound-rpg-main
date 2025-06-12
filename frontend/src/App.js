@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON INPUT AISLADO
+// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON UX MEJORADA
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -17,10 +17,11 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   
-  // UI States - FIXED
+  // UI States - UPDATED para popups
   const [narrativeVisible, setNarrativeVisible] = useState(true);
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
+  const [showSkills, setShowSkills] = useState(false); // NUEVO
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
   const [showEmotionsModal, setShowEmotionsModal] = useState(false);
 
@@ -45,7 +46,7 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
-  // Socket initialization - OPTIMIZADO para evitar rerenders
+  // Socket initialization - OPTIMIZADO
   useEffect(() => {
     const newSocket = io(BACKEND_URL);
     setSocket(newSocket);
@@ -60,7 +61,6 @@ function App() {
 
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
-        // OPTIMIZACIÓN: Solo actualizar si realmente cambió
         setGameState(prevState => {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
@@ -69,7 +69,6 @@ function App() {
           return prevState;
         });
         
-        // Actualizar acciones sugeridas sin forzar rerender del input
         if (data.suggested_actions) {
           setSuggestedActions(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(data.suggested_actions)) {
@@ -204,6 +203,12 @@ function App() {
     setShowInventory(!showInventory);
   };
 
+  const toggleSkills = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowSkills(!showSkills);
+  };
+
   const toggleEmotionsModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -248,7 +253,6 @@ function App() {
 
   // CRITICAL FIX: getSkillIcon con verificación robusta
   const getSkillIcon = (skill) => {
-    // Verificación robusta para evitar errores undefined
     const skillName = (skill?.id || skill || '').toString().toLowerCase();
     if (!skillName) return '✨';
     
@@ -271,7 +275,7 @@ function App() {
     return getEmotionIcon(sortedEmotions[0][0]);
   };
 
-  // Componente Canvas Integrado
+  // Componente Canvas - SIN CLICK, solo visual
   const IntegratedCanvas = () => {
     const canvasRef = useRef(null);
     
@@ -314,15 +318,12 @@ function App() {
       <div className="integrated-canvas-container">
         <canvas 
           ref={canvasRef} 
-          className="ai-canvas clickable" 
-          onClick={toggleNarrativeModal}
+          className="ai-canvas" 
+          // SIN onClick - solo visual
         />
         
         {narrativeVisible && latestEntry && (
-          <div 
-            className="narrative-overlay clickable"
-            onClick={toggleNarrativeModal}
-          >
+          <div className="narrative-overlay">
             <div className="narrative-title">
               📜 {gameState.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}
             </div>
@@ -335,17 +336,26 @@ function App() {
                 : latestEntry.narrative
               }
             </div>
-            <div className="narrative-hint">
-              Click para ver la historia completa
-            </div>
           </div>
         )}
         
+        {/* SOLO este botón abre narrativa */}
         {!narrativeVisible && gameState?.narrativeLog?.length > 0 && (
           <button 
             className="narrative-toggle clickable"
             onClick={toggleNarrativeVisible}
             title="Mostrar narrativa"
+          >
+            📜
+          </button>
+        )}
+        
+        {/* Botón 📜 siempre visible para abrir modal completo */}
+        {gameState?.narrativeLog?.length > 0 && (
+          <button 
+            className="narrative-full-toggle clickable"
+            onClick={toggleNarrativeModal}
+            title="Abrir historia completa"
           >
             📜
           </button>
@@ -360,7 +370,7 @@ function App() {
     );
   };
 
-  // NUEVO: Header Ultra-Compacto
+  // Header con stats como barras - DESKTOP
   const CompactHeader = () => {
     const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
@@ -368,7 +378,7 @@ function App() {
       <header className="compact-header">
         <div className="header-left">
           <h1 className="header-title">
-            {/* MOBILE: Header ultra-compacto */}
+            {/* MOBILE: Header ultra-compacto con ubicación */}
             <span className="mobile-ultra-compact">
               HELLBOUND | ❤️{vitals.health} 🔮{vitals.mana} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
             </span>
@@ -377,29 +387,34 @@ function App() {
               🔥 HELLBOUND RPG v2.0
             </span>
           </h1>
+          
+          {/* UBICACIÓN SIEMPRE VISIBLE */}
           {gameState?.location && (
-            <div className="header-location desktop-only">
+            <div className="header-location">
               <span>📍</span>
               <span>{gameState.location}</span>
             </div>
           )}
         </div>
         
+        {/* DESKTOP: Stats como barras elegantes */}
         <div className="header-stats desktop-only">
           {Object.entries(vitals).map(([type, value]) => {
             const icons = { health: '❤️', mana: '🔮', stamina: '⚡' };
-            const percentage = (value / 100) * 100;
+            const percentage = Math.max(0, Math.min(100, value));
             
             return (
-              <div key={type} className="inline-stat">
-                <span>{icons[type] || '📊'}</span>
-                <div className="mini-bar">
+              <div key={type} className="stat-bar-container">
+                <div className="stat-label">
+                  <span className="stat-icon">{icons[type]}</span>
+                  <span className="stat-value">{percentage}</span>
+                </div>
+                <div className="stat-bar">
                   <div 
-                    className={`mini-fill ${type}`}
+                    className={`stat-fill ${type}`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span>{value}%</span>
               </div>
             );
           })}
@@ -447,32 +462,26 @@ function App() {
     </div>
   );
 
-  // MOBILE: Skills + Estados ABAJO del input  
+  // MOBILE: Skills minimalistas + Estados ABAJO del input  
   const MobileSkillsStatesBar = () => {
     const skills = gameState?.skills || [];
     
     return (
       <div className="mobile-skills-states-bar">
-        <div className="mobile-skills-section">
-          {skills.length === 0 ? (
-            <div className="no-skills-text">
-              Habilidades aparecerán según tus acciones
+        <button
+          onClick={toggleSkills}
+          className="mobile-skills-button clickable"
+          title="Ver habilidades"
+        >
+          📚
+        </button>
+        
+        <div className="mobile-skills-icons">
+          {skills.slice(0, 5).map((skill, index) => (
+            <div key={skill?.id || index} className="skill-icon-minimal clickable">
+              {getSkillIcon(skill)}
             </div>
-          ) : (
-            skills.slice(0, 3).map((skill, index) => (
-              <div key={skill?.id || index} className="skill-item clickable">
-                <span className="skill-icon">{getSkillIcon(skill)}</span>
-                <div className="skill-info">
-                  <div className="skill-name">
-                    {skill?.id || skill || 'Habilidad'}
-                  </div>
-                  {skill?.level && (
-                    <div className="skill-level">Nv.{skill.level}</div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
+          ))}
         </div>
         
         <button
@@ -487,35 +496,29 @@ function App() {
     );
   };
 
-  // DESKTOP: Skills Bar con acciones CON TEXTO
+  // DESKTOP: Skills Bar optimizada
   const DesktopSkillsBar = () => {
     const skills = gameState?.skills || [];
 
     return (
       <div className="desktop-skills-bar">
-        <div className="skills-section">
-          {skills.length === 0 ? (
-            <div className="no-skills-text">
-              Las habilidades aparecerán según tus acciones
+        <button
+          onClick={toggleSkills}
+          className="desktop-skills-button clickable"
+          title="Ver habilidades detalladas"
+        >
+          📚 Skills
+        </button>
+        
+        <div className="skills-icons-section">
+          {skills.slice(0, 6).map((skill, index) => (
+            <div key={skill?.id || index} className="skill-icon-minimal clickable" title={skill?.id || 'Habilidad'}>
+              {getSkillIcon(skill)}
             </div>
-          ) : (
-            skills.map((skill, index) => (
-              <div key={skill?.id || index} className="skill-item clickable">
-                <span className="skill-icon">{getSkillIcon(skill)}</span>
-                <div className="skill-info">
-                  <div className="skill-name">
-                    {skill?.id || skill || 'Habilidad'}
-                  </div>
-                  {skill?.level && (
-                    <div className="skill-level">Nv.{skill.level}</div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
+          ))}
         </div>
         
-        {/* DESKTOP: Acciones rápidas CON TEXTO */}
+        {/* ACCIONES RÁPIDAS CENTRADAS con flex-grow */}
         <div className="desktop-actions-section">
           {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
             <button
@@ -530,7 +533,7 @@ function App() {
           ))}
         </div>
         
-        <div className="modal-triggers">
+        <div className="desktop-modal-triggers">
           <button 
             className="modal-trigger clickable"
             onClick={toggleObjectives}
@@ -548,17 +551,17 @@ function App() {
     );
   };
 
-  // Controls Bar CON COMPONENTE AISLADO StoryInput
+  // Controls Bar CON StoryInput
   const ControlsBar = () => (
     <div className="controls-bar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', width: '100%' }}>
+      <div className="controls-content">
         <StoryInput 
           onSubmit={submitAction}
           loading={loading}
           gameOver={gameOver}
         />
         
-        {/* DESKTOP: Botón Estados al lado */}
+        {/* DESKTOP: Botón Estados del mismo tamaño que ACTUAR */}
         <button
           type="button"
           onClick={toggleEmotionsModal}
@@ -573,7 +576,66 @@ function App() {
     </div>
   );
 
-  // Modal Estados Emocionales FUNCIONAL
+  // Modal Skills DETALLADO - NUEVO
+  const SkillsModal = () => {
+    const skills = gameState?.skills || [];
+
+    return (
+      <>
+        <div 
+          className={`modal-overlay ${showSkills ? 'show' : ''}`}
+          onClick={() => setShowSkills(false)}
+        />
+        <div className={`popup-modal ${showSkills ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>📚 Habilidades</span>
+            <button 
+              className="modal-close clickable" 
+              onClick={() => setShowSkills(false)}
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-content">
+            {skills.length === 0 ? (
+              <p className="no-skills-message">
+                Las habilidades aparecerán según tus acciones en la aventura.
+              </p>
+            ) : (
+              <div className="skills-detailed-list">
+                {skills.map((skill, index) => (
+                  <div key={skill?.id || index} className="skill-detailed-item">
+                    <div className="skill-icon-large">{getSkillIcon(skill)}</div>
+                    <div className="skill-detailed-info">
+                      <div className="skill-detailed-name">
+                        {skill?.id || skill || 'Habilidad'}
+                      </div>
+                      {skill?.level && (
+                        <div className="skill-detailed-level">Nivel {skill.level}</div>
+                      )}
+                      {skill?.description && (
+                        <div className="skill-detailed-desc">{skill.description}</div>
+                      )}
+                      {skill?.tags && (
+                        <div className="skill-tags">
+                          {skill.tags.map((tag, tagIndex) => (
+                            <span key={tagIndex} className="skill-tag">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // Modal Estados Emocionales - POPUP
   const EmotionsModal = () => {
     const emotionalStates = gameState?.emotionalStates || {};
     const allEmotions = [
@@ -586,7 +648,7 @@ function App() {
           className={`modal-overlay ${showEmotionsModal ? 'show' : ''}`}
           onClick={() => setShowEmotionsModal(false)}
         />
-        <div className={`slide-modal ${showEmotionsModal ? 'show' : ''}`}>
+        <div className={`popup-modal ${showEmotionsModal ? 'show' : ''}`}>
           <div className="modal-header">
             <span>😌 Estados Mentales</span>
             <button 
@@ -618,7 +680,7 @@ function App() {
     );
   };
 
-  // Modal Objetivos
+  // Modal Objetivos - POPUP
   const ObjectivesModal = () => {
     const defaultObjectives = [
       { description: "Investigar la figura misteriosa", completed: false },
@@ -634,7 +696,7 @@ function App() {
           className={`modal-overlay ${showObjectives ? 'show' : ''}`}
           onClick={() => setShowObjectives(false)}
         />
-        <div className={`slide-modal ${showObjectives ? 'show' : ''}`}>
+        <div className={`popup-modal ${showObjectives ? 'show' : ''}`}>
           <div className="modal-header">
             <span>🎯 Objetivos</span>
             <button 
@@ -665,7 +727,7 @@ function App() {
     );
   };
 
-  // Modal Inventario
+  // Modal Inventario - POPUP
   const InventoryModal = () => {
     const items = gameState?.inventory || [];
     const totalSlots = 9;
@@ -677,7 +739,7 @@ function App() {
           className={`modal-overlay ${showInventory ? 'show' : ''}`}
           onClick={() => setShowInventory(false)}
         />
-        <div className={`slide-modal right ${showInventory ? 'show' : ''}`}>
+        <div className={`popup-modal inventory-popup ${showInventory ? 'show' : ''}`}>
           <div className="modal-header">
             <span>📦 Inventario</span>
             <button 
@@ -709,14 +771,14 @@ function App() {
     );
   };
 
-  // Modal Narrativa Expandida
+  // Modal Narrativa Expandida - POPUP
   const NarrativeModal = () => (
     <>
       <div 
         className={`modal-overlay ${showNarrativeModal ? 'show' : ''}`}
         onClick={() => setShowNarrativeModal(false)}
       />
-      <div className={`narrative-modal ${showNarrativeModal ? 'show' : ''}`}>
+      <div className={`popup-modal narrative-popup ${showNarrativeModal ? 'show' : ''}`}>
         <div className="modal-header">
           <span>📜 {gameState?.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}</span>
           <button 
@@ -727,22 +789,24 @@ function App() {
             ✕
           </button>
         </div>
-        <div className="narrative-modal-content">
+        <div className="modal-content">
           {gameState?.narrativeLog?.length === 0 ? (
-            <p style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            <p className="no-narrative-message">
               Tu historia comienza aquí...
             </p>
           ) : (
-            gameState?.narrativeLog?.map((entry, index) => (
-              <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
-                <p className="narrative-action">
-                  ▶ {entry.player_action}
-                </p>
-                <p className="narrative-text">
-                  {entry.narrative}
-                </p>
-              </div>
-            ))
+            <div className="narrative-entries">
+              {gameState?.narrativeLog?.map((entry, index) => (
+                <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
+                  <p className="narrative-action">
+                    ▶ {entry.player_action}
+                  </p>
+                  <p className="narrative-text">
+                    {entry.narrative}
+                  </p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -940,25 +1004,26 @@ function App() {
           </div>
         </div>
       ) : (
-        // LAYOUT FINAL: Mobile y Desktop específicos CON INPUT AISLADO
+        // LAYOUT FINAL: Mobile y Desktop CON UX MEJORADA
         <>
           <CompactHeader />
           <IntegratedCanvas />
           
-          {/* MOBILE LAYOUT: Orden específico */}
+          {/* MOBILE LAYOUT */}
           <div className="mobile-only">
-            <MobileActionsBar />       {/* 1. ARRIBA del input */}
-            <ControlsBar />            {/* 2. INPUT AISLADO en el medio */}
-            <MobileSkillsStatesBar />  {/* 3. ABAJO del input */}
+            <MobileActionsBar />       
+            <ControlsBar />            
+            <MobileSkillsStatesBar />  
           </div>
           
-          {/* DESKTOP LAYOUT: Layout tradicional */}
+          {/* DESKTOP LAYOUT */}
           <div className="desktop-only">
-            <ControlsBar />            {/* Input aislado + botón Estados */}
-            <DesktopSkillsBar />       {/* Skills + acciones con texto */}
+            <ControlsBar />            
+            <DesktopSkillsBar />       
           </div>
           
-          {/* Modales */}
+          {/* TODOS LOS MODALES COMO POPUPS */}
+          <SkillsModal />
           <ObjectivesModal />
           <InventoryModal />
           <EmotionsModal />
