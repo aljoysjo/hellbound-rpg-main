@@ -3,7 +3,7 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 
-// 🎮 MAIN APP COMPONENT - FINAL VERSION CON CAMBIOS IMPLEMENTADOS
+// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON TODOS LOS FIXES
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -21,13 +21,13 @@ function App() {
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
-  const [showEmotionsModal, setShowEmotionsModal] = useState(false); // NUEVO
+  const [showEmotionsModal, setShowEmotionsModal] = useState(false);
   const [action, setAction] = useState('');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
 
-  // Auto-fade narrativa después de 5 segundos - FIXED
+  // Auto-fade narrativa después de 5 segundos
   useEffect(() => {
     if (narrativeVisible && gameState?.narrativeLog?.length > 0) {
       if (fadeTimeoutRef.current) {
@@ -62,7 +62,7 @@ function App() {
       if (data.session_id === sessionId) {
         setGameState(prevState => {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
-            setNarrativeVisible(true); // Mostrar narrativa en actualizaciones
+            setNarrativeVisible(true);
             return data.game_state;
           }
           return prevState;
@@ -134,7 +134,7 @@ function App() {
     }
   };
 
-  // Submit action - FIXED
+  // Submit action
   const submitAction = async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
@@ -179,7 +179,7 @@ function App() {
     }
   };
 
-  // FIXED: Event handlers con prevención correcta
+  // FIXED: Event handlers
   const handleActionSubmit = (e) => {
     e.preventDefault();
     if (action.trim()) {
@@ -188,16 +188,16 @@ function App() {
     }
   };
 
-  // FIXED: Input change sin preventDefault
+  // CRITICAL FIX: Input change SIN preventDefault
   const handleInputChange = (e) => {
-    setAction(e.target.value);
+    setAction(e.target.value); // Sin preventDefault para input fluido
   };
 
   const handleSuggestedAction = (suggestedAction) => {
     submitAction(suggestedAction);
   };
 
-  // FIXED: Modal handlers
+  // Modal handlers
   const toggleObjectives = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -228,8 +228,9 @@ function App() {
     setNarrativeVisible(!narrativeVisible);
   };
 
-  // Helper functions - FIXED getSkillIcon
+  // Helper functions
   const getActionIcon = (action) => {
+    if (!action) return '⚡';
     const actionLower = action.toLowerCase();
     if (actionLower.includes('atacar') || actionLower.includes('luchar')) return '⚔️';
     if (actionLower.includes('magia') || actionLower.includes('hechizo')) return '🔮';
@@ -251,9 +252,12 @@ function App() {
     return icons[emotion] || '😐';
   };
 
-  // FIXED: getSkillIcon con verificación
+  // CRITICAL FIX: getSkillIcon con verificación robusta
   const getSkillIcon = (skill) => {
+    // Verificación robusta para evitar errores undefined
     const skillName = (skill?.id || skill || '').toString().toLowerCase();
+    if (!skillName) return '✨';
+    
     if (skillName.includes('exorcismo')) return '🔥';
     if (skillName.includes('percep')) return '⚡';
     if (skillName.includes('combate')) return '⚔️';
@@ -262,7 +266,7 @@ function App() {
     return '✨';
   };
 
-  // FIXED: getDominantEmotionIcon para botón estados
+  // getDominantEmotionIcon para botón estados
   const getDominantEmotionIcon = () => {
     const emotionalStates = gameState?.emotionalStates || {};
     const sortedEmotions = Object.entries(emotionalStates)
@@ -273,7 +277,7 @@ function App() {
     return getEmotionIcon(sortedEmotions[0][0]);
   };
 
-  // Componente Canvas Integrado - FIXED
+  // Componente Canvas Integrado
   const IntegratedCanvas = () => {
     const canvasRef = useRef(null);
     
@@ -282,19 +286,16 @@ function App() {
         const ctx = canvasRef.current.getContext('2d');
         const canvas = canvasRef.current;
         
-        // Redimensionar canvas al contenedor
         const container = canvas.parentElement;
         canvas.width = container.offsetWidth;
         canvas.height = container.offsetHeight;
         
-        // Background gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, '#8C5E2A');
         gradient.addColorStop(1, '#5B3A1D');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Location text
         ctx.fillStyle = '#F3E7C6';
         ctx.font = 'bold 24px Cinzel';
         ctx.textAlign = 'center';
@@ -323,7 +324,6 @@ function App() {
           onClick={toggleNarrativeModal}
         />
         
-        {/* Narrativa Overlay - FIXED */}
         {narrativeVisible && latestEntry && (
           <div 
             className="narrative-overlay clickable"
@@ -347,7 +347,6 @@ function App() {
           </div>
         )}
         
-        {/* Botón para reabrir narrativa - FIXED */}
         {!narrativeVisible && gameState?.narrativeLog?.length > 0 && (
           <button 
             className="narrative-toggle clickable"
@@ -358,7 +357,6 @@ function App() {
           </button>
         )}
         
-        {/* Loading indicator - FIXED */}
         {loading && (
           <div className="loading-indicator">
             🎨 Generando respuesta...
@@ -368,31 +366,32 @@ function App() {
     );
   };
 
-  // Componente Header Compacto - FIXED MOBILE
+  // NUEVO: Header Ultra-Compacto
   const CompactHeader = () => {
-    const vitals = gameState?.vitals || {};
+    const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
     return (
       <header className="compact-header">
         <div className="header-left">
           <h1 className="header-title">
-            {/* FORMATO ULTRA-COMPACTO MOBILE: HELLBOUND | ❤️85 🔮60 ● On */}
+            {/* MOBILE: Header ultra-compacto */}
             <span className="mobile-ultra-compact">
-              HELLBOUND | ❤️{vitals.health || 85} 🔮{vitals.mana || 60} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
+              HELLBOUND | ❤️{vitals.health} 🔮{vitals.mana} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
             </span>
+            {/* DESKTOP: Header completo */}
             <span className="desktop-full">
               🔥 HELLBOUND RPG v2.0
             </span>
           </h1>
           {gameState?.location && (
-            <div className="header-location hidden sm:flex">
+            <div className="header-location desktop-only">
               <span>📍</span>
               <span>{gameState.location}</span>
             </div>
           )}
         </div>
         
-        <div className="header-stats">
+        <div className="header-stats desktop-only">
           {Object.entries(vitals).map(([type, value]) => {
             const icons = { health: '❤️', mana: '🔮', stamina: '⚡' };
             const percentage = (value / 100) * 100;
@@ -406,23 +405,21 @@ function App() {
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span className="hidden sm:inline">{value}%</span>
-                <span className="sm:hidden">{value}</span>
+                <span>{value}%</span>
               </div>
             );
           })}
           
           <div className="connection-status">
             <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-            <span className="hidden sm:inline">{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
-            <span className="sm:hidden">{connectionStatus === 'connected' ? '● On' : '● Off'}</span>
+            <span>{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
           </div>
         </div>
       </header>
     );
   };
 
-  // NUEVO: Acciones Bar Mobile
+  // MOBILE: Acciones Rápidas ARRIBA del input
   const MobileActionsBar = () => (
     <div className="mobile-actions-bar">
       <div className="mobile-quick-actions">
@@ -456,15 +453,55 @@ function App() {
     </div>
   );
 
-  // Componente Skills Bar REORGANIZADO
-  const SkillsBar = () => {
+  // MOBILE: Skills + Estados ABAJO del input  
+  const MobileSkillsStatesBar = () => {
+    const skills = gameState?.skills || [];
+    
+    return (
+      <div className="mobile-skills-states-bar">
+        <div className="mobile-skills-section">
+          {skills.length === 0 ? (
+            <div className="no-skills-text">
+              Habilidades aparecerán según tus acciones
+            </div>
+          ) : (
+            skills.slice(0, 3).map((skill, index) => (
+              <div key={skill?.id || index} className="skill-item clickable">
+                <span className="skill-icon">{getSkillIcon(skill)}</span>
+                <div className="skill-info">
+                  <div className="skill-name">
+                    {skill?.id || skill || 'Habilidad'}
+                  </div>
+                  {skill?.level && (
+                    <div className="skill-level">Nv.{skill.level}</div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        
+        <button
+          onClick={toggleEmotionsModal}
+          disabled={loading || gameOver}
+          className="mobile-emotions-button clickable"
+          title="Ver estados emocionales"
+        >
+          <span>{getDominantEmotionIcon()}</span>
+        </button>
+      </div>
+    );
+  };
+
+  // DESKTOP: Skills Bar con acciones CON TEXTO
+  const DesktopSkillsBar = () => {
     const skills = gameState?.skills || [];
 
     return (
-      <div className="skills-bar">
+      <div className="desktop-skills-bar">
         <div className="skills-section">
           {skills.length === 0 ? (
-            <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            <div className="no-skills-text">
               Las habilidades aparecerán según tus acciones
             </div>
           ) : (
@@ -484,7 +521,7 @@ function App() {
           )}
         </div>
         
-        {/* NUEVO: Acciones rápidas con texto en DESKTOP */}
+        {/* DESKTOP: Acciones rápidas CON TEXTO */}
         <div className="desktop-actions-section">
           {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
             <button
@@ -499,7 +536,6 @@ function App() {
           ))}
         </div>
         
-        {/* Modales - Solo desktop */}
         <div className="modal-triggers">
           <button 
             className="modal-trigger clickable"
@@ -518,14 +554,14 @@ function App() {
     );
   };
 
-  // Componente Controls Bar - FIXED CON BOTÓN ESTADOS
+  // Controls Bar con botón Estados al lado de ACTUAR
   const ControlsBar = () => (
     <div className="controls-bar">
       <form onSubmit={handleActionSubmit} className="input-group">
         <input
           type="text"
           value={action}
-          onChange={handleInputChange} // FIXED: Sin preventDefault
+          onChange={handleInputChange} // SIN preventDefault - CRITICAL FIX
           placeholder="Escribe lo que quieres que suceda..."
           disabled={loading || gameOver}
           className="main-input clickable"
@@ -542,22 +578,22 @@ function App() {
           {loading ? '...' : 'ACTUAR'}
         </button>
         
-        {/* NUEVO: Botón Estados Emocionales */}
+        {/* DESKTOP: Botón Estados al lado de ACTUAR */}
         <button
           type="button"
           onClick={toggleEmotionsModal}
           disabled={loading || gameOver}
-          className="emotions-button clickable"
+          className="emotions-button desktop-only clickable"
           title="Ver estados emocionales"
         >
           <span>{getDominantEmotionIcon()}</span>
-          <span className="hidden sm:inline">Estados</span>
+          <span>Estados</span>
         </button>
       </form>
     </div>
   );
 
-  // NUEVO: Modal Estados Emocionales
+  // Modal Estados Emocionales FUNCIONAL
   const EmotionsModal = () => {
     const emotionalStates = gameState?.emotionalStates || {};
     const allEmotions = [
@@ -602,7 +638,7 @@ function App() {
     );
   };
 
-  // Modal Objetivos - FIXED
+  // Modal Objetivos
   const ObjectivesModal = () => {
     const defaultObjectives = [
       { description: "Investigar la figura misteriosa", completed: false },
@@ -649,7 +685,7 @@ function App() {
     );
   };
 
-  // Modal Inventario - FIXED
+  // Modal Inventario
   const InventoryModal = () => {
     const items = gameState?.inventory || [];
     const totalSlots = 9;
@@ -693,7 +729,7 @@ function App() {
     );
   };
 
-  // Modal Narrativa Expandida - FIXED
+  // Modal Narrativa Expandida
   const NarrativeModal = () => (
     <>
       <div 
@@ -733,7 +769,7 @@ function App() {
     </>
   );
 
-  // Formulario Sandbox - FIXED
+  // Formulario Sandbox
   const SandboxConceptForm = ({ onSubmit, loading }) => {
     const [concept, setConcept] = useState('');
 
@@ -924,19 +960,25 @@ function App() {
           </div>
         </div>
       ) : (
-        // Interfaz del juego - LAYOUT REORGANIZADO CON ORDEN ESPECÍFICO CON ORDEN ESPECÍFICO
+        // LAYOUT FINAL: Mobile y Desktop específicos
         <>
           <CompactHeader />
           <IntegratedCanvas />
           
-          {/* ORDEN ESPECÍFICO PARA MOBILE: acciones arriba, controls medio, skills abajo */}
-          <div className="mobile-layout-container">
-            <MobileActionsBar /> {/* Solo en móvil - ARRIBA */}
-            <ControlsBar />      {/* MEDIO */}
-            <SkillsBar />        {/* ABAJO en mobile, normal en desktop */}
+          {/* MOBILE LAYOUT: Orden específico */}
+          <div className="mobile-only">
+            <MobileActionsBar />       {/* 1. ARRIBA del input */}
+            <ControlsBar />            {/* 2. INPUT en el medio */}
+            <MobileSkillsStatesBar />  {/* 3. ABAJO del input */}
           </div>
           
-          {/* Modales - TODOS FIXED */}
+          {/* DESKTOP LAYOUT: Layout tradicional */}
+          <div className="desktop-only">
+            <ControlsBar />            {/* Input + botón Estados */}
+            <DesktopSkillsBar />       {/* Skills + acciones con texto */}
+          </div>
+          
+          {/* Modales */}
           <ObjectivesModal />
           <InventoryModal />
           <EmotionsModal />
@@ -944,7 +986,7 @@ function App() {
         </>
       )}
 
-      {/* Error Display - FIXED */}
+      {/* Error Display */}
       {error && (
         <div style={{
           position: 'fixed',

@@ -1,4 +1,4 @@
-/* Hellbound RPG v2.0 - FINAL LAYOUT CON CAMBIOS IMPLEMENTADOS */
+/* Hellbound RPG v2.0 - VERSIÓN FINAL CON LAYOUTS MOBILE/DESKTOP */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 
 :root {
@@ -36,6 +36,7 @@
   --space-sm: 0.5rem;
   --space-md: 0.75rem;
   --space-lg: 1rem;
+  --space-xl: 1.5rem;
   
   /* SOMBRAS */
   --shadow-md: 0 4px 12px rgba(45, 24, 16, 0.2);
@@ -70,7 +71,7 @@ body {
   height: 100dvh;
 }
 
-/* LAYOUT PRINCIPAL - FIXED MOBILE */
+/* LAYOUT PRINCIPAL */
 .app-container {
   height: 100vh;
   height: 100dvh;
@@ -84,7 +85,28 @@ body {
   bottom: 0;
 }
 
-/* HEADER COMPACTO - MOBILE FIXED */
+/* RESPONSIVE: Mobile/Desktop específico */
+.mobile-only {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* HEADER ULTRA-COMPACTO */
 .compact-header {
   background: var(--bg-panel-light);
   border-bottom: var(--border-width) solid var(--color-primary);
@@ -125,27 +147,27 @@ body {
 
 @media (max-width: 767px) {
   .header-title {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-  }
-  
-  /* Ultra-compacto: HELLBOUND | ❤️85 🔮60 ● On */
-  .header-title .mobile-ultra-compact {
-    display: inline;
-  }
-  
-  .header-title .desktop-full {
-    display: none;
   }
 }
 
-@media (min-width: 768px) {
-  .header-title .mobile-ultra-compact {
-    display: none;
+/* MOBILE: Header ultra-compacto */
+.mobile-ultra-compact {
+  display: none;
+}
+
+.desktop-full {
+  display: inline;
+}
+
+@media (max-width: 767px) {
+  .mobile-ultra-compact {
+    display: inline;
   }
   
-  .header-title .desktop-full {
-    display: inline;
+  .desktop-full {
+    display: none;
   }
 }
 
@@ -158,12 +180,6 @@ body {
   font-weight: 600;
 }
 
-@media (max-width: 767px) {
-  .header-location {
-    font-size: 0.8rem;
-  }
-}
-
 .header-stats {
   display: flex;
   align-items: center;
@@ -171,23 +187,10 @@ body {
   font-size: 0.9rem;
 }
 
-@media (max-width: 767px) {
-  .header-stats {
-    gap: var(--space-xs);
-    font-size: 0.75rem;
-  }
-}
-
 .inline-stat {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-}
-
-@media (max-width: 767px) {
-  .inline-stat {
-    gap: 2px;
-  }
 }
 
 .mini-bar {
@@ -197,13 +200,6 @@ body {
   border-radius: 4px;
   overflow: hidden;
   border: 1px solid var(--color-primary);
-}
-
-@media (max-width: 767px) {
-  .mini-bar {
-    width: 25px;
-    height: 5px;
-  }
 }
 
 .mini-fill {
@@ -222,12 +218,6 @@ body {
   font-size: 0.9rem;
 }
 
-@media (max-width: 767px) {
-  .connection-status {
-    font-size: 0.7rem;
-  }
-}
-
 .status-dot {
   width: 8px;
   height: 8px;
@@ -235,28 +225,21 @@ body {
   background: var(--color-danger);
 }
 
-@media (max-width: 767px) {
-  .status-dot {
-    width: 6px;
-    height: 6px;
-  }
-}
-
 .status-dot.connected {
   background: var(--color-success);
 }
 
-/* CANVAS INTEGRADO - FIXED HEIGHT */
+/* CANVAS INTEGRADO */
 .integrated-canvas-container {
   flex: 1;
   position: relative;
   overflow: hidden;
-  height: calc(100vh - 50px - 40px - 60px);
+  height: calc(100vh - 50px - 200px);
 }
 
 @media (max-width: 767px) {
   .integrated-canvas-container {
-    height: calc(100dvh - var(--mobile-header-height) - var(--mobile-skills-height) - var(--mobile-footer-height) - var(--mobile-actions-height));
+    height: calc(100dvh - var(--mobile-header-height) - 220px);
   }
 }
 
@@ -269,7 +252,7 @@ body {
   cursor: pointer;
 }
 
-/* NARRATIVA OVERLAY - FIXED CLICKEABLE */
+/* NARRATIVA OVERLAY */
 .narrative-overlay {
   position: absolute;
   top: var(--space-lg);
@@ -297,12 +280,6 @@ body {
   }
 }
 
-.narrative-overlay.fading {
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
-}
-
 .narrative-title {
   font-family: var(--font-title);
   color: var(--color-primary);
@@ -314,23 +291,11 @@ body {
   gap: var(--space-xs);
 }
 
-@media (max-width: 767px) {
-  .narrative-title {
-    font-size: 1rem;
-  }
-}
-
 .narrative-preview {
   color: var(--text-dark);
   font-size: 1rem;
   line-height: 1.5;
   margin-bottom: var(--space-sm);
-}
-
-@media (max-width: 767px) {
-  .narrative-preview {
-    font-size: 0.9rem;
-  }
 }
 
 .narrative-hint {
@@ -339,13 +304,7 @@ body {
   font-style: italic;
 }
 
-@media (max-width: 767px) {
-  .narrative-hint {
-    font-size: 0.8rem;
-  }
-}
-
-/* BOTÓN PARA REABRIR NARRATIVA */
+/* BOTÓN REABRIR NARRATIVA */
 .narrative-toggle {
   position: absolute;
   top: var(--space-lg);
@@ -364,62 +323,22 @@ body {
   pointer-events: all;
 }
 
-@media (max-width: 767px) {
-  .narrative-toggle {
-    top: var(--space-sm);
-    right: var(--space-sm);
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
-  }
-}
-
 .narrative-toggle:hover {
   background: #B8912F;
   transform: scale(1.1);
 }
 
-/* LAYOUT MOBILE ESPECÍFICO CON ORDEN CONTROLADO */
-.mobile-layout-container {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 767px) {
-  .mobile-layout-container {
-    /* Orden específico en mobile: acciones -> controls -> skills */
-  }
-  
-  .mobile-actions-bar {
-    order: 1; /* ARRIBA en mobile */
-  }
-  
-  .controls-bar {
-    order: 2; /* MEDIO en mobile */  
-  }
-  
-  .skills-bar {
-    order: 3; /* ABAJO en mobile */
-  }
-}
-
-/* HEADER ULTRA-COMPACTO MOBILE */
+/* MOBILE: Acciones rápidas ARRIBA del input */
 .mobile-actions-bar {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .mobile-actions-bar {
-    display: flex;
-    background: var(--bg-panel-light);
-    padding: var(--space-sm);
-    border-top: var(--border-width) solid var(--color-primary);
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    height: var(--mobile-actions-height);
-    z-index: 40;
-  }
+  display: flex;
+  background: var(--bg-panel-light);
+  padding: var(--space-sm);
+  border-top: var(--border-width) solid var(--color-primary);
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: var(--mobile-actions-height);
+  z-index: 40;
 }
 
 .mobile-quick-actions {
@@ -435,8 +354,80 @@ body {
   gap: var(--space-sm);
 }
 
-/* SKILLS BAR DINÁMICO - REORGANIZADO */
-.skills-bar {
+.quick-action {
+  background: var(--color-secondary);
+  color: var(--text-light);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  padding: var(--space-sm);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  min-width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.quick-action:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--text-dark);
+  transform: scale(1.1);
+}
+
+/* MOBILE: Skills + Estados ABAJO del input */
+.mobile-skills-states-bar {
+  display: flex;
+  background: var(--bg-panel-dark);
+  padding: var(--space-sm);
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  min-height: var(--mobile-skills-height);
+  border-top: var(--border-width) solid var(--color-primary);
+  z-index: 30;
+}
+
+.mobile-skills-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mobile-skills-section::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-emotions-button {
+  background: var(--color-secondary);
+  color: var(--text-light);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  padding: var(--space-sm);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  min-width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.mobile-emotions-button:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--text-dark);
+  transform: scale(1.1);
+}
+
+/* DESKTOP: Skills Bar con acciones CON TEXTO */
+.desktop-skills-bar {
   background: var(--bg-panel-dark);
   padding: var(--space-sm) var(--space-md);
   display: flex;
@@ -448,15 +439,6 @@ body {
   z-index: 30;
 }
 
-@media (max-width: 767px) {
-  .skills-bar {
-    height: var(--mobile-skills-height);
-    padding: var(--space-xs) var(--space-sm);
-    min-height: auto;
-    order: 4; /* Mover skills abajo en mobile */
-  }
-}
-
 .skills-section {
   display: flex;
   align-items: center;
@@ -465,12 +447,6 @@ body {
   overflow-x: auto;
   scrollbar-width: none;
   padding: var(--space-xs) 0;
-}
-
-@media (max-width: 767px) {
-  .skills-section {
-    gap: var(--space-sm);
-  }
 }
 
 .skills-section::-webkit-scrollbar {
@@ -508,12 +484,6 @@ body {
   font-size: 1rem;
 }
 
-@media (max-width: 767px) {
-  .skill-icon {
-    font-size: 0.9rem;
-  }
-}
-
 .skill-info {
   display: flex;
   flex-direction: column;
@@ -526,34 +496,22 @@ body {
   font-size: 0.85rem;
 }
 
-@media (max-width: 767px) {
-  .skill-name {
-    font-size: 0.75rem;
-  }
-}
-
 .skill-level {
   font-size: 0.75rem;
   color: var(--color-primary);
 }
 
-@media (max-width: 767px) {
-  .skill-level {
-    font-size: 0.65rem;
-  }
+.no-skills-text {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
 }
 
-/* ACCIONES RÁPIDAS CON TEXTO EN DESKTOP */
+/* DESKTOP: Acciones con TEXTO */
 .desktop-actions-section {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-}
-
-@media (max-width: 767px) {
-  .desktop-actions-section {
-    display: none;
-  }
 }
 
 .action-with-text {
@@ -589,12 +547,6 @@ body {
   gap: var(--space-sm);
 }
 
-@media (max-width: 767px) {
-  .modal-triggers {
-    display: none; /* Ocultar en mobile, se muestran en mobile-actions-bar */
-  }
-}
-
 .modal-trigger {
   background: var(--color-primary);
   color: var(--text-dark);
@@ -626,7 +578,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* CONTROLS BAR - FIXED INPUT + ESTADOS */
+/* CONTROLS BAR con botón Estados */
 .controls-bar {
   background: var(--bg-panel-light);
   padding: var(--space-md);
@@ -646,7 +598,6 @@ body {
     flex-direction: column;
     gap: var(--space-sm);
     min-height: auto;
-    order: 3; /* Controls antes que skills en mobile */
   }
 }
 
@@ -753,51 +704,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* QUICK ACTIONS MOBILE */
-.quick-actions {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .quick-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-  }
-}
-
-.quick-action {
-  background: var(--color-secondary);
-  color: var(--text-light);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--border-radius);
-  padding: var(--space-sm);
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  min-width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: all;
-}
-
-@media (max-width: 767px) {
-  .quick-action {
-    min-width: 48px;
-    height: 48px;
-    font-size: 1.1rem;
-  }
-}
-
-.quick-action:hover:not(:disabled) {
-  background: var(--color-primary);
-  color: var(--text-dark);
-  transform: scale(1.1);
-}
-
-/* MODALES DESLIZANTES - FIXED Z-INDEX */
+/* MODALES DESLIZANTES */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1067,4 +974,17 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* RESPONSIVE HELPERS */
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none !important;
+  }
 }
