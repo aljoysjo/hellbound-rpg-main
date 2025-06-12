@@ -805,8 +805,13 @@ function App() {
                     {objective.completed ? '☑️' : '☐'}
                   </span>
                   <span className="objective-text">
-                    {objective.description || objective}
-                    {objective.isNew && <span className="new-badge">NEW</span>}
+                    {/* FIX: Asegurar que description siempre sea string */}
+                    {typeof objective?.description === 'string' 
+                      ? objective.description 
+                      : typeof objective === 'string' 
+                        ? objective 
+                        : 'Objetivo sin descripción'}
+                    {objective?.isNew && <span className="new-badge">NEW</span>}
                   </span>
                 </div>
               ))}
