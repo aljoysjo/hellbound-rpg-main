@@ -332,6 +332,60 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
+  // SISTEMA DE POLLING ALTERNATIVO cuando WebSocket falla
+  useEffect(() => {
+    let pollingInterval;
+    
+    if (sessionId && connectionStatus === 'disconnected') {
+      console.log('🔄 WebSocket fallido, iniciando polling manual...');
+      pollingInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
+          if (response.ok) {
+            const data = await response.json();
+            
+            setGameState(prevState => {
+              if (!prevState || data.game_state.actionCount > prevState.actionCount) {
+                console.log('🔄 POLLING UPDATE:', data.game_state);
+                
+                // Aplicar misma lógica de badges
+                if (prevState) {
+                  const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
+                  const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
+                  const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
+                  const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
+                  
+                  if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+                      skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
+                    
+                    console.log('✨ POLLING BADGES UPDATE');
+                    setBadges(prev => ({
+                      inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
+                      objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
+                      skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
+                      emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
+                    }));
+                  }
+                }
+                
+                return data.game_state;
+              }
+              return prevState;
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error en polling:', error);
+        }
+      }, 3000); // Poll cada 3 segundos
+    }
+    
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [sessionId, connectionStatus, BACKEND_URL]);
+
   // Start new session
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
     setLoading(true);
