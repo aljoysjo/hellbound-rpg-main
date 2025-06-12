@@ -194,16 +194,27 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
-  // Socket initialization CON DETECCIÓN AVANZADA
+  // Socket initialization CON DETECCIÓN AVANZADA + FALLBACK POLLING
   useEffect(() => {
-    const newSocket = io(BACKEND_URL);
+    console.log('🔌 Iniciando conexión WebSocket a:', BACKEND_URL);
+    const newSocket = io(BACKEND_URL, {
+      transports: ['polling', 'websocket'], // Fallback a polling si websocket falla
+      forceNew: true
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
+      console.log('✅ WebSocket conectado exitosamente');
       setConnectionStatus('connected');
     });
 
     newSocket.on('disconnect', () => {
+      console.log('❌ WebSocket desconectado');
+      setConnectionStatus('disconnected');
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Error de conexión WebSocket:', error);
       setConnectionStatus('disconnected');
     });
 
