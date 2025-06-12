@@ -570,13 +570,16 @@ function App() {
   const ControlsBar = () => (
     <div className="controls-bar">
       <form onSubmit={handleActionSubmit} className="input-group">
-        <input
-          type="text"
+        <textarea
+          ref={inputRef}
           value={action}
-          onChange={handleInputChange} // SIN preventDefault - CRITICAL FIX
+          onChange={handleInputChange} // SIN preventDefault ni stopPropagation
+          onKeyDown={handleKeyDown} // Enter para enviar
+          rows={2}
           placeholder="Escribe lo que quieres que suceda..."
           disabled={loading || gameOver}
           className="main-input clickable"
+          style={{ resize: 'none' }}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
