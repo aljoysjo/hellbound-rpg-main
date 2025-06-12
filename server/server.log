@@ -711,3 +711,60 @@ Error analizando cambios de estado: SyntaxError: Unexpected token '+', ..."ntigu
 🎯 Acciones dinámicas generadas: Examinar la figura oscura detenidamente, Preparar un ataque con exorcismo, Mantenerse alerta a los susurros, Retroceder un paso para evaluar la situación.
 📋 Objetivo actualizado: Investigar la figura misteriosa - 100%
 🔌 Client disconnected: IdtUMRC0l5Mj7_uEAAAD
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar detenidamente la figura en la niebla, Usar percepción sobrenatural para investigar, Preparar el equipo de exorcismo, Salir sigilosamente para acercarme a la ventana.
+🔌 Client disconnected: 6EXfogpqm0uV94w9AAAG
+🔌 Client connected: dV7BrV16V_zCQmtxAAAI
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 70, "fatiga": 0},
+  "locationChange": "Fuera del cuarto",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {"hechizos": 10},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 70, fatiga: 0 },
+  locationChange: 'Fuera del cuarto',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: { hechizos: 10 },
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 70,
+    "fatiga": 0
+  },
+  "locationChange": "Fuera del cuarto",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {
+    "hechizos": 10
+  },
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 70%
+😊 fatiga: 0%
+📍 Nueva ubicación: Fuera del cuarto
+⭐ Nueva habilidad: undefined (Nivel undefined)
+🧠 Conocimiento de hechizos: 10%
+🎯 Acciones dinámicas generadas: Acercarse a la figura en la niebla, Usar percepción sobrenatural para investigar, Buscar un lugar elevado para observar, Recitar encantamientos del libro encontrado.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
