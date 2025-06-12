@@ -332,12 +332,12 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
-  // SISTEMA DE POLLING ALTERNATIVO cuando WebSocket falla
+  // SISTEMA DE POLLING FORZADO para badges (independiente de WebSocket)
   useEffect(() => {
     let pollingInterval;
     
-    if (sessionId && connectionStatus === 'disconnected') {
-      console.log('🔄 WebSocket fallido, iniciando polling manual...');
+    if (sessionId) {
+      console.log('🔄 Iniciando polling forzado para badges, connectionStatus:', connectionStatus);
       pollingInterval = setInterval(async () => {
         try {
           const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
@@ -347,6 +347,7 @@ function App() {
             setGameState(prevState => {
               if (!prevState || data.game_state.actionCount > prevState.actionCount) {
                 console.log('🔄 POLLING UPDATE:', data.game_state);
+                setNarrativeVisible(true);
                 
                 // Aplicar misma lógica de badges
                 if (prevState) {
@@ -354,6 +355,8 @@ function App() {
                   const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
                   const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
                   const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
+                  
+                  console.log('🎯 POLLING CHANGES:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
                   
                   if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                       skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
@@ -376,7 +379,7 @@ function App() {
         } catch (error) {
           console.error('❌ Error en polling:', error);
         }
-      }, 3000); // Poll cada 3 segundos
+      }, 2000); // Poll cada 2 segundos
     }
     
     return () => {
@@ -384,9 +387,7 @@ function App() {
         clearInterval(pollingInterval);
       }
     };
-  }, [sessionId, connectionStatus, BACKEND_URL]);
-
-  // SISTEMA DE POLLING ALTERNATIVO cuando WebSocket falla
+  }, [sessionId, BACKEND_URL]);
   useEffect(() => {
     let pollingInterval;
     
