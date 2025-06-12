@@ -208,13 +208,16 @@ function App() {
     });
 
     newSocket.on('game_update', (data) => {
+      console.log('🔥 WEBSOCKET UPDATE RECEIVED:', data);
       if (data.session_id === sessionId) {
         setGameState(prevState => {
+          console.log('🔍 COMPARING STATES:', { prevState, newState: data.game_state });
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
             
             // SISTEMA DE BADGES AVANZADO
             if (prevState) {
+              console.log('🔍 DETECTING CHANGES...');
               // Detectar cambios en inventario
               const inventoryChanges = detectInventoryChanges(
                 prevState.inventory, 
@@ -239,30 +242,37 @@ function App() {
                 data.game_state.emotionalStates
               );
               
+              console.log('🎯 CHANGES DETECTED:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
+              
               // Actualizar badges si hay cambios
               if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
                 
-                setBadges(prevBadges => ({
-                  inventory: {
-                    count: prevBadges.inventory.count + inventoryChanges.totalCount,
-                    newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
-                  },
-                  objectives: {
-                    count: prevBadges.objectives.count + objectivesChanges.totalCount,
-                    newObjectives: [...prevBadges.objectives.newObjectives, ...objectivesChanges.newObjectives],
-                    completedObjectives: [...prevBadges.objectives.completedObjectives, ...objectivesChanges.completedObjectives]
-                  },
-                  skills: {
-                    count: prevBadges.skills.count + skillsChanges.totalCount,
-                    newSkills: [...prevBadges.skills.newSkills, ...skillsChanges.newSkills],
-                    levelUps: [...prevBadges.skills.levelUps, ...skillsChanges.levelUps]
-                  },
-                  emotions: {
-                    count: prevBadges.emotions.count + emotionsChanges.totalCount,
-                    significantChanges: [...prevBadges.emotions.significantChanges, ...emotionsChanges.significantChanges]
-                  }
-                }));
+                console.log('✨ UPDATING BADGES...');
+                setBadges(prevBadges => {
+                  const newBadges = {
+                    inventory: {
+                      count: prevBadges.inventory.count + inventoryChanges.totalCount,
+                      newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
+                    },
+                    objectives: {
+                      count: prevBadges.objectives.count + objectivesChanges.totalCount,
+                      newObjectives: [...prevBadges.objectives.newObjectives, ...objectivesChanges.newObjectives],
+                      completedObjectives: [...prevBadges.objectives.completedObjectives, ...objectivesChanges.completedObjectives]
+                    },
+                    skills: {
+                      count: prevBadges.skills.count + skillsChanges.totalCount,
+                      newSkills: [...prevBadges.skills.newSkills, ...skillsChanges.newSkills],
+                      levelUps: [...prevBadges.skills.levelUps, ...skillsChanges.levelUps]
+                    },
+                    emotions: {
+                      count: prevBadges.emotions.count + emotionsChanges.totalCount,
+                      significantChanges: [...prevBadges.emotions.significantChanges, ...emotionsChanges.significantChanges]
+                    }
+                  };
+                  console.log('🏆 NEW BADGES STATE:', newBadges);
+                  return newBadges;
+                });
                 
                 // Actualizar elementos NEW
                 setNewElements(prevNew => ({
