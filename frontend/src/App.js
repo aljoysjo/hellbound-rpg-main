@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
+import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON TODOS LOS FIXES
+// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON INPUT AISLADO
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -22,11 +23,9 @@ function App() {
   const [showInventory, setShowInventory] = useState(false);
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
   const [showEmotionsModal, setShowEmotionsModal] = useState(false);
-  const [action, setAction] = useState('');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
-  const inputRef = useRef(null); // Ref para mantener foco del textarea
 
   // Auto-fade narrativa después de 5 segundos
   useEffect(() => {
@@ -46,14 +45,7 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
-  // CRITICAL FIX: Foco inicial al textarea para input fluido
-  useEffect(() => {
-    if (sessionId && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [sessionId]); // Dar foco cuando inicie sesión
-
-  // Socket initialization
+  // Socket initialization - OPTIMIZADO para evitar rerenders
   useEffect(() => {
     const newSocket = io(BACKEND_URL);
     setSocket(newSocket);
@@ -68,6 +60,7 @@ function App() {
 
     newSocket.on('game_update', (data) => {
       if (data.session_id === sessionId) {
+        // OPTIMIZACIÓN: Solo actualizar si realmente cambió
         setGameState(prevState => {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
@@ -76,9 +69,16 @@ function App() {
           return prevState;
         });
         
+        // Actualizar acciones sugeridas sin forzar rerender del input
         if (data.suggested_actions) {
-          setSuggestedActions(data.suggested_actions);
+          setSuggestedActions(prev => {
+            if (JSON.stringify(prev) !== JSON.stringify(data.suggested_actions)) {
+              return data.suggested_actions;
+            }
+            return prev;
+          });
         }
+        
         if (data.game_over) {
           setGameOver(true);
         }
@@ -142,8 +142,8 @@ function App() {
     }
   };
 
-  // Submit action
-  const submitAction = async (actionText) => {
+  // Submit action - OPTIMIZADO
+  const submitAction = useCallback(async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
     setLoading(true);
@@ -185,36 +185,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId, loading, gameOver, BACKEND_URL]);
 
-  // FIXED: Event handlers
-  const handleActionSubmit = (e) => {
-    e.preventDefault();
-    if (action.trim()) {
-      submitAction(action.trim());
-      setAction('');
-    }
-  };
-
-  // CRITICAL FIX: Input con useCallback para evitar re-renders
-  const handleInputChange = useCallback((e) => {
-    setAction(e.target.value);
-  }, []);
-
-  // Handler para Enter sin interferir con el foco
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (action.trim()) {
-        submitAction(action.trim());
-        setAction('');
-      }
-    }
-  }, [action, submitAction]);
-
-  const handleSuggestedAction = (suggestedAction) => {
+  const handleSuggestedAction = useCallback((suggestedAction) => {
     submitAction(suggestedAction);
-  };
+  }, [submitAction]);
 
   // Modal handlers
   const toggleObjectives = (e) => {
@@ -573,34 +548,17 @@ function App() {
     );
   };
 
-  // Controls Bar con botón Estados al lado de ACTUAR
+  // Controls Bar CON COMPONENTE AISLADO StoryInput
   const ControlsBar = () => (
     <div className="controls-bar">
-      <form onSubmit={handleActionSubmit} className="input-group">
-        <textarea
-          ref={inputRef}
-          value={action}
-          onChange={handleInputChange} // SIN preventDefault ni stopPropagation
-          onKeyDown={handleKeyDown} // Enter para enviar
-          rows={2}
-          placeholder="Escribe lo que quieres que suceda..."
-          disabled={loading || gameOver}
-          className="main-input clickable"
-          style={{ resize: 'none' }}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', width: '100%' }}>
+        <StoryInput 
+          onSubmit={submitAction}
+          loading={loading}
+          gameOver={gameOver}
         />
-        <button
-          type="submit"
-          disabled={loading || gameOver || !action.trim()}
-          className="action-button clickable"
-        >
-          {loading ? '...' : 'ACTUAR'}
-        </button>
         
-        {/* DESKTOP: Botón Estados al lado de ACTUAR */}
+        {/* DESKTOP: Botón Estados al lado */}
         <button
           type="button"
           onClick={toggleEmotionsModal}
@@ -611,7 +569,7 @@ function App() {
           <span>{getDominantEmotionIcon()}</span>
           <span>Estados</span>
         </button>
-      </form>
+      </div>
     </div>
   );
 
@@ -982,7 +940,7 @@ function App() {
           </div>
         </div>
       ) : (
-        // LAYOUT FINAL: Mobile y Desktop específicos
+        // LAYOUT FINAL: Mobile y Desktop específicos CON INPUT AISLADO
         <>
           <CompactHeader />
           <IntegratedCanvas />
@@ -990,13 +948,13 @@ function App() {
           {/* MOBILE LAYOUT: Orden específico */}
           <div className="mobile-only">
             <MobileActionsBar />       {/* 1. ARRIBA del input */}
-            <ControlsBar />            {/* 2. INPUT en el medio */}
+            <ControlsBar />            {/* 2. INPUT AISLADO en el medio */}
             <MobileSkillsStatesBar />  {/* 3. ABAJO del input */}
           </div>
           
           {/* DESKTOP LAYOUT: Layout tradicional */}
           <div className="desktop-only">
-            <ControlsBar />            {/* Input + botón Estados */}
+            <ControlsBar />            {/* Input aislado + botón Estados */}
             <DesktopSkillsBar />       {/* Skills + acciones con texto */}
           </div>
           
