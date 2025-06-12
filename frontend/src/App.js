@@ -188,9 +188,10 @@ function App() {
     }
   };
 
-  // CRITICAL FIX: Input change SIN preventDefault
+  // CRITICAL FIX: Input change completamente limpio
   const handleInputChange = (e) => {
-    setAction(e.target.value); // Sin preventDefault para input fluido
+    e.stopPropagation(); // Evitar interferencias
+    setAction(e.target.value);
   };
 
   const handleSuggestedAction = (suggestedAction) => {
