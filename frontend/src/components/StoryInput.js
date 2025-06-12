@@ -1,13 +1,19 @@
 // Componente aislado para input fluido sin rerenders
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, useEffect, memo, forwardRef, useImperativeHandle } from 'react';
 
-function StoryInput({ onSubmit, loading, gameOver, placeholder = "Escribe lo que quieres que suceda..." }) {
+const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Escribe lo que quieres que suceda..." }, ref) => {
   const [draft, setDraft] = useState('');
-  const ref = useRef(null);
+  const textareaRef = useRef(null);
+
+  // Exponer blur al componente padre
+  useImperativeHandle(ref, () => ({
+    blur: () => textareaRef.current?.blur(),
+    focus: () => textareaRef.current?.focus()
+  }));
 
   // Mantiene foco siempre que el componente siga montado
   useEffect(() => {
-    ref.current?.focus();
+    textareaRef.current?.focus();
   });
 
   const handleSend = () => {
@@ -16,14 +22,20 @@ function StoryInput({ onSubmit, loading, gameOver, placeholder = "Escribe lo que
     setDraft('');
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleSend();
+  };
+
   return (
-    <div 
+    <form 
+      onSubmit={handleSubmit}
       className="input-group"
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
     >
       <textarea
-        ref={ref}
+        ref={textareaRef}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => {
@@ -44,17 +56,11 @@ function StoryInput({ onSubmit, loading, gameOver, placeholder = "Escribe lo que
         autoCapitalize="off"
         spellCheck="false"
       />
-      <button
-        onClick={handleSend}
-        disabled={loading || gameOver || !draft.trim()}
-        className="action-button clickable"
-        type="button"
-      >
-        {loading ? '...' : 'ACTUAR'}
-      </button>
-    </div>
+    </form>
   );
-}
+});
+
+StoryInput.displayName = 'StoryInput';
 
 // Evita rerender salvo que cambien las props
 export default memo(StoryInput);

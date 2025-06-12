@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - VERSIÓN FINAL CON UX MEJORADA
+// 🎮 MAIN APP COMPONENT - UX REORGANIZADA CON BARRA POPUPS UNIFICADA
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -17,16 +17,23 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   
-  // UI States - UPDATED para popups
+  // UI States - REORGANIZADO
   const [narrativeVisible, setNarrativeVisible] = useState(true);
   const [showObjectives, setShowObjectives] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
-  const [showSkills, setShowSkills] = useState(false); // NUEVO
-  const [showNarrativeModal, setShowNarrativeModal] = useState(false);
+  const [showSkills, setShowSkills] = useState(false);
   const [showEmotionsModal, setShowEmotionsModal] = useState(false);
+  const [showNarrativeModal, setShowNarrativeModal] = useState(false);
+
+  // BADGES para notificaciones
+  const [newItems, setNewItems] = useState(0);
+  const [newObjectives, setNewObjectives] = useState(0);
+  const [newSkills, setNewSkills] = useState(0);
+  const [newEmotions, setNewEmotions] = useState(0);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
+  const inputRef = useRef(null);
 
   // Auto-fade narrativa después de 5 segundos
   useEffect(() => {
@@ -64,6 +71,31 @@ function App() {
         setGameState(prevState => {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
+            
+            // BADGES AUTOMÁTICOS - detectar cambios
+            if (prevState) {
+              // Nuevos items
+              const prevItems = prevState.inventory?.length || 0;
+              const newItemsCount = data.game_state.inventory?.length || 0;
+              if (newItemsCount > prevItems) {
+                setNewItems(prev => prev + (newItemsCount - prevItems));
+              }
+
+              // Nuevos objetivos
+              const prevObjectives = prevState.questObjectives?.length || 0;
+              const newObjectivesCount = data.game_state.questObjectives?.length || 0;
+              if (newObjectivesCount > prevObjectives) {
+                setNewObjectives(prev => prev + (newObjectivesCount - prevObjectives));
+              }
+
+              // Nuevas skills
+              const prevSkills = prevState.skills?.length || 0;
+              const newSkillsCount = data.game_state.skills?.length || 0;
+              if (newSkillsCount > prevSkills) {
+                setNewSkills(prev => prev + (newSkillsCount - prevSkills));
+              }
+            }
+            
             return data.game_state;
           }
           return prevState;
@@ -190,41 +222,63 @@ function App() {
     submitAction(suggestedAction);
   }, [submitAction]);
 
-  // Modal handlers
+  // HELPER: input.blur() antes de abrir popups
+  const blurInput = () => {
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
+  };
+
+  // Modal handlers CON BLUR Y BADGE RESET
   const toggleObjectives = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    blurInput();
     setShowObjectives(!showObjectives);
+    if (!showObjectives) setNewObjectives(0); // Reset badge
   };
 
   const toggleInventory = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    blurInput();
     setShowInventory(!showInventory);
+    if (!showInventory) setNewItems(0); // Reset badge
   };
 
   const toggleSkills = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    blurInput();
     setShowSkills(!showSkills);
+    if (!showSkills) setNewSkills(0); // Reset badge
   };
 
   const toggleEmotionsModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    blurInput();
     setShowEmotionsModal(!showEmotionsModal);
+    if (!showEmotionsModal) setNewEmotions(0); // Reset badge
   };
 
   const toggleNarrativeModal = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    blurInput();
     setShowNarrativeModal(!showNarrativeModal);
   };
 
   const toggleNarrativeVisible = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setNarrativeVisible(!narrativeVisible);
+    if (narrativeVisible) {
+      // Si está visible, abrir modal completo
+      toggleNarrativeModal(e);
+    } else {
+      // Si no está visible, mostrar overlay
+      setNarrativeVisible(true);
+    }
   };
 
   // Helper functions
@@ -264,18 +318,7 @@ function App() {
     return '✨';
   };
 
-  // getDominantEmotionIcon para botón estados
-  const getDominantEmotionIcon = () => {
-    const emotionalStates = gameState?.emotionalStates || {};
-    const sortedEmotions = Object.entries(emotionalStates)
-      .filter(([, value]) => value > 30)
-      .sort((a, b) => b[1] - a[1]);
-    
-    if (sortedEmotions.length === 0) return '😐';
-    return getEmotionIcon(sortedEmotions[0][0]);
-  };
-
-  // Componente Canvas - SIN CLICK, solo visual
+  // Canvas - UN SOLO PERGAMINO INTELIGENTE
   const IntegratedCanvas = () => {
     const canvasRef = useRef(null);
     
@@ -336,26 +379,18 @@ function App() {
                 : latestEntry.narrative
               }
             </div>
+            <div className="narrative-hint">
+              Click en 📜 para ver historia completa
+            </div>
           </div>
         )}
         
-        {/* SOLO este botón abre narrativa */}
-        {!narrativeVisible && gameState?.narrativeLog?.length > 0 && (
-          <button 
-            className="narrative-toggle clickable"
-            onClick={toggleNarrativeVisible}
-            title="Mostrar narrativa"
-          >
-            📜
-          </button>
-        )}
-        
-        {/* Botón 📜 siempre visible para abrir modal completo */}
+        {/* UN SOLO PERGAMINO INTELIGENTE */}
         {gameState?.narrativeLog?.length > 0 && (
           <button 
-            className="narrative-full-toggle clickable"
-            onClick={toggleNarrativeModal}
-            title="Abrir historia completa"
+            className="narrative-smart-toggle clickable"
+            onClick={toggleNarrativeVisible}
+            title={narrativeVisible ? "Ver historia completa" : "Mostrar resumen"}
           >
             📜
           </button>
@@ -370,7 +405,7 @@ function App() {
     );
   };
 
-  // Header con stats como barras - DESKTOP
+  // Header con stats HORIZONTALES
   const CompactHeader = () => {
     const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
@@ -397,188 +432,182 @@ function App() {
           )}
         </div>
         
-        {/* DESKTOP: Stats como barras elegantes */}
-        <div className="header-stats desktop-only">
+        {/* DESKTOP: Stats HORIZONTALES compactos */}
+        <div className="header-stats-horizontal desktop-only">
           {Object.entries(vitals).map(([type, value]) => {
             const icons = { health: '❤️', mana: '🔮', stamina: '⚡' };
             const percentage = Math.max(0, Math.min(100, value));
             
             return (
-              <div key={type} className="stat-bar-container">
-                <div className="stat-label">
-                  <span className="stat-icon">{icons[type]}</span>
-                  <span className="stat-value">{percentage}</span>
-                </div>
-                <div className="stat-bar">
+              <div key={type} className="stat-horizontal">
+                <span className="stat-icon">{icons[type]}</span>
+                <div className="stat-bar-horizontal">
                   <div 
                     className={`stat-fill ${type}`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
+                <span className="stat-value">{percentage}</span>
               </div>
             );
           })}
           
-          <div className="connection-status">
+          <div className="connection-indicator">
             <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-            <span>{connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
+            <span>Conectado</span>
           </div>
         </div>
       </header>
     );
   };
 
-  // MOBILE: Acciones Rápidas ARRIBA del input
-  const MobileActionsBar = () => (
-    <div className="mobile-actions-bar">
-      <div className="mobile-quick-actions">
-        {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestedAction(suggestedAction)}
-            disabled={loading || gameOver}
-            className="quick-action clickable"
-            title={suggestedAction}
-          >
-            {getActionIcon(suggestedAction)}
-          </button>
-        ))}
-      </div>
-      
-      <div className="mobile-modal-triggers">
-        <button 
-          className="modal-trigger clickable"
-          onClick={toggleObjectives}
-        >
-          🎯 <span>{gameState?.questObjectives?.length || 3}</span>
-        </button>
-        <button 
-          className="modal-trigger clickable"
-          onClick={toggleInventory}
-        >
-          📦 <span>{gameState?.inventory?.length || 0}</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  // MOBILE: Skills minimalistas + Estados ABAJO del input  
-  const MobileSkillsStatesBar = () => {
-    const skills = gameState?.skills || [];
-    
-    return (
-      <div className="mobile-skills-states-bar">
-        <button
-          onClick={toggleSkills}
-          className="mobile-skills-button clickable"
-          title="Ver habilidades"
-        >
-          📚
-        </button>
-        
-        <div className="mobile-skills-icons">
-          {skills.slice(0, 5).map((skill, index) => (
-            <div key={skill?.id || index} className="skill-icon-minimal clickable">
-              {getSkillIcon(skill)}
-            </div>
-          ))}
-        </div>
-        
-        <button
-          onClick={toggleEmotionsModal}
-          disabled={loading || gameOver}
-          className="mobile-emotions-button clickable"
-          title="Ver estados emocionales"
-        >
-          <span>{getDominantEmotionIcon()}</span>
-        </button>
-      </div>
-    );
-  };
-
-  // DESKTOP: Skills Bar optimizada
-  const DesktopSkillsBar = () => {
-    const skills = gameState?.skills || [];
-
-    return (
-      <div className="desktop-skills-bar">
-        <button
-          onClick={toggleSkills}
-          className="desktop-skills-button clickable"
-          title="Ver habilidades detalladas"
-        >
-          📚 Skills
-        </button>
-        
-        <div className="skills-icons-section">
-          {skills.slice(0, 6).map((skill, index) => (
-            <div key={skill?.id || index} className="skill-icon-minimal clickable" title={skill?.id || 'Habilidad'}>
-              {getSkillIcon(skill)}
-            </div>
-          ))}
-        </div>
-        
-        {/* ACCIONES RÁPIDAS CENTRADAS con flex-grow */}
-        <div className="desktop-actions-section">
-          {suggestedActions.slice(0, 3).map((suggestedAction, index) => (
+  // MOBILE: Acciones CON TEXTO debajo del input
+  const MobileActionsPanel = () => (
+    <div className="mobile-actions-panel">
+      <div className="mobile-actions-scroll">
+        {suggestedActions.length === 0 ? (
+          <div className="no-actions-text">
+            Las acciones aparecerán aquí...
+          </div>
+        ) : (
+          suggestedActions.map((suggestedAction, index) => (
             <button
               key={index}
               onClick={() => handleSuggestedAction(suggestedAction)}
               disabled={loading || gameOver}
-              className="action-with-text clickable"
+              className="mobile-action-with-text clickable"
             >
               <span>{getActionIcon(suggestedAction)}</span>
               <span>{suggestedAction}</span>
             </button>
-          ))}
-        </div>
-        
-        <div className="desktop-modal-triggers">
-          <button 
-            className="modal-trigger clickable"
-            onClick={toggleObjectives}
-          >
-            🎯 <span>{gameState?.questObjectives?.length || 3}</span>
-          </button>
-          <button 
-            className="modal-trigger clickable"
-            onClick={toggleInventory}
-          >
-            📦 <span>{gameState?.inventory?.length || 0}</span>
-          </button>
-        </div>
+          ))
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
-  // Controls Bar CON StoryInput
+  // BARRA POPUPS UNIFICADA
+  const PopupsBar = () => (
+    <div className="popups-bar">
+      <button 
+        className="popup-button clickable"
+        onClick={toggleInventory}
+        aria-label="Inventario"
+      >
+        📦
+        <span className="popup-label">Inv.</span>
+        {newItems > 0 && <div className="notification-badge">{newItems}</div>}
+      </button>
+      
+      <button 
+        className="popup-button clickable"
+        onClick={toggleObjectives}
+        aria-label="Objetivos"
+      >
+        🎯
+        <span className="popup-label">Obj.</span>
+        {newObjectives > 0 && <div className="notification-badge">{newObjectives}</div>}
+      </button>
+      
+      <button 
+        className="popup-button clickable"
+        onClick={toggleSkills}
+        aria-label="Habilidades"
+      >
+        📚
+        <span className="popup-label">Skills</span>
+        {newSkills > 0 && <div className="notification-badge">{newSkills}</div>}
+      </button>
+      
+      <button 
+        className="popup-button clickable"
+        onClick={toggleEmotionsModal}
+        aria-label="Estados"
+      >
+        😌
+        <span className="popup-label">Estados</span>
+        {newEmotions > 0 && <div className="notification-badge">{newEmotions}</div>}
+      </button>
+    </div>
+  );
+
+  // DESKTOP: Acciones centradas responsivas
+  const DesktopActionsSection = () => (
+    <div className="desktop-actions-section">
+      {suggestedActions.length === 0 ? (
+        <div className="no-actions-placeholder">
+          Acciones disponibles...
+        </div>
+      ) : (
+        suggestedActions.slice(0, 3).map((suggestedAction, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestedAction(suggestedAction)}
+            disabled={loading || gameOver}
+            className="desktop-action-button clickable"
+          >
+            <span>{getActionIcon(suggestedAction)}</span>
+            <span className="action-text">{suggestedAction}</span>
+          </button>
+        ))
+      )}
+    </div>
+  );
+
+  // Controls Bar REORGANIZADO
   const ControlsBar = () => (
     <div className="controls-bar">
       <div className="controls-content">
         <StoryInput 
+          ref={inputRef}
           onSubmit={submitAction}
           loading={loading}
           gameOver={gameOver}
         />
         
-        {/* DESKTOP: Botón Estados del mismo tamaño que ACTUAR */}
         <button
           type="button"
-          onClick={toggleEmotionsModal}
+          onClick={(e) => {
+            e.preventDefault();
+            const form = e.target.closest('.controls-content').querySelector('form');
+            if (form) {
+              form.requestSubmit();
+            }
+          }}
           disabled={loading || gameOver}
-          className="emotions-button desktop-only clickable"
-          title="Ver estados emocionales"
+          className="actuar-button clickable"
         >
-          <span>{getDominantEmotionIcon()}</span>
-          <span>Estados</span>
+          {loading ? '...' : 'ACTUAR'}
         </button>
+        
+        {/* DESKTOP: Acciones centradas + Popups bar */}
+        <div className="desktop-only desktop-extensions">
+          <DesktopActionsSection />
+          <PopupsBar />
+        </div>
       </div>
     </div>
   );
 
-  // Modal Skills DETALLADO - NUEVO
+  // Modal Skills AVANZADO con tabs
   const SkillsModal = () => {
     const skills = gameState?.skills || [];
+    const [activeTab, setActiveTab] = useState('activas');
+
+    // Categorizar skills
+    const categorizedSkills = {
+      activas: skills.filter(skill => skill?.type === 'active' || !skill?.type),
+      magia: skills.filter(skill => skill?.type === 'magic'),
+      pasivas: skills.filter(skill => skill?.type === 'passive')
+    };
+
+    const tabs = [
+      { id: 'activas', label: 'Activas', skills: categorizedSkills.activas },
+      { id: 'magia', label: 'Magia', skills: categorizedSkills.magia },
+      { id: 'pasivas', label: 'Pasivas', skills: categorizedSkills.pasivas }
+    ];
+
+    const currentSkills = categorizedSkills[activeTab] || [];
 
     return (
       <>
@@ -586,7 +615,7 @@ function App() {
           className={`modal-overlay ${showSkills ? 'show' : ''}`}
           onClick={() => setShowSkills(false)}
         />
-        <div className={`popup-modal ${showSkills ? 'show' : ''}`}>
+        <div className={`popup-modal skills-popup ${showSkills ? 'show' : ''}`}>
           <div className="modal-header">
             <span>📚 Habilidades</span>
             <button 
@@ -597,19 +626,37 @@ function App() {
               ✕
             </button>
           </div>
+          
+          {/* TABS HORIZONTALES */}
+          <div className="skills-tabs">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={`skill-tab ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+                {tab.skills.length > 0 && (
+                  <span className="tab-count">({tab.skills.length})</span>
+                )}
+              </button>
+            ))}
+          </div>
+          
           <div className="modal-content">
-            {skills.length === 0 ? (
+            {currentSkills.length === 0 ? (
               <p className="no-skills-message">
-                Las habilidades aparecerán según tus acciones en la aventura.
+                No tienes habilidades {activeTab} aún.
               </p>
             ) : (
               <div className="skills-detailed-list">
-                {skills.map((skill, index) => (
+                {currentSkills.map((skill, index) => (
                   <div key={skill?.id || index} className="skill-detailed-item">
                     <div className="skill-icon-large">{getSkillIcon(skill)}</div>
                     <div className="skill-detailed-info">
                       <div className="skill-detailed-name">
                         {skill?.id || skill || 'Habilidad'}
+                        {skill?.isNew && <span className="new-badge">NEW</span>}
                       </div>
                       {skill?.level && (
                         <div className="skill-detailed-level">Nivel {skill.level}</div>
@@ -617,11 +664,9 @@ function App() {
                       {skill?.description && (
                         <div className="skill-detailed-desc">{skill.description}</div>
                       )}
-                      {skill?.tags && (
-                        <div className="skill-tags">
-                          {skill.tags.map((tag, tagIndex) => (
-                            <span key={tagIndex} className="skill-tag">{tag}</span>
-                          ))}
+                      {skill?.effects && (
+                        <div className="skill-effects">
+                          Efectos: {skill.effects}
                         </div>
                       )}
                     </div>
@@ -670,6 +715,12 @@ function App() {
                       <div className="emotion-name">{emotion}</div>
                       <div className="emotion-value">{Math.round(value)}%</div>
                     </div>
+                    <div className="emotion-bar">
+                      <div 
+                        className="emotion-fill"
+                        style={{ width: `${Math.round(value)}%` }}
+                      />
+                    </div>
                   </div>
                 );
               })}
@@ -717,7 +768,10 @@ function App() {
                   <span className="objective-checkbox">
                     {objective.completed ? '☑️' : '☐'}
                   </span>
-                  <span>{objective.description || objective}</span>
+                  <span className="objective-text">
+                    {objective.description || objective}
+                    {objective.isNew && <span className="new-badge">NEW</span>}
+                  </span>
                 </div>
               ))}
             </div>
@@ -756,6 +810,7 @@ function App() {
                 <div key={index} className="inventory-slot clickable">
                   <div className="slot-icon">{item.icon || '📦'}</div>
                   <div className="slot-name">{item.name || `Item ${index + 1}`}</div>
+                  {item.isNew && <div className="item-new-indicator">NEW</div>}
                 </div>
               ))}
               {Array.from({ length: emptySlots }, (_, index) => (
@@ -1004,25 +1059,24 @@ function App() {
           </div>
         </div>
       ) : (
-        // LAYOUT FINAL: Mobile y Desktop CON UX MEJORADA
+        // LAYOUT FINAL REORGANIZADO
         <>
           <CompactHeader />
           <IntegratedCanvas />
           
           {/* MOBILE LAYOUT */}
           <div className="mobile-only">
-            <MobileActionsBar />       
-            <ControlsBar />            
-            <MobileSkillsStatesBar />  
+            <ControlsBar />
+            <MobileActionsPanel />
+            <PopupsBar />
           </div>
           
           {/* DESKTOP LAYOUT */}
           <div className="desktop-only">
-            <ControlsBar />            
-            <DesktopSkillsBar />       
+            <ControlsBar />
           </div>
           
-          {/* TODOS LOS MODALES COMO POPUPS */}
+          {/* TODOS LOS MODALES */}
           <SkillsModal />
           <ObjectivesModal />
           <InventoryModal />
