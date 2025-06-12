@@ -360,7 +360,31 @@ body {
   transform: scale(1.1);
 }
 
-/* ACCIONES RÁPIDAS EN MOBILE */
+/* LAYOUT MOBILE ESPECÍFICO CON ORDEN CONTROLADO */
+.mobile-layout-container {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .mobile-layout-container {
+    /* Orden específico en mobile: acciones -> controls -> skills */
+  }
+  
+  .mobile-actions-bar {
+    order: 1; /* ARRIBA en mobile */
+  }
+  
+  .controls-bar {
+    order: 2; /* MEDIO en mobile */  
+  }
+  
+  .skills-bar {
+    order: 3; /* ABAJO en mobile */
+  }
+}
+
+/* HEADER ULTRA-COMPACTO MOBILE */
 .mobile-actions-bar {
   display: none;
 }
