@@ -332,9 +332,14 @@ class HellboundRPGTester:
                         # Find matching initial skill
                         initial_skill = next((s for s in initial_skills if isinstance(s, dict) and s.get('id') == skill_id), None)
                         
-                        if initial_skill and skill_level > initial_skill.get('level', 0):
+                        if initial_skill and skill_level is not None and initial_skill.get('level') is not None:
+                            if skill_level > initial_skill.get('level', 0):
+                                skills_changed = True
+                                print(f"✅ Skill '{skill_id}' level increased from {initial_skill.get('level')} to {skill_level}")
+                        elif not initial_skill:
+                            # This is a new skill
                             skills_changed = True
-                            print(f"✅ Skill '{skill_id}' level increased from {initial_skill.get('level')} to {skill_level}")
+                            print(f"✅ New skill '{skill_id}' added with level {skill_level}")
                 
                 if skills_changed:
                     # Check WebSocket updates
