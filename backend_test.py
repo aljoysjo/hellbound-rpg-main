@@ -563,7 +563,7 @@ class HellboundRPGTester:
                 self.ws_thread.join(timeout=1)
 
 def main():
-    # Get backend URL from frontend .env file
+    # Get backend URL from frontend .env file or use local server
     try:
         with open('/app/frontend/.env', 'r') as f:
             for line in f:
@@ -571,6 +571,10 @@ def main():
                     backend_url = line.strip().split('=')[1]
                     break
     except:
+        backend_url = "http://localhost:8001"
+    
+    # If we're testing locally, use the local server
+    if "localhost" not in backend_url and "127.0.0.1" not in backend_url:
         backend_url = "http://localhost:8001"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
