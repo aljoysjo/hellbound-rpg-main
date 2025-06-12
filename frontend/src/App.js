@@ -376,12 +376,16 @@ function App() {
       <header className="compact-header">
         <div className="header-left">
           <h1 className="header-title">
-            {/* FIXED: Header mobile compacto */}
-            <span className="hidden sm:inline">🔥 HELLBOUND RPG v2.0</span>
-            <span className="sm:hidden">HELLBOUND</span>
+            {/* FORMATO ULTRA-COMPACTO MOBILE: HELLBOUND | ❤️85 🔮60 ● On */}
+            <span className="mobile-ultra-compact">
+              HELLBOUND | ❤️{vitals.health || 85} 🔮{vitals.mana || 60} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
+            </span>
+            <span className="desktop-full">
+              🔥 HELLBOUND RPG v2.0
+            </span>
           </h1>
           {gameState?.location && (
-            <div className="header-location">
+            <div className="header-location hidden sm:flex">
               <span>📍</span>
               <span>{gameState.location}</span>
             </div>
