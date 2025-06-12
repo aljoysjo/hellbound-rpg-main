@@ -14,6 +14,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "El input no funciona correctamente. En pruebas móviles, al escribir 'Examinar la habitación' solo se registra 'E'. Posible problema con preventDefault en handleInputChange."
+      - working: false
+        agent: "testing"
+        comment: "Confirmado el problema con input fluido. La función handleInputChange en línea 192 podría estar causando el problema."
 
   - task: "Inicio de sesión"
     implemented: true
@@ -123,7 +126,7 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
 
 test_plan:
   current_focus:
@@ -147,3 +150,5 @@ agent_communication:
     message: "El modal de estados emocionales funciona correctamente en móvil."
   - agent: "testing"
     message: "Hay un error de WebSocket que podría afectar algunas funcionalidades, pero no impide la operación principal del juego."
+  - agent: "testing"
+    message: "Confirmado el problema con input fluido. La función handleInputChange en línea 192 no tiene preventDefault, lo cual es correcto según el comentario 'SIN preventDefault para input fluido', pero aún así el input no funciona correctamente. Se recomienda revisar esta función."
