@@ -26,6 +26,7 @@ function App() {
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
+  const inputRef = useRef(null); // Ref para mantener foco del textarea
 
   // Auto-fade narrativa después de 5 segundos
   useEffect(() => {
