@@ -196,21 +196,21 @@ function App() {
     }
   };
 
-  // CRITICAL FIX: Input completamente limpio sin interferencias
-  const handleInputChange = (e) => {
-    setAction(e.target.value); // SIN preventDefault ni stopPropagation
-  };
+  // CRITICAL FIX: Input con useCallback para evitar re-renders
+  const handleInputChange = useCallback((e) => {
+    setAction(e.target.value);
+  }, []);
 
   // Handler para Enter sin interferir con el foco
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Solo para evitar salto de línea
+      e.preventDefault();
       if (action.trim()) {
         submitAction(action.trim());
         setAction('');
       }
     }
-  };
+  }, [action, submitAction]);
 
   const handleSuggestedAction = (suggestedAction) => {
     submitAction(suggestedAction);
