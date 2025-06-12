@@ -160,3 +160,5 @@ agent_communication:
     message: "Confirmado el problema con input fluido. La función handleInputChange en línea 192 no tiene preventDefault, lo cual es correcto según el comentario 'SIN preventDefault para input fluido', pero aún así el input no funciona correctamente. Se recomienda revisar esta función."
   - agent: "testing"
     message: "Verificado que el problema de input fluido ha sido corregido. La función handleInputChange en línea 192 ahora incluye e.stopPropagation() en lugar de e.preventDefault(), lo que permite el input fluido. El código ahora tiene un comentario 'CRITICAL FIX: Input change completamente limpio'."
+  - agent: "testing"
+    message: "PRUEBA CRÍTICA FINAL: A pesar de los cambios implementados (textarea, eliminación de stopPropagation, useRef y useEffect para mantener foco), el input sigue sin funcionar correctamente en la URL especificada (dark-chronicles-1.preview.emergentagent.com). En desktop no se registra ningún texto y en móvil solo se registra la primera letra 'E'. El cursor pierde el foco durante la escritura y Enter no envía la acción correctamente. El problema del input fluido NO está solucionado."
