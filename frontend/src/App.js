@@ -117,10 +117,16 @@ function App() {
     const prev = Array.isArray(prevSkills) ? prevSkills : [];
     const current = Array.isArray(currentSkills) ? currentSkills : [];
     
+    console.log('🔍 SKILLS DEBUG:', { prev: prev.length, current: current.length });
+    
     const prevIds = prev.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
     const currentIds = current.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
     
-    const newSkills = current.filter((skill, index) => !prevIds.includes(currentIds[index]));
+    // CORRECCIÓN: Nuevas skills son las que NO están en prevIds
+    const newSkills = current.filter(skill => {
+      const skillId = skill?.id || skill?.name || JSON.stringify(skill);
+      return !prevIds.includes(skillId);
+    });
     
     // Detectar level ups
     const levelUps = [];
@@ -130,6 +136,8 @@ function App() {
         levelUps.push(currentSkill);
       }
     });
+    
+    console.log('⭐ SKILLS CHANGES:', { prevIds, currentIds, newSkills, levelUps });
     
     return {
       newSkills,
