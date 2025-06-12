@@ -84,16 +84,32 @@ function App() {
     const prev = Array.isArray(prevObjectives) ? prevObjectives : [];
     const current = Array.isArray(currentObjectives) ? currentObjectives : [];
     
-    const prevCompleted = prev.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
-    const currentCompleted = current.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
+    console.log('🔍 OBJECTIVES DEBUG:', { prev: prev.length, current: current.length });
     
     const prevIds = prev.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
     const currentIds = current.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
     
+    const prevCompleted = prev.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
+    const currentCompleted = current.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
+    
+    // CORRECCIÓN: Nuevos objetivos son los que NO están en prevIds
+    const newObjectives = current.filter(obj => {
+      const objId = obj?.id || obj?.description || JSON.stringify(obj);
+      return !prevIds.includes(objId);
+    });
+    
+    // CORRECCIÓN: Objetivos recién completados
+    const completedObjectives = currentCompleted.filter(id => !prevCompleted.includes(id));
+    
+    console.log('🎯 OBJECTIVES CHANGES:', { 
+      prevIds, currentIds, newObjectives, 
+      prevCompleted, currentCompleted, completedObjectives 
+    });
+    
     return {
-      newObjectives: current.filter((obj, index) => !prevIds.includes(currentIds[index])),
-      completedObjectives: currentCompleted.filter(id => !prevCompleted.includes(id)),
-      totalCount: Math.max(0, (current.length - prev.length) + (currentCompleted.length - prevCompleted.length))
+      newObjectives,
+      completedObjectives,
+      totalCount: newObjectives.length + completedObjectives.length
     };
   };
 
