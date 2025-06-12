@@ -920,7 +920,7 @@ function App() {
           </div>
         </div>
       ) : (
-        // Interfaz del juego - LAYOUT REORGANIZADO CON ORDEN ESPECÍFICO
+        // Interfaz del juego - LAYOUT REORGANIZADO CON ORDEN ESPECÍFICO CON ORDEN ESPECÍFICO
         <>
           <CompactHeader />
           <IntegratedCanvas />
