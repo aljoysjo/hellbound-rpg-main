@@ -779,6 +779,27 @@ app.get('/api/get_session/:sessionId', (req, res) => {
   }
 });
 
+// ENDPOINT PARA POLLING DE BADGES
+app.get('/api/get_session/:sessionId', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    if (!sessionId || !gameSessions.has(sessionId)) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    const gameState = gameSessions.get(sessionId);
+    
+    res.json({
+      session_id: sessionId,
+      game_state: gameState.toDict()
+    });
+  } catch (error) {
+    console.error('Error getting session:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/start_session', async (req, res) => {
   try {
     const { mode = 'sandbox', campaign, sandboxConcept } = req.body;
