@@ -244,7 +244,7 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 3
+  test_sequence: 4
 
 test_plan:
   current_focus:
@@ -253,10 +253,12 @@ test_plan:
     - "Input fluido"
     - "Modal objetivos e inventario"
     - "Narrativa expandible"
+    - "Sistema de badges"
   stuck_tasks:
     - "Input fluido"
     - "Configuración CORS"
     - "Polling para detección de cambios en badges"
+    - "Sistema de badges"
   test_all: true
   test_priority: "high_first"
 
