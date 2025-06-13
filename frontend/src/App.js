@@ -343,7 +343,11 @@ function App() {
         const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
         if (response.ok) {
           const data = await response.json();
-          console.log('🔄 POLLING RESPONSE:', data.game_state);
+          console.log('🔄 POLLING RESPONSE RAW:', {
+            inventory: data.game_state?.inventory,
+            inventoryLength: data.game_state?.inventory?.length,
+            actionCount: data.game_state?.actionCount
+          });
           
           setGameState(prevState => {
             if (!prevState) {
