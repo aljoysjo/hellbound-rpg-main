@@ -49,7 +49,7 @@ backend:
     implemented: true
     working: false
     file: "/app/server/index.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "medium"
     needs_retesting: true
     status_history:
@@ -59,6 +59,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "La configuración CORS está implementada en las líneas 17-22 y 25-28, pero las pruebas muestran que el header 'Access-Control-Allow-Origin' no está presente en las respuestas OPTIONS. Esto podría causar problemas con las solicitudes desde el frontend."
+      - working: false
+        agent: "testing"
+        comment: "Se intentó corregir la configuración CORS agregando métodos, headers permitidos y headers expuestos, pero el problema persiste. El header 'Access-Control-Allow-Origin' sigue sin estar presente en las respuestas OPTIONS."
 
   - task: "Nueva API key OpenAI"
     implemented: true
