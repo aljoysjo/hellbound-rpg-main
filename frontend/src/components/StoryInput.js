@@ -1,5 +1,5 @@
 // Componente aislado para input fluido sin rerenders
-import { useState, useRef, useEffect, memo, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, memo, forwardRef, useImperativeHandle } from 'react';
 
 const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Escribe lo que quieres que suceda..." }, ref) => {
   const [draft, setDraft] = useState('');
@@ -11,15 +11,12 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
     focus: () => textareaRef.current?.focus()
   }));
 
-  // Mantiene foco siempre que el componente siga montado
-  useEffect(() => {
-    textareaRef.current?.focus();
-  });
-
   const handleSend = () => {
     if (!draft.trim() || loading || gameOver) return;
     onSubmit(draft.trim());
     setDraft('');
+    // Reestablecer foco después de enviar
+    setTimeout(() => textareaRef.current?.focus(), 100);
   };
 
   const handleSubmit = (e) => {
@@ -27,17 +24,20 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
     handleSend();
   };
 
+  const handleChange = (e) => {
+    // CRITICAL FIX: Input completamente limpio sin preventDefault
+    setDraft(e.target.value);
+  };
+
   return (
     <form 
       onSubmit={handleSubmit}
       className="input-group"
-      onMouseDown={(e) => e.stopPropagation()}
-      onTouchStart={(e) => e.stopPropagation()}
     >
       <textarea
         ref={textareaRef}
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={handleChange}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -50,7 +50,6 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
         placeholder={placeholder}
         disabled={loading || gameOver}
         autoFocus
-        data-no-rebuild
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
