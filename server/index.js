@@ -15,19 +15,18 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com', '*'],
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
-// Middleware
+// Middleware - CORS LIBERAL PARA DEBUGGING
 app.use(cors({
-  origin: ['https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com', '*'],
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Access-Control-Allow-Origin']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
