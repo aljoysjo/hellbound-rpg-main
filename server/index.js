@@ -443,10 +443,27 @@ class GameState {
       const newItem = {
         name: stateChanges.newInventoryItem.name,
         icon: stateChanges.newInventoryItem.icon || '📦',
-        description: stateChanges.newInventoryItem.description || ''
+        description: stateChanges.newInventoryItem.description || '',
+        instanceId: crypto.randomUUID() // ID único para cada instancia
       };
       this.inventory.push(newItem);
       console.log(`📦 Nuevo item obtenido: ${newItem.name} ${newItem.icon}`);
+    }
+    
+    // Remover item del inventario (consumibles, drops, etc.)
+    if (stateChanges.removeInventoryItem) {
+      const itemToRemove = stateChanges.removeInventoryItem;
+      const itemIndex = this.inventory.findIndex(item => 
+        item.name.toLowerCase().includes(itemToRemove.name.toLowerCase()) ||
+        itemToRemove.name.toLowerCase().includes(item.name.toLowerCase())
+      );
+      
+      if (itemIndex !== -1) {
+        const removedItem = this.inventory.splice(itemIndex, 1)[0];
+        console.log(`❌ Item eliminado: ${removedItem.name} ${removedItem.icon} (${itemToRemove.reason || 'usado'})`);
+      } else {
+        console.log(`⚠️ No se encontró item para eliminar: ${itemToRemove.name}`);
+      }
     }
     
     // Remover habilidad
