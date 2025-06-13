@@ -984,9 +984,18 @@ function App() {
     const [activeTab, setActiveTab] = useState('activas');
 
     const categorizedSkills = {
-      activas: skills.filter(skill => skill?.type === 'active' || !skill?.type),
-      magia: skills.filter(skill => skill?.type === 'magic'),
-      pasivas: skills.filter(skill => skill?.type === 'passive')
+      activas: skills.filter(skill => {
+        const category = skill?.category || skill?.type;
+        return category === 'activa' || category === 'active' || !category;
+      }),
+      magia: skills.filter(skill => {
+        const category = skill?.category || skill?.type;
+        return category === 'magia' || category === 'magic';
+      }),
+      pasivas: skills.filter(skill => {
+        const category = skill?.category || skill?.type;
+        return category === 'pasiva' || category === 'passive';
+      })
     };
 
     const tabs = [
