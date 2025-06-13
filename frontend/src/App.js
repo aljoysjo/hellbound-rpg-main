@@ -332,137 +332,100 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
-  // SISTEMA DE POLLING PARA BADGES (funciona siempre)
+  // SISTEMA DE POLLING ÚNICO PARA BADGES (CORREGIDO - SIN DUPLICACIÓN)
   useEffect(() => {
-    let pollingInterval;
+    if (!sessionId) return;
     
-    if (sessionId) {
-      console.log('🔄 INICIANDO POLLING para sessionId:', sessionId);
-      pollingInterval = setInterval(async () => {
-        try {
-          console.log('🔄 Haciendo polling request...');
-          const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
-          if (response.ok) {
-            const data = await response.json();
-            console.log('🔄 POLLING RESPONSE:', data.game_state);
+    console.log('🔄 INICIANDO POLLING ÚNICO para sessionId:', sessionId);
+    const intervalId = setInterval(async () => {
+      try {
+        console.log('🔄 Haciendo polling request...');
+        const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('🔄 POLLING RESPONSE:', data.game_state);
+          
+          setGameState(prevState => {
+            if (!prevState) {
+              console.log('🔄 No prevState, returning new state');
+              return data.game_state;
+            }
             
-            setGameState(prevState => {
-              if (!prevState) {
-                console.log('🔄 No prevState, returning new state');
-                return data.game_state;
+            // MEJORADO: Detectar cambios por múltiples campos, no solo actionCount
+            const hasInventoryChanges = (data.game_state.inventory?.length || 0) > (prevState.inventory?.length || 0);
+            const hasSkillsChanges = (data.game_state.skills?.length || 0) > (prevState.skills?.length || 0);
+            const hasObjectivesChanges = (data.game_state.questObjectives?.length || 0) > (prevState.questObjectives?.length || 0);
+            const hasActionCountChange = data.game_state.actionCount > prevState.actionCount;
+            
+            if (hasActionCountChange || hasInventoryChanges || hasSkillsChanges || hasObjectivesChanges) {
+              console.log('🔄 CAMBIOS DETECTADOS:', { 
+                actionCount: `${prevState.actionCount} → ${data.game_state.actionCount}`,
+                inventory: `${prevState.inventory?.length || 0} → ${data.game_state.inventory?.length || 0}`,
+                skills: `${prevState.skills?.length || 0} → ${data.game_state.skills?.length || 0}`,
+                objectives: `${prevState.questObjectives?.length || 0} → ${data.game_state.questObjectives?.length || 0}`
+              });
+              
+              setNarrativeVisible(true);
+              
+              // DETECTAR CAMBIOS ESPECÍFICOS PARA BADGES
+              const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
+              const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
+              const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
+              const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
+              
+              console.log('🎯 CAMBIOS ESPECÍFICOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
+              
+              if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+                  skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
+                
+                console.log('✨ ACTUALIZANDO BADGES!');
+                setBadges(prev => ({
+                  inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
+                  objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
+                  skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
+                  emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
+                }));
+                
+                // Actualizar elementos NEW
+                setNewElements(prevNew => ({
+                  inventory: new Set([
+                    ...prevNew.inventory,
+                    ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+                  ]),
+                  objectives: new Set([
+                    ...prevNew.objectives,
+                    ...objectivesChanges.newObjectives.map(obj => obj?.id || obj?.description || JSON.stringify(obj)),
+                    ...objectivesChanges.completedObjectives
+                  ]),
+                  skills: new Set([
+                    ...prevNew.skills,
+                    ...skillsChanges.newSkills.map(skill => skill?.id || skill?.name || JSON.stringify(skill)),
+                    ...skillsChanges.levelUps.map(skill => `${skill?.id || skill?.name}-levelup`)
+                  ]),
+                  emotions: new Set([
+                    ...prevNew.emotions,
+                    ...emotionsChanges.significantChanges.map(change => change.emotion)
+                  ])
+                }));
               }
               
-              if (data.game_state.actionCount > prevState.actionCount) {
-                console.log('🔄 NUEVO ACTION COUNT:', data.game_state.actionCount, 'vs', prevState.actionCount);
-                setNarrativeVisible(true);
-                
-                // DETECTAR CAMBIOS
-                const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
-                const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
-                const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
-                const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
-                
-                console.log('🎯 CAMBIOS DETECTADOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
-                
-                if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
-                    skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
-                  
-                  console.log('✨ ACTUALIZANDO BADGES!');
-                  setBadges(prev => ({
-                    inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
-                    objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
-                    skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
-                    emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
-                  }));
-                }
-                
-                return data.game_state;
-              }
-              
-              console.log('🔄 Sin cambios en actionCount');
-              return prevState;
-            });
-          } else {
-            console.error('❌ Error response:', response.status);
-          }
-        } catch (error) {
-          console.error('❌ Error en polling:', error);
+              return data.game_state;
+            }
+            
+            console.log('🔄 Sin cambios significativos');
+            return prevState;
+          });
+        } else {
+          console.error('❌ Error response:', response.status);
         }
-      }, 2000);
-    }
+      } catch (error) {
+        console.error('❌ Error en polling:', error);
+      }
+    }, 2000);
     
     return () => {
-      if (pollingInterval) {
-        console.log('🔄 Limpiando polling interval');
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [sessionId, BACKEND_URL]);
-
-  // SISTEMA DE POLLING PARA BADGES (funciona siempre)
-  useEffect(() => {
-    let pollingInterval;
-    
-    if (sessionId) {
-      console.log('🔄 INICIANDO POLLING para sessionId:', sessionId);
-      pollingInterval = setInterval(async () => {
-        try {
-          console.log('🔄 Haciendo polling request...');
-          const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
-          if (response.ok) {
-            const data = await response.json();
-            console.log('🔄 POLLING RESPONSE:', data.game_state);
-            
-            setGameState(prevState => {
-              if (!prevState) {
-                console.log('🔄 No prevState, returning new state');
-                return data.game_state;
-              }
-              
-              if (data.game_state.actionCount > prevState.actionCount) {
-                console.log('🔄 NUEVO ACTION COUNT:', data.game_state.actionCount, 'vs', prevState.actionCount);
-                setNarrativeVisible(true);
-                
-                // DETECTAR CAMBIOS
-                const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
-                const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
-                const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
-                const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
-                
-                console.log('🎯 CAMBIOS DETECTADOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
-                
-                if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
-                    skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
-                  
-                  console.log('✨ ACTUALIZANDO BADGES!');
-                  setBadges(prev => ({
-                    inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
-                    objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
-                    skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
-                    emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
-                  }));
-                }
-                
-                return data.game_state;
-              }
-              
-              console.log('🔄 Sin cambios en actionCount');
-              return prevState;
-            });
-          } else {
-            console.error('❌ Error response:', response.status);
-          }
-        } catch (error) {
-          console.error('❌ Error en polling:', error);
-        }
-      }, 2000);
-    }
-    
-    return () => {
-      if (pollingInterval) {
-        console.log('🔄 Limpiando polling interval');
-        clearInterval(pollingInterval);
-      }
+      console.log('🔄 Limpiando polling interval');
+      clearInterval(intervalId);
     };
   }, [sessionId, BACKEND_URL]);
 
