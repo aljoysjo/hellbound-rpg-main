@@ -895,7 +895,23 @@ function App() {
         📦
         <span className="popup-label">Inv.</span>
         {badges.inventory.count > 0 && (
-          <div className="notification-badge pulse-animation">
+          <div className="notification-badge pulse-animation" style={{
+            position: 'absolute',
+            top: '-8px', 
+            right: '-8px',
+            background: '#dc2626',
+            color: 'white',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            border: '2px solid #F3E7C6',
+            zIndex: 10
+          }}>
             {badges.inventory.count}
           </div>
         )}
