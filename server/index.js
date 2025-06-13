@@ -679,12 +679,19 @@ ESTADO ACTUAL:
 
 IMPORTANTE: Analiza la narrativa REALMENTE y detecta:
 1. OBTENER OBJETOS (encontrar, tomar, recoger libros, armas, pociones, llaves, etc.)
-2. NUEVAS HABILIDADES (aprender, entrenar, dominar nuevas técnicas)
-3. DAÑO FÍSICO real (caídas, ataques, heridas)
-4. GASTO DE ENERGÍA (magia, esfuerzo físico)
-5. CAMBIOS DE UBICACIÓN explícitos
-6. ESTADOS EMOCIONALES por situaciones intensas
-7. MUERTE si la situación es mortal
+2. USAR/SOLTAR/PERDER OBJETOS (usar poción, soltar cuchillo, perder item, consumir, etc.)
+3. NUEVAS HABILIDADES con CLASIFICACIÓN:
+   - ACTIVAS: combate, ataques, acciones que requieren activación (esgrima, tiro con arco, salto, etc.)
+   - MAGIA: hechizos, conjuros, magia (curación, bola de fuego, telepatía, etc.)  
+   - PASIVAS: conocimientos, oficios, resistencias (forja, cocina, resistencia veneno, etc.)
+4. DAÑO FÍSICO real (caídas, ataques, heridas)
+5. GASTO DE ENERGÍA (magia, esfuerzo físico)
+6. CAMBIOS DE UBICACIÓN explícitos
+7. ESTADOS EMOCIONALES por situaciones intensas
+8. MUERTE si la situación es mortal
+
+INVENTARIO ACTUAL:
+${gameState.inventory.map((item, index) => `${index}: ${item.name} ${item.icon}`).join('\n')}
 
 Responde SOLO con un JSON válido:
 
@@ -692,14 +699,20 @@ Responde SOLO con un JSON válido:
   "vitalDelta": {"health": -15, "mana": -20, "stamina": -10},
   "statusSet": {"miedo": 70, "alerta": 90, "fatiga": 30},
   "locationChange": "Nueva Ubicación Específica",
-  "newSkill": {"id": "nueva_habilidad", "level": 1, "tags": ["tag"], "description": "desc"},
+  "newSkill": {"id": "forja_espadas", "level": 1, "category": "pasiva", "tags": ["craft"], "description": "Habilidad para forjar armas"},
   "newInventoryItem": {"name": "Libro de Hechizos", "icon": "📖", "description": "Manual de conjuros básicos"},
+  "removeInventoryItem": {"name": "Cuchillo", "reason": "soltado"},
   "resourceDelta": {"gold": +10, "rations": -1},
   "relationshipDelta": {"Persona": +15},
   "knowledgeDelta": {"Tema": +20},
   "forceDeathCheck": true,
   "deathReason": "Razón específica de muerte"
 }
+
+CLASIFICACIÓN DE SKILLS OBLIGATORIA:
+- category: "activa" = Habilidades de combate y acciones (esgrima, arquería, salto, etc.)
+- category: "magia" = Hechizos y poderes mágicos (curación, fuego, telepatía, etc.)  
+- category: "pasiva" = Conocimientos y oficios (forja, cocina, historia, etc.)
 
 CRITERIOS ESPECÍFICOS:
 - Combate/Daño = health -10 a -30
