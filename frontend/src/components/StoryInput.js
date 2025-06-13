@@ -1,22 +1,32 @@
-// Componente aislado para input fluido sin rerenders
-import { useState, useRef, memo, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, memo, forwardRef, useImperativeHandle, useEffect } from 'react';
 
 const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Escribe lo que quieres que suceda..." }, ref) => {
   const [draft, setDraft] = useState('');
   const textareaRef = useRef(null);
 
-  // Exponer blur al componente padre
+  // Exponer blur y focus al componente padre
   useImperativeHandle(ref, () => ({
     blur: () => textareaRef.current?.blur(),
     focus: () => textareaRef.current?.focus()
   }));
 
+  // Asegurar foco inicial
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
+
   const handleSend = () => {
     if (!draft.trim() || loading || gameOver) return;
     onSubmit(draft.trim());
     setDraft('');
-    // Reestablecer foco después de enviar
-    setTimeout(() => textareaRef.current?.focus(), 100);
+    // Enfocar después de enviar
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, 100);
   };
 
   const handleSubmit = (e) => {
@@ -24,29 +34,31 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
     handleSend();
   };
 
-  const handleChange = (e) => {
-    // CRITICAL FIX: Input completamente limpio sin preventDefault
-    setDraft(e.target.value);
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit}
-      className="input-group"
-    >
+    <form onSubmit={handleSubmit} className="input-group">
       <textarea
         ref={textareaRef}
         value={draft}
-        onChange={handleChange}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-          }
-        }}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={handleKeyDown}
         rows={2}
         className="main-input clickable"
-        style={{ resize: 'none' }}
+        style={{ 
+          resize: 'none',
+          width: '100%',
+          padding: '8px',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          fontFamily: 'inherit',
+          fontSize: '14px'
+        }}
         placeholder={placeholder}
         disabled={loading || gameOver}
         autoFocus
@@ -61,5 +73,4 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
 
 StoryInput.displayName = 'StoryInput';
 
-// Evita rerender salvo que cambien las props
 export default memo(StoryInput);
