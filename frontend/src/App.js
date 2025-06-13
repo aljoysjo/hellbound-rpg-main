@@ -332,6 +332,73 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
+  // SISTEMA DE POLLING PARA BADGES (funciona siempre)
+  useEffect(() => {
+    let pollingInterval;
+    
+    if (sessionId) {
+      console.log('🔄 INICIANDO POLLING para sessionId:', sessionId);
+      pollingInterval = setInterval(async () => {
+        try {
+          console.log('🔄 Haciendo polling request...');
+          const response = await fetch(`${BACKEND_URL}/api/get_session/${sessionId}`);
+          if (response.ok) {
+            const data = await response.json();
+            console.log('🔄 POLLING RESPONSE:', data.game_state);
+            
+            setGameState(prevState => {
+              if (!prevState) {
+                console.log('🔄 No prevState, returning new state');
+                return data.game_state;
+              }
+              
+              if (data.game_state.actionCount > prevState.actionCount) {
+                console.log('🔄 NUEVO ACTION COUNT:', data.game_state.actionCount, 'vs', prevState.actionCount);
+                setNarrativeVisible(true);
+                
+                // DETECTAR CAMBIOS
+                const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
+                const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
+                const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
+                const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
+                
+                console.log('🎯 CAMBIOS DETECTADOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
+                
+                if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+                    skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
+                  
+                  console.log('✨ ACTUALIZANDO BADGES!');
+                  setBadges(prev => ({
+                    inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
+                    objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
+                    skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
+                    emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
+                  }));
+                }
+                
+                return data.game_state;
+              }
+              
+              console.log('🔄 Sin cambios en actionCount');
+              return prevState;
+            });
+          } else {
+            console.error('❌ Error response:', response.status);
+          }
+        } catch (error) {
+          console.error('❌ Error en polling:', error);
+        }
+      }, 2000);
+    }
+    
+    return () => {
+      if (pollingInterval) {
+        console.log('🔄 Limpiando polling interval');
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [sessionId, BACKEND_URL]);
+
   // Start new session
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
     setLoading(true);
