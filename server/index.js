@@ -426,12 +426,17 @@ class GameState {
       console.log(`📍 Nueva ubicación: ${this.location}`);
     }
     
-    // Añadir nueva habilidad
+    // Añadir nueva habilidad CON CATEGORIZACIÓN
     if (stateChanges.newSkill) {
       const existingSkill = this.skills.find(s => s.id === stateChanges.newSkill.id);
       if (!existingSkill) {
-        this.skills.push(stateChanges.newSkill);
-        console.log(`⭐ Nueva habilidad: ${stateChanges.newSkill.id} (Nivel ${stateChanges.newSkill.level})`);
+        // Asegurar que tenga categoría correcta
+        const newSkill = {
+          ...stateChanges.newSkill,
+          category: stateChanges.newSkill.category || this.detectSkillCategory(stateChanges.newSkill)
+        };
+        this.skills.push(newSkill);
+        console.log(`⭐ Nueva habilidad (${newSkill.category}): ${newSkill.id} (Nivel ${newSkill.level})`);
       } else {
         existingSkill.level = Math.max(existingSkill.level, stateChanges.newSkill.level);
         console.log(`📈 Habilidad mejorada: ${existingSkill.id} (Nivel ${existingSkill.level})`);
