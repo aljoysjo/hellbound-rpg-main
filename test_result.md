@@ -80,11 +80,11 @@ backend:
 
   - task: "Polling para detección de cambios en badges"
     implemented: true
-    working: true
+    working: false
     file: "/app/server/index.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -92,6 +92,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "El sistema de polling funciona correctamente. Las pruebas muestran que el endpoint /api/get_session/:sessionId devuelve el estado actualizado después de cada acción, incluyendo cambios en el inventario y actionCount."
+      - working: false
+        agent: "testing"
+        comment: "Se detectó un problema en las pruebas de múltiples acciones. El actionCount no siempre se incrementa correctamente después de cada acción. En algunas ocasiones, el contador permanece igual después de una acción, lo que podría afectar el sistema de badges."
 
 frontend:
   - task: "Input fluido"
