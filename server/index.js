@@ -15,8 +15,9 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: ['https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com', '*'],
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
