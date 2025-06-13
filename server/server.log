@@ -4,3 +4,204 @@
    - Lore: 3 entries
    - Functions: 1 functions
    - Lexicon: 2 words
+🎨 Sandbox inicializado con concepto: "Explorador encontrando tesoros..."
+🎯 Acciones dinámicas generadas: Explorar el camino iluminado por el sol, Investigar el resplandor dorado en la oscuridad, Revisar el mapa en busca de pistas, Escuchar atentamente los susurros del viento
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 0, "alerta": 20},
+  "locationChange": "Biblioteca antigua",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 0, alerta: 20 },
+  locationChange: 'Biblioteca antigua',
+  newSkill: {},
+  newInventoryItem: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 0,
+    "alerta": 20
+  },
+  "locationChange": "Biblioteca antigua",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+😊 miedo: 0%
+😊 alerta: 20%
+📍 Nueva ubicación: Biblioteca antigua
+⭐ Nueva habilidad: undefined (Nivel undefined)
+📦 Nuevo item obtenido: undefined 📦
+🎯 Acciones dinámicas generadas: Abrir el libro encuadernado en cuero, Examinar estanterías en busca de pistas, Usar maná para iluminar el área, Buscar un mapa de la biblioteca.
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 70, "alerta": 90},
+  "locationChange": "Cueva antigua",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 70, alerta: 90 },
+  locationChange: 'Cueva antigua',
+  newSkill: {},
+  newInventoryItem: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 70,
+    "alerta": 90
+  },
+  "locationChange": "Cueva antigua",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+😊 miedo: 70%
+😊 alerta: 90%
+📍 Nueva ubicación: Cueva antigua
+📈 Habilidad mejorada: undefined (Nivel NaN)
+📦 Nuevo item obtenido: undefined 📦
+🎯 Acciones dinámicas generadas: Examinar el altar en busca de pistas, Abrir el cofre con precaución, Investigar las inscripciones en las paredes, Mantenerse alerta ante posibles peligros.
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 70, "alerta": 90},
+  "locationChange": "Altar en la cueva oscura",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 70, alerta: 90 },
+  locationChange: 'Altar en la cueva oscura',
+  newSkill: {},
+  newInventoryItem: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 70,
+    "alerta": 90
+  },
+  "locationChange": "Altar en la cueva oscura",
+  "newSkill": {},
+  "newInventoryItem": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false
+}
+😊 miedo: 70%
+😊 alerta: 90%
+📍 Nueva ubicación: Altar en la cueva oscura
+📈 Habilidad mejorada: undefined (Nivel NaN)
+📦 Nuevo item obtenido: undefined 📦
+🎯 Acciones dinámicas generadas: Examinar el altar en busca de pistas, Abrir el cofre con cautela, Escuchar los susurros de la cueva, Preparar defensa ante lo desconocido
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 90, "alerta": 95},
+  "locationChange": "Altar en la cueva oscura",
+  "newSkill": {},
+  "newInventoryItem": {
+    "name": "Amuleto de poder",
+    "icon": "🔮",
+    "description": "Un amuleto que otorga poder mágico al portador."
+  },
+  "resourceDelta": {
+    "gold": 100,
+    "rations": 0
+  },
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": true,
+  "deathReason": "Sombra oscura que surge del cofre"
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 90, alerta: 95 },
+  locationChange: 'Altar en la cueva oscura',
+  newSkill: {},
+  newInventoryItem: {
+    name: 'Amuleto de poder',
+    icon: '🔮',
+    description: 'Un amuleto que otorga poder mágico al portador.'
+  },
+  resourceDelta: { gold: 100, rations: 0 },
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: true,
+  deathReason: 'Sombra oscura que surge del cofre'
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 90,
+    "alerta": 95
+  },
+  "locationChange": "Altar en la cueva oscura",
+  "newSkill": {},
+  "newInventoryItem": {
+    "name": "Amuleto de poder",
+    "icon": "🔮",
+    "description": "Un amuleto que otorga poder mágico al portador."
+  },
+  "resourceDelta": {
+    "gold": 100,
+    "rations": 0
+  },
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": true,
+  "deathReason": "Sombra oscura que surge del cofre"
+}
+💰 gold: 120
+💰 rations: 3
+😊 miedo: 90%
+😊 alerta: 95%
+📍 Nueva ubicación: Altar en la cueva oscura
+📈 Habilidad mejorada: undefined (Nivel NaN)
+📦 Nuevo item obtenido: Amuleto de poder 🔮
+💀 MUERTE FORZADA: Sombra oscura que surge del cofre
