@@ -403,48 +403,6 @@ class GameState {
     return 'activa';
   }
 
-  // 🎯 CATEGORIZACIÓN AUTOMÁTICA DE HABILIDADES
-  detectSkillCategory(skill) {
-    const skillId = skill.id?.toLowerCase() || '';
-    const skillDesc = skill.description?.toLowerCase() || '';
-    const skillTags = skill.tags || [];
-    
-    // Palabras clave para PASIVAS
-    const passiveKeywords = [
-      'forja', 'herrera', 'craft', 'fabricar', 'crear', 'construcción',
-      'reparación', 'reparar', 'cocina', 'cocinar', 'alquimia',
-      'conocimiento', 'historia', 'idioma', 'tradición', 'cultura',
-      'resistencia', 'inmunidad', 'tolerancia', 'oficio', 'artesanía'
-    ];
-    
-    // Palabras clave para MAGIA
-    const magicKeywords = [
-      'hechizo', 'conjuro', 'magia', 'mágico', 'arcano', 'místico',
-      'curación', 'sanar', 'heal', 'bola de fuego', 'telepatía',
-      'teletransporte', 'invocación', 'ritual', 'bendición', 'maldición',
-      'elemental', 'espiritual', 'divino', 'encantamiento'
-    ];
-    
-    // Verificar PASIVAS
-    if (passiveKeywords.some(keyword => 
-      skillId.includes(keyword) || skillDesc.includes(keyword) ||
-      skillTags.some(tag => tag.toLowerCase().includes(keyword))
-    )) {
-      return 'pasiva';
-    }
-    
-    // Verificar MAGIA
-    if (magicKeywords.some(keyword => 
-      skillId.includes(keyword) || skillDesc.includes(keyword) ||
-      skillTags.some(tag => tag.toLowerCase().includes(keyword))
-    )) {
-      return 'magia';
-    }
-    
-    // Por defecto: ACTIVA (combate, movimiento, etc.)
-    return 'activa';
-  }
-
   // 🔄 SISTEMA DE CAMBIOS DE ESTADO DINÁMICOS
   applyStateChanges(stateChanges) {
     console.log('📊 Aplicando cambios de estado:', JSON.stringify(stateChanges, null, 2));
