@@ -101,7 +101,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -120,6 +120,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (dark-chronicles-1.preview.emergentagent.com). A pesar de los cambios implementados (textarea, eliminación de stopPropagation, useRef y useEffect para mantener foco), el input sigue sin funcionar correctamente. En desktop no se registra ningún texto y en móvil solo se registra la primera letra 'E'. El cursor pierde el foco durante la escritura y Enter no envía la acción correctamente."
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada en la URL especificada (https://rpg-achievement.preview.emergentagent.com). El input sigue sin funcionar correctamente. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
 
   - task: "Inicio de sesión"
     implemented: true
