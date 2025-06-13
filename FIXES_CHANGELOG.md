@@ -149,7 +149,33 @@
 ---
 
 **Estado**: ✅ **COMPLETAMENTE FUNCIONAL** (Desktop + Móvil)
-**Prioridad**: 🔥 **TESTING FINAL REQUERIDO**
+**Prioridad**: 🔥 **TESTING FINAL REQUERIDO**  
 **Responsable**: Main Development Agent
 
-**LISTO PARA PRODUCCIÓN** 🚀
+## 🔧 **HOTFIX v2.1 - BADGES REPARADOS**
+
+### ❌ **PROBLEMA IDENTIFICADO:**
+- **Badges desaparecieron**: Variables CSS inconsistentes entre `tokens.css` y `App.css`
+- **Variables usadas**: `--c-bg`, `--c-text`, etc. 
+- **Variables definidas**: `--color-bg`, `--color-primary`, etc.
+- **Resultado**: Badges no se renderizaban por CSS roto
+
+### ✅ **SOLUCIÓN IMPLEMENTADA:**
+1. **Mapeado de compatibilidad** agregado a `tokens.css`:
+```css
+:root {
+  --c-bg: var(--color-bg);
+  --c-text: var(--text-dark);  
+  --c-border: var(--color-primary);
+  /* ... más mapeos */
+}
+```
+
+2. **Badge border arreglado**: Cambiado `var(--c-bg)` → `var(--color-bg)` en notification-badge
+
+### 🧪 **VERIFICACIÓN REQUERIDA:**
+- [ ] Badges rojos visibles junto a iconos 📦 🎯 📚 😌
+- [ ] Animación "pulse" funcionando
+- [ ] Números incrementan al obtener items/skills
+
+**LISTO PARA TESTING INMEDIATO** 🚀
