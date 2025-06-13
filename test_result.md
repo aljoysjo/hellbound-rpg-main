@@ -138,6 +138,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Se pueden crear sesiones de campaña correctamente. Hay un error de WebSocket pero no impide la funcionalidad principal."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada en la URL especificada (https://rpg-achievement.preview.emergentagent.com). El inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y comenzar la aventura sin errores 'Failed to fetch'. La aplicación carga correctamente y muestra la interfaz del juego."
 
   - task: "Layout móvil"
     implemented: true
