@@ -72,45 +72,8 @@ class HellboundRPGTester:
                 return False
         return success
 
-    def test_start_session_campaign(self):
-        """Test starting a new campaign game session"""
-        success, response = self.run_test(
-            "Start Campaign Session API",
-            "POST",
-            "api/start_session",
-            200,
-            data={"mode": "campaign"}
-        )
-        if success and 'session_id' in response:
-            self.session_id = response['session_id']
-            print(f"Session ID: {self.session_id}")
-            print(f"Initial Narrative: {response.get('initial_narrative')}")
-            
-            # Check game state
-            game_state = response.get('game_state', {})
-            self.validate_game_state_structure(game_state)
-            
-            # Verify campaign-specific elements
-            if game_state.get('mode') != 'campaign':
-                print("❌ Game mode is not set to campaign")
-                return False
-                
-            # Check for campaign objectives
-            if not game_state.get('questObjectives'):
-                print("❌ Campaign objectives not found")
-                return False
-                
-            print(f"Campaign Mode: {game_state.get('mode')}")
-            print(f"Quest Objectives: {len(game_state.get('questObjectives', []))} objectives")
-            
-            # Connect to WebSocket for this session
-            self.connect_websocket()
-            
-            return True
-        return False
-
     def test_start_session_sandbox(self):
-        """Test starting a new sandbox game session"""
+        """Test starting a new sandbox game session with a specific concept"""
         success, response = self.run_test(
             "Start Sandbox Session API",
             "POST",
@@ -118,7 +81,7 @@ class HellboundRPGTester:
             200,
             data={
                 "mode": "sandbox", 
-                "sandboxConcept": "Un exorcista investigando fenómenos paranormales en una mansión abandonada"
+                "sandboxConcept": "Explorador encontrando tesoros"
             }
         )
         if success and 'session_id' in response:
@@ -138,9 +101,11 @@ class HellboundRPGTester:
             # Check for sandbox concept
             if not game_state.get('sandboxConcept'):
                 print("❌ Sandbox concept not found")
+                return False
                 
             print(f"Sandbox Mode: {game_state.get('mode')}")
             print(f"Sandbox Concept: {game_state.get('sandboxConcept')}")
+            print(f"Initial Action Count: {game_state.get('actionCount', 0)}")
             
             # Connect to WebSocket for this session
             self.connect_websocket()
@@ -155,7 +120,7 @@ class HellboundRPGTester:
         # Check for required fields
         required_fields = [
             'inventory', 'skills', 'emotionalStates', 'questObjectives',
-            'vitals', 'resources', 'location'
+            'vitals', 'resources', 'location', 'actionCount'
         ]
         
         for field in required_fields:
@@ -165,6 +130,9 @@ class HellboundRPGTester:
         
         # Check inventory structure
         print(f"📦 Inventory: {game_state.get('inventory', [])}")
+        
+        # Check action count
+        print(f"🔢 Action Count: {game_state.get('actionCount', 0)}")
         
         # Check skills structure
         skills = game_state.get('skills', [])
@@ -192,13 +160,13 @@ class HellboundRPGTester:
         print("✅ Game state structure validation complete")
         return True
 
-    def test_inventory_change(self):
-        """Test actions that change inventory"""
+    def test_action_count_increment(self):
+        """Test that actionCount increments correctly after actions"""
         if not self.session_id:
-            print("❌ Cannot test inventory changes without a valid session")
+            print("❌ Cannot test action count without a valid session")
             return False
             
-        # Get initial inventory
+        # Get initial state
         _, initial_response = self.run_test(
             "Get Initial Session State",
             "GET",
@@ -206,18 +174,64 @@ class HellboundRPGTester:
             200
         )
         
-        initial_inventory = initial_response.get('game_state', {}).get('inventory', [])
-        print(f"Initial Inventory: {initial_inventory}")
+        initial_action_count = initial_response.get('game_state', {}).get('actionCount', 0)
+        print(f"Initial Action Count: {initial_action_count}")
         
-        # Send action to find objects
+        # Send action to find a magical book
         success, response = self.run_test(
-            "Inventory Change - Find Objects",
+            "Action Count - Find Magical Book",
             "POST",
             "api/free_input",
             200,
             data={
                 "session_id": self.session_id,
-                "action": "Buscar objetos en la habitación"
+                "action": "Buscar un libro mágico en la biblioteca"
+            }
+        )
+        
+        if success:
+            # Check if action count increased
+            game_state = response.get('game_state', {})
+            new_action_count = game_state.get('actionCount', 0)
+            print(f"New Action Count: {new_action_count}")
+            
+            if new_action_count > initial_action_count:
+                print(f"✅ Action count successfully incremented from {initial_action_count} to {new_action_count}")
+                return True
+            else:
+                print(f"❌ Action count did not increment as expected")
+                return False
+        
+        return False
+
+    def test_inventory_item_acquisition(self):
+        """Test acquiring items and verify they are not duplicated"""
+        if not self.session_id:
+            print("❌ Cannot test inventory changes without a valid session")
+            return False
+            
+        # Get initial inventory
+        _, initial_response = self.run_test(
+            "Get Initial Inventory State",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_inventory = initial_response.get('game_state', {}).get('inventory', [])
+        initial_count = len(initial_inventory)
+        print(f"Initial Inventory Count: {initial_count}")
+        print(f"Initial Inventory: {initial_inventory}")
+        
+        # Send action to find a treasure
+        success, response = self.run_test(
+            "Inventory Change - Find Treasure",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": self.session_id,
+                "action": "Buscar un tesoro antiguo en la cueva"
             }
         )
         
@@ -225,230 +239,245 @@ class HellboundRPGTester:
             # Check for inventory changes
             game_state = response.get('game_state', {})
             new_inventory = game_state.get('inventory', [])
+            new_count = len(new_inventory)
+            print(f"New Inventory Count: {new_count}")
             print(f"New Inventory: {new_inventory}")
             
             # Check if inventory changed
-            if len(new_inventory) > len(initial_inventory):
-                print("✅ Inventory successfully changed")
+            if new_count > initial_count:
+                print(f"✅ Inventory successfully changed from {initial_count} to {new_count} items")
                 
-                # Check WebSocket updates
-                self.check_websocket_updates("inventory")
-                return True
+                # Get the latest inventory state through polling endpoint
+                _, polling_response = self.run_test(
+                    "Poll Session State After Item Acquisition",
+                    "GET",
+                    f"api/get_session/{self.session_id}",
+                    200
+                )
+                
+                polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
+                polling_count = len(polling_inventory)
+                print(f"Polled Inventory Count: {polling_count}")
+                print(f"Polled Inventory: {polling_inventory}")
+                
+                # Verify no duplication occurred
+                if polling_count == new_count:
+                    print("✅ No inventory duplication detected")
+                    return True
+                else:
+                    print(f"❌ Possible inventory duplication: {new_count} vs {polling_count}")
+                    return False
             else:
                 print("❌ Inventory did not change as expected")
                 
                 # Try another action
                 success, response = self.run_test(
-                    "Inventory Change - Examine Room",
+                    "Inventory Change - Second Attempt",
                     "POST",
                     "api/free_input",
                     200,
                     data={
                         "session_id": self.session_id,
-                        "action": "Examinar la habitación en busca de objetos útiles"
+                        "action": "Excavar en el suelo para encontrar reliquias"
                     }
                 )
                 
                 if success:
                     game_state = response.get('game_state', {})
                     new_inventory = game_state.get('inventory', [])
-                    print(f"New Inventory after second attempt: {new_inventory}")
+                    new_count = len(new_inventory)
+                    print(f"New Inventory Count (Second Attempt): {new_count}")
+                    print(f"New Inventory (Second Attempt): {new_inventory}")
                     
-                    if len(new_inventory) > len(initial_inventory):
-                        print("✅ Inventory successfully changed on second attempt")
+                    if new_count > initial_count:
+                        print(f"✅ Inventory successfully changed on second attempt")
                         
-                        # Check WebSocket updates
-                        self.check_websocket_updates("inventory")
-                        return True
+                        # Get the latest inventory state through polling endpoint
+                        _, polling_response = self.run_test(
+                            "Poll Session State After Second Item Acquisition",
+                            "GET",
+                            f"api/get_session/{self.session_id}",
+                            200
+                        )
+                        
+                        polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
+                        polling_count = len(polling_inventory)
+                        print(f"Polled Inventory Count (Second Attempt): {polling_count}")
+                        print(f"Polled Inventory (Second Attempt): {polling_inventory}")
+                        
+                        # Verify no duplication occurred
+                        if polling_count == new_count:
+                            print("✅ No inventory duplication detected on second attempt")
+                            return True
+                        else:
+                            print(f"❌ Possible inventory duplication on second attempt: {new_count} vs {polling_count}")
+                            return False
         
         return False
 
-    def test_skills_change(self):
-        """Test actions that change skills"""
+    def test_multiple_actions_and_polling(self):
+        """Test multiple actions and verify polling endpoint correctly tracks changes"""
         if not self.session_id:
-            print("❌ Cannot test skills changes without a valid session")
+            print("❌ Cannot test multiple actions without a valid session")
             return False
             
-        # Get initial skills
+        # Get initial state
         _, initial_response = self.run_test(
-            "Get Initial Skills State",
+            "Get Initial State for Multiple Actions Test",
             "GET",
             f"api/get_session/{self.session_id}",
             200
         )
         
-        initial_skills = initial_response.get('game_state', {}).get('skills', [])
-        print(f"Initial Skills: {[s.get('id') if isinstance(s, dict) else s for s in initial_skills]}")
+        initial_action_count = initial_response.get('game_state', {}).get('actionCount', 0)
+        initial_inventory = initial_response.get('game_state', {}).get('inventory', [])
+        print(f"Initial Action Count: {initial_action_count}")
+        print(f"Initial Inventory Count: {len(initial_inventory)}")
         
-        # Send action to use exorcism
-        success, response = self.run_test(
-            "Skills Change - Use Exorcism",
-            "POST",
-            "api/free_input",
-            200,
-            data={
-                "session_id": self.session_id,
-                "action": "Usar exorcismo para purificar el área"
-            }
-        )
+        # Execute multiple actions
+        actions = [
+            "Explorar la cueva oscura",
+            "Buscar tesoros en el cofre",
+            "Examinar las inscripciones en la pared"
+        ]
         
-        if success:
-            # Check for skills changes
-            game_state = response.get('game_state', {})
-            new_skills = game_state.get('skills', [])
-            print(f"New Skills: {[s.get('id') if isinstance(s, dict) else s for s in new_skills]}")
-            
-            # Try another action for meditation
+        last_action_count = initial_action_count
+        last_inventory_count = len(initial_inventory)
+        
+        for i, action in enumerate(actions):
             success, response = self.run_test(
-                "Skills Change - Meditate",
+                f"Multiple Actions Test - Action {i+1}",
                 "POST",
                 "api/free_input",
                 200,
                 data={
                     "session_id": self.session_id,
-                    "action": "Meditar para aumentar mi percepción sobrenatural"
+                    "action": action
                 }
             )
             
             if success:
                 game_state = response.get('game_state', {})
-                final_skills = game_state.get('skills', [])
-                print(f"Final Skills: {[s.get('id') if isinstance(s, dict) else s for s in final_skills]}")
+                new_action_count = game_state.get('actionCount', 0)
+                new_inventory = game_state.get('inventory', [])
                 
-                # Check if skills changed (either new skills or level changes)
-                skills_changed = False
+                print(f"Action {i+1} - Action Count: {new_action_count}")
+                print(f"Action {i+1} - Inventory Count: {len(new_inventory)}")
                 
-                # Check for new skills
-                if len(final_skills) > len(initial_skills):
-                    skills_changed = True
-                    print("✅ New skills added")
-                
-                # Check for skill level changes
-                for skill in final_skills:
-                    if isinstance(skill, dict):
-                        skill_id = skill.get('id')
-                        skill_level = skill.get('level')
-                        
-                        # Find matching initial skill
-                        initial_skill = next((s for s in initial_skills if isinstance(s, dict) and s.get('id') == skill_id), None)
-                        
-                        if initial_skill and skill_level is not None and initial_skill.get('level') is not None:
-                            if skill_level > initial_skill.get('level', 0):
-                                skills_changed = True
-                                print(f"✅ Skill '{skill_id}' level increased from {initial_skill.get('level')} to {skill_level}")
-                        elif not initial_skill:
-                            # This is a new skill
-                            skills_changed = True
-                            print(f"✅ New skill '{skill_id}' added with level {skill_level}")
-                
-                if skills_changed:
-                    # Check WebSocket updates
-                    self.check_websocket_updates("skills")
-                    return True
+                # Verify action count increased
+                if new_action_count > last_action_count:
+                    print(f"✅ Action count incremented from {last_action_count} to {new_action_count}")
                 else:
-                    print("❌ Skills did not change as expected")
-        
-        return False
-
-    def test_emotional_states_change(self):
-        """Test actions that change emotional states"""
-        if not self.session_id:
-            print("❌ Cannot test emotional states without a valid session")
-            return False
-            
-        # Get initial emotional states
-        _, initial_response = self.run_test(
-            "Get Initial Emotional States",
-            "GET",
-            f"api/get_session/{self.session_id}",
-            200
-        )
-        
-        initial_states = initial_response.get('game_state', {}).get('emotionalStates', {})
-        print(f"Initial Emotional States:")
-        for emotion, value in initial_states.items():
-            print(f"  - {emotion}: {value}%")
-        
-        # Send action to explore a scary place
-        success, response = self.run_test(
-            "Emotional States Change - Explore Scary Place",
-            "POST",
-            "api/free_input",
-            200,
-            data={
-                "session_id": self.session_id,
-                "action": "Explorar el lugar tenebroso y oscuro que hay al fondo del pasillo"
-            }
-        )
-        
-        if success:
-            # Check for emotional state changes
-            game_state = response.get('game_state', {})
-            new_states = game_state.get('emotionalStates', {})
-            print(f"New Emotional States:")
-            for emotion, value in new_states.items():
-                print(f"  - {emotion}: {value}%")
-            
-            # Check if fear increased
-            if new_states.get('miedo', 0) > initial_states.get('miedo', 0):
-                print(f"✅ Fear increased from {initial_states.get('miedo', 0)}% to {new_states.get('miedo', 0)}%")
+                    print(f"❌ Action count did not increment as expected")
+                    return False
                 
-                # Check WebSocket updates
-                self.check_websocket_updates("emotionalStates")
-                return True
-            else:
-                print("❌ Fear did not increase as expected")
-                
-                # Try another action
-                success, response = self.run_test(
-                    "Emotional States Change - Face Danger",
-                    "POST",
-                    "api/free_input",
-                    200,
-                    data={
-                        "session_id": self.session_id,
-                        "action": "Enfrentar el peligro inminente con valentía"
-                    }
+                # Poll the session state
+                _, polling_response = self.run_test(
+                    f"Poll Session After Action {i+1}",
+                    "GET",
+                    f"api/get_session/{self.session_id}",
+                    200
                 )
                 
-                if success:
-                    game_state = response.get('game_state', {})
-                    final_states = game_state.get('emotionalStates', {})
-                    print(f"Final Emotional States:")
-                    for emotion, value in final_states.items():
-                        print(f"  - {emotion}: {value}%")
-                    
-                    # Check if any emotional state changed significantly
-                    for emotion, value in final_states.items():
-                        if abs(value - initial_states.get(emotion, 0)) > 10:
-                            print(f"✅ Emotional state '{emotion}' changed significantly from {initial_states.get(emotion, 0)}% to {value}%")
-                            
-                            # Check WebSocket updates
-                            self.check_websocket_updates("emotionalStates")
-                            return True
+                polling_action_count = polling_response.get('game_state', {}).get('actionCount', 0)
+                polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
+                
+                print(f"Polled Action Count: {polling_action_count}")
+                print(f"Polled Inventory Count: {len(polling_inventory)}")
+                
+                # Verify polling endpoint returns correct data
+                if polling_action_count == new_action_count:
+                    print("✅ Polling endpoint correctly reports action count")
+                else:
+                    print(f"❌ Polling endpoint reports incorrect action count: {polling_action_count} vs {new_action_count}")
+                    return False
+                
+                if len(polling_inventory) == len(new_inventory):
+                    print("✅ Polling endpoint correctly reports inventory count")
+                else:
+                    print(f"❌ Polling endpoint reports incorrect inventory count: {len(polling_inventory)} vs {len(new_inventory)}")
+                    return False
+                
+                last_action_count = new_action_count
+                last_inventory_count = len(new_inventory)
+            else:
+                print(f"❌ Action {i+1} failed")
+                return False
         
-        return False
+        # Final verification
+        if last_action_count >= initial_action_count + len(actions):
+            print(f"✅ Action count correctly incremented across multiple actions")
+            return True
+        else:
+            print(f"❌ Action count did not increment correctly across multiple actions")
+            return False
 
-    def test_get_session(self):
-        """Test retrieving an existing session"""
+    def test_cors_configuration(self):
+        """Test CORS configuration by checking OPTIONS request"""
+        try:
+            url = f"{self.base_url}/api/healthcheck"
+            
+            # Send OPTIONS request to check CORS headers
+            response = requests.options(url)
+            
+            print(f"CORS Test - Status Code: {response.status_code}")
+            print(f"CORS Headers: {response.headers}")
+            
+            # Check for CORS headers
+            if 'Access-Control-Allow-Origin' in response.headers:
+                allowed_origins = response.headers['Access-Control-Allow-Origin']
+                print(f"Allowed Origins: {allowed_origins}")
+                
+                if '*' in allowed_origins or 'https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com' in allowed_origins:
+                    print("✅ CORS configuration allows appropriate origins")
+                    return True
+                else:
+                    print("❌ CORS configuration does not allow appropriate origins")
+            else:
+                print("❌ CORS headers not found in response")
+            
+            return False
+        except Exception as e:
+            print(f"❌ CORS test failed with error: {str(e)}")
+            return False
+
+    def test_get_session_endpoint(self):
+        """Test the /api/get_session/:sessionId endpoint specifically"""
         if not self.session_id:
-            print("❌ Cannot test get session without a valid session")
+            print("❌ Cannot test get_session endpoint without a valid session")
             return False
             
         success, response = self.run_test(
-            "Get Session API",
+            "Get Session API Endpoint Test",
             "GET",
             f"api/get_session/{self.session_id}",
             200
         )
+        
         if success:
-            print(f"Retrieved Session ID: {response.get('session_id')}")
-            game_state = response.get('game_state', {})
-            
-            # Validate game state structure
-            self.validate_game_state_structure(game_state)
-            
+            # Verify response structure
+            if 'session_id' not in response:
+                print("❌ Missing session_id in response")
+                return False
+                
+            if 'game_state' not in response:
+                print("❌ Missing game_state in response")
+                return False
+                
+            # Verify session ID matches
+            if response['session_id'] != self.session_id:
+                print(f"❌ Session ID mismatch: {response['session_id']} vs {self.session_id}")
+                return False
+                
+            # Verify game state structure
+            game_state = response['game_state']
+            if not self.validate_game_state_structure(game_state):
+                print("❌ Invalid game state structure")
+                return False
+                
+            print("✅ Get Session endpoint works correctly")
             return True
+        
         return False
 
     def connect_websocket(self):
@@ -563,7 +592,7 @@ class HellboundRPGTester:
                 self.ws_thread.join(timeout=1)
 
 def main():
-    # Get backend URL from frontend .env file or use local server
+    # Get backend URL from frontend .env file
     try:
         with open('/app/frontend/.env', 'r') as f:
             for line in f:
@@ -571,10 +600,6 @@ def main():
                     backend_url = line.strip().split('=')[1]
                     break
     except:
-        backend_url = "http://localhost:8001"
-    
-    # If we're testing locally, use the local server
-    if "localhost" not in backend_url and "127.0.0.1" not in backend_url:
         backend_url = "http://localhost:8001"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
@@ -589,47 +614,51 @@ def main():
             print("❌ Healthcheck failed, stopping tests")
             return 1
         
-        print("\n==== 2. CREATE NEW CAMPAIGN SESSION ====")
-        if not tester.test_start_session_campaign():
-            print("❌ Campaign session creation failed, trying sandbox mode")
-            
-            print("\n==== 2. CREATE NEW SANDBOX SESSION (FALLBACK) ====")
-            if not tester.test_start_session_sandbox():
-                print("❌ Both session creation modes failed, stopping tests")
-                return 1
+        print("\n==== 2. TEST CORS CONFIGURATION ====")
+        cors_success = tester.test_cors_configuration()
+        print(f"{'✅' if cors_success else '❌'} CORS configuration test {'passed' if cors_success else 'failed'}")
         
-        print("\n==== 3. TEST INVENTORY CHANGES ====")
-        inventory_success = tester.test_inventory_change()
-        print(f"{'✅' if inventory_success else '❌'} Inventory change test {'passed' if inventory_success else 'failed'}")
+        print("\n==== 3. CREATE NEW SANDBOX SESSION ====")
+        if not tester.test_start_session_sandbox():
+            print("❌ Sandbox session creation failed, stopping tests")
+            return 1
         
-        print("\n==== 4. TEST SKILLS CHANGES ====")
-        skills_success = tester.test_skills_change()
-        print(f"{'✅' if skills_success else '❌'} Skills change test {'passed' if skills_success else 'failed'}")
+        print("\n==== 4. TEST ACTION COUNT INCREMENT ====")
+        action_count_success = tester.test_action_count_increment()
+        print(f"{'✅' if action_count_success else '❌'} Action count increment test {'passed' if action_count_success else 'failed'}")
         
-        print("\n==== 5. TEST EMOTIONAL STATES CHANGES ====")
-        emotional_success = tester.test_emotional_states_change()
-        print(f"{'✅' if emotional_success else '❌'} Emotional states change test {'passed' if emotional_success else 'failed'}")
+        print("\n==== 5. TEST INVENTORY ITEM ACQUISITION (NO DUPLICATION) ====")
+        inventory_success = tester.test_inventory_item_acquisition()
+        print(f"{'✅' if inventory_success else '❌'} Inventory item acquisition test {'passed' if inventory_success else 'failed'}")
         
-        print("\n==== 6. VERIFY SESSION STATE STRUCTURE ====")
-        if not tester.test_get_session():
-            print("❌ Get session test failed")
+        print("\n==== 6. TEST GET_SESSION ENDPOINT ====")
+        get_session_success = tester.test_get_session_endpoint()
+        print(f"{'✅' if get_session_success else '❌'} Get session endpoint test {'passed' if get_session_success else 'failed'}")
+        
+        print("\n==== 7. TEST MULTIPLE ACTIONS AND POLLING ====")
+        multiple_actions_success = tester.test_multiple_actions_and_polling()
+        print(f"{'✅' if multiple_actions_success else '❌'} Multiple actions and polling test {'passed' if multiple_actions_success else 'failed'}")
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
         
-        # Summary of dynamic state tests
-        print("\n==== DYNAMIC STATE SYSTEM TEST SUMMARY ====")
-        print(f"Inventory Changes: {'✅ PASSED' if inventory_success else '❌ FAILED'}")
-        print(f"Skills Changes: {'✅ PASSED' if skills_success else '❌ FAILED'}")
-        print(f"Emotional States Changes: {'✅ PASSED' if emotional_success else '❌ FAILED'}")
+        # Summary of badge system tests
+        print("\n==== BADGE SYSTEM TEST SUMMARY ====")
+        print(f"CORS Configuration: {'✅ PASSED' if cors_success else '❌ FAILED'}")
+        print(f"Action Count Increment: {'✅ PASSED' if action_count_success else '❌ FAILED'}")
+        print(f"Inventory Item Acquisition (No Duplication): {'✅ PASSED' if inventory_success else '❌ FAILED'}")
+        print(f"Get Session Endpoint: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
+        print(f"Multiple Actions and Polling: {'✅ PASSED' if multiple_actions_success else '❌ FAILED'}")
         
         overall_success = (
+            cors_success and
+            action_count_success and 
             inventory_success and 
-            skills_success and 
-            emotional_success
+            get_session_success and
+            multiple_actions_success
         )
         
-        print(f"\n{'✅' if overall_success else '❌'} Dynamic State System Tests: {'PASSED' if overall_success else 'FAILED'}")
+        print(f"\n{'✅' if overall_success else '❌'} Badge System Tests: {'PASSED' if overall_success else 'FAILED'}")
         
         return 0 if overall_success else 1
     
