@@ -1343,3 +1343,18 @@ body {
     display: none !important;
   }
 }
+
+/* ===== VARIABLES DE COMPATIBILIDAD PARA App.css ===== */
+:root {
+  /* Mapeo de variables para compatibilidad */
+  --c-bg: var(--color-bg);
+  --c-text: var(--text-dark);
+  --c-panel: var(--bg-panel-light);
+  --c-border: var(--color-primary);
+  --c-hover: rgba(209, 164, 56, 0.2);
+  --c-cedar: var(--color-secondary);
+  --c-emerald: var(--color-accent);
+  --c-health: var(--color-health);
+  --c-mana: var(--color-mana);
+  --c-stamina: var(--color-stamina);
+}
