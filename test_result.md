@@ -236,7 +236,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -246,6 +246,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Se realizaron pruebas en la URL especificada (https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada en la URL especificada (https://rpg-achievement.preview.emergentagent.com). No se pudo verificar la funcionalidad de los badges. Aunque el sistema de polling funciona correctamente (se observan logs de polling cada 2 segundos), no se pudo encontrar el botón de inventario ('Inv.') en la interfaz y no se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. Esto podría deberse a que no se pudo interactuar con el input para realizar acciones que generen cambios en el inventario."
 
 metadata:
   created_by: "testing_agent"
