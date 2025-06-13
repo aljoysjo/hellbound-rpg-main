@@ -225,6 +225,21 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar completamente debido a que la narrativa no se cargó correctamente durante las pruebas."
+        
+  - task: "Sistema de badges"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba del sistema de badges"
+      - working: false
+        agent: "testing"
+        comment: "Se realizaron pruebas en la URL especificada (https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
 
 metadata:
   created_by: "testing_agent"
