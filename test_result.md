@@ -234,12 +234,14 @@ metadata:
 test_plan:
   current_focus:
     - "Configuración CORS"
+    - "Polling para detección de cambios en badges"
     - "Input fluido"
     - "Modal objetivos e inventario"
     - "Narrativa expandible"
   stuck_tasks:
     - "Input fluido"
     - "Configuración CORS"
+    - "Polling para detección de cambios en badges"
   test_all: true
   test_priority: "high_first"
 
