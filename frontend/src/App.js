@@ -374,6 +374,13 @@ function App() {
               const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
               
               console.log('🎯 CAMBIOS ESPECÍFICOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
+              console.log('🔍 BADGES DEBUG:', { 
+                currentBadges: badges,
+                inventoryCount: inventoryChanges.totalCount,
+                skillsCount: skillsChanges.totalCount,
+                objectivesCount: objectivesChanges.totalCount,
+                emotionsCount: emotionsChanges.totalCount
+              });
               
               if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
