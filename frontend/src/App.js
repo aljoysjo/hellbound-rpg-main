@@ -891,30 +891,29 @@ function App() {
         className="popup-button clickable"
         onClick={toggleInventory}
         aria-label="Inventario"
+        style={{ position: 'relative' }}
       >
         📦
         <span className="popup-label">Inv.</span>
-        {badges.inventory.count > 0 && (
-          <div className="notification-badge pulse-animation" style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#dc2626',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            border: '2px solid #F3E7C6',
-            zIndex: 10
-          }}>
-            {badges.inventory.count}
-          </div>
-        )}
+        {/* DEBUG: Mostrar badge siempre para testing */}
+        <div style={{
+          position: 'absolute',
+          top: '-8px', 
+          right: '-8px',
+          background: 'red',
+          color: 'white',
+          borderRadius: '50%',
+          width: '20px',
+          height: '20px', 
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '11px',
+          fontWeight: 'bold',
+          zIndex: 10
+        }}>
+          {badges.inventory.count || 'T'}
+        </div>
       </button>
       
       <button 
