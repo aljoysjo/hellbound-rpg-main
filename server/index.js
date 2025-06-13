@@ -1225,19 +1225,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
   }
 });
 
-app.get('/api/get_session/:sessionId', (req, res) => {
-  const sessionId = req.params.sessionId;
-  
-  if (!gameSessions.has(sessionId)) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-  
-  const gameState = gameSessions.get(sessionId);
-  res.json({
-    session_id: sessionId,
-    game_state: gameState.toDict()
-  });
-});
+
 
 // WebSocket events
 io.on('connection', (socket) => {
