@@ -249,3 +249,84 @@ body {
     padding: 0.75rem;
   }
 }
+
+/* ===== BADGES Y NOTIFICACIONES ===== */
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex !important; /* Forzar display en móvil */
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  border: 2px solid var(--c-bg);
+  z-index: 10;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.new-badge {
+  background: #10b981;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.levelup-badge {
+  background: #f59e0b;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.completed-badge {
+  background: #8b5cf6;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Asegurar badges visibles en TODOS los dispositivos */
+.popup-button {
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .notification-badge {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
