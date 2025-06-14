@@ -1196,30 +1196,24 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       narrative += ` Encuentras ${newItem.name} y lo guardas en tu inventario.`;
     }
     
-    // Detectar soltar items
-    if (actionLowerForFlags.includes('suelto') || actionLowerForFlags.includes('dejo') || actionLowerForFlags.includes('tiro') || 
-        actionLowerForFlags.includes('abandono')) {
-      const palabras = actionLowerForFlags.split(' ');
-      let itemName = '';
+    // Detectar soltar items CON REGEX ESPECÍFICO
+    const dropRegex = /\b(?:suelto|dejo|tiro|abandono|desecho|boto)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
+    const dropMatch = actionLowerForFlags.match(dropRegex);
+    
+    if (dropMatch) {
+      const itemNameToDrop = dropMatch[1].trim();
+      console.log('❌ ITEM DETECTADO PARA DROP:', itemNameToDrop);
       
-      for (let i = 0; i < palabras.length; i++) {
-        const palabra = palabras[i];
-        if (['cuchillo', 'espada', 'libro', 'llave', 'poción', 'gema', 'anillo', 'pergamino', 'daga', 'hacha'].includes(palabra)) {
-          itemName = palabra;
-          break;
-        }
-      }
+      const itemIndex = gameState.inventory.findIndex(item => 
+        (item?.name || '').toLowerCase().includes(itemNameToDrop.toLowerCase())
+      );
       
-      if (itemName) {
-        const itemIndex = gameState.inventory.findIndex(item => 
-          (item?.name || '').toLowerCase().includes(itemName)
-        );
-        
-        if (itemIndex !== -1) {
-          const removedItem = gameState.inventory.splice(itemIndex, 1)[0];
-          console.log(`❌ ITEM ELIMINADO MANUALMENTE: ${removedItem.name} ${removedItem.icon}`);
-          narrative += ` Sueltas ${removedItem.name}.`;
-        }
+      if (itemIndex !== -1) {
+        const removedItem = gameState.inventory.splice(itemIndex, 1)[0];
+        console.log(`❌ ITEM ELIMINADO EXITOSAMENTE: ${removedItem.name} ${removedItem.icon}`);
+        narrative += ` Sueltas ${removedItem.name}.`;
+      } else {
+        console.log('⚠️ ITEM NO ENCONTRADO PARA DROP:', itemNameToDrop);
       }
     }
     
