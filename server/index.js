@@ -1505,7 +1505,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         'varita', 'bastón', 'cetro', 'orbe',
         'cuerda', 'antorcha', 'linterna', 'cristal',
         'cabeza', 'cráneo', 'hueso', 'esqueleto',
-        'capa', 'túnica', 'ropa', 'botas'
+        'capa', 'túnica', 'ropa', 'botas',
+        'espejo', 'mirror' // nuevos items
       ];
       
       const lowerText = text.toLowerCase();
