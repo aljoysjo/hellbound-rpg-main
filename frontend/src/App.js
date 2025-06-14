@@ -293,6 +293,18 @@ function App() {
                     }
                   };
                   console.log('🏆 NEW BADGES STATE:', newBadges);
+                  
+                  // AUTO-RESET BADGES DESPUÉS DE 5 SEGUNDOS (WEBSOCKET)
+                  setTimeout(() => {
+                    console.log('🔄 Auto-reseteando badges WebSocket después de 5 segundos');
+                    setBadges({
+                      inventory: { count: 0, newItems: [] },
+                      objectives: { count: 0, newObjectives: [], completedObjectives: [] },
+                      skills: { count: 0, newSkills: [], levelUps: [] },
+                      emotions: { count: 0, significantChanges: [] }
+                    });
+                  }, 5000);
+                  
                   return newBadges;
                 });
                 
