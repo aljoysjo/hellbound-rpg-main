@@ -777,6 +777,48 @@ ${recentActions}`;
 }
 
 // 💀 ANÁLISIS MEJORADO PARA DETECTAR CAMBIOS Y MUERTE
+/**
+ * 🎯 FUNCIÓN DE EMPAREJAMIENTO INTELIGENTE
+ * Convierte cualquier descripción libre en tipo e ícono conocido
+ */
+function matchItemIntelligent(description) {
+  if (!description || typeof description !== 'string') {
+    return { name: description, type: 'unknown', icon: '📦', confidence: 'none' };
+  }
+  
+  const lower = description.toLowerCase().trim();
+  console.log(`🎯 Analizando item: "${description}"`);
+  
+  // 1️⃣ BÚSQUEDA POR KEYWORDS (alta confianza)
+  for (const item of ITEM_DATABASE) {
+    for (const keyword of item.keywords) {
+      if (lower.includes(keyword)) {
+        console.log(`✅ Match encontrado: "${keyword}" → ${item.type} ${item.icon}`);
+        return {
+          name: description, // Conservar nombre completo
+          type: item.type,
+          icon: item.icon,
+          confidence: 'high',
+          matchedKeyword: keyword
+        };
+      }
+    }
+  }
+  
+  // 2️⃣ FALLBACK: Primera palabra significativa (baja confianza)
+  const words = lower.split(' ').filter(w => w.length > 2);
+  const firstWord = words[0] || description.split(' ')[0] || 'unknown';
+  
+  console.log(`⚠️ Sin match específico, usando primera palabra: "${firstWord}"`);
+  return {
+    name: description,
+    type: firstWord,
+    icon: '📦', // Ícono genérico
+    confidence: 'low',
+    matchedKeyword: firstWord
+  };
+}
+
 async function analyzeNarrativeForStateChanges(action, narrative, gameState, openaiClient) {
   try {
     const analysisPrompt = `
