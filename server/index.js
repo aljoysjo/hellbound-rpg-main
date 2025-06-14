@@ -1157,29 +1157,96 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const actionLowerForFlags = (action || '').toLowerCase();
     console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
     
-    // 🎯 DETECCIÓN MEJORADA DE ITEMS CON REGEX AMPLIO
+    // 🎯 SISTEMA DE DETECCIÓN DE ITEMS INTELIGENTE Y ROBUSTO
     console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
     
-    // Detectar recoger items CON REGEX ROBUSTO
-    const pickupRegex = /\b(?:recojo|agarro|tomo|coger|agarré|encuentro|obtengo|consigo|tomo)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
-    const pickupMatch = actionLowerForFlags.match(pickupRegex);
-    
-    if (pickupMatch) {
-      const itemName = pickupMatch[1].trim();
-      console.log('📦 ITEM DETECTADO PARA PICKUP:', itemName);
+    // FUNCIÓN PARA VALIDAR SI ES UN ITEM FÍSICO REAL
+    const isPhysicalItem = (itemText) => {
+      const physicalKeywords = [
+        'cuchillo', 'espada', 'daga', 'sable', 'hacha', 'martillo',
+        'pistola', 'rifle', 'arma', 'ballesta',
+        'libro', 'grimorio', 'tomo', 'pergamino', 'mapa', 'carta',
+        'poción', 'frasco', 'elixir', 'medicina',
+        'llave', 'gema', 'diamante', 'rubí', 'oro', 'moneda',
+        'anillo', 'collar', 'amuleto', 'talismán',
+        'varita', 'bastón', 'cetro', 'orbe',
+        'armadura', 'casco', 'escudo', 'guante',
+        'cuerda', 'antorcha', 'linterna', 'cristal'
+      ];
       
+      // Palabras que NO son items físicos
+      const nonPhysicalKeywords = [
+        'hechizo', 'conjuro', 'spell', 'magia', 'encantamiento',
+        'lección', 'enseñanza', 'conocimiento', 'sabiduría',
+        'poder', 'habilidad', 'técnica', 'destreza',
+        'experiencia', 'recuerdo', 'memoria'
+      ];
+      
+      const lowerItem = itemText.toLowerCase();
+      
+      // Si contiene palabras no-físicas, rechazar
+      if (nonPhysicalKeywords.some(keyword => lowerItem.includes(keyword))) {
+        return false;
+      }
+      
+      // Si contiene palabras físicas, aceptar
+      return physicalKeywords.some(keyword => lowerItem.includes(keyword));
+    };
+    
+    // DETECTAR MÚLTIPLES ITEMS EN ORACIONES COMPUESTAS
+    const detectMultipleItems = (action) => {
+      const items = [];
+      
+      // Regex mejorado para detectar múltiples items
+      const itemPatterns = [
+        /\b(?:agarro|recojo|tomo|coger|encuentro|obtengo)\s+(?:un[ae]?|la?|el)?\s*([^,y]+?)(?:\s+y\s+(?:un[ae]?|la?|el)?\s*([^,y]+?))*(?:\s+que|$|\.|,)/gi,
+        /\b(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+)(?:\s+y\s+(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+))*/gi
+      ];
+      
+      for (const pattern of itemPatterns) {
+        let match;
+        while ((match = pattern.exec(action)) !== null) {
+          for (let i = 1; i < match.length; i++) {
+            if (match[i] && isPhysicalItem(match[i].trim())) {
+              items.push(match[i].trim());
+            }
+          }
+        }
+      }
+      
+      // Detectar items individuales más simples
+      const simpleRegex = /\b(?:agarro|recojo|tomo|coger|encuentro|obtengo)\s+(?:un[ae]?|la?|el)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:que|del?|de la?|y|$|\.|,))/gi;
+      let simpleMatch;
+      while ((simpleMatch = simpleRegex.exec(action)) !== null) {
+        const itemText = simpleMatch[1].trim();
+        if (isPhysicalItem(itemText) && !items.includes(itemText)) {
+          items.push(itemText);
+        }
+      }
+      
+      return [...new Set(items)]; // Eliminar duplicados
+    };
+    
+    // APLICAR DETECCIÓN MÚLTIPLE
+    const detectedItems = detectMultipleItems(actionLowerForFlags);
+    console.log('📦 ITEMS DETECTADOS:', detectedItems);
+    
+    // AÑADIR CADA ITEM DETECTADO
+    for (const itemName of detectedItems) {
       // Determinar icono basado en palabras clave
       let icon = '📦';
-      if (itemName.includes('cuchillo') || itemName.includes('daga') || itemName.includes('navaja')) icon = '🔪';
-      else if (itemName.includes('espada') || itemName.includes('sable')) icon = '⚔️';
-      else if (itemName.includes('libro') || itemName.includes('grimorio') || itemName.includes('tomo')) icon = '📖';
-      else if (itemName.includes('llave') || itemName.includes('llaves')) icon = '🗝️';
-      else if (itemName.includes('poción') || itemName.includes('frasco') || itemName.includes('elixir')) icon = '🧪';
-      else if (itemName.includes('gema') || itemName.includes('diamante') || itemName.includes('rubí')) icon = '💎';
-      else if (itemName.includes('anillo') || itemName.includes('sortija')) icon = '💍';
-      else if (itemName.includes('varita') || itemName.includes('bastón') || itemName.includes('cetro')) icon = '🪄';
-      else if (itemName.includes('pistola') || itemName.includes('arma') || itemName.includes('rifle')) icon = '🔫';
-      else if (itemName.includes('pergamino') || itemName.includes('mapa') || itemName.includes('carta')) icon = '📜';
+      const lowerItem = itemName.toLowerCase();
+      
+      if (lowerItem.includes('cuchillo') || lowerItem.includes('daga') || lowerItem.includes('navaja')) icon = '🔪';
+      else if (lowerItem.includes('espada') || lowerItem.includes('sable')) icon = '⚔️';
+      else if (lowerItem.includes('libro') || lowerItem.includes('grimorio') || lowerItem.includes('tomo')) icon = '📖';
+      else if (lowerItem.includes('llave') || lowerItem.includes('llaves')) icon = '🗝️';
+      else if (lowerItem.includes('poción') || lowerItem.includes('frasco') || lowerItem.includes('elixir')) icon = '🧪';
+      else if (lowerItem.includes('gema') || lowerItem.includes('diamante') || lowerItem.includes('rubí')) icon = '💎';
+      else if (lowerItem.includes('anillo') || lowerItem.includes('sortija')) icon = '💍';
+      else if (lowerItem.includes('varita') || lowerItem.includes('bastón') || lowerItem.includes('cetro')) icon = '🪄';
+      else if (lowerItem.includes('pistola') || lowerItem.includes('arma') || lowerItem.includes('rifle')) icon = '🔫';
+      else if (lowerItem.includes('pergamino') || lowerItem.includes('mapa') || lowerItem.includes('carta')) icon = '📜';
       
       const newItem = {
         name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
@@ -1188,12 +1255,18 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         instanceId: crypto.randomUUID()
       };
       
-      // USAR PUSH EN LUGAR DE REEMPLAZAR
-      gameState.inventory.push(newItem);
-      console.log(`📦 ITEM AÑADIDO EXITOSAMENTE: ${newItem.name} ${newItem.icon}`);
+      // Verificar que no existe ya (evitar duplicados)
+      const exists = gameState.inventory.some(item => 
+        item.name.toLowerCase() === newItem.name.toLowerCase()
+      );
       
-      // Actualizar narrativa para incluir el item
-      narrative += ` Encuentras ${newItem.name} y lo guardas en tu inventario.`;
+      if (!exists) {
+        gameState.inventory.push(newItem);
+        console.log(`📦 ITEM AÑADIDO: ${newItem.name} ${newItem.icon}`);
+        narrative += ` Añades ${newItem.name} a tu inventario.`;
+      } else {
+        console.log(`⚠️ ITEM YA EXISTE: ${newItem.name}`);
+      }
     }
     
     // Detectar soltar items CON REGEX ESPECÍFICO
