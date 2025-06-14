@@ -1293,7 +1293,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       
       // Regex mejorado para detectar múltiples items
       const itemPatterns = [
-        /\b(?:agarro|recojo|tomo|coger|encuentro|obtengo)\s+(?:un[ae]?|la?|el)?\s*([^,y]+?)(?:\s+y\s+(?:un[ae]?|la?|el)?\s*([^,y]+?))*(?:\s+que|$|\.|,)/gi,
+        /\b(?:agarro|agarré|recojo|tomo|coger|encuentro|obtengo|consigo)\s+(?:un[ae]?|la?|el)?\s*([^,y]+?)(?:\s+y\s+(?:un[ae]?|la?|el)?\s*([^,y]+?))*(?:\s+que|$|\.|,)/gi,
         /\b(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+)(?:\s+y\s+(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+))*/gi
       ];
       
