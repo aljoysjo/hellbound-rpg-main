@@ -61,22 +61,33 @@ function App() {
     const prev = Array.isArray(prevInventory) ? prevInventory : [];
     const current = Array.isArray(currentInventory) ? currentInventory : [];
     
-    console.log('🔍 INVENTORY DEBUG:', { prev: prev.length, current: current.length });
-    
-    const prevIds = prev.map(item => item?.id || item?.name || JSON.stringify(item));
-    const currentIds = current.map(item => item?.id || item?.name || JSON.stringify(item));
-    
-    // CORRECCIÓN: Filtrar items que NO están en prevIds
-    const newItems = current.filter(item => {
-      const itemId = item?.id || item?.name || JSON.stringify(item);
-      return !prevIds.includes(itemId);
+    console.log('🔍 INVENTORY DEBUG:', { 
+      prevLength: prev.length, 
+      currentLength: current.length,
+      prev: prev.map(i => i?.name),
+      current: current.map(i => i?.name)
     });
     
-    console.log('📦 INVENTORY CHANGES:', { prevIds, currentIds, newItems });
+    // CAMBIO CLAVE: Detectar CUALQUIER cambio, no solo nuevos items
+    const hasLengthChange = prev.length !== current.length;
+    const hasContentChange = JSON.stringify(prev.map(i => i?.name).sort()) !== 
+                           JSON.stringify(current.map(i => i?.name).sort());
+    
+    if (hasLengthChange || hasContentChange) {
+      console.log('📦 INVENTORY CHANGES DETECTED:', { hasLengthChange, hasContentChange });
+      
+      // Simular items "nuevos" para el badge
+      const changeCount = Math.abs(current.length - prev.length) || 1;
+      
+      return {
+        newItems: current.slice(-changeCount), // Últimos items como "nuevos"
+        totalCount: changeCount
+      };
+    }
     
     return {
-      newItems,
-      totalCount: newItems.length
+      newItems: [],
+      totalCount: 0
     };
   };
 
