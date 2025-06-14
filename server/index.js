@@ -1266,25 +1266,33 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         'anillo', 'collar', 'amuleto', 'talismán',
         'varita', 'bastón', 'cetro', 'orbe',
         'cuerda', 'antorcha', 'linterna', 'cristal',
-        'cabeza', 'cráneo', 'hueso', 'esqueleto' // items macabros
+        'cabeza', 'cráneo', 'hueso', 'esqueleto', // items macabros
+        'capa', 'túnica', 'ropa', 'botas' // ropa
       ];
       
-      // Palabras que NO son items físicos
+      // ❌ Palabras que NO son items físicos (EXPANDIDO)
       const nonPhysicalKeywords = [
         'hechizo', 'conjuro', 'spell', 'magia', 'encantamiento',
         'lección', 'enseñanza', 'conocimiento', 'sabiduría',
         'poder', 'habilidad', 'técnica', 'destreza',
-        'experiencia', 'recuerdo', 'memoria'
+        'experiencia', 'recuerdo', 'memoria',
+        'piso', 'suelo', 'mesa', 'lugar', 'sitio', // ubicaciones
+        'usarlo', 'usarla', 'weapon', 'tool', 'para', 'como' // contexto
       ];
       
       const lowerItem = itemText.toLowerCase();
       
-      // Si contiene palabras no-físicas, rechazar
+      // ❌ Si contiene palabras no-físicas, rechazar inmediatamente
       if (nonPhysicalKeywords.some(keyword => lowerItem.includes(keyword))) {
         return false;
       }
       
-      // Si contiene palabras físicas, aceptar
+      // ❌ Si es muy corto o contiene solo preposiciones, rechazar
+      if (itemText.length < 3 || /^(de|del|la|el|en|para|como|con)$/i.test(lowerItem)) {
+        return false;
+      }
+      
+      // ✅ Si contiene palabras físicas, aceptar
       return physicalKeywords.some(keyword => lowerItem.includes(keyword));
     };
     
