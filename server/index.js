@@ -1241,6 +1241,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       
       if (lowerItem.includes('cuchillo') || lowerItem.includes('daga') || lowerItem.includes('navaja')) icon = '🔪';
       else if (lowerItem.includes('espada') || lowerItem.includes('sable')) icon = '⚔️';
+      else if (lowerItem.includes('escudo')) icon = '🛡️';
       else if (lowerItem.includes('libro') || lowerItem.includes('grimorio') || lowerItem.includes('tomo')) icon = '📖';
       else if (lowerItem.includes('llave') || lowerItem.includes('llaves')) icon = '🗝️';
       else if (lowerItem.includes('poción') || lowerItem.includes('frasco') || lowerItem.includes('elixir')) icon = '🧪';
