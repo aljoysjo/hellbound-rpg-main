@@ -8,12 +8,13 @@
     "dev": "node --watch index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
     "cors": "^2.8.5",
-    "socket.io": "^4.7.5",
-    "mongodb": "^6.3.0",
-    "openai": "^4.26.0",
     "dotenv": "^16.3.1",
-    "inkjs": "^2.2.0"
+    "express": "^4.19.2",
+    "inkjs": "^2.2.0",
+    "mongodb": "^6.3.0",
+    "node-emoji": "^2.2.0",
+    "openai": "^4.26.0",
+    "socket.io": "^4.7.5"
   }
 }
