@@ -41,6 +41,7 @@ const ITEM_DATABASE = [
   { type: 'candado', icon: '🔒', keywords: ['candado', 'lock', 'cerradura', 'cerrojo'] },
   { type: 'cuerda', icon: '🪢', keywords: ['cuerda', 'rope', 'soga', 'cable', 'hilo'] },
   { type: 'antorcha', icon: '🕯️', keywords: ['antorcha', 'torch', 'vela', 'candle', 'linterna', 'lámpara'] },
+  { type: 'espejo', icon: '🪞', keywords: ['espejo', 'mirror', 'cristal', 'reflejo'] },
   
   // 🧪 CONSUMIBLES MÁGICOS
   { type: 'poción', icon: '🧪', keywords: ['poción', 'elixir', 'frasco', 'botella', 'tónico', 'brebaje'] },
