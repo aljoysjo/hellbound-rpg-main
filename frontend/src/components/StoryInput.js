@@ -18,13 +18,32 @@ const StoryInput = forwardRef(({ onSubmit, loading, gameOver, placeholder = "Esc
   }, []);
 
   const handleSend = () => {
-    if (!draft.trim() || loading || gameOver) return;
+    console.log('📝 StoryInput handleSend llamado:', { 
+      draft: draft.trim(), 
+      draftLength: draft.trim().length,
+      loading, 
+      gameOver,
+      onSubmit: typeof onSubmit
+    });
+    
+    if (!draft.trim() || loading || gameOver) {
+      console.log('❌ StoryInput: Bloqueado envío:', {
+        noDraft: !draft.trim(),
+        loading,
+        gameOver
+      });
+      return;
+    }
+    
+    console.log('✅ StoryInput: Enviando acción:', draft.trim());
     onSubmit(draft.trim());
     setDraft('');
+    
     // Enfocar después de enviar
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
+        console.log('🎯 StoryInput: Foco restaurado al textarea');
       }
     }, 100);
   };
