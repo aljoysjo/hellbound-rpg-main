@@ -1288,38 +1288,37 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return physicalKeywords.some(keyword => lowerItem.includes(keyword));
     };
     
-    // DETECTAR MÚLTIPLES ITEMS EN ORACIONES COMPUESTAS
+    // DETECTAR MÚLTIPLES ITEMS EN ORACIONES COMPUESTAS (MEJORADO)
     const detectMultipleItems = (action) => {
       const items = [];
       
-      // Regex mejorado para detectar múltiples items
+      // ✅ PATRONES MEJORADOS Y MÁS RESTRICTIVOS
       const itemPatterns = [
-        /\b(?:agarro|agarré|recojo|tomo|coger|encuentro|obtengo|consigo)\s+(?:un[ae]?|la?|el)?\s*([^,y]+?)(?:\s+y\s+(?:un[ae]?|la?|el)?\s*([^,y]+?))*(?:\s+que|$|\.|,)/gi,
-        /\b(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+)(?:\s+y\s+(?:un[ae]?|la?|el)\s+([a-záéíóúñ]+))*/gi
+        // Patrón principal: "agarro/recojo/tomo + item"
+        /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:y\s+|del?\s+|en\s+|para\s+|como\s+|$))/gi
       ];
       
       for (const pattern of itemPatterns) {
         let match;
         while ((match = pattern.exec(action)) !== null) {
-          for (let i = 1; i < match.length; i++) {
-            if (match[i] && isPhysicalItem(match[i].trim())) {
-              items.push(match[i].trim());
-            }
+          const itemText = match[1].trim();
+          
+          // ❌ FILTROS PARA EVITAR FALSOS POSITIVOS
+          if (itemText.length < 3) continue; // Muy corto
+          if (/\b(que|del|de|la|el|en|para|como|con|sin|por|desde|hasta)\b/i.test(itemText)) continue; // Preposiciones
+          if (/\b(usarlo|usarla|usarlos|arma|weapon|tool)\b/i.test(itemText)) continue; // Palabras de contexto
+          
+          // ✅ VERIFICAR QUE SEA ITEM FÍSICO
+          if (isPhysicalItem(itemText) && !items.some(existing => 
+            existing.toLowerCase().includes(itemText.toLowerCase()) || 
+            itemText.toLowerCase().includes(existing.toLowerCase())
+          )) {
+            items.push(itemText);
           }
         }
       }
       
-      // Detectar items individuales más simples
-      const simpleRegex = /\b(?:agarro|recojo|tomo|coger|encuentro|obtengo)\s+(?:un[ae]?|la?|el)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:que|del?|de la?|y|$|\.|,))/gi;
-      let simpleMatch;
-      while ((simpleMatch = simpleRegex.exec(action)) !== null) {
-        const itemText = simpleMatch[1].trim();
-        if (isPhysicalItem(itemText) && !items.includes(itemText)) {
-          items.push(itemText);
-        }
-      }
-      
-      return [...new Set(items)]; // Eliminar duplicados
+      return [...new Set(items)]; // Eliminar duplicados exactos
     };
     
     // APLICAR DETECCIÓN MÚLTIPLE
