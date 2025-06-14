@@ -778,49 +778,133 @@ ${recentActions}`;
 
 // 💀 ANÁLISIS MEJORADO PARA DETECTAR CAMBIOS Y MUERTE
 /**
- * 🎯 FUNCIÓN DE EMPAREJAMIENTO INTELIGENTE CON NOMBRES CORTOS
- * Convierte descripciones largas en nombres cortos + descripción completa
+ * 🎯 SISTEMA HÍBRIDO: LOCAL + IA FALLBACK
+ * Cache para evitar llamadas repetidas a IA
  */
-function matchItemIntelligent(description) {
-  if (!description || typeof description !== 'string') {
-    return { name: description, type: 'unknown', icon: '📦', confidence: 'none' };
-  }
+const aiMatchCache = new Map();
+
+/**
+ * 🚀 MATCH LOCAL MEJORADO (90% de casos)
+ */
+function matchItemLocal(description) {
+  if (!description || typeof description !== 'string') return null;
   
-  const lower = description.toLowerCase().trim();
-  console.log(`🎯 Analizando item: "${description}"`);
+  // 🧹 NORMALIZAR: quitar tildes, puntuación, espacios extra
+  const normalized = description.toLowerCase()
+    .replace(/[áéíóú]/g, match => ({'á':'a','é':'e','í':'i','ó':'o','ú':'u'}[match]))
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   
-  // 1️⃣ BÚSQUEDA POR KEYWORDS (alta confianza)
+  console.log(`🔍 [LOCAL] Analizando: "${description}" → normalizado: "${normalized}"`);
+  
+  // 🎯 BUSCAR EN BASE DE DATOS LOCAL
   for (const item of ITEM_DATABASE) {
     for (const keyword of item.keywords) {
-      if (lower.includes(keyword)) {
-        // 🎨 CREAR NOMBRE CORTO INTELIGENTE
+      if (normalized.includes(keyword)) {
         const shortName = createShortName(description, keyword, item.type);
         
-        console.log(`✅ Match encontrado: "${keyword}" → ${item.type} ${item.icon}`);
+        console.log(`✅ [LOCAL] Match encontrado: "${keyword}" → ${shortName} ${item.icon}`);
         return {
-          name: shortName, // Nombre corto para UI
-          fullDescription: description, // Descripción completa para tooltip
+          name: shortName,
+          fullDescription: description,
           type: item.type,
           icon: item.icon,
           confidence: 'high',
+          source: 'local',
           matchedKeyword: keyword
         };
       }
     }
   }
   
-  // 2️⃣ FALLBACK: Primera palabra significativa (baja confianza)
-  const words = lower.split(' ').filter(w => w.length > 2);
-  const firstWord = words[0] || description.split(' ')[0] || 'unknown';
+  console.log(`❌ [LOCAL] Sin match para: "${description}"`);
+  return null;
+}
+
+/**
+ * 🤖 FALLBACK IA CON CACHE (10% de casos edge)
+ */
+async function matchItemAI(description, openaiClient) {
+  if (!description || !openaiClient) return null;
   
-  console.log(`⚠️ Sin match específico, usando primera palabra: "${firstWord}"`);
+  // 🏆 VERIFICAR CACHE PRIMERO
+  if (aiMatchCache.has(description)) {
+    const cached = aiMatchCache.get(description);
+    console.log(`💾 [AI-CACHE] Usando resultado cacheado para: "${description}" → ${cached.icon}`);
+    return cached;
+  }
+  
+  try {
+    console.log(`🤖 [AI] Consultando fallback para: "${description}"`);
+    
+    const prompt = `Dame SOLO el emoji más apropiado para este objeto de RPG: "${description}". 
+Responde SOLO con el emoji, nada más. Si no hay emoji específico, responde "📦".`;
+    
+    const response = await openaiClient.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0,
+      max_tokens: 5
+    });
+    
+    const aiIcon = response.choices[0].message.content.trim();
+    
+    // 🎨 CREAR RESULTADO AI
+    const result = {
+      name: createShortName(description, description.split(' ')[0], 'unknown'),
+      fullDescription: description,
+      type: 'ai_detected',
+      icon: /\p{Emoji}/u.test(aiIcon) ? aiIcon : '📦',
+      confidence: 'medium',
+      source: 'ai',
+      matchedKeyword: 'ai_fallback'
+    };
+    
+    // 💾 CACHEAR RESULTADO
+    aiMatchCache.set(description, result);
+    
+    console.log(`✅ [AI] Match encontrado: "${description}" → ${result.name} ${result.icon}`);
+    return result;
+    
+  } catch (error) {
+    console.log(`❌ [AI] Error en fallback: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * 🎯 FUNCIÓN PRINCIPAL: LOCAL FIRST + AI FALLBACK
+ */
+async function matchItemIntelligent(description, openaiClient = null) {
+  if (!description || typeof description !== 'string') {
+    return { name: description, type: 'unknown', icon: '📦', confidence: 'none', source: 'fallback' };
+  }
+  
+  // 1️⃣ INTENTAR MATCH LOCAL PRIMERO (RÁPIDO)
+  const localMatch = matchItemLocal(description);
+  if (localMatch) {
+    return localMatch;
+  }
+  
+  // 2️⃣ FALLBACK A IA (SOLO SI ES NECESARIO)
+  if (openaiClient) {
+    const aiMatch = await matchItemAI(description, openaiClient);
+    if (aiMatch) {
+      return aiMatch;
+    }
+  }
+  
+  // 3️⃣ FALLBACK FINAL
+  console.log(`📦 [FALLBACK] Usando genérico para: "${description}"`);
   return {
-    name: firstWord.charAt(0).toUpperCase() + firstWord.slice(1),
+    name: description.split(' ')[0].charAt(0).toUpperCase() + description.split(' ')[0].slice(1),
     fullDescription: description,
-    type: firstWord,
+    type: 'unknown',
     icon: '📦',
     confidence: 'low',
-    matchedKeyword: firstWord
+    source: 'fallback',
+    matchedKeyword: 'none'
   };
 }
 
