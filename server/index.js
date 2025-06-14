@@ -1529,20 +1529,21 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const detectedItems = detectMultipleItems(actionLowerForFlags);
     console.log('📦 ITEMS DETECTADOS:', detectedItems);
     
-    // AÑADIR CADA ITEM DETECTADO CON NOMBRES INTELIGENTES
+    // AÑADIR CADA ITEM DETECTADO CON SISTEMA HÍBRIDO
     for (const itemName of detectedItems) {
-      // 🎯 USAR SISTEMA DE EMPAREJAMIENTO INTELIGENTE CON NOMBRES CORTOS
-      const matchResult = matchItemIntelligent(itemName);
+      // 🎯 USAR SISTEMA HÍBRIDO: LOCAL + AI FALLBACK
+      const matchResult = await matchItemIntelligent(itemName, openai);
       
-      console.log(`📦 Item procesado: "${itemName}" → ${matchResult.name} ${matchResult.icon} (${matchResult.confidence})`);
+      console.log(`📦 [${matchResult.source.toUpperCase()}] Item procesado: "${itemName}" → ${matchResult.name} ${matchResult.icon} (${matchResult.confidence})`);
       
       const newItem = {
-        name: matchResult.name, // NUEVO: Nombre corto para UI
-        fullDescription: matchResult.fullDescription, // NUEVO: Descripción completa
+        name: matchResult.name, // Nombre corto para UI
+        fullDescription: matchResult.fullDescription, // Descripción completa
         type: matchResult.type,
         icon: matchResult.icon,
-        description: `${matchResult.name} encontrado`, // Descripción para tooltip
+        description: `${matchResult.name} encontrado`,
         confidence: matchResult.confidence,
+        source: matchResult.source, // NUEVO: tracking de origen
         instanceId: crypto.randomUUID()
       };
       
