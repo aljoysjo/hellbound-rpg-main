@@ -1150,8 +1150,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       max_tokens: 300
     });
     
-    const message = response.choices[0].message;
-    let narrative = message.content || "El eco de tu acción resuena en el silencio...";
+    const message = response.choices?.[0]?.message;
+    let narrative = message?.content || "El eco de tu acción resuena en el silencio...";
     
     // 📊 ANALIZAR CAMBIOS DE ESTADO DINÁMICOS (MEJORADO)
     const stateChanges = await analyzeNarrativeForStateChanges(action, narrative, gameState, openai);
