@@ -1355,37 +1355,46 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return physicalKeywords.some(keyword => lowerItem.includes(keyword));
     };
     
-    // DETECTAR MÚLTIPLES ITEMS EN ORACIONES COMPUESTAS (MEJORADO)
+    // DETECTAR ITEMS DE FORMA SÚPER RESTRICTIVA (SIN FALSOS POSITIVOS)
     const detectMultipleItems = (action) => {
       const items = [];
       
-      // ✅ PATRONES MEJORADOS Y MÁS RESTRICTIVOS
-      const itemPatterns = [
-        // Patrón principal: "agarro/recojo/tomo + item"
-        /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:y\s+|del?\s+|en\s+|para\s+|como\s+|$))/gi
-      ];
+      // 🎯 REGEX SÚPER RESTRICTIVO: Solo sustantivo principal + max 2 adjetivos
+      const restrictivePattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ]+(?:\s+de\s+[a-záéíóúñ]+|\s+[a-záéíóúñ]+){0,2})(?=\s|$)/gi;
       
-      for (const pattern of itemPatterns) {
-        let match;
-        while ((match = pattern.exec(action)) !== null) {
-          const itemText = match[1].trim();
+      let match;
+      while ((match = restrictivePattern.exec(action)) !== null) {
+        let itemText = match[1].trim();
+        
+        // 🧹 LIMPIAR TEXTO: Remover palabras de contexto/ubicación
+        itemText = itemText.replace(/\b(en\s+el\s+piso|del?\s+piso|de\s+la\s+mesa|en\s+la\s+mesa|del?\s+suelo|para\s+usar|como\s+arma|de\s+arma)\b/gi, '').trim();
+        
+        // ❌ FILTROS ESTRICTOS
+        if (itemText.length < 3) continue; // Muy corto
+        if (/^(que|del|de|la|el|en|para|como|con|sin|por|desde|hasta|sobre|bajo)$/i.test(itemText)) continue;
+        
+        // ✅ VERIFICAR QUE SEA ITEM FÍSICO
+        if (isPhysicalItem(itemText)) {
+          // 🔍 EVITAR DUPLICADOS INTELIGENTE
+          const isDuplicate = items.some(existing => {
+            const lowerExisting = existing.toLowerCase();
+            const lowerItem = itemText.toLowerCase();
+            // Si uno está contenido en el otro, es duplicado
+            return lowerExisting.includes(lowerItem) || lowerItem.includes(lowerExisting);
+          });
           
-          // ❌ FILTROS PARA EVITAR FALSOS POSITIVOS
-          if (itemText.length < 3) continue; // Muy corto
-          if (/\b(que|del|de|la|el|en|para|como|con|sin|por|desde|hasta)\b/i.test(itemText)) continue; // Preposiciones
-          if (/\b(usarlo|usarla|usarlos|arma|weapon|tool)\b/i.test(itemText)) continue; // Palabras de contexto
-          
-          // ✅ VERIFICAR QUE SEA ITEM FÍSICO
-          if (isPhysicalItem(itemText) && !items.some(existing => 
-            existing.toLowerCase().includes(itemText.toLowerCase()) || 
-            itemText.toLowerCase().includes(existing.toLowerCase())
-          )) {
+          if (!isDuplicate) {
             items.push(itemText);
+            console.log(`🎯 Item válido detectado: "${itemText}"`);
+          } else {
+            console.log(`⚠️ Duplicado evitado: "${itemText}"`);
           }
+        } else {
+          console.log(`❌ No es item físico: "${itemText}"`);
         }
       }
       
-      return [...new Set(items)]; // Eliminar duplicados exactos
+      return items;
     };
     
     // APLICAR DETECCIÓN MÚLTIPLE
