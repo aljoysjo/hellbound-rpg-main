@@ -978,18 +978,19 @@ ESTADO ACTUAL:
 
 IMPORTANTE: Analiza la narrativa REALMENTE y detecta SOLO:
 
-🚫 NO DETECTES CAMBIOS DE INVENTARIO (ya se manejan manualmente)
+🚫 NO DETECTES CAMBIOS DE INVENTARIO EN NINGÚN CASO
+🚫 El inventario se maneja automáticamente por otro sistema
+🚫 NUNCA incluyas "newInventoryItem" o "removeInventoryItem" en tu respuesta
 
 SÍ DETECTA:
 1. NUEVAS HABILIDADES con CLASIFICACIÓN:
    - ACTIVAS: combate, ataques, acciones que requieren activación (esgrima, tiro con arco, salto, etc.)
    - MAGIA: hechizos, conjuros, magia (curación, bola de fuego, telepatía, etc.)  
    - PASIVAS: conocimientos, oficios, resistencias (forja, cocina, resistencia veneno, etc.)
-4. DAÑO FÍSICO real (caídas, ataques, heridas)
-5. GASTO DE ENERGÍA (magia, esfuerzo físico)
-6. CAMBIOS DE UBICACIÓN explícitos
-7. ESTADOS EMOCIONALES por situaciones intensas
-8. MUERTE si la situación es mortal
+2. CAMBIOS DE SALUD/MANÁ/STAMINA (-10 salud, +20 maná, etc.)
+3. CAMBIOS EMOCIONALES SIGNIFICATIVOS (terror extremo, calma total, ira, etc.)
+4. CAMBIOS DE UBICACIÓN (entrar cueva, salir bosque, llegar pueblo, etc.)
+5. NUEVOS OBJETIVOS (encontrar reliquia, hablar con X, etc.)
 
 INVENTARIO ACTUAL:
 ${gameState.inventory.map((item, index) => `${index}: ${item.name} ${item.icon}`).join('\n')}
