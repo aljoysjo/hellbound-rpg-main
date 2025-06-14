@@ -1157,35 +1157,43 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const actionLowerForFlags = (action || '').toLowerCase();
     console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
     
-    // Detectar recoger items
-    if (actionLowerForFlags.includes('recog') || actionLowerForFlags.includes('agarro') || actionLowerForFlags.includes('tomo') || 
-        actionLowerForFlags.includes('cojo') || actionLowerForFlags.includes('encuentro')) {
-      const palabras = actionLowerForFlags.split(' ');
-      let itemName = '';
+    // 🎯 DETECCIÓN MEJORADA DE ITEMS CON REGEX AMPLIO
+    console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
+    
+    // Detectar recoger items CON REGEX ROBUSTO
+    const pickupRegex = /\b(?:recojo|agarro|tomo|coger|agarré|encuentro|obtengo|consigo|tomo)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
+    const pickupMatch = actionLowerForFlags.match(pickupRegex);
+    
+    if (pickupMatch) {
+      const itemName = pickupMatch[1].trim();
+      console.log('📦 ITEM DETECTADO PARA PICKUP:', itemName);
       
-      // Buscar palabras que puedan ser items
-      for (let i = 0; i < palabras.length; i++) {
-        const palabra = palabras[i];
-        if (['cuchillo', 'espada', 'libro', 'llave', 'poción', 'gema', 'anillo', 'pergamino', 'daga', 'hacha'].includes(palabra)) {
-          itemName = palabra;
-          break;
-        }
-      }
+      // Determinar icono basado en palabras clave
+      let icon = '📦';
+      if (itemName.includes('cuchillo') || itemName.includes('daga') || itemName.includes('navaja')) icon = '🔪';
+      else if (itemName.includes('espada') || itemName.includes('sable')) icon = '⚔️';
+      else if (itemName.includes('libro') || itemName.includes('grimorio') || itemName.includes('tomo')) icon = '📖';
+      else if (itemName.includes('llave') || itemName.includes('llaves')) icon = '🗝️';
+      else if (itemName.includes('poción') || itemName.includes('frasco') || itemName.includes('elixir')) icon = '🧪';
+      else if (itemName.includes('gema') || itemName.includes('diamante') || itemName.includes('rubí')) icon = '💎';
+      else if (itemName.includes('anillo') || itemName.includes('sortija')) icon = '💍';
+      else if (itemName.includes('varita') || itemName.includes('bastón') || itemName.includes('cetro')) icon = '🪄';
+      else if (itemName.includes('pistola') || itemName.includes('arma') || itemName.includes('rifle')) icon = '🔫';
+      else if (itemName.includes('pergamino') || itemName.includes('mapa') || itemName.includes('carta')) icon = '📜';
       
-      if (itemName) {
-        const newItem = {
-          name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
-          icon: itemName === 'cuchillo' ? '🔪' : itemName === 'libro' ? '📖' : itemName === 'llave' ? '🗝️' : 
-                itemName === 'poción' ? '🧪' : itemName === 'gema' ? '💎' : '📦',
-          description: `${itemName} encontrado`,
-          instanceId: crypto.randomUUID()
-        };
-        gameState.inventory.push(newItem);
-        console.log(`📦 ITEM AÑADIDO MANUALMENTE: ${newItem.name} ${newItem.icon}`);
-        
-        // Actualizar narrativa para incluir el item
-        narrative += ` Encuentras ${newItem.name} y lo guardas en tu inventario.`;
-      }
+      const newItem = {
+        name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
+        icon: icon,
+        description: `${itemName} encontrado`,
+        instanceId: crypto.randomUUID()
+      };
+      
+      // USAR PUSH EN LUGAR DE REEMPLAZAR
+      gameState.inventory.push(newItem);
+      console.log(`📦 ITEM AÑADIDO EXITOSAMENTE: ${newItem.name} ${newItem.icon}`);
+      
+      // Actualizar narrativa para incluir el item
+      narrative += ` Encuentras ${newItem.name} y lo guardas en tu inventario.`;
     }
     
     // Detectar soltar items
