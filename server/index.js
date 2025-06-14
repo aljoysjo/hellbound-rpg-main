@@ -1355,46 +1355,90 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return physicalKeywords.some(keyword => lowerItem.includes(keyword));
     };
     
-    // DETECTAR ITEMS DE FORMA SÚPER RESTRICTIVA (SIN FALSOS POSITIVOS)
+    // DETECTAR ITEMS DE FORMA CONTEXTUAL E INTELIGENTE
     const detectMultipleItems = (action) => {
       const items = [];
       
-      // 🎯 REGEX SÚPER RESTRICTIVO: Solo sustantivo principal + max 2 adjetivos
-      const restrictivePattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ]+(?:\s+de\s+[a-záéíóúñ]+|\s+[a-záéíóúñ]+){0,2})(?=\s|$)/gi;
+      // 🎯 REGEX CONTEXTUAL: Captura item + contexto/ubicación
+      const contextualPattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:y\s+(?:un[ae]?|la?|el)|para\s+(?:usar|atacar)|como\s+arma|$))/gi;
       
       let match;
-      while ((match = restrictivePattern.exec(action)) !== null) {
+      while ((match = contextualPattern.exec(action)) !== null) {
         let itemText = match[1].trim();
         
-        // 🧹 LIMPIAR TEXTO: Remover palabras de contexto/ubicación
-        itemText = itemText.replace(/\b(en\s+el\s+piso|del?\s+piso|de\s+la\s+mesa|en\s+la\s+mesa|del?\s+suelo|para\s+usar|como\s+arma|de\s+arma)\b/gi, '').trim();
+        console.log(`🔍 Item detectado en bruto: "${itemText}"`);
         
-        // ❌ FILTROS ESTRICTOS
-        if (itemText.length < 3) continue; // Muy corto
-        if (/^(que|del|de|la|el|en|para|como|con|sin|por|desde|hasta|sobre|bajo)$/i.test(itemText)) continue;
+        // 🧹 LIMPIAR: Remover palabras de acción/uso al final pero preservar contexto de ubicación
+        itemText = itemText.replace(/\s+(para\s+usar|como\s+arma|de\s+arma|para\s+atacar)$/gi, '').trim();
         
-        // ✅ VERIFICAR QUE SEA ITEM FÍSICO
-        if (isPhysicalItem(itemText)) {
+        // ❌ FILTROS BÁSICOS
+        if (itemText.length < 3) {
+          console.log(`❌ Muy corto: "${itemText}"`);
+          continue;
+        }
+        
+        // ❌ Si es solo preposiciones/artículos
+        if (/^(que|del|de|la|el|en|para|como|con|sin|por|desde|hasta|sobre|bajo|un|una|los|las)$/i.test(itemText)) {
+          console.log(`❌ Solo preposiciones: "${itemText}"`);
+          continue;
+        }
+        
+        // ✅ VERIFICAR QUE CONTENGA AL MENOS UN KEYWORD FÍSICO
+        if (containsPhysicalKeyword(itemText)) {
           // 🔍 EVITAR DUPLICADOS INTELIGENTE
           const isDuplicate = items.some(existing => {
             const lowerExisting = existing.toLowerCase();
             const lowerItem = itemText.toLowerCase();
-            // Si uno está contenido en el otro, es duplicado
-            return lowerExisting.includes(lowerItem) || lowerItem.includes(lowerExisting);
+            // Si el 80% de las palabras coinciden, es duplicado
+            const overlap = calculateWordOverlap(lowerExisting, lowerItem);
+            return overlap > 0.8;
           });
           
           if (!isDuplicate) {
             items.push(itemText);
-            console.log(`🎯 Item válido detectado: "${itemText}"`);
+            console.log(`✅ Item válido detectado: "${itemText}"`);
           } else {
             console.log(`⚠️ Duplicado evitado: "${itemText}"`);
           }
         } else {
-          console.log(`❌ No es item físico: "${itemText}"`);
+          console.log(`❌ No contiene keywords físicos: "${itemText}"`);
         }
       }
       
       return items;
+    };
+    
+    // 🔍 VERIFICAR SI CONTIENE AL MENOS UN KEYWORD DE ITEM FÍSICO
+    const containsPhysicalKeyword = (text) => {
+      const physicalKeywords = [
+        'cuchillo', 'espada', 'daga', 'sable', 'hacha', 'martillo',
+        'escudo', 'armadura', 'casco', 'guante',
+        'pistola', 'rifle', 'arma', 'ballesta',
+        'libro', 'grimorio', 'tomo', 'pergamino', 'mapa', 'carta',
+        'poción', 'frasco', 'elixir', 'medicina',
+        'llave', 'gema', 'diamante', 'rubí', 'oro', 'moneda',
+        'anillo', 'collar', 'amuleto', 'talismán',
+        'varita', 'bastón', 'cetro', 'orbe',
+        'cuerda', 'antorcha', 'linterna', 'cristal',
+        'cabeza', 'cráneo', 'hueso', 'esqueleto',
+        'capa', 'túnica', 'ropa', 'botas'
+      ];
+      
+      const lowerText = text.toLowerCase();
+      return physicalKeywords.some(keyword => lowerText.includes(keyword));
+    };
+    
+    // 📊 CALCULAR OVERLAP DE PALABRAS PARA DETECTAR DUPLICADOS
+    const calculateWordOverlap = (text1, text2) => {
+      const words1 = text1.split(' ').filter(w => w.length > 2);
+      const words2 = text2.split(' ').filter(w => w.length > 2);
+      
+      if (words1.length === 0 || words2.length === 0) return 0;
+      
+      const commonWords = words1.filter(w => words2.includes(w)).length;
+      const totalWords = Math.max(words1.length, words2.length);
+      
+      return commonWords / totalWords;
     };
     
     // APLICAR DETECCIÓN MÚLTIPLE
