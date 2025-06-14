@@ -501,8 +501,8 @@ class GameState {
     if (stateChanges.removeInventoryItem) {
       const itemToRemove = stateChanges.removeInventoryItem;
       const itemIndex = this.inventory.findIndex(item => 
-        item.name.toLowerCase().includes(itemToRemove.name.toLowerCase()) ||
-        itemToRemove.name.toLowerCase().includes(item.name.toLowerCase())
+        (item?.name || '').toLowerCase().includes((itemToRemove?.name || '').toLowerCase()) ||
+        (itemToRemove?.name || '').toLowerCase().includes((item?.name || '').toLowerCase())
       );
       
       if (itemIndex !== -1) {
