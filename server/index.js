@@ -1295,7 +1295,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     }
     
     // Detectar flags de eventos importantes basados en palabras clave
-    const actionLowerForFlags = (action || '').toLowerCase();
     const narrativeLower = (narrative || '').toLowerCase();
     
     if (actionLowerForFlags.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
