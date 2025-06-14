@@ -11,6 +11,56 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// 🎯 BASE DE DATOS DE ITEMS PARA EMPAREJAMIENTO INTELIGENTE
+const ITEM_DATABASE = [
+  // 🗡️ ARMAS Y COMBATE
+  { type: 'espada', icon: '⚔️', keywords: ['espada', 'sable', 'hoja', 'blade', 'cuchilla', 'gladius', 'katana', 'espadón'] },
+  { type: 'daga', icon: '🔪', keywords: ['daga', 'cuchillo', 'puñal', 'navaja', 'stiletto', 'dagger'] },
+  { type: 'hacha', icon: '🪓', keywords: ['hacha', 'axe', 'machete', 'hachuela'] },
+  { type: 'arco', icon: '🏹', keywords: ['arco', 'ballesta', 'bow', 'flecha', 'arrow'] },
+  
+  // 🛡️ DEFENSAS
+  { type: 'escudo', icon: '🛡️', keywords: ['escudo', 'shield', 'broquel', 'rodela', 'buckler'] },
+  { type: 'armadura', icon: '🦺', keywords: ['armadura', 'armor', 'coraza', 'cota', 'peto', 'mail'] },
+  
+  // 👕 ROPA Y VESTIMENTA
+  { type: 'capa', icon: '🧥', keywords: ['capa', 'manto', 'cape', 'cloak', 'túnica', 'robe'] },
+  { type: 'ropa', icon: '👔', keywords: ['camisa', 'pantalón', 'vestido', 'túnica', 'ropa', 'clothes', 'garment'] },
+  { type: 'zapatos', icon: '👢', keywords: ['botas', 'zapatos', 'sandalias', 'shoes', 'boots', 'calzado'] },
+  { type: 'guantes', icon: '🧤', keywords: ['guantes', 'gloves', 'manoplas', 'mitones'] },
+  
+  // 🍖 COMIDA Y CONSUMIBLES
+  { type: 'comida', icon: '🍖', keywords: ['carne', 'comida', 'alimento', 'food', 'meat', 'jamón'] },
+  { type: 'pan', icon: '🍞', keywords: ['pan', 'bread', 'hogaza', 'barra', 'bollo'] },
+  { type: 'fruta', icon: '🍎', keywords: ['fruta', 'manzana', 'pera', 'fruit', 'apple', 'naranja'] },
+  { type: 'bebida', icon: '🍷', keywords: ['vino', 'cerveza', 'agua', 'bebida', 'drink', 'líquido', 'wine', 'beer'] },
+  
+  // 🔧 HERRAMIENTAS Y UTILITARIOS
+  { type: 'llave', icon: '🗝️', keywords: ['llave', 'key', 'llaves', 'keys'] },
+  { type: 'cofre', icon: '📦', keywords: ['cofre', 'caja', 'chest', 'box', 'baúl', 'container'] },
+  { type: 'candado', icon: '🔒', keywords: ['candado', 'lock', 'cerradura', 'cerrojo'] },
+  { type: 'cuerda', icon: '🪢', keywords: ['cuerda', 'rope', 'soga', 'cable', 'hilo'] },
+  { type: 'antorcha', icon: '🕯️', keywords: ['antorcha', 'torch', 'vela', 'candle', 'linterna', 'lámpara'] },
+  
+  // 🧪 CONSUMIBLES MÁGICOS
+  { type: 'poción', icon: '🧪', keywords: ['poción', 'elixir', 'frasco', 'botella', 'tónico', 'brebaje'] },
+  { type: 'varita', icon: '🪄', keywords: ['varita', 'vara', 'bastón', 'cetro', 'wand', 'staff'] },
+  
+  // 💎 TESOROS
+  { type: 'gema', icon: '💎', keywords: ['gema', 'diamante', 'rubí', 'esmeralda', 'zafiro', 'cristal', 'piedra'] },
+  { type: 'moneda', icon: '🪙', keywords: ['moneda', 'oro', 'plata', 'coin', 'dinero', 'tesoro'] },
+  
+  // 📚 CONOCIMIENTO
+  { type: 'libro', icon: '📖', keywords: ['libro', 'grimorio', 'tomo', 'manuscrito', 'volumen', 'text'] },
+  { type: 'pergamino', icon: '📜', keywords: ['pergamino', 'scroll', 'mapa', 'carta', 'plano', 'documento'] },
+  
+  // 🏆 OBJETOS ESPECIALES
+  { type: 'trofeo', icon: '🏆', keywords: ['trofeo', 'trophy', 'premio', 'medalla', 'copa', 'galardón'] },
+  { type: 'reliquia', icon: '⚗️', keywords: ['reliquia', 'relic', 'artefacto', 'artifact', 'objeto sagrado', 'antigüedad'] },
+  { type: 'cuerpo', icon: '💀', keywords: ['cabeza', 'cráneo', 'hueso', 'esqueleto', 'skull', 'bone', 'head'] },
+  { type: 'material', icon: '🌿', keywords: ['rama', 'madera', 'hierba', 'planta', 'root', 'leaf', 'wood', 'branch'] }
+];
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
