@@ -485,8 +485,8 @@ class GameState {
       }
     }
     
-    // Añadir nuevo item al inventario
-    if (stateChanges.newInventoryItem) {
+    // Añadir nuevo item al inventario (SOLO SI TIENE NOMBRE VÁLIDO)
+    if (stateChanges.newInventoryItem && stateChanges.newInventoryItem.name && stateChanges.newInventoryItem.name.trim()) {
       const newItem = {
         name: stateChanges.newInventoryItem.name,
         icon: stateChanges.newInventoryItem.icon || '📦',
