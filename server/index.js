@@ -1265,7 +1265,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         'llave', 'gema', 'diamante', 'rubí', 'oro', 'moneda',
         'anillo', 'collar', 'amuleto', 'talismán',
         'varita', 'bastón', 'cetro', 'orbe',
-        'cuerda', 'antorcha', 'linterna', 'cristal'
+        'cuerda', 'antorcha', 'linterna', 'cristal',
+        'cabeza', 'cráneo', 'hueso', 'esqueleto' // items macabros
       ];
       
       // Palabras que NO son items físicos
