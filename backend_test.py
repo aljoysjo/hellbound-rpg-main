@@ -428,7 +428,7 @@ class HellboundRPGTester:
                 allowed_origins = response.headers['Access-Control-Allow-Origin']
                 print(f"Allowed Origins: {allowed_origins}")
                 
-                if '*' in allowed_origins or 'https://f9c456b2-5118-4176-bb10-69ae2c6a13d5.preview.emergentagent.com' in allowed_origins:
+                if '*' in allowed_origins or 'https://5270bdd3-7b2b-48fb-a3a5-345f7f9bb7d9.preview.emergentagent.com' in allowed_origins:
                     print("✅ CORS configuration allows appropriate origins")
                     return True
                 else:
