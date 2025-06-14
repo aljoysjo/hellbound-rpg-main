@@ -1158,9 +1158,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
     
     // Detectar recoger items
-    if (actionLower.includes('recog') || actionLower.includes('agarro') || actionLower.includes('tomo') || 
-        actionLower.includes('cojo') || actionLower.includes('encuentro')) {
-      const palabras = actionLower.split(' ');
+    if (actionLowerForFlags.includes('recog') || actionLowerForFlags.includes('agarro') || actionLowerForFlags.includes('tomo') || 
+        actionLowerForFlags.includes('cojo') || actionLowerForFlags.includes('encuentro')) {
+      const palabras = actionLowerForFlags.split(' ');
       let itemName = '';
       
       // Buscar palabras que puedan ser items
