@@ -408,12 +408,27 @@ function App() {
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
                 
                 console.log('✨ ACTUALIZANDO BADGES!');
-                setBadges(prev => ({
-                  inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
-                  objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
-                  skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
-                  emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
-                }));
+                setBadges(prev => {
+                  const newBadges = {
+                    inventory: { count: prev.inventory.count + inventoryChanges.totalCount, newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems] },
+                    objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
+                    skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
+                    emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
+                  };
+                  
+                  // AUTO-RESET BADGES DESPUÉS DE 5 SEGUNDOS
+                  setTimeout(() => {
+                    console.log('🔄 Auto-reseteando badges después de 5 segundos');
+                    setBadges({
+                      inventory: { count: 0, newItems: [] },
+                      objectives: { count: 0, newObjectives: [], completedObjectives: [] },
+                      skills: { count: 0, newSkills: [], levelUps: [] },
+                      emotions: { count: 0, significantChanges: [] }
+                    });
+                  }, 5000);
+                  
+                  return newBadges;
+                });
                 
                 // Actualizar elementos NEW
                 setNewElements(prevNew => ({
