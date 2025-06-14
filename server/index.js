@@ -1272,24 +1272,36 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       }
     }
     
-    // Detectar soltar items CON REGEX ESPECÍFICO
+    // Detectar soltar items CON SOPORTE PARA MÚLTIPLES ITEMS
     const dropRegex = /\b(?:suelto|dejo|tiro|abandono|desecho|boto)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
     const dropMatch = actionLowerForFlags.match(dropRegex);
     
     if (dropMatch) {
-      const itemNameToDrop = dropMatch[1].trim();
-      console.log('❌ ITEM DETECTADO PARA DROP:', itemNameToDrop);
+      let itemsToDrop = dropMatch[1].trim();
+      console.log('❌ TEXTO DETECTADO PARA DROP:', itemsToDrop);
       
-      const itemIndex = gameState.inventory.findIndex(item => 
-        (item?.name || '').toLowerCase().includes(itemNameToDrop.toLowerCase())
+      // Dividir por "y" para múltiples items: "escudo y libro" → ["escudo", "libro"]
+      const itemList = itemsToDrop.split(/\s+y\s+/i).map(item => 
+        item.trim().replace(/^(un[ae]?|el|la|los|las)\s+/i, '')
       );
       
-      if (itemIndex !== -1) {
-        const removedItem = gameState.inventory.splice(itemIndex, 1)[0];
-        console.log(`❌ ITEM ELIMINADO EXITOSAMENTE: ${removedItem.name} ${removedItem.icon}`);
-        narrative += ` Sueltas ${removedItem.name}.`;
-      } else {
-        console.log('⚠️ ITEM NO ENCONTRADO PARA DROP:', itemNameToDrop);
+      console.log('❌ ITEMS INDIVIDUALES PARA DROP:', itemList);
+      
+      // Procesar cada item por separado
+      for (const itemNameToDrop of itemList) {
+        if (!itemNameToDrop) continue;
+        
+        const itemIndex = gameState.inventory.findIndex(item => 
+          (item?.name || '').toLowerCase().includes(itemNameToDrop.toLowerCase())
+        );
+        
+        if (itemIndex !== -1) {
+          const removedItem = gameState.inventory.splice(itemIndex, 1)[0];
+          console.log(`❌ ITEM ELIMINADO EXITOSAMENTE: ${removedItem.name} ${removedItem.icon}`);
+          narrative += ` Sueltas ${removedItem.name}.`;
+        } else {
+          console.log(`⚠️ ITEM NO ENCONTRADO PARA DROP: "${itemNameToDrop}"`);
+        }
       }
     }
     
