@@ -661,23 +661,35 @@ body {
   }
 }
 
-/* BADGES VIVOS CON ANIMACIONES */
+/* BADGES VIVOS CON ANIMACIONES - CORREGIDO PARA MÓVIL */
 .notification-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: var(--color-danger);
-  color: var(--text-light);
-  border-radius: 50%;
-  min-width: 20px;
-  height: 20px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  border: 2px solid var(--color-bg);
+  position: absolute !important;
+  top: -6px !important;
+  right: -6px !important;
+  background: var(--color-danger) !important;
+  color: var(--text-light) !important;
+  border-radius: 50% !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  font-size: 0.7rem !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 50 !important;
+  border: 2px solid var(--color-bg) !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 767px) {
+  .notification-badge {
+    top: -4px !important;
+    right: -4px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    font-size: 0.65rem !important;
+    z-index: 60 !important;
+  }
 }
 
 .pulse-animation {
