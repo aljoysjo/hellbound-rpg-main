@@ -1153,6 +1153,70 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const message = response.choices?.[0]?.message;
     let narrative = message?.content || "El eco de tu acción resuena en el silencio...";
     
+    // 🎯 DETECCIÓN MANUAL DE ITEMS PARA TESTING (ANTES DE IA)
+    const actionLower = (action || '').toLowerCase();
+    console.log('🔍 ANALYZING ACTION:', actionLower);
+    
+    // Detectar recoger items
+    if (actionLower.includes('recog') || actionLower.includes('agarro') || actionLower.includes('tomo') || 
+        actionLower.includes('cojo') || actionLower.includes('encuentro')) {
+      const palabras = actionLower.split(' ');
+      let itemName = '';
+      
+      // Buscar palabras que puedan ser items
+      for (let i = 0; i < palabras.length; i++) {
+        const palabra = palabras[i];
+        if (['cuchillo', 'espada', 'libro', 'llave', 'poción', 'gema', 'anillo', 'pergamino', 'daga', 'hacha'].includes(palabra)) {
+          itemName = palabra;
+          break;
+        }
+      }
+      
+      if (itemName) {
+        const newItem = {
+          name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
+          icon: itemName === 'cuchillo' ? '🔪' : itemName === 'libro' ? '📖' : itemName === 'llave' ? '🗝️' : 
+                itemName === 'poción' ? '🧪' : itemName === 'gema' ? '💎' : '📦',
+          description: `${itemName} encontrado`,
+          instanceId: crypto.randomUUID()
+        };
+        gameState.inventory.push(newItem);
+        console.log(`📦 ITEM AÑADIDO MANUALMENTE: ${newItem.name} ${newItem.icon}`);
+        
+        // Actualizar narrativa para incluir el item
+        narrative += ` Encuentras ${newItem.name} y lo guardas en tu inventario.`;
+      }
+    }
+    
+    // Detectar soltar items
+    if (actionLower.includes('suelto') || actionLower.includes('dejo') || actionLower.includes('tiro') || 
+        actionLower.includes('abandono')) {
+      const palabras = actionLower.split(' ');
+      let itemName = '';
+      
+      for (let i = 0; i < palabras.length; i++) {
+        const palabra = palabras[i];
+        if (['cuchillo', 'espada', 'libro', 'llave', 'poción', 'gema', 'anillo', 'pergamino', 'daga', 'hacha'].includes(palabra)) {
+          itemName = palabra;
+          break;
+        }
+      }
+      
+      if (itemName) {
+        const itemIndex = gameState.inventory.findIndex(item => 
+          (item?.name || '').toLowerCase().includes(itemName)
+        );
+        
+        if (itemIndex !== -1) {
+          const removedItem = gameState.inventory.splice(itemIndex, 1)[0];
+          console.log(`❌ ITEM ELIMINADO MANUALMENTE: ${removedItem.name} ${removedItem.icon}`);
+          narrative += ` Sueltas ${removedItem.name}.`;
+        }
+      }
+    }
+    
+    console.log('🔍 CURRENT INVENTORY:', gameState.inventory.map(item => `${item.name} ${item.icon}`));
+    
     // 📊 ANALIZAR CAMBIOS DE ESTADO DINÁMICOS (MEJORADO)
     const stateChanges = await analyzeNarrativeForStateChanges(action, narrative, gameState, openai);
     
