@@ -741,10 +741,12 @@ ESTADO ACTUAL:
 - Miedo: ${gameState.emotionalStates.miedo}/100
 - Alerta: ${gameState.emotionalStates.alerta}/100
 
-IMPORTANTE: Analiza la narrativa REALMENTE y detecta:
-1. OBTENER OBJETOS (encontrar, tomar, recoger libros, armas, pociones, llaves, etc.)
-2. USAR/SOLTAR/PERDER OBJETOS (usar poción, soltar cuchillo, perder item, consumir, etc.)
-3. NUEVAS HABILIDADES con CLASIFICACIÓN:
+IMPORTANTE: Analiza la narrativa REALMENTE y detecta SOLO:
+
+🚫 NO DETECTES CAMBIOS DE INVENTARIO (ya se manejan manualmente)
+
+SÍ DETECTA:
+1. NUEVAS HABILIDADES con CLASIFICACIÓN:
    - ACTIVAS: combate, ataques, acciones que requieren activación (esgrima, tiro con arco, salto, etc.)
    - MAGIA: hechizos, conjuros, magia (curación, bola de fuego, telepatía, etc.)  
    - PASIVAS: conocimientos, oficios, resistencias (forja, cocina, resistencia veneno, etc.)
