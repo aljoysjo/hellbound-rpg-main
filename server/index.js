@@ -778,8 +778,8 @@ ${recentActions}`;
 
 // 💀 ANÁLISIS MEJORADO PARA DETECTAR CAMBIOS Y MUERTE
 /**
- * 🎯 FUNCIÓN DE EMPAREJAMIENTO INTELIGENTE
- * Convierte cualquier descripción libre en tipo e ícono conocido
+ * 🎯 FUNCIÓN DE EMPAREJAMIENTO INTELIGENTE CON NOMBRES CORTOS
+ * Convierte descripciones largas en nombres cortos + descripción completa
  */
 function matchItemIntelligent(description) {
   if (!description || typeof description !== 'string') {
@@ -793,9 +793,13 @@ function matchItemIntelligent(description) {
   for (const item of ITEM_DATABASE) {
     for (const keyword of item.keywords) {
       if (lower.includes(keyword)) {
+        // 🎨 CREAR NOMBRE CORTO INTELIGENTE
+        const shortName = createShortName(description, keyword, item.type);
+        
         console.log(`✅ Match encontrado: "${keyword}" → ${item.type} ${item.icon}`);
         return {
-          name: description, // Conservar nombre completo
+          name: shortName, // Nombre corto para UI
+          fullDescription: description, // Descripción completa para tooltip
           type: item.type,
           icon: item.icon,
           confidence: 'high',
@@ -811,12 +815,67 @@ function matchItemIntelligent(description) {
   
   console.log(`⚠️ Sin match específico, usando primera palabra: "${firstWord}"`);
   return {
-    name: description,
+    name: firstWord.charAt(0).toUpperCase() + firstWord.slice(1),
+    fullDescription: description,
     type: firstWord,
-    icon: '📦', // Ícono genérico
+    icon: '📦',
     confidence: 'low',
     matchedKeyword: firstWord
   };
+}
+
+/**
+ * 🎨 CREAR NOMBRES CORTOS PERO DESCRIPTIVOS
+ * "espada de marfil bañada en lágrimas" → "Espada de marfil"
+ */
+function createShortName(fullText, keyword, type) {
+  const words = fullText.toLowerCase().split(' ');
+  const keywordIndex = words.findIndex(w => w.includes(keyword.toLowerCase()));
+  
+  if (keywordIndex === -1) {
+    return keyword.charAt(0).toUpperCase() + keyword.slice(1);
+  }
+  
+  // Tomar el keyword + 1-2 palabras descriptivas importantes
+  let shortName = [words[keywordIndex]];
+  
+  // Añadir adjetivos importantes ANTES del keyword
+  for (let i = keywordIndex - 1; i >= 0 && shortName.length < 3; i--) {
+    const word = words[i];
+    if (isImportantAdjective(word)) {
+      shortName.unshift(word);
+    }
+  }
+  
+  // Añadir adjetivos importantes DESPUÉS del keyword  
+  for (let i = keywordIndex + 1; i < words.length && shortName.length < 3; i++) {
+    const word = words[i];
+    if (isImportantAdjective(word)) {
+      shortName.push(word);
+    }
+  }
+  
+  // Capitalizar primera letra
+  return shortName.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/**
+ * 🏷️ DETECTAR ADJETIVOS IMPORTANTES PARA NOMBRES CORTOS
+ */
+function isImportantAdjective(word) {
+  const importantAdjectives = [
+    // Materiales
+    'marfil', 'oro', 'plata', 'hierro', 'acero', 'cristal', 'diamante',
+    // Colores importantes
+    'negro', 'dorado', 'plateado', 'rojo', 'azul', 'verde',
+    // Orígenes/tipos
+    'élfico', 'élfica', 'enano', 'enana', 'mágico', 'mágica', 'sagrado', 'sagrada',
+    'ancestral', 'antiguo', 'antigua', 'legendario', 'legendaria',
+    // Tamaños
+    'grande', 'pequeño', 'pequeña', 'gigante'
+  ];
+  
+  return importantAdjectives.includes(word.toLowerCase());
 }
 
 async function analyzeNarrativeForStateChanges(action, narrative, gameState, openaiClient) {
