@@ -1325,29 +1325,21 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const detectedItems = detectMultipleItems(actionLowerForFlags);
     console.log('📦 ITEMS DETECTADOS:', detectedItems);
     
-    // AÑADIR CADA ITEM DETECTADO
+    // AÑADIR CADA ITEM DETECTADO CON SISTEMA INTELIGENTE
     for (const itemName of detectedItems) {
-      // Determinar icono basado en palabras clave
-      let icon = '📦';
-      const lowerItem = itemName.toLowerCase();
+      // 🎯 USAR SISTEMA DE EMPAREJAMIENTO INTELIGENTE
+      const matchResult = matchItemIntelligent(itemName);
       
-      if (lowerItem.includes('cuchillo') || lowerItem.includes('daga') || lowerItem.includes('navaja')) icon = '🔪';
-      else if (lowerItem.includes('espada') || lowerItem.includes('sable')) icon = '⚔️';
-      else if (lowerItem.includes('escudo')) icon = '🛡️';
-      else if (lowerItem.includes('libro') || lowerItem.includes('grimorio') || lowerItem.includes('tomo')) icon = '📖';
-      else if (lowerItem.includes('llave') || lowerItem.includes('llaves')) icon = '🗝️';
-      else if (lowerItem.includes('poción') || lowerItem.includes('frasco') || lowerItem.includes('elixir')) icon = '🧪';
-      else if (lowerItem.includes('gema') || lowerItem.includes('diamante') || lowerItem.includes('rubí')) icon = '💎';
-      else if (lowerItem.includes('anillo') || lowerItem.includes('sortija')) icon = '💍';
-      else if (lowerItem.includes('varita') || lowerItem.includes('bastón') || lowerItem.includes('cetro')) icon = '🪄';
-      else if (lowerItem.includes('pistola') || lowerItem.includes('arma') || lowerItem.includes('rifle')) icon = '🔫';
-      else if (lowerItem.includes('pergamino') || lowerItem.includes('mapa') || lowerItem.includes('carta')) icon = '📜';
+      console.log(`📦 Item procesado: "${itemName}" → ${matchResult.type} ${matchResult.icon} (${matchResult.confidence})`);
       
       const newItem = {
         name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
-        icon: icon,
+        type: matchResult.type, // NUEVO: tipo del item
+        icon: matchResult.icon, // INTELIGENTE: ícono basado en matching
         description: `${itemName} encontrado`,
+        confidence: matchResult.confidence, // NUEVO: nivel de confianza
         instanceId: crypto.randomUUID()
+      };
       };
       
       // Verificar que no existe ya (evitar duplicados)
