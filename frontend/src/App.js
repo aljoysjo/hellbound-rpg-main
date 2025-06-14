@@ -56,38 +56,32 @@ function App() {
     return String(value);
   };
 
-  // SISTEMA DE DETECCIÓN DE CAMBIOS ROBUSTO CORREGIDO
+  // SISTEMA DE DETECCIÓN DE CAMBIOS BASADO EN INSTANCE ID (DEFINITIVO)
   const detectInventoryChanges = (prevInventory, currentInventory) => {
     const prev = Array.isArray(prevInventory) ? prevInventory : [];
     const current = Array.isArray(currentInventory) ? currentInventory : [];
     
-    console.log('🔍 INVENTORY DEBUG:', { 
-      prevLength: prev.length, 
-      currentLength: current.length,
-      prev: prev.map(i => i?.name),
-      current: current.map(i => i?.name)
+    // Usar instanceId para detección precisa
+    const prevIds = new Set(prev.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
+    const currentIds = new Set(current.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
+    
+    // Detectar items realmente nuevos
+    const newItems = current.filter(item => {
+      const itemId = item?.instanceId || item?.name || JSON.stringify(item);
+      return !prevIds.has(itemId);
     });
     
-    // CAMBIO CLAVE: Detectar CUALQUIER cambio, no solo nuevos items
-    const hasLengthChange = prev.length !== current.length;
-    const hasContentChange = JSON.stringify(prev.map(i => i?.name).sort()) !== 
-                           JSON.stringify(current.map(i => i?.name).sort());
-    
-    if (hasLengthChange || hasContentChange) {
-      console.log('📦 INVENTORY CHANGES DETECTED:', { hasLengthChange, hasContentChange });
-      
-      // Simular items "nuevos" para el badge
-      const changeCount = Math.abs(current.length - prev.length) || 1;
-      
-      return {
-        newItems: current.slice(-changeCount), // Últimos items como "nuevos"
-        totalCount: changeCount
-      };
-    }
+    console.log('📦 INVENTORY CHANGES DETECTED:', { 
+      prevCount: prev.length, 
+      currentCount: current.length,
+      prevIds: Array.from(prevIds),
+      currentIds: Array.from(currentIds),
+      newItems: newItems.map(i => i?.name)
+    });
     
     return {
-      newItems: [],
-      totalCount: 0
+      newItems,
+      totalCount: newItems.length
     };
   };
 
