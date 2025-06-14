@@ -1189,9 +1189,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     }
     
     // Detectar soltar items
-    if (actionLower.includes('suelto') || actionLower.includes('dejo') || actionLower.includes('tiro') || 
-        actionLower.includes('abandono')) {
-      const palabras = actionLower.split(' ');
+    if (actionLowerForFlags.includes('suelto') || actionLowerForFlags.includes('dejo') || actionLowerForFlags.includes('tiro') || 
+        actionLowerForFlags.includes('abandono')) {
+      const palabras = actionLowerForFlags.split(' ');
       let itemName = '';
       
       for (let i = 0; i < palabras.length; i++) {
