@@ -447,11 +447,20 @@ function App() {
     };
   }, [sessionId, BACKEND_URL]);
 
-  // Start new session
+  // Start new session - SOLUCION DEFINITIVA CON DEBUGGING COMPLETO
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
     setLoading(true);
     setError(null);
     setGameOver(false);
+    
+    // 🔥 DEBUGGING COMPLETO OBLIGATORIO
+    console.log('🚀 INICIANDO NUEVA SESIÓN:', {
+      selectedMode,
+      campaignName,
+      sandboxConcept,
+      BACKEND_URL,
+      fullEndpoint: `${BACKEND_URL}/api/start_session`
+    });
     
     // Reset badges y elementos new
     setBadges({
@@ -484,18 +493,37 @@ function App() {
         requestBody.sandboxConcept = sandboxConcept;
       }
       
-      const response = await fetch(`${BACKEND_URL}/api/start_session`, {
+      // Verificar que la URL no esté undefined
+      if (!BACKEND_URL) {
+        throw new Error('BACKEND_URL está undefined - revisar .env');
+      }
+      
+      const endpoint = `${BACKEND_URL}/api/start_session`;
+      console.log('📤 Haciendo fetch a:', endpoint);
+      console.log('📦 Enviando body:', requestBody);
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
 
+      console.log('📥 Respuesta recibida:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to start session');
+        const errorText = await response.text();
+        console.error('❌ Respuesta no OK:', { status: response.status, errorText });
+        throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to start session'}`);
       }
 
       const data = await response.json();
+      console.log('✅ Sesión iniciada exitosamente:', data);
+      
       setSessionId(data.session_id);
       setGameState(data.game_state);
       setShowSandboxForm(false);
@@ -510,7 +538,19 @@ function App() {
       }
 
     } catch (err) {
-      setError('Error al iniciar sesión: ' + err.message);
+      console.error('💥 ERROR COMPLETO EN startNewSession:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+        BACKEND_URL,
+        selectedMode,
+        requestBody: {
+          mode: selectedMode || 'sandbox',
+          campaign: campaignName,
+          sandboxConcept: sandboxConcept ? sandboxConcept.substring(0, 50) + '...' : undefined
+        }
+      });
+      setError(`Error al iniciar sesión: ${err.message}`);
     } finally {
       setLoading(false);
     }
