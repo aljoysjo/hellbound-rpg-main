@@ -1295,16 +1295,16 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     }
     
     // Detectar flags de eventos importantes basados en palabras clave
-    const actionLower = (action || '').toLowerCase();
+    const actionLowerForFlags = (action || '').toLowerCase();
     const narrativeLower = (narrative || '').toLowerCase();
     
-    if (actionLower.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
+    if (actionLowerForFlags.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
       gameState.addEventFlag('MUERTE', 'Evento de muerte detectado');
     }
-    if (actionLower.includes('combate') || actionLower.includes('atacar') || narrativeLower.includes('batalla')) {
+    if (actionLowerForFlags.includes('combate') || actionLowerForFlags.includes('atacar') || narrativeLower.includes('batalla')) {
       gameState.addEventFlag('COMBATE', `Combate en ${gameState.location}`);
     }
-    if (actionLower.includes('compañero') || narrativeLower.includes('compañero') || narrativeLower.includes('aliado')) {
+    if (actionLowerForFlags.includes('compañero') || narrativeLower.includes('compañero') || narrativeLower.includes('aliado')) {
       gameState.addEventFlag('COMPAÑERO', 'Interacción con compañero detectada');
     }
     if (narrativeLower.includes('quest') || narrativeLower.includes('misión') || narrativeLower.includes('objetivo')) {
