@@ -1340,7 +1340,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         confidence: matchResult.confidence, // NUEVO: nivel de confianza
         instanceId: crypto.randomUUID()
       };
-      };
       
       // Verificar que no existe ya (evitar duplicados)
       const exists = gameState.inventory.some(item => 
