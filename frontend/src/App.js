@@ -516,15 +516,32 @@ function App() {
     }
   };
 
-  // Submit action
+  // Submit action - SOLUCION DEFINITIVA CON DEBUGGING COMPLETO
   const submitAction = useCallback(async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
     setLoading(true);
     setError(null);
 
+    // 🔥 DEBUGGING COMPLETO OBLIGATORIO
+    console.log('🚀 INICIANDO ENVÍO DE ACCIÓN:', {
+      actionText,
+      sessionId,
+      BACKEND_URL,
+      fullEndpoint: `${BACKEND_URL}/api/free_input`
+    });
+
     try {
-      const response = await fetch(`${BACKEND_URL}/api/free_input`, {
+      const endpoint = `${BACKEND_URL}/api/free_input`;
+      
+      // Verificar que la URL no esté undefined
+      if (!BACKEND_URL) {
+        throw new Error('BACKEND_URL está undefined - revisar .env');
+      }
+      
+      console.log('📤 Haciendo fetch a:', endpoint);
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -533,11 +550,21 @@ function App() {
         }),
       });
 
+      console.log('📥 Respuesta recibida:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: response.headers
+      });
+
       if (!response.ok) {
-        throw new Error('Failed to submit action');
+        const errorText = await response.text();
+        console.error('❌ Respuesta no OK:', { status: response.status, errorText });
+        throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to submit action'}`);
       }
 
       const data = await response.json();
+      console.log('✅ Datos procesados exitosamente:', data);
       
       if (data.success || data.game_over) {
         setGameState(data.game_state);
@@ -551,11 +578,20 @@ function App() {
           setGameOver(true);
         }
       } else {
-        setError('Error en la acción: ' + data.error);
+        console.error('❌ Error en respuesta del servidor:', data);
+        setError('Error en la acción: ' + (data.error || 'Respuesta inesperada del servidor'));
       }
 
     } catch (err) {
-      setError('Error al procesar acción: ' + err.message);
+      console.error('💥 ERROR COMPLETO EN submitAction:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+        BACKEND_URL,
+        sessionId,
+        actionText
+      });
+      setError(`Error de conexión: ${err.message}`);
     } finally {
       setLoading(false);
     }
