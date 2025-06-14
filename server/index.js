@@ -1359,8 +1359,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const detectMultipleItems = (action) => {
       const items = [];
       
-      // 🎯 REGEX CONTEXTUAL: Captura item + contexto/ubicación
-      const contextualPattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:y\s+(?:un[ae]?|la?|el)|para\s+(?:usar|atacar)|como\s+arma|$))/gi;
+      // 🎯 REGEX CONTEXTUAL MEJORADO: Más flexible con las terminaciones
+      const contextualPattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*([a-záéíóúñ\s]+?)(?=\s+(?:y\s+|para\s+|como\s+|$))/gi;
       
       let match;
       while ((match = contextualPattern.exec(action)) !== null) {
