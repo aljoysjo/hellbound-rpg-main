@@ -1154,7 +1154,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     let narrative = message?.content || "El eco de tu acción resuena en el silencio...";
     
     // 🎯 DETECCIÓN MANUAL DE ITEMS PARA TESTING (ANTES DE IA)
-    const actionLower = (action || '').toLowerCase();
+    const actionLowerForFlags = (action || '').toLowerCase();
     console.log('🔍 ANALYZING ACTION:', actionLower);
     
     // Detectar recoger items
