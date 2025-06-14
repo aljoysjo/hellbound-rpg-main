@@ -1002,13 +1002,11 @@ Responde SOLO con un JSON válido:
   "statusSet": {"miedo": 70, "alerta": 90, "fatiga": 30},
   "locationChange": "Nueva Ubicación Específica",
   "newSkill": {"id": "forja_espadas", "level": 1, "category": "pasiva", "tags": ["craft"], "description": "Habilidad para forjar armas"},
-  "newInventoryItem": {"name": "Libro de Hechizos", "icon": "📖", "description": "Manual de conjuros básicos"},
-  "removeInventoryItem": {"name": "Cuchillo", "reason": "soltado"},
   "resourceDelta": {"gold": +10, "rations": -1},
   "relationshipDelta": {"Persona": +15},
   "knowledgeDelta": {"Tema": +20},
-  "forceDeathCheck": true,
-  "deathReason": "Razón específica de muerte"
+  "forceDeathCheck": false,
+  "deathReason": ""
 }
 
 CLASIFICACIÓN DE SKILLS OBLIGATORIA:
