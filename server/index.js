@@ -1155,7 +1155,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     
     // 🎯 DETECCIÓN MANUAL DE ITEMS PARA TESTING (ANTES DE IA)
     const actionLowerForFlags = (action || '').toLowerCase();
-    console.log('🔍 ANALYZING ACTION:', actionLower);
+    console.log('🔍 ANALYZING ACTION:', actionLowerForFlags);
     
     // Detectar recoger items
     if (actionLower.includes('recog') || actionLower.includes('agarro') || actionLower.includes('tomo') || 
