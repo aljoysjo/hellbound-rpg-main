@@ -1166,13 +1166,13 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const isPhysicalItem = (itemText) => {
       const physicalKeywords = [
         'cuchillo', 'espada', 'daga', 'sable', 'hacha', 'martillo',
+        'escudo', 'armadura', 'casco', 'guante',
         'pistola', 'rifle', 'arma', 'ballesta',
         'libro', 'grimorio', 'tomo', 'pergamino', 'mapa', 'carta',
         'poción', 'frasco', 'elixir', 'medicina',
         'llave', 'gema', 'diamante', 'rubí', 'oro', 'moneda',
         'anillo', 'collar', 'amuleto', 'talismán',
         'varita', 'bastón', 'cetro', 'orbe',
-        'armadura', 'casco', 'escudo', 'guante',
         'cuerda', 'antorcha', 'linterna', 'cristal'
       ];
       
