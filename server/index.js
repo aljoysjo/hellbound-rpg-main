@@ -1401,19 +1401,20 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const detectedItems = detectMultipleItems(actionLowerForFlags);
     console.log('📦 ITEMS DETECTADOS:', detectedItems);
     
-    // AÑADIR CADA ITEM DETECTADO CON SISTEMA INTELIGENTE
+    // AÑADIR CADA ITEM DETECTADO CON NOMBRES INTELIGENTES
     for (const itemName of detectedItems) {
-      // 🎯 USAR SISTEMA DE EMPAREJAMIENTO INTELIGENTE
+      // 🎯 USAR SISTEMA DE EMPAREJAMIENTO INTELIGENTE CON NOMBRES CORTOS
       const matchResult = matchItemIntelligent(itemName);
       
-      console.log(`📦 Item procesado: "${itemName}" → ${matchResult.type} ${matchResult.icon} (${matchResult.confidence})`);
+      console.log(`📦 Item procesado: "${itemName}" → ${matchResult.name} ${matchResult.icon} (${matchResult.confidence})`);
       
       const newItem = {
-        name: itemName.charAt(0).toUpperCase() + itemName.slice(1),
-        type: matchResult.type, // NUEVO: tipo del item
-        icon: matchResult.icon, // INTELIGENTE: ícono basado en matching
-        description: `${itemName} encontrado`,
-        confidence: matchResult.confidence, // NUEVO: nivel de confianza
+        name: matchResult.name, // NUEVO: Nombre corto para UI
+        fullDescription: matchResult.fullDescription, // NUEVO: Descripción completa
+        type: matchResult.type,
+        icon: matchResult.icon,
+        description: `${matchResult.name} encontrado`, // Descripción para tooltip
+        confidence: matchResult.confidence,
         instanceId: crypto.randomUUID()
       };
       
