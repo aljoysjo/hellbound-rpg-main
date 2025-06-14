@@ -1231,8 +1231,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     }
     
     // Detectar flags de eventos importantes basados en palabras clave
-    const actionLower = action.toLowerCase();
-    const narrativeLower = narrative.toLowerCase();
+    const actionLower = (action || '').toLowerCase();
+    const narrativeLower = (narrative || '').toLowerCase();
     
     if (actionLower.includes('morir') || narrativeLower.includes('mueres') || narrativeLower.includes('muerte')) {
       gameState.addEventFlag('MUERTE', 'Evento de muerte detectado');
