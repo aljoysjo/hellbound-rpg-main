@@ -1950,7 +1950,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           itemName = itemName.replace(/[,\.!?;]$/, '').trim();
           
           // Filtrar palabras demasiado cortas o genéricas
-          if (itemName.length > 3 && !['lugar', 'sitio', 'cosa', 'algo', 'esto'].includes(itemName.toLowerCase())) {
+          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 50) {
             foundItems.push(itemName);
             console.log(`🔍 Item detectado: "${itemName}"`);
           }
