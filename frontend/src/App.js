@@ -632,7 +632,7 @@ function App() {
 
       // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
 
       const response = await fetch(endpoint, {
         method: 'POST',
