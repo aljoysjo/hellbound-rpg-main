@@ -1356,6 +1356,310 @@ body {
   }
 }
 
+/* ===== 🎁 SISTEMA DISCOVERED ITEMS ===== */
+
+/* Overlay en el canvas */
+.discovered-items-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: var(--bg-panel-dark);
+  border: var(--border-width) solid var(--color-warning);
+  border-radius: var(--border-radius);
+  padding: var(--space-md);
+  color: var(--text-light);
+  backdrop-filter: blur(10px);
+  max-width: 400px;
+  z-index: 15;
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+.discovered-items-title {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--color-warning);
+  text-align: center;
+}
+
+.discovered-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--space-sm);
+  max-width: 100%;
+}
+
+/* Cards de items descubiertos */
+.discovered-item-card {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--border-radius);
+  padding: var(--space-sm);
+  text-align: center;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.discovered-item-card:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #fbbf24;
+  transform: translateY(-2px);
+}
+
+.discovered-item-card.new-item {
+  animation: pulse 2s infinite;
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.discovered-item-card.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: none;
+}
+
+.discovered-item-card .item-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+.discovered-item-card .item-name {
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-light);
+}
+
+.discovered-item-card .new-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--color-success);
+  color: white;
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.discovered-item-card .pickup-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-overlay);
+  color: var(--text-light);
+  padding: var(--space-xs);
+  border-radius: var(--border-radius);
+  font-size: 0.7rem;
+}
+
+.more-items-button {
+  background: rgba(209, 164, 56, 0.2);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--border-radius);
+  padding: var(--space-sm);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-items-button:hover {
+  background: rgba(209, 164, 56, 0.3);
+}
+
+/* Modal discovered items */
+.discovered-popup .modal-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.discovered-items-grid-large {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.discovered-item-card-large {
+  background: var(--bg-card);
+  border: var(--border-width) solid var(--color-primary);
+  border-radius: var(--border-radius);
+  padding: var(--space-lg);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.discovered-item-card-large:hover {
+  border-color: var(--color-warning);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.discovered-item-card-large.new-item {
+  border-color: var(--color-success);
+  background: rgba(16, 185, 129, 0.05);
+  animation: pulse 2s infinite;
+}
+
+.discovered-item-card-large.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: none;
+}
+
+.discovered-item-card-large .item-icon-large {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.discovered-item-card-large .item-info {
+  flex: 1;
+}
+
+.discovered-item-card-large .item-name-large {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: var(--space-xs);
+}
+
+.discovered-item-card-large .item-description {
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  margin-bottom: var(--space-xs);
+}
+
+.discovered-item-card-large .item-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.discovered-item-card-large .item-contexts {
+  font-size: 0.7rem;
+  color: var(--color-primary);
+  font-weight: 500;
+  margin-top: var(--space-xs);
+}
+
+.discovered-item-card-large .new-indicator-large {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--color-success);
+  color: white;
+  font-size: 0.7rem;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius);
+  font-weight: bold;
+}
+
+.discovered-item-card-large .pickup-hint {
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-sm);
+  font-size: 0.7rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.discovered-item-card-large .pickup-loading-large {
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--color-warning);
+  color: white;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.no-items-message {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--space-xl);
+}
+
+/* Animaciones */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* Responsive para discovered items */
+@media (max-width: 767px) {
+  .discovered-items-overlay {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+  
+  .discovered-items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+  
+  .discovered-item-card {
+    min-height: 50px;
+    padding: var(--space-xs);
+  }
+  
+  .discovered-item-card .item-icon {
+    font-size: 1.2rem;
+  }
+  
+  .discovered-item-card .item-name {
+    font-size: 0.6rem;
+  }
+  
+  .discovered-item-card-large {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
+  }
+  
+  .discovered-item-card-large .item-icon-large {
+    font-size: 2.5rem;
+  }
+}
+
 /* ===== VARIABLES DE COMPATIBILIDAD PARA App.css ===== */
 :root {
   /* Mapeo de variables para compatibilidad */
