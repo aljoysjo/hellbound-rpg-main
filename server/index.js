@@ -1333,6 +1333,11 @@ Responde SOLO con la narrativa, sin explicaciones.
           max_tokens: 200
         }),
         new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('OpenAI timeout')), 15000)
+        )
+      ]);
+        }),
+        new Promise((_, reject) => 
           setTimeout(() => reject(new Error('OpenAI timeout')), 15000) // 15 segundos timeout
         )
       ]);
