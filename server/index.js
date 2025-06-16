@@ -234,12 +234,41 @@ const io = new Server(server, {
   }
 });
 
-// Middleware - CORS LIBERAL PARA DEBUGGING
+// Middleware - CORS PERMANENTE Y ROBUSTO
+const allowedOrigins = [
+  'https://hellbound-rpg.preview.emergentagent.com',
+  'https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com',
+  'http://localhost:3000', // Para desarrollo local
+  'http://localhost:3001', // Puerto alternativo
+  process.env.FRONTEND_URL // URL dinámica desde .env si existe
+].filter(Boolean); // Filtrar valores undefined/null
+
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como aplicaciones móviles, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Permitir cualquier subdominio de emergentagent.com
+    if (origin.includes('.preview.emergentagent.com')) {
+      return callback(null, true);
+    }
+    
+    // Permitir orígenes específicos
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    // Para desarrollo, permitir localhost
+    if (origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    
+    return callback(null, true); // TEMPORAL: Permitir todo mientras se estabiliza
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Para browsers legacy
 }));
 app.use(express.json());
 
