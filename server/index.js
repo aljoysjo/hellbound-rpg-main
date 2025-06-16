@@ -1337,6 +1337,11 @@ Responde SOLO con la narrativa, sin explicaciones.
           setTimeout(() => reject(new Error('OpenAI timeout')), 15000)
         )
       ]);
+      initialNarrative = conceptResponse.choices[0].message.content || fallbackNarrative;
+    } catch (error) {
+      console.log("⚠️ OpenAI timeout o error, usando narrativa rápida:", error.message);
+      initialNarrative = `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
+    }
 
       initialNarrative = conceptResponse.choices[0].message.content || 
         `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
