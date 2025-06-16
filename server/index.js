@@ -1325,12 +1325,17 @@ Crea una narrativa inicial inmersiva (máximo 4 oraciones) en segunda persona qu
 Responde SOLO con la narrativa, sin explicaciones.
 `;
 
-      const conceptResponse = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: conceptPrompt }],
-        temperature: 0.8,
-        max_tokens: 200
-      });
+      const conceptResponse = await Promise.race([
+        openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: conceptPrompt }],
+          temperature: 0.8,
+          max_tokens: 200
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('OpenAI timeout')), 15000) // 15 segundos timeout
+        )
+      ]);
 
       initialNarrative = conceptResponse.choices[0].message.content || 
         `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
