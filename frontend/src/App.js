@@ -686,6 +686,7 @@ function App() {
       }
 
     } catch (err) {
+      // 🔧 DIAGNÓSTICO PRECISO DE ERRORES
       console.error('💥 ERROR COMPLETO EN startNewSession:', {
         message: err.message,
         stack: err.stack,
@@ -701,19 +702,21 @@ function App() {
         }
       });
       
-      // 📱 MENSAJES DE ERROR ESPECÍFICOS PARA MÓVILES
+      // 📱 MENSAJES DE ERROR MEJORADOS Y PRECISOS
       let errorMessage = 'Error al iniciar sesión';
       
-      if (err.name === 'AbortError') {
-        errorMessage = 'La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.';
-      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-        errorMessage = 'Sin conexión al servidor. Verifica tu internet y intenta de nuevo.';
-      } else if (err.message.includes('CORS')) {
-        errorMessage = 'Error de configuración del servidor. Por favor reporta este problema.';
-      } else if (!navigator.onLine) {
+      if (!navigator.onLine) {
         errorMessage = 'Sin conexión a internet. Conéctate y intenta de nuevo.';
+      } else if (err.name === 'AbortError') {
+        errorMessage = 'La petición tardó demasiado tiempo. Intenta de nuevo.';
+      } else if (err.message.includes('Failed to fetch')) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+      } else if (err.message.includes('NetworkError')) {
+        errorMessage = 'Error de red. Verifica tu conexión e intenta de nuevo.';
+      } else if (err.message.includes('CORS')) {
+        errorMessage = 'Error de configuración del servidor. Reporta este problema.';
       } else {
-        errorMessage = `Error de conexión: ${err.message}`;
+        errorMessage = `Error: ${err.message}`;
       }
       
       setError(errorMessage);
