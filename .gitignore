@@ -1,0 +1,16 @@
+.godot/
+*.import
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.key
+*/.env
+server/.env
+
+# Node.js dependencies
+node_modules/
+*/node_modules/
+frontend/node_modules/
+server/node_modules/

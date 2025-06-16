@@ -1,0 +1,306 @@
+📄 Connected to MongoDB
+🔥 Hellbound RPG Backend running on port 8001
+📊 Game configuration loaded:
+   - Lore: 3 entries
+   - Functions: 1 functions
+   - Lexicon: 2 words
+🔌 Client connected: EdqfrB5aDLcdyFHOAAAB
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar la figura desde la ventana, Usar percepción sobrenatural para analizar el entorno, Salir de la habitación con cautela, Preparar un ritual de exorcismo.
+🔌 Client disconnected: EdqfrB5aDLcdyFHOAAAB
+🔌 Client connected: k5VgQasKGq8BCkALAAAD
+🔍 ANALYZING ACTION: agarro una cuerda, una daga y un trofeo que estaban debajo de mi cama
+🔍 ANALYZING ACTION: agarro una cuerda, una daga y un trofeo que estaban debajo de mi cama
+🔍 Texto completo detectado: "cuerda, una daga y un trofeo que estaban debajo de mi cama"
+🔍 Texto limpio: "cuerda, una daga y un trofeo que estaban debajo de mi cama"
+🔍 Items individuales detectados: [ 'cuerda', 'una daga', 'un trofeo que estaban debajo de mi cama' ]
+🔍 Item individual limpio: "cuerda"
+🔍 KEYWORDS DINÁMICAS DISPONIBLES: 176 total
+✅ Item válido detectado: "cuerda"
+🔍 Item individual limpio: "daga"
+🔍 KEYWORDS DINÁMICAS DISPONIBLES: 176 total
+✅ Item válido detectado: "daga"
+🔍 Item individual limpio: "trofeo que estaban debajo de mi cama"
+🔍 KEYWORDS DINÁMICAS DISPONIBLES: 176 total
+✅ Item válido detectado: "trofeo que estaban debajo de mi cama"
+📦 ITEMS DETECTADOS: [ 'cuerda', 'daga', 'trofeo que estaban debajo de mi cama' ]
+🔍 [LOCAL] Analizando: "cuerda" → normalizado: "cuerda"
+✅ [LOCAL] Match encontrado: "cuerda" → Cuerda 🪢
+📦 [LOCAL] Item procesado: "cuerda" → Cuerda 🪢 (high)
+📦 ITEM AÑADIDO: Cuerda 🪢
+🔍 [LOCAL] Analizando: "daga" → normalizado: "daga"
+✅ [LOCAL] Match encontrado: "daga" → Daga 🔪
+📦 [LOCAL] Item procesado: "daga" → Daga 🔪 (high)
+📦 ITEM AÑADIDO: Daga 🔪
+🔍 [LOCAL] Analizando: "trofeo que estaban debajo de mi cama" → normalizado: "trofeo que estaban debajo de mi cama"
+✅ [LOCAL] Match encontrado: "trofeo" → Trofeo 🏆
+📦 [LOCAL] Item procesado: "trofeo que estaban debajo de mi cama" → Trofeo 🏆 (high)
+📦 ITEM AÑADIDO: Trofeo 🏆
+🔍 CURRENT INVENTORY: [ 'Cuerda 🪢', 'Daga 🔪', 'Trofeo 🏆' ]
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 0, "alerta": 20},
+  "locationChange": "salir de la habitación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 0, alerta: 20 },
+  locationChange: 'salir de la habitación',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 0,
+    "alerta": 20
+  },
+  "locationChange": "salir de la habitación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 0%
+😊 alerta: 20%
+📍 Nueva ubicación: salir de la habitación
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Aproximarse al hombre de atuendo gris, Usar percepción sobrenatural para analizar el entorno, Revisar el talismán para obtener pistas, Preparar la daga para un posible enfrentamiento.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
+🔍 ANALYZING ACTION: ahora, suelto el trofeo porque no me sirve para nada. pero agarro una calavera que tenía
+🔍 ANALYZING ACTION: ahora, suelto el trofeo porque no me sirve para nada. pero agarro una calavera que tenía
+🔍 Texto completo detectado: "calavera que tenía"
+🔍 Texto limpio: "calavera que tenía"
+🔍 Items individuales detectados: [ 'calavera que tenía' ]
+🔍 Item individual limpio: "calavera que tenía"
+🔍 KEYWORDS DINÁMICAS DISPONIBLES: 176 total
+✅ Item válido detectado: "calavera que tenía"
+📦 ITEMS DETECTADOS: [ 'calavera que tenía' ]
+🔍 [LOCAL] Analizando: "calavera que tenía" → normalizado: "calavera que tenia"
+✅ [LOCAL] Match encontrado: "calavera" → Calavera 💀
+📦 [LOCAL] Item procesado: "calavera que tenía" → Calavera 💀 (high)
+📦 ITEM AÑADIDO: Calavera 💀
+❌ TEXTO DETECTADO PARA DROP: trofeo porque no me sirve para nada. pero agarro una calavera que tenía
+❌ ITEMS INDIVIDUALES PARA DROP: [
+  'trofeo porque no me sirve para nada. pero agarro una calavera que tenía'
+]
+⚠️ ITEM NO ENCONTRADO PARA DROP: "trofeo porque no me sirve para nada. pero agarro una calavera que tenía"
+🔍 CURRENT INVENTORY: [ 'Cuerda 🪢', 'Daga 🔪', 'Trofeo 🏆', 'Calavera 💀' ]
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 50},
+  "locationChange": "salir de la habitación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 50 },
+  locationChange: 'salir de la habitación',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 50
+  },
+  "locationChange": "salir de la habitación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 50%
+📍 Nueva ubicación: salir de la habitación
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Confrontar al hombre en la ventana, Usar percepción sobrenatural en la calavera, Investigar la habitación en busca de pistas, Preparar un hechizo de exorcismo.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 40%
+🔍 ANALYZING ACTION: suelto el trofeo y la cuerda
+🔍 ANALYZING ACTION: suelto el trofeo y la cuerda
+📦 ITEMS DETECTADOS: []
+❌ TEXTO DETECTADO PARA DROP: trofeo y la cuerda
+❌ ITEMS INDIVIDUALES PARA DROP: [ 'trofeo', 'cuerda' ]
+❌ ITEM ELIMINADO EXITOSAMENTE: Trofeo 🏆
+❌ ITEM ELIMINADO EXITOSAMENTE: Cuerda 🪢
+🔍 CURRENT INVENTORY: [ 'Daga 🔪', 'Calavera 💀' ]
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 50, "alerta": 70},
+  "locationChange": "junto a la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 50, alerta: 70 },
+  locationChange: 'junto a la ventana',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 50,
+    "alerta": 70
+  },
+  "locationChange": "junto a la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 50%
+😊 alerta: 70%
+📍 Nueva ubicación: junto a la ventana
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Confrontar al hombre de atuendo gris, Usar percepción sobrenatural en la figura, Preguntar sobre la calavera, Observar el entorno en busca de pistas.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 60%
+🔍 ANALYZING ACTION: me drogo y me pongo super nervioso
+🔍 ANALYZING ACTION: me drogo y me pongo super nervioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: [ 'Daga 🔪', 'Calavera 💀' ]
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {"health": 0, "mana": 0, "stamina": 0},
+  "statusSet": {"miedo": 70, "alerta": 90, "fatiga": 0},
+  "locationChange": "junto a la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: { health: 0, mana: 0, stamina: 0 },
+  statusSet: { miedo: 70, alerta: 90, fatiga: 0 },
+  locationChange: 'junto a la ventana',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {
+    "health": 0,
+    "mana": 0,
+    "stamina": 0
+  },
+  "statusSet": {
+    "miedo": 70,
+    "alerta": 90,
+    "fatiga": 0
+  },
+  "locationChange": "junto a la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+💗 health: 100
+💗 mana: 100
+💗 stamina: 100
+😊 miedo: 70%
+😊 alerta: 90%
+😊 fatiga: 0%
+📍 Nueva ubicación: junto a la ventana
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Examinar la figura en la ventana, Usar percepción sobrenatural para identificar amenazas, Preparar defensa con objetos disponibles, Buscar una salida rápida.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 80%
+🔍 ANALYZING ACTION: mis niveles de alerta disminuyen
+🔍 ANALYZING ACTION: mis niveles de alerta disminuyen
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: [ 'Daga 🔪', 'Calavera 💀' ]
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 70, "alerta": 70},
+  "locationChange": "",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 70, alerta: 70 },
+  locationChange: '',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 70,
+    "alerta": 70
+  },
+  "locationChange": "",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 70%
+😊 alerta: 70%
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Acercarme a la figura en la ventana, Preguntar sobre la calavera, Usar percepción sobrenatural, Ofrecerle el oro a cambio de conocimiento
+📋 Objetivo actualizado: Investigar la figura misteriosa - 100%

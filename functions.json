@@ -1,0 +1,25 @@
+[
+  {
+    "name": "apply_player_action",
+    "description": "Devuelve la narrativa y los cambios de estado.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "narrative": {
+          "type": "string",
+          "description": "Texto narrativo oscuro (<30 palabras, español)."
+        },
+        "stateChanges": {
+          "type": "object",
+          "properties": {
+            "health": { "type": "integer" },
+            "mana": { "type": "integer" },
+            "gold": { "type": "integer" },
+            "location": { "type": "string" }
+          }
+        }
+      },
+      "required": ["narrative"]
+    }
+  }
+]
