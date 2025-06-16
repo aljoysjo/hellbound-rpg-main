@@ -30,10 +30,6 @@ function App() {
   const [discoveredItems, setDiscoveredItems] = useState([]);
   const [pickupLoading, setPickupLoading] = useState(null); // item siendo recogido
 
-  // 🎁 SISTEMA DISCOVERED ITEMS - NUEVO
-  const [discoveredItems, setDiscoveredItems] = useState([]);
-  const [pickupLoading, setPickupLoading] = useState(null); // item siendo recogido
-
   // SISTEMA BADGES "VIVOS" MEJORADO - INCLUYE ITEMS SOLTADOS
   const [badges, setBadges] = useState({
     inventory: { count: 0, newItems: [], removedItems: [] }, // AGREGADO: removedItems
