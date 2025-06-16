@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - SISTEMA POPUPS "VIVOS" COMPLETO
+// 🎮 MAIN APP COMPONENT - SISTEMA POPUPS "VIVOS" COMPLETO + DISCOVERED ITEMS
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -35,7 +35,8 @@ function App() {
     inventory: { count: 0, newItems: [], removedItems: [] }, // AGREGADO: removedItems
     objectives: { count: 0, newObjectives: [], completedObjectives: [] },
     skills: { count: 0, newSkills: [], levelUps: [] },
-    emotions: { count: 0, significantChanges: [] }
+    emotions: { count: 0, significantChanges: [] },
+    discovered: { count: 0, newItems: [] } // NUEVO: badge para discovered items
   });
 
   // Persistencia de elementos "NEW"
@@ -43,11 +44,13 @@ function App() {
     inventory: new Set(),
     objectives: new Set(), 
     skills: new Set(),
-    emotions: new Set()
+    emotions: new Set(),
+    discovered: new Set() // NUEVO: para discovered items
   });
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
+  
   // HELPER: Safe string conversion
   const safeStringify = (value, fallback = '') => {
     if (typeof value === 'string') return value;
@@ -57,6 +60,47 @@ function App() {
       return value.name || value.id || value.description || fallback;
     }
     return String(value);
+  };
+
+  // 🎁 FUNCIÓN PICKUP ITEM - NUEVA
+  const pickupItem = async (item) => {
+    if (!sessionId || !item || pickupLoading) return;
+    
+    setPickupLoading(item.instanceId);
+    
+    try {
+      console.log('🎁 Recogiendo item:', item);
+      
+      const response = await fetch(`${BACKEND_URL}/api/pickup_item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          item_id: item.instanceId
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Item recogido exitosamente:', data);
+      
+      // Actualizar estado local inmediatamente
+      setGameState(data.game_state);
+      setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
+      
+      // Mostrar feedback visual (se puede mejorar más adelante)
+      // TODO: Añadir notificación toast
+      
+    } catch (error) {
+      console.error('❌ Error recogiendo item:', error);
+      setError(`Error recogiendo ${item.name}: ${error.message}`);
+    } finally {
+      setPickupLoading(null);
+    }
   };
 
   // SISTEMA DE DETECCIÓN DE CAMBIOS BASADO EN INSTANCE ID (DEFINITIVO) - CORREGIDO PARA ITEMS SOLTADOS
@@ -93,6 +137,31 @@ function App() {
       newItems,
       removedItems, // NUEVO: items soltados
       totalCount: newItems.length + removedItems.length // NUEVO: contar ambos tipos
+    };
+  };
+
+  // 🎁 NUEVO: Detectar cambios en discovered items
+  const detectDiscoveredChanges = (prevDiscovered, currentDiscovered) => {
+    const prev = Array.isArray(prevDiscovered) ? prevDiscovered : [];
+    const current = Array.isArray(currentDiscovered) ? currentDiscovered : [];
+    
+    const prevIds = new Set(prev.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
+    const currentIds = new Set(current.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
+    
+    const newItems = current.filter(item => {
+      const itemId = item?.instanceId || item?.name || JSON.stringify(item);
+      return !prevIds.has(itemId);
+    });
+    
+    console.log('🎁 DISCOVERED CHANGES DETECTED:', { 
+      prevCount: prev.length, 
+      currentCount: current.length,
+      newItems: newItems.map(i => i?.name)
+    });
+    
+    return {
+      newItems,
+      totalCount: newItems.length
     };
   };
 
@@ -242,6 +311,11 @@ function App() {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
             
+            // 🎁 ACTUALIZAR DISCOVERED ITEMS
+            if (data.game_state.discoveredItems) {
+              setDiscoveredItems(data.game_state.discoveredItems);
+            }
+            
             // SISTEMA DE BADGES AVANZADO
             if (prevState) {
               console.log('🔍 DETECTING CHANGES...');
@@ -249,6 +323,12 @@ function App() {
               const inventoryChanges = detectInventoryChanges(
                 prevState.inventory, 
                 data.game_state.inventory
+              );
+              
+              // 🎁 NUEVO: Detectar cambios en discovered items
+              const discoveredChanges = detectDiscoveredChanges(
+                prevState.discoveredItems,
+                data.game_state.discoveredItems
               );
               
               // Detectar cambios en objetivos
@@ -269,10 +349,10 @@ function App() {
                 data.game_state.emotionalStates
               );
               
-              console.log('🎯 CHANGES DETECTED:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
+              console.log('🎯 CHANGES DETECTED:', { inventoryChanges, discoveredChanges, objectivesChanges, skillsChanges, emotionsChanges });
               
               // Actualizar badges si hay cambios
-              if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+              if (inventoryChanges.totalCount > 0 || discoveredChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
                 
                 console.log('✨ UPDATING BADGES...');
@@ -281,6 +361,10 @@ function App() {
                     inventory: {
                       count: prevBadges.inventory.count + inventoryChanges.totalCount,
                       newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
+                    },
+                    discovered: {
+                      count: prevBadges.discovered.count + discoveredChanges.totalCount,
+                      newItems: [...prevBadges.discovered.newItems, ...discoveredChanges.newItems]
                     },
                     objectives: {
                       count: prevBadges.objectives.count + objectivesChanges.totalCount,
@@ -308,6 +392,10 @@ function App() {
                   inventory: new Set([
                     ...prevNew.inventory,
                     ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+                  ]),
+                  discovered: new Set([
+                    ...prevNew.discovered,
+                    ...discoveredChanges.newItems.map(item => item?.instanceId || item?.name || JSON.stringify(item))
                   ]),
                   objectives: new Set([
                     ...prevNew.objectives,
@@ -350,7 +438,7 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
-  // SISTEMA DE POLLING ÚNICO PARA BADGES (CORREGIDO - SIN DUPLICACIÓN)
+  // SISTEMA DE POLLING ÚNICO PARA BADGES (CORREGIDO - SIN DUPLICACIÓN) + DISCOVERED ITEMS
   useEffect(() => {
     if (!sessionId) return;
     
@@ -364,54 +452,54 @@ function App() {
           console.log('🔄 POLLING RESPONSE RAW:', {
             inventory: data.game_state?.inventory,
             inventoryLength: data.game_state?.inventory?.length,
+            discoveredItems: data.game_state?.discoveredItems,
+            discoveredLength: data.game_state?.discoveredItems?.length,
             actionCount: data.game_state?.actionCount
           });
           
           setGameState(prevState => {
             if (!prevState) {
               console.log('🔄 No prevState, returning new state');
+              // 🎁 SINCRONIZAR DISCOVERED ITEMS EN PRIMER ESTADO
+              if (data.game_state.discoveredItems) {
+                setDiscoveredItems(data.game_state.discoveredItems);
+              }
               return data.game_state;
             }
             
-            // MEJORADO: Detectar cambios por múltiples campos, no solo actionCount
+            // MEJORADO: Detectar cambios por múltiples campos, incluyendo discoveredItems
             const hasInventoryChanges = (data.game_state.inventory?.length || 0) > (prevState.inventory?.length || 0);
+            const hasDiscoveredChanges = (data.game_state.discoveredItems?.length || 0) !== (prevState.discoveredItems?.length || 0);
             const hasSkillsChanges = (data.game_state.skills?.length || 0) > (prevState.skills?.length || 0);
             const hasObjectivesChanges = (data.game_state.questObjectives?.length || 0) > (prevState.questObjectives?.length || 0);
             const hasActionCountChange = data.game_state.actionCount > prevState.actionCount;
             
-            if (hasActionCountChange || hasInventoryChanges || hasSkillsChanges || hasObjectivesChanges) {
+            if (hasActionCountChange || hasInventoryChanges || hasDiscoveredChanges || hasSkillsChanges || hasObjectivesChanges) {
               console.log('🔄 CAMBIOS DETECTADOS:', { 
                 actionCount: `${prevState.actionCount} → ${data.game_state.actionCount}`,
                 inventory: `${prevState.inventory?.length || 0} → ${data.game_state.inventory?.length || 0}`,
+                discovered: `${prevState.discoveredItems?.length || 0} → ${data.game_state.discoveredItems?.length || 0}`,
                 skills: `${prevState.skills?.length || 0} → ${data.game_state.skills?.length || 0}`,
                 objectives: `${prevState.questObjectives?.length || 0} → ${data.game_state.questObjectives?.length || 0}`
               });
               
               setNarrativeVisible(true);
               
+              // 🎁 ACTUALIZAR DISCOVERED ITEMS
+              if (data.game_state.discoveredItems) {
+                setDiscoveredItems(data.game_state.discoveredItems);
+              }
+              
               // DETECTAR CAMBIOS ESPECÍFICOS PARA BADGES
               const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
+              const discoveredChanges = detectDiscoveredChanges(prevState.discoveredItems, data.game_state.discoveredItems);
               const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
               const skillsChanges = detectSkillsChanges(prevState.skills, data.game_state.skills);
               const emotionsChanges = detectEmotionsChanges(prevState.emotionalStates, data.game_state.emotionalStates);
               
-              console.log('🎯 CAMBIOS ESPECÍFICOS:', { inventoryChanges, objectivesChanges, skillsChanges, emotionsChanges });
-              console.log('🔍 BADGES DEBUG:', { 
-                currentBadges: badges,
-                inventoryCount: inventoryChanges.totalCount,
-                skillsCount: skillsChanges.totalCount,
-                objectivesCount: objectivesChanges.totalCount,
-                emotionsCount: emotionsChanges.totalCount
-              });
-              console.log('🔍 BADGES DEBUG:', { 
-                currentBadges: badges,
-                inventoryCount: inventoryChanges.totalCount,
-                skillsCount: skillsChanges.totalCount,
-                objectivesCount: objectivesChanges.totalCount,
-                emotionsCount: emotionsChanges.totalCount
-              });
+              console.log('🎯 CAMBIOS ESPECÍFICOS:', { inventoryChanges, discoveredChanges, objectivesChanges, skillsChanges, emotionsChanges });
               
-              if (inventoryChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
+              if (inventoryChanges.totalCount > 0 || discoveredChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
                 
                 console.log('✨ ACTUALIZANDO BADGES!');
@@ -421,6 +509,10 @@ function App() {
                       count: prev.inventory.count + inventoryChanges.totalCount, 
                       newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems],
                       removedItems: [...prev.inventory.removedItems, ...(inventoryChanges.removedItems || [])]
+                    },
+                    discovered: {
+                      count: prev.discovered.count + discoveredChanges.totalCount,
+                      newItems: [...prev.discovered.newItems, ...discoveredChanges.newItems]
                     },
                     objectives: { count: prev.objectives.count + objectivesChanges.totalCount, newObjectives: [...prev.objectives.newObjectives, ...objectivesChanges.newObjectives], completedObjectives: [...prev.objectives.completedObjectives, ...objectivesChanges.completedObjectives] },
                     skills: { count: prev.skills.count + skillsChanges.totalCount, newSkills: [...prev.skills.newSkills, ...skillsChanges.newSkills], levelUps: [...prev.skills.levelUps, ...skillsChanges.levelUps] },
@@ -436,6 +528,10 @@ function App() {
                   inventory: new Set([
                     ...prevNew.inventory,
                     ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+                  ]),
+                  discovered: new Set([
+                    ...prevNew.discovered,
+                    ...discoveredChanges.newItems.map(item => item?.instanceId || item?.name || JSON.stringify(item))
                   ]),
                   objectives: new Set([
                     ...prevNew.objectives,
@@ -494,15 +590,20 @@ function App() {
       inventory: { count: 0, newItems: [], removedItems: [] }, // CORREGIDO: incluir removedItems
       objectives: { count: 0, newObjectives: [], completedObjectives: [] },
       skills: { count: 0, newSkills: [], levelUps: [] },
-      emotions: { count: 0, significantChanges: [] }
+      emotions: { count: 0, significantChanges: [] },
+      discovered: { count: 0, newItems: [] } // NUEVO: reset discovered badge
     });
     
     setNewElements({
       inventory: new Set(),
       objectives: new Set(),
       skills: new Set(),
-      emotions: new Set()
+      emotions: new Set(),
+      discovered: new Set() // NUEVO: reset discovered elements
     });
+    
+    // 🎁 RESET DISCOVERED ITEMS
+    setDiscoveredItems([]);
     
     try {
       const requestBody = { mode: selectedMode || 'sandbox' };
@@ -555,6 +656,11 @@ function App() {
       setGameState(data.game_state);
       setShowSandboxForm(false);
       setNarrativeVisible(true);
+      
+      // 🎁 INICIALIZAR DISCOVERED ITEMS
+      if (data.game_state.discoveredItems) {
+        setDiscoveredItems(data.game_state.discoveredItems);
+      }
       
       if (data.suggested_actions) {
         setSuggestedActions(data.suggested_actions);
@@ -636,6 +742,11 @@ function App() {
       if (data.success || data.game_over) {
         setGameState(data.game_state);
         setNarrativeVisible(true);
+        
+        // 🎁 ACTUALIZAR DISCOVERED ITEMS
+        if (data.game_state.discoveredItems) {
+          setDiscoveredItems(data.game_state.discoveredItems);
+        }
         
         if (data.suggested_actions) {
           setSuggestedActions(data.suggested_actions);
@@ -745,6 +856,18 @@ function App() {
       toggleNarrativeModal(e);
     } else {
       setNarrativeVisible(true);
+    }
+  };
+
+  // 🎁 NUEVO: Toggle discovered items modal
+  const toggleDiscoveredItems = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    forceBlurAll();
+    setShowDiscoveredItems(!showDiscoveredItems);
+    if (!showDiscoveredItems) {
+      // Reset badge al abrir
+      setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
     }
   };
 
@@ -862,6 +985,39 @@ function App() {
             </div>
             <div className="narrative-hint">
               Click en 📜 para ver historia completa
+            </div>
+          </div>
+        )}
+        
+        {/* 🎁 NUEVO: Mostrar discovered items como overlay */}
+        {discoveredItems.length > 0 && (
+          <div className="discovered-items-overlay">
+            <div className="discovered-items-title">
+              🎁 Items Descubiertos ({discoveredItems.length})
+            </div>
+            <div className="discovered-items-grid">
+              {discoveredItems.slice(0, 3).map((item, index) => { // Mostrar máximo 3
+                const isNew = isElementNew('discovered', item?.instanceId || item?.name || JSON.stringify(item));
+                return (
+                  <button
+                    key={item.instanceId || index}
+                    className={`discovered-item-card clickable ${isNew ? 'new-item' : ''} ${pickupLoading === item.instanceId ? 'loading' : ''}`}
+                    onClick={() => pickupItem(item)}
+                    disabled={pickupLoading === item.instanceId}
+                    title={`Recoger ${item.name}`}
+                  >
+                    <div className="item-icon">{item.icon || '📦'}</div>
+                    <div className="item-name">{safeStringify(item.name, 'Item')}</div>
+                    {isNew && <div className="new-indicator">NEW!</div>}
+                    {pickupLoading === item.instanceId && <div className="pickup-loading">...</div>}
+                  </button>
+                );
+              })}
+              {discoveredItems.length > 3 && (
+                <button className="more-items-button clickable" onClick={toggleDiscoveredItems}>
+                  +{discoveredItems.length - 3} más
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -1005,7 +1161,7 @@ function App() {
     </div>
   );
 
-  // BARRA POPUPS CON BADGES VIVOS - CORREGIDO CON CSS INLINE
+  // BARRA POPUPS CON BADGES VIVOS - CORREGIDO CON CSS INLINE + DISCOVERED ITEMS
   const PopupsBar = () => (
     <div className="popups-bar">
       <button 
@@ -1036,6 +1192,60 @@ function App() {
             animation: 'pulse 2s infinite'
           }}>
             {badges.inventory.count}
+          </div>
+        ) : null}
+      </button>
+      
+      {/* 🎁 NUEVO: Botón discovered items */}
+      <button 
+        className="popup-button clickable"
+        onClick={toggleDiscoveredItems}
+        aria-label="Items Descubiertos"
+        style={{ position: 'relative' }}
+      >
+        🎁
+        <span className="popup-label">Items</span>
+        {/* BADGE DISCOVERED: CSS inline funcionando */}
+        {badges.discovered.count > 0 ? (
+          <div style={{
+            position: 'absolute',
+            top: '-8px', 
+            right: '-8px',
+            background: '#f59e0b',
+            color: 'white',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            zIndex: 10,
+            animation: 'pulse 2s infinite'
+          }}>
+            {badges.discovered.count}
+          </div>
+        ) : null}
+        {/* Mostrar badge también si hay items sin recoger */}
+        {discoveredItems.length > 0 && badges.discovered.count === 0 ? (
+          <div style={{
+            position: 'absolute',
+            top: '-8px', 
+            right: '-8px',
+            background: '#10b981',
+            color: 'white',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px', 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            zIndex: 10
+          }}>
+            {discoveredItems.length}
           </div>
         ) : null}
       </button>
@@ -1461,6 +1671,76 @@ function App() {
     );
   };
 
+  // 🎁 NUEVO: Modal Discovered Items
+  const DiscoveredItemsModal = () => {
+    return (
+      <>
+        <div 
+          className={`modal-overlay ${showDiscoveredItems ? 'show' : ''}`}
+          onClick={() => setShowDiscoveredItems(false)}
+        />
+        <div className={`popup-modal discovered-popup ${showDiscoveredItems ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>🎁 Items Descubiertos ({discoveredItems.length})</span>
+            <button 
+              className="modal-close clickable" 
+              onClick={() => setShowDiscoveredItems(false)}
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="modal-content">
+            {discoveredItems.length === 0 ? (
+              <p className="no-items-message">
+                No hay items descubiertos. Usa acciones como "busco algo valioso" para encontrar tesoros.
+              </p>
+            ) : (
+              <div className="discovered-items-grid-large">
+                {discoveredItems.map((item, index) => {
+                  const isNew = isElementNew('discovered', item?.instanceId || item?.name || JSON.stringify(item));
+                  return (
+                    <div 
+                      key={item.instanceId || index} 
+                      className={`discovered-item-card-large clickable ${isNew ? 'new-item' : ''} ${pickupLoading === item.instanceId ? 'loading' : ''}`}
+                      onClick={() => {
+                        if (isNew) markElementSeen('discovered', item?.instanceId || item?.name || JSON.stringify(item));
+                        pickupItem(item);
+                      }}
+                      disabled={pickupLoading === item.instanceId}
+                    >
+                      <div className="item-icon-large">{item.icon || '📦'}</div>
+                      <div className="item-info">
+                        <div className="item-name-large">{safeStringify(item.name, 'Item Desconocido')}</div>
+                        {item.description && (
+                          <div className="item-description">{safeStringify(item.description, '')}</div>
+                        )}
+                        {item.type && (
+                          <div className="item-type">Tipo: {safeStringify(item.type, '')}</div>
+                        )}
+                        {item.contexts && item.contexts.length > 0 && (
+                          <div className="item-contexts">
+                            Contexto: {item.contexts.join(', ')}
+                          </div>
+                        )}
+                      </div>
+                      {isNew && <div className="new-indicator-large">NEW!</div>}
+                      {pickupLoading === item.instanceId ? (
+                        <div className="pickup-loading-large">Recogiendo...</div>
+                      ) : (
+                        <div className="pickup-hint">Click para recoger</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  };
+
   // Modal Narrativa
   const NarrativeModal = () => (
     <>
@@ -1656,6 +1936,7 @@ function App() {
           <SkillsModal />
           <ObjectivesModal />
           <InventoryModal />
+          <DiscoveredItemsModal />
           <EmotionsModal />
           <NarrativeModal />
         </>
