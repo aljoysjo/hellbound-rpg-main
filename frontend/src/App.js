@@ -630,11 +630,26 @@ function App() {
       console.log('📤 Haciendo fetch a:', endpoint);
       console.log('📦 Enviando body:', requestBody);
 
+      // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(requestBody),
+        signal: controller.signal,
+        // Configuración adicional para móviles
+        mode: 'cors',
+        credentials: 'omit', // Simplificar para móviles
+        keepalive: false
       });
+
+      clearTimeout(timeoutId);
 
       console.log('📥 Respuesta recibida:', {
         status: response.status,
