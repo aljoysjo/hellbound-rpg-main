@@ -1912,42 +1912,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       state_changes: stateChanges
     });
     
-    
-    // 🔧 FUNCIÓN: DETECCIÓN INTELIGENTE DE ITEMS EN NARRATIVA
-    function extractItemsFromNarrative(narrative) {
-      console.log('📖 Analizando narrativa para detectar items...');
-      
-      const patterns = [
-        /encuentras? (una?|el|la) ([^,.!?]+)/gi,
-        /descubres? (una?|el|la) ([^,.!?]+)/gi,
-        /hallas? (una?|el|la) ([^,.!?]+)/gi,
-        /ves? (una?|el|la) ([^,.!?]+)/gi,
-        /hay (una?|el|la) ([^,.!?]+)/gi,
-        /aparece (una?|el|la) ([^,.!?]+)/gi,
-        /observas? (una?|el|la) ([^,.!?]+)/gi,
-        /localizas? (una?|el|la) ([^,.!?]+)/gi,
-        /notas? (una?|el|la) ([^,.!?]+)/gi,
-        /(una?|el|la) ([^,.!?]+) (sobre|en|bajo|dentro de|junto a)/gi,
-        /se encuentra (una?|el|la) ([^,.!?]+)/gi
-      ];
-      
-      let foundItems = [];
-      
-      patterns.forEach((pattern, index) => {
-        let match;
-        while ((match = pattern.exec(narrative)) !== null) {
-          let itemName = '';
-          
-          // Para la mayoría de patrones, el item está en la posición 2
-          if (index < 10) {
-            itemName = match[2].trim();
-          } else {
-            // Para el último patrón es diferente
-            itemName = match[2].trim();
-          }
-          
-          // Limpiar y validar el item
-          itemName = itemName.replace(/[,\.!?;]$/, '').trim();
           
           // Filtrar palabras demasiado cortas o genéricas
           if (itemName.length > 3 && !['lugar', 'sitio', 'cosa', 'algo', 'esto'].includes(itemName.toLowerCase())) {
