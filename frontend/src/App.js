@@ -770,14 +770,24 @@ function App() {
       
       console.log('📤 Haciendo fetch a:', endpoint);
       
+      // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 segundos
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
         body: JSON.stringify({
           session_id: sessionId,
           action: actionText
         }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       console.log('📥 Respuesta recibida:', {
         status: response.status,
