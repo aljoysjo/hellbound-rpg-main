@@ -698,7 +698,20 @@ function App() {
     } catch (err) {
       console.error('💥 ERROR COMPLETO EN startNewSession:', {
         message: err.message,
-        stack: err.stack,
+        // 📱 MENSAJE DE ERROR ESPECÍFICO PARA MÓVILES
+        let errorMessage = 'Error al iniciar sesión';
+        
+        if (err.name === 'AbortError') {
+          errorMessage = 'La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.';
+        } else if (err.message.includes('Failed to fetch')) {
+          errorMessage = 'Sin conexión al servidor. Verifica tu internet y recarga la página.';
+        } else if (!navigator.onLine) {
+          errorMessage = 'Sin conexión a internet. Conéctate y intenta de nuevo.';
+        } else {
+          errorMessage = `Error: ${err.message}`;
+        }
+        
+        setError(errorMessage);
         name: err.name,
         BACKEND_URL,
         selectedMode,
