@@ -1325,6 +1325,7 @@ Crea una narrativa inicial inmersiva (máximo 4 oraciones) en segunda persona qu
 Responde SOLO con la narrativa, sin explicaciones.
 `;
 
+    try {
       const conceptResponse = await Promise.race([
         openai.chat.completions.create({
           model: "gpt-4o-mini",
