@@ -113,6 +113,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Se detectó un problema con el sistema de loot dinámico. Aunque el código para generar items dinámicos está implementado en las líneas 1878-1897 y el sistema detecta correctamente las acciones de búsqueda (como 'busco algo valioso'), los items no aparecen en el campo 'discoveredItems' del game_state. La narrativa menciona el descubrimiento de items (ej: 'Descubres amuleto protector 🧿 en el lugar'), pero estos no se añaden al estado del juego. El endpoint /api/pickup_item no puede funcionar correctamente sin items en discoveredItems."
+      - working: false
+        agent: "testing"
+        comment: "Se identificó que el problema es que el campo 'discoveredItems' no está incluido en el método toDict() de la clase GameState, por lo que no se devuelve en las respuestas de la API. Se modificó el método toDict() para incluir 'discoveredItems: this.discoveredItems || []', pero el problema persiste. Los items se añaden correctamente al array discoveredItems en el servidor, pero no se incluyen en la respuesta de la API. Esto impide que el frontend pueda mostrar los items descubiertos y que el usuario pueda recogerlos."
 
 frontend:
   - task: "Input fluido"
