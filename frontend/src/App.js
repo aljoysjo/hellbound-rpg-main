@@ -632,19 +632,9 @@ function App() {
 
       // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
 
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -698,20 +688,7 @@ function App() {
     } catch (err) {
       console.error('💥 ERROR COMPLETO EN startNewSession:', {
         message: err.message,
-        // 📱 MENSAJE DE ERROR ESPECÍFICO PARA MÓVILES
-        let errorMessage = 'Error al iniciar sesión';
-        
-        if (err.name === 'AbortError') {
-          errorMessage = 'La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.';
-        } else if (err.message.includes('Failed to fetch')) {
-          errorMessage = 'Sin conexión al servidor. Verifica tu internet y recarga la página.';
-        } else if (!navigator.onLine) {
-          errorMessage = 'Sin conexión a internet. Conéctate y intenta de nuevo.';
-        } else {
-          errorMessage = `Error: ${err.message}`;
-        }
-        
-        setError(errorMessage);
+        stack: err.stack,
         name: err.name,
         BACKEND_URL,
         selectedMode,
@@ -770,24 +747,14 @@ function App() {
       
       console.log('📤 Haciendo fetch a:', endpoint);
       
-      // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 segundos
-
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_id: sessionId,
           action: actionText
         }),
-        signal: controller.signal
       });
-
-      clearTimeout(timeoutId);
 
       console.log('📥 Respuesta recibida:', {
         status: response.status,
