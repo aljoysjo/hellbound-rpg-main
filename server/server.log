@@ -4,3 +4,652 @@
    - Lore: 3 entries
    - Functions: 1 functions
    - Lexicon: 2 words
+🎨 Sandbox inicializado con concepto: "Detective paranormal investigando misterios..."
+🎯 Acciones dinámicas generadas: Seguir el susurro hacia la sala de estar, Investigar el sótano en busca de secretos, Escanear el entorno con la linterna, Escuchar atentamente por otros sonidos.
+🔍 ANALYZING ACTION: busco algo valioso
+🔍 ANALYZING ACTION: busco algo valioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 20, "alerta": 30},
+  "locationChange": "Lugar de Inicio",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 20, alerta: 30 },
+  locationChange: 'Lugar de Inicio',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 20,
+    "alerta": 30
+  },
+  "locationChange": "Lugar de Inicio",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 20%
+😊 alerta: 30%
+📍 Nueva ubicación: Lugar de Inicio
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Examinar el medallón más detenidamente, Encender el candelabro para más luz, Escuchar atentamente los susurros en la penumbra, Buscar otro cajón en el escritorio.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "busco algo valioso"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="busco algo valioso"
+🔍 Contextos detectados: mystical, exploration
+🧠 Analizando sandbox concept: "Detective paranormal investigando misterios"
+🧠 Temas detectados: investigation
+🎯 Contextos finales: investigation, mystical, exploration
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: pergamino sagrado 📜 (mystical)
+🎁 ITEM DESCUBIERTO (clickeable): pergamino sagrado 📜
+🎯 CONTEXTOS UTILIZADOS: investigation, mystical, exploration
+🔍 ANALYZING ACTION: examino el área en busca de objetos
+🔍 ANALYZING ACTION: examino el área en busca de objetos
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 30, "alerta": 40},
+  "locationChange": "Lugar de Inicio",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 30, alerta: 40 },
+  locationChange: 'Lugar de Inicio',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 30,
+    "alerta": 40
+  },
+  "locationChange": "Lugar de Inicio",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 30%
+😊 alerta: 40%
+📍 Nueva ubicación: Lugar de Inicio
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Leer el viejo diario cuidadosamente, Examinar las estanterías en busca de objetos, Investigar el brillo en las sombras, Escuchar atentamente cualquier sonido en el entorno.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "examino el área en busca de objetos"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="examino el área en busca de objetos"
+🔍 Contextos detectados: mystical, knowledge, nautical
+🎯 Contextos finales: investigation, mystical, knowledge, nautical
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: pergamino sagrado 📜 (mystical)
+⚠️ LOOT YA EXISTE: pergamino sagrado
+🔍 ANALYZING ACTION: examino el área
+🔍 ANALYZING ACTION: examino el área
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 50, "alerta": 60},
+  "locationChange": "Rincón oculto detrás de una estantería",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 50, alerta: 60 },
+  locationChange: 'Rincón oculto detrás de una estantería',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 50,
+    "alerta": 60
+  },
+  "locationChange": "Rincón oculto detrás de una estantería",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 50%
+😊 alerta: 60%
+📍 Nueva ubicación: Rincón oculto detrás de una estantería
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Examinar el cofre de metal, Revisar la silla cubierta de polvo, Escuchar sonidos en el entorno, Encender una vela para más luz
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "examino el área"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="examino el área"
+🔍 Contextos detectados: exploration
+🎯 Contextos finales: investigation, exploration
+🎯 Categoría seleccionada: exploration
+🎁 LOOT GENERADO: brújula antigua 🧭 (exploration)
+🎁 ITEM DESCUBIERTO (clickeable): brújula antigua 🧭
+🎯 CONTEXTOS UTILIZADOS: investigation, exploration
+🔍 ANALYZING ACTION: hurgo entre los objetos
+🔍 ANALYZING ACTION: hurgo entre los objetos
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 60, "alerta": 70},
+  "locationChange": "Rincón oculto detrás de una estantería",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 60, alerta: 70 },
+  locationChange: 'Rincón oculto detrás de una estantería',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 60,
+    "alerta": 70
+  },
+  "locationChange": "Rincón oculto detrás de una estantería",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 60%
+😊 alerta: 70%
+📍 Nueva ubicación: Rincón oculto detrás de una estantería
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Examinar el espejo más de cerca, Abrir uno de los frascos, Escuchar ruidos en la oscuridad, Salir del rincón y buscar ayuda.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "hurgo entre los objetos"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="hurgo entre los objetos"
+🔍 Contextos detectados: knowledge, exploration
+🎯 Contextos finales: investigation, knowledge, exploration
+🎯 Categoría seleccionada: knowledge
+🎁 LOOT GENERADO: archivo secreto 📁 (knowledge)
+🎁 ITEM DESCUBIERTO (clickeable): archivo secreto 📁
+🎯 CONTEXTOS UTILIZADOS: investigation, knowledge, exploration
+🔍 ANALYZING ACTION: buscar un libro mágico en la biblioteca
+🔍 ANALYZING ACTION: buscar un libro mágico en la biblioteca
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: {
+  "vitalDelta": {},
+  "statusSet": {"miedo": 60, "alerta": 70},
+  "locationChange": "biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 60, alerta: 70 },
+  locationChange: 'biblioteca',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 60,
+    "alerta": 70
+  },
+  "locationChange": "biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 60%
+😊 alerta: 70%
+📍 Nueva ubicación: biblioteca
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Abrir el libro brilloso, Examinar el entorno en busca de pistas, Buscar otros libros relacionados, Investigar símbolos arcanos en la cubierta.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "Buscar un libro mágico en la biblioteca"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="Buscar un libro mágico en la biblioteca"
+🔍 Contextos detectados: knowledge, exploration, nautical
+🎯 Contextos finales: investigation, knowledge, exploration, nautical
+🎯 Categoría seleccionada: knowledge
+🎁 LOOT GENERADO: libro de conocimiento 📖 (knowledge)
+🎁 ITEM DESCUBIERTO (clickeable): libro de conocimiento 📖
+🎯 CONTEXTOS UTILIZADOS: investigation, knowledge, exploration, nautical
+🎨 Sandbox inicializado con concepto: "Detective paranormal investigando misterios..."
+🎯 Acciones dinámicas generadas: Investigar el diario más a fondo, Llamar a tu viejo colega, Preparar un equipo básico para la investigación, Dirigirte al antiguo faro en la costa.
+🔍 ANALYZING ACTION: busco algo valioso
+🔍 ANALYZING ACTION: busco algo valioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: {
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "faro",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: {},
+  locationChange: 'faro',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "faro",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📍 Nueva ubicación: faro
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Estudiar el mapa detenidamente, Llamar a tu viejo colega, Preparar equipo para la expedición, Investigar más en el faro
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "busco algo valioso"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="busco algo valioso"
+🔍 Contextos detectados: mystical, exploration, nautical
+🧠 Analizando sandbox concept: "Detective paranormal investigando misterios"
+🧠 Temas detectados: investigation
+🎯 Contextos finales: investigation, mystical, exploration, nautical
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: amuleto protector 🧿 (mystical)
+🎁 ITEM DESCUBIERTO (clickeable): amuleto protector 🧿
+🎯 CONTEXTOS UTILIZADOS: investigation, mystical, exploration, nautical
+🎨 Sandbox inicializado con concepto: "Detective paranormal investigando misterios..."
+🎯 Acciones dinámicas generadas: Cruzar la puerta y entrar con cautela, Escuchar atentamente el susurro que llama, Examinar el suelo en busca de pistas, Encender la linterna y explorar la mansión.
+🔍 ANALYZING ACTION: busco algo valioso
+🔍 ANALYZING ACTION: busco algo valioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 20, "alerta": 30},
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 20, alerta: 30 },
+  locationChange: 'vestíbulo de la mansión',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 20,
+    "alerta": 30
+  },
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 20%
+😊 alerta: 30%
+📍 Nueva ubicación: vestíbulo de la mansión
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Examinar el amuleto detenidamente, Investigar debajo de los muebles cubiertos, Probar la caja de música, Escuchar los ecos en el vestíbulo
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "busco algo valioso"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="busco algo valioso"
+🔍 Contextos detectados: mystical, knowledge
+🧠 Analizando sandbox concept: "Detective paranormal investigando misterios"
+🧠 Temas detectados: investigation
+🎯 Contextos finales: investigation, mystical, knowledge
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: amuleto protector 🧿 (mystical)
+🎁 ITEM DESCUBIERTO (clickeable): amuleto protector 🧿
+🎯 CONTEXTOS UTILIZADOS: investigation, mystical, knowledge
+🔍 ANALYZING ACTION: examino el área en busca de objetos
+🔍 ANALYZING ACTION: examino el área en busca de objetos
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: {},
+  locationChange: 'vestíbulo de la mansión',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📍 Nueva ubicación: vestíbulo de la mansión
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Leer el diario cuidadosamente, Examinar la pluma en detalle, Investigar el retrato en la pared, Revisar el mueble donde encontraste el cofre
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "examino el área en busca de objetos"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="examino el área en busca de objetos"
+🔍 Contextos detectados: mystical, knowledge
+🎯 Contextos finales: investigation, mystical, knowledge
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: amuleto protector 🧿 (mystical)
+⚠️ LOOT YA EXISTE: amuleto protector
+🔍 ANALYZING ACTION: examino el área
+🔍 ANALYZING ACTION: examino el área
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 30, "alerta": 40},
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 30, alerta: 40 },
+  locationChange: 'vestíbulo de la mansión',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 30,
+    "alerta": 40
+  },
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 30%
+😊 alerta: 40%
+📍 Nueva ubicación: vestíbulo de la mansión
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Tocar suavemente el espejo antiguo, Investigar los muebles del vestíbulo, Susurrar al espejo buscando respuestas, Escuchar el murmullo con atención.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "examino el área"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="examino el área"
+🔍 Contextos detectados: nautical
+🎯 Contextos finales: investigation, nautical
+🎯 Categoría seleccionada: exploration
+🎁 LOOT GENERADO: cuerda resistente 🪢 (exploration)
+🎁 ITEM DESCUBIERTO (clickeable): cuerda resistente 🪢
+🎯 CONTEXTOS UTILIZADOS: investigation, nautical
+🔍 ANALYZING ACTION: hurgo entre los objetos
+🔍 ANALYZING ACTION: hurgo entre los objetos
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 50, "alerta": 60},
+  "locationChange": "vestíbulo de la mansión",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {"rituales_oscuros": +10},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+Error analizando cambios de estado: SyntaxError: Unexpected token '+', ..."oscuros": +10},
+  "f"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at analyzeNarrativeForStateChanges (file:///app/server/index.js:1205:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///app/server/index.js:1760:26
+🎯 Acciones dinámicas generadas: Leer la carta con más atención, Buscar otros objetos en el vestíbulo, Investigar el origen de la fragancia, Examinar las paredes en busca de secretos.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "hurgo entre los objetos"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="hurgo entre los objetos"
+🔍 Contextos detectados: mystical, exploration, nautical
+🎯 Contextos finales: investigation, mystical, exploration, nautical
+🎯 Categoría seleccionada: mystical
+🎁 LOOT GENERADO: cristal energético 🔮 (mystical)
+🎁 ITEM DESCUBIERTO (clickeable): cristal energético 🔮
+🎯 CONTEXTOS UTILIZADOS: investigation, mystical, exploration, nautical
+🔍 ANALYZING ACTION: buscar un libro mágico en la biblioteca
+🔍 ANALYZING ACTION: buscar un libro mágico en la biblioteca
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 60},
+  "locationChange": "biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 60 },
+  locationChange: 'biblioteca',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 60
+  },
+  "locationChange": "biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 60%
+📍 Nueva ubicación: biblioteca
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Acercarse al libro en la mesa, Examinar los estantes más altos, Buscar un diario de la biblioteca, Escuchar los susurros de los libros.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "Buscar un libro mágico en la biblioteca"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="Buscar un libro mágico en la biblioteca"
+🔍 Contextos detectados: knowledge, exploration
+🎯 Contextos finales: investigation, knowledge, exploration
+🎯 Categoría seleccionada: knowledge
+🎁 LOOT GENERADO: pergamino de datos 📜 (knowledge)
+🎁 ITEM DESCUBIERTO (clickeable): pergamino de datos 📜
+🎯 CONTEXTOS UTILIZADOS: investigation, knowledge, exploration
+🎨 Sandbox inicializado con concepto: "Detective paranormal investigando misterios..."
+🎯 Acciones dinámicas generadas: Investigar el expediente en detalle, Preparar equipo antes de salir, Escuchar sonidos provenientes de la mansión, Salir hacia la mansión bajo la lluvia.
+🔍 ANALYZING ACTION: busco algo valioso
+🔍 ANALYZING ACTION: busco algo valioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 0, "alerta": 20},
+  "locationChange": "mansión abandonada",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 0, alerta: 20 },
+  locationChange: 'mansión abandonada',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 0,
+    "alerta": 20
+  },
+  "locationChange": "mansión abandonada",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 0%
+😊 alerta: 20%
+📍 Nueva ubicación: mansión abandonada
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Abrir el cofre con cuidado, Examinar símbolos en el cofre, Buscar objetos útiles en la habitación, Escuchar sonidos en la mansión.
+🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "busco algo valioso"
+🎯 Generando loot inteligente...
+🔍 Analizando contexto: action="busco algo valioso"
+🔍 Contextos detectados: urban, exploration
+🧠 Analizando sandbox concept: "Detective paranormal investigando misterios"
+🧠 Temas detectados: investigation
+🎯 Contextos finales: investigation, urban, exploration
+🎯 Categoría seleccionada: urban
+🎁 LOOT GENERADO: gema preciosa 💎 (urban)
+🎁 ITEM DESCUBIERTO (clickeable): gema preciosa 💎
+🎯 CONTEXTOS UTILIZADOS: investigation, urban, exploration
