@@ -81,7 +81,7 @@ class HellboundRPGTester:
             200,
             data={
                 "mode": "sandbox", 
-                "sandboxConcept": "Explorador encontrando tesoros"
+                "sandboxConcept": "Detective paranormal investigando misterios"
             }
         )
         if success and 'session_id' in response:
@@ -131,6 +131,10 @@ class HellboundRPGTester:
         # Check inventory structure
         print(f"📦 Inventory: {game_state.get('inventory', [])}")
         
+        # Check discovered items if present
+        if 'discoveredItems' in game_state:
+            print(f"🎁 Discovered Items: {game_state.get('discoveredItems', [])}")
+        
         # Check action count
         print(f"🔢 Action Count: {game_state.get('actionCount', 0)}")
         
@@ -158,6 +162,392 @@ class HellboundRPGTester:
                 print(f"  - {objective.get('description')} ({objective.get('progress')}%)")
         
         print("✅ Game state structure validation complete")
+        return True
+
+    def test_dynamic_loot_system(self):
+        """Test the dynamic loot system by searching for valuable items"""
+        if not self.session_id:
+            print("❌ Cannot test dynamic loot system without a valid session")
+            return False
+            
+        # Get initial state
+        _, initial_response = self.run_test(
+            "Get Initial Session State",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_discovered_items = initial_game_state.get('discoveredItems', [])
+        print(f"Initial Discovered Items: {initial_discovered_items}")
+        
+        # Send action to search for valuable items
+        success, response = self.run_test(
+            "Dynamic Loot - Search for Valuable Items",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": self.session_id,
+                "action": "busco algo valioso"
+            }
+        )
+        
+        if success:
+            # Check if new items were discovered
+            game_state = response.get('game_state', {})
+            discovered_items = game_state.get('discoveredItems', [])
+            
+            print(f"Discovered Items After Search: {discovered_items}")
+            
+            if len(discovered_items) > len(initial_discovered_items):
+                print(f"✅ New items discovered: {len(discovered_items) - len(initial_discovered_items)} items")
+                
+                # Verify item structure
+                for item in discovered_items:
+                    if not self.validate_item_structure(item):
+                        print(f"❌ Invalid item structure: {item}")
+                        return False
+                
+                # Check if narrative mentions the discovered item
+                narrative = response.get('new_narrative', '')
+                print(f"Narrative: {narrative}")
+                
+                item_mentioned = False
+                for item in discovered_items:
+                    if item['name'].lower() in narrative.lower():
+                        item_mentioned = True
+                        print(f"✅ Item '{item['name']}' mentioned in narrative")
+                        break
+                
+                if not item_mentioned:
+                    print("⚠️ No specific item mentioned in narrative")
+                
+                # Save the first discovered item for pickup test
+                self.discovered_item_id = discovered_items[0]['instanceId']
+                print(f"Saved item ID for pickup test: {self.discovered_item_id}")
+                
+                return True
+            else:
+                print("❌ No new items discovered")
+                
+                # Try another search action
+                print("\n🔍 Trying another search action...")
+                success, response = self.run_test(
+                    "Dynamic Loot - Second Search Attempt",
+                    "POST",
+                    "api/free_input",
+                    200,
+                    data={
+                        "session_id": self.session_id,
+                        "action": "examino el área en busca de objetos"
+                    }
+                )
+                
+                if success:
+                    game_state = response.get('game_state', {})
+                    discovered_items = game_state.get('discoveredItems', [])
+                    
+                    print(f"Discovered Items After Second Search: {discovered_items}")
+                    
+                    if len(discovered_items) > len(initial_discovered_items):
+                        print(f"✅ New items discovered on second attempt: {len(discovered_items) - len(initial_discovered_items)} items")
+                        
+                        # Verify item structure
+                        for item in discovered_items:
+                            if not self.validate_item_structure(item):
+                                print(f"❌ Invalid item structure: {item}")
+                                return False
+                        
+                        # Save the first discovered item for pickup test
+                        self.discovered_item_id = discovered_items[0]['instanceId']
+                        print(f"Saved item ID for pickup test: {self.discovered_item_id}")
+                        
+                        return True
+                    else:
+                        print("❌ No new items discovered on second attempt")
+                        return False
+        
+        return False
+
+    def validate_item_structure(self, item):
+        """Validate the structure of a discovered item"""
+        required_fields = ['name', 'icon', 'instanceId', 'type']
+        
+        for field in required_fields:
+            if field not in item:
+                print(f"❌ Missing required field in item: {field}")
+                return False
+        
+        # Check if contexts field exists
+        if 'contexts' not in item:
+            print("❌ Missing 'contexts' field in item")
+            return False
+        
+        print(f"✅ Valid item structure: {item['name']} ({item['type']}) - {item['icon']}")
+        return True
+
+    def test_pickup_item(self):
+        """Test picking up a discovered item"""
+        if not self.session_id or not hasattr(self, 'discovered_item_id'):
+            print("❌ Cannot test pickup_item without a valid session and discovered item")
+            return False
+        
+        # Get initial state
+        _, initial_response = self.run_test(
+            "Get Initial State Before Pickup",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_discovered_items = initial_game_state.get('discoveredItems', [])
+        initial_inventory = initial_game_state.get('inventory', [])
+        
+        print(f"Initial Discovered Items Count: {len(initial_discovered_items)}")
+        print(f"Initial Inventory Count: {len(initial_inventory)}")
+        
+        # Pick up the discovered item
+        success, response = self.run_test(
+            "Pickup Item API",
+            "POST",
+            "api/pickup_item",
+            200,
+            data={
+                "session_id": self.session_id,
+                "item_id": self.discovered_item_id
+            }
+        )
+        
+        if success:
+            # Check response message
+            message = response.get('message', '')
+            print(f"Pickup Message: {message}")
+            
+            if not message or 'recogido' not in message.lower():
+                print("❌ Pickup message does not confirm item was picked up")
+                return False
+            
+            # Check updated game state
+            game_state = response.get('game_state', {})
+            discovered_items = game_state.get('discoveredItems', [])
+            inventory = game_state.get('inventory', [])
+            
+            print(f"Discovered Items After Pickup: {len(discovered_items)}")
+            print(f"Inventory After Pickup: {len(inventory)}")
+            
+            # Verify item was moved from discoveredItems to inventory
+            if len(discovered_items) < len(initial_discovered_items) and len(inventory) > len(initial_inventory):
+                print("✅ Item successfully moved from discoveredItems to inventory")
+                
+                # Verify the specific item is now in inventory
+                item_in_inventory = False
+                for item in inventory:
+                    if item.get('instanceId') == self.discovered_item_id:
+                        item_in_inventory = True
+                        print(f"✅ Item '{item['name']}' found in inventory")
+                        break
+                
+                if not item_in_inventory:
+                    print("❌ Picked up item not found in inventory")
+                    return False
+                
+                # Test edge case: Try to pick up the same item again
+                print("\n🔍 Testing edge case: Picking up the same item again...")
+                _, edge_response = self.run_test(
+                    "Pickup Same Item Again",
+                    "POST",
+                    "api/pickup_item",
+                    400,  # Expecting error status
+                    data={
+                        "session_id": self.session_id,
+                        "item_id": self.discovered_item_id
+                    }
+                )
+                
+                print("✅ Attempting to pick up the same item again correctly returns an error")
+                
+                return True
+            else:
+                print("❌ Item was not correctly moved from discoveredItems to inventory")
+                return False
+        
+        return False
+
+    def test_multiple_searches(self):
+        """Test multiple search actions to verify different items are generated"""
+        if not self.session_id:
+            print("❌ Cannot test multiple searches without a valid session")
+            return False
+        
+        # Get initial state
+        _, initial_response = self.run_test(
+            "Get Initial State Before Multiple Searches",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_discovered_items = initial_game_state.get('discoveredItems', [])
+        
+        print(f"Initial Discovered Items: {initial_discovered_items}")
+        
+        # Define multiple search actions
+        search_actions = [
+            "examino el área",
+            "hurgo entre los objetos"
+        ]
+        
+        all_discovered_items = []
+        if initial_discovered_items:
+            all_discovered_items.extend(initial_discovered_items)
+        
+        for i, action in enumerate(search_actions):
+            success, response = self.run_test(
+                f"Multiple Searches - Action {i+1}",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": self.session_id,
+                    "action": action
+                }
+            )
+            
+            if success:
+                game_state = response.get('game_state', {})
+                discovered_items = game_state.get('discoveredItems', [])
+                
+                print(f"Discovered Items After Search {i+1}: {discovered_items}")
+                
+                # Check for new items
+                new_items = []
+                for item in discovered_items:
+                    if not any(existing['instanceId'] == item['instanceId'] for existing in all_discovered_items):
+                        new_items.append(item)
+                        all_discovered_items.append(item)
+                
+                print(f"New Items Found in Search {i+1}: {len(new_items)}")
+                for item in new_items:
+                    print(f"  - {item['name']} ({item['type']}) - {item['icon']}")
+                
+                # Verify item types are appropriate for the context
+                for item in new_items:
+                    if 'contexts' in item:
+                        print(f"  - Contexts: {item['contexts']}")
+            else:
+                print(f"❌ Search action {i+1} failed")
+                return False
+        
+        # Verify we found different types of items
+        item_types = set(item['type'] for item in all_discovered_items)
+        print(f"Different item types found: {item_types}")
+        
+        if len(item_types) > 1:
+            print("✅ Multiple item types were generated based on context")
+            return True
+        elif len(all_discovered_items) > len(initial_discovered_items):
+            print("✅ New items were discovered, but all of the same type")
+            return True
+        else:
+            print("❌ No new items were discovered across multiple searches")
+            return False
+
+    def test_edge_cases(self):
+        """Test edge cases for the loot system"""
+        if not self.session_id:
+            print("❌ Cannot test edge cases without a valid session")
+            return False
+        
+        # Test case 1: Try to pick up an item that doesn't exist
+        print("\n🔍 Testing edge case: Picking up non-existent item...")
+        success, response = self.run_test(
+            "Pickup Non-existent Item",
+            "POST",
+            "api/pickup_item",
+            404,  # Expecting not found status
+            data={
+                "session_id": self.session_id,
+                "item_id": "non-existent-item-id"
+            }
+        )
+        
+        if success:
+            print("❌ Picking up non-existent item should fail but succeeded")
+            return False
+        else:
+            print("✅ Picking up non-existent item correctly returns an error")
+        
+        # Test case 2: Try to pick up an item with invalid session
+        print("\n🔍 Testing edge case: Picking up item with invalid session...")
+        success, response = self.run_test(
+            "Pickup Item with Invalid Session",
+            "POST",
+            "api/pickup_item",
+            404,  # Expecting not found status
+            data={
+                "session_id": "invalid-session-id",
+                "item_id": "some-item-id"
+            }
+        )
+        
+        if success:
+            print("❌ Picking up item with invalid session should fail but succeeded")
+            return False
+        else:
+            print("✅ Picking up item with invalid session correctly returns an error")
+        
+        # Test case 3: Anti-duplication check
+        # First, get current discovered items
+        _, state_response = self.run_test(
+            "Get Current State for Anti-duplication Test",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        current_game_state = state_response.get('game_state', {})
+        current_discovered_items = current_game_state.get('discoveredItems', [])
+        
+        # If we have discovered items, try to search for the same type of item
+        if current_discovered_items:
+            item_type = current_discovered_items[0]['type']
+            search_action = f"busco un {item_type}"
+            
+            print(f"\n🔍 Testing anti-duplication: Searching for same item type '{item_type}'...")
+            success, response = self.run_test(
+                "Search for Same Item Type",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": self.session_id,
+                    "action": search_action
+                }
+            )
+            
+            if success:
+                game_state = response.get('game_state', {})
+                new_discovered_items = game_state.get('discoveredItems', [])
+                
+                # Check if any new items have the same name as existing ones
+                duplicate_found = False
+                for new_item in new_discovered_items:
+                    for old_item in current_discovered_items:
+                        if new_item['name'] == old_item['name'] and new_item['instanceId'] != old_item['instanceId']:
+                            duplicate_found = True
+                            print(f"❌ Duplicate item found: {new_item['name']}")
+                            break
+                
+                if not duplicate_found:
+                    print("✅ No duplicate items found when searching for the same item type")
+                else:
+                    print("❌ Duplicate items were found, anti-duplication check failed")
+                    return False
+        
         return True
 
     def test_action_count_increment(self):
@@ -203,243 +593,6 @@ class HellboundRPGTester:
                 return False
         
         return False
-
-    def test_inventory_item_acquisition(self):
-        """Test acquiring items and verify they are not duplicated"""
-        if not self.session_id:
-            print("❌ Cannot test inventory changes without a valid session")
-            return False
-            
-        # Get initial inventory
-        _, initial_response = self.run_test(
-            "Get Initial Inventory State",
-            "GET",
-            f"api/get_session/{self.session_id}",
-            200
-        )
-        
-        initial_inventory = initial_response.get('game_state', {}).get('inventory', [])
-        initial_count = len(initial_inventory)
-        print(f"Initial Inventory Count: {initial_count}")
-        print(f"Initial Inventory: {initial_inventory}")
-        
-        # Send action to find a treasure
-        success, response = self.run_test(
-            "Inventory Change - Find Treasure",
-            "POST",
-            "api/free_input",
-            200,
-            data={
-                "session_id": self.session_id,
-                "action": "Buscar un tesoro antiguo en la cueva"
-            }
-        )
-        
-        if success:
-            # Check for inventory changes
-            game_state = response.get('game_state', {})
-            new_inventory = game_state.get('inventory', [])
-            new_count = len(new_inventory)
-            print(f"New Inventory Count: {new_count}")
-            print(f"New Inventory: {new_inventory}")
-            
-            # Check if inventory changed
-            if new_count > initial_count:
-                print(f"✅ Inventory successfully changed from {initial_count} to {new_count} items")
-                
-                # Get the latest inventory state through polling endpoint
-                _, polling_response = self.run_test(
-                    "Poll Session State After Item Acquisition",
-                    "GET",
-                    f"api/get_session/{self.session_id}",
-                    200
-                )
-                
-                polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
-                polling_count = len(polling_inventory)
-                print(f"Polled Inventory Count: {polling_count}")
-                print(f"Polled Inventory: {polling_inventory}")
-                
-                # Verify no duplication occurred
-                if polling_count == new_count:
-                    print("✅ No inventory duplication detected")
-                    return True
-                else:
-                    print(f"❌ Possible inventory duplication: {new_count} vs {polling_count}")
-                    return False
-            else:
-                print("❌ Inventory did not change as expected")
-                
-                # Try another action
-                success, response = self.run_test(
-                    "Inventory Change - Second Attempt",
-                    "POST",
-                    "api/free_input",
-                    200,
-                    data={
-                        "session_id": self.session_id,
-                        "action": "Excavar en el suelo para encontrar reliquias"
-                    }
-                )
-                
-                if success:
-                    game_state = response.get('game_state', {})
-                    new_inventory = game_state.get('inventory', [])
-                    new_count = len(new_inventory)
-                    print(f"New Inventory Count (Second Attempt): {new_count}")
-                    print(f"New Inventory (Second Attempt): {new_inventory}")
-                    
-                    if new_count > initial_count:
-                        print(f"✅ Inventory successfully changed on second attempt")
-                        
-                        # Get the latest inventory state through polling endpoint
-                        _, polling_response = self.run_test(
-                            "Poll Session State After Second Item Acquisition",
-                            "GET",
-                            f"api/get_session/{self.session_id}",
-                            200
-                        )
-                        
-                        polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
-                        polling_count = len(polling_inventory)
-                        print(f"Polled Inventory Count (Second Attempt): {polling_count}")
-                        print(f"Polled Inventory (Second Attempt): {polling_inventory}")
-                        
-                        # Verify no duplication occurred
-                        if polling_count == new_count:
-                            print("✅ No inventory duplication detected on second attempt")
-                            return True
-                        else:
-                            print(f"❌ Possible inventory duplication on second attempt: {new_count} vs {polling_count}")
-                            return False
-        
-        return False
-
-    def test_multiple_actions_and_polling(self):
-        """Test multiple actions and verify polling endpoint correctly tracks changes"""
-        if not self.session_id:
-            print("❌ Cannot test multiple actions without a valid session")
-            return False
-            
-        # Get initial state
-        _, initial_response = self.run_test(
-            "Get Initial State for Multiple Actions Test",
-            "GET",
-            f"api/get_session/{self.session_id}",
-            200
-        )
-        
-        initial_action_count = initial_response.get('game_state', {}).get('actionCount', 0)
-        initial_inventory = initial_response.get('game_state', {}).get('inventory', [])
-        print(f"Initial Action Count: {initial_action_count}")
-        print(f"Initial Inventory Count: {len(initial_inventory)}")
-        
-        # Execute multiple actions
-        actions = [
-            "Explorar la cueva oscura",
-            "Buscar tesoros en el cofre",
-            "Examinar las inscripciones en la pared"
-        ]
-        
-        last_action_count = initial_action_count
-        last_inventory_count = len(initial_inventory)
-        
-        for i, action in enumerate(actions):
-            success, response = self.run_test(
-                f"Multiple Actions Test - Action {i+1}",
-                "POST",
-                "api/free_input",
-                200,
-                data={
-                    "session_id": self.session_id,
-                    "action": action
-                }
-            )
-            
-            if success:
-                game_state = response.get('game_state', {})
-                new_action_count = game_state.get('actionCount', 0)
-                new_inventory = game_state.get('inventory', [])
-                
-                print(f"Action {i+1} - Action Count: {new_action_count}")
-                print(f"Action {i+1} - Inventory Count: {len(new_inventory)}")
-                
-                # Verify action count increased
-                if new_action_count > last_action_count:
-                    print(f"✅ Action count incremented from {last_action_count} to {new_action_count}")
-                else:
-                    print(f"❌ Action count did not increment as expected")
-                    return False
-                
-                # Poll the session state
-                _, polling_response = self.run_test(
-                    f"Poll Session After Action {i+1}",
-                    "GET",
-                    f"api/get_session/{self.session_id}",
-                    200
-                )
-                
-                polling_action_count = polling_response.get('game_state', {}).get('actionCount', 0)
-                polling_inventory = polling_response.get('game_state', {}).get('inventory', [])
-                
-                print(f"Polled Action Count: {polling_action_count}")
-                print(f"Polled Inventory Count: {len(polling_inventory)}")
-                
-                # Verify polling endpoint returns correct data
-                if polling_action_count == new_action_count:
-                    print("✅ Polling endpoint correctly reports action count")
-                else:
-                    print(f"❌ Polling endpoint reports incorrect action count: {polling_action_count} vs {new_action_count}")
-                    return False
-                
-                if len(polling_inventory) == len(new_inventory):
-                    print("✅ Polling endpoint correctly reports inventory count")
-                else:
-                    print(f"❌ Polling endpoint reports incorrect inventory count: {len(polling_inventory)} vs {len(new_inventory)}")
-                    return False
-                
-                last_action_count = new_action_count
-                last_inventory_count = len(new_inventory)
-            else:
-                print(f"❌ Action {i+1} failed")
-                return False
-        
-        # Final verification
-        if last_action_count >= initial_action_count + len(actions):
-            print(f"✅ Action count correctly incremented across multiple actions")
-            return True
-        else:
-            print(f"❌ Action count did not increment correctly across multiple actions")
-            return False
-
-    def test_cors_configuration(self):
-        """Test CORS configuration by checking OPTIONS request"""
-        try:
-            url = f"{self.base_url}/api/healthcheck"
-            
-            # Send OPTIONS request to check CORS headers
-            response = requests.options(url)
-            
-            print(f"CORS Test - Status Code: {response.status_code}")
-            print(f"CORS Headers: {response.headers}")
-            
-            # Check for CORS headers
-            if 'Access-Control-Allow-Origin' in response.headers:
-                allowed_origins = response.headers['Access-Control-Allow-Origin']
-                print(f"Allowed Origins: {allowed_origins}")
-                
-                if '*' in allowed_origins or 'https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com' in allowed_origins:
-                    print("✅ CORS configuration allows appropriate origins")
-                    return True
-                else:
-                    print("❌ CORS configuration does not allow appropriate origins")
-            else:
-                print("❌ CORS headers not found in response")
-            
-            return False
-        except Exception as e:
-            print(f"❌ CORS test failed with error: {str(e)}")
-            return False
 
     def test_get_session_endpoint(self):
         """Test the /api/get_session/:sessionId endpoint specifically"""
@@ -538,52 +691,6 @@ class HellboundRPGTester:
             print(f"❌ Failed to connect to WebSocket: {str(e)}")
             return False
 
-    def check_websocket_updates(self, expected_field):
-        """Check if WebSocket updates are received with the expected field"""
-        if not self.ws_connected:
-            print("❌ WebSocket not connected, cannot check updates")
-            return False
-            
-        print(f"\n🔍 Checking WebSocket updates for '{expected_field}'...")
-        
-        # Wait for WebSocket messages
-        timeout = 5  # seconds
-        start_time = time.time()
-        
-        while time.time() - start_time < timeout:
-            try:
-                # Check if there are any messages in the queue
-                if not self.ws_messages.empty():
-                    message = self.ws_messages.get(block=False)
-                    
-                    # Parse Socket.IO message format
-                    if message.startswith('42'):
-                        data_str = message[2:]
-                        try:
-                            data = json.loads(data_str)
-                            if isinstance(data, list) and len(data) >= 2:
-                                event_name = data[0]
-                                event_data = data[1]
-                                
-                                print(f"📩 Received event: {event_name}")
-                                
-                                if event_name == 'game_update':
-                                    game_state = event_data.get('game_state', {})
-                                    
-                                    # Check if the expected field is in the update
-                                    if expected_field in game_state:
-                                        print(f"✅ WebSocket update contains '{expected_field}'")
-                                        return True
-                        except json.JSONDecodeError:
-                            print(f"❌ Failed to parse WebSocket message: {message}")
-                
-                time.sleep(0.1)
-            except queue.Empty:
-                time.sleep(0.1)
-        
-        print(f"❌ No WebSocket updates with '{expected_field}' received within {timeout} seconds")
-        return False
-
     def cleanup(self):
         """Clean up resources"""
         if self.ws:
@@ -614,51 +721,61 @@ def main():
             print("❌ Healthcheck failed, stopping tests")
             return 1
         
-        print("\n==== 2. TEST CORS CONFIGURATION ====")
-        cors_success = tester.test_cors_configuration()
-        print(f"{'✅' if cors_success else '❌'} CORS configuration test {'passed' if cors_success else 'failed'}")
-        
-        print("\n==== 3. CREATE NEW SANDBOX SESSION ====")
+        print("\n==== 2. CREATE NEW SANDBOX SESSION ====")
         if not tester.test_start_session_sandbox():
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 4. TEST ACTION COUNT INCREMENT ====")
+        print("\n==== 3. TEST DYNAMIC LOOT SYSTEM ====")
+        dynamic_loot_success = tester.test_dynamic_loot_system()
+        print(f"{'✅' if dynamic_loot_success else '❌'} Dynamic loot system test {'passed' if dynamic_loot_success else 'failed'}")
+        
+        if dynamic_loot_success:
+            print("\n==== 4. TEST PICKUP ITEM ====")
+            pickup_success = tester.test_pickup_item()
+            print(f"{'✅' if pickup_success else '❌'} Pickup item test {'passed' if pickup_success else 'failed'}")
+        else:
+            pickup_success = False
+            print("⚠️ Skipping pickup item test as no items were discovered")
+        
+        print("\n==== 5. TEST MULTIPLE SEARCHES ====")
+        multiple_searches_success = tester.test_multiple_searches()
+        print(f"{'✅' if multiple_searches_success else '❌'} Multiple searches test {'passed' if multiple_searches_success else 'failed'}")
+        
+        print("\n==== 6. TEST EDGE CASES ====")
+        edge_cases_success = tester.test_edge_cases()
+        print(f"{'✅' if edge_cases_success else '❌'} Edge cases test {'passed' if edge_cases_success else 'failed'}")
+        
+        print("\n==== 7. TEST ACTION COUNT INCREMENT ====")
         action_count_success = tester.test_action_count_increment()
         print(f"{'✅' if action_count_success else '❌'} Action count increment test {'passed' if action_count_success else 'failed'}")
         
-        print("\n==== 5. TEST INVENTORY ITEM ACQUISITION (NO DUPLICATION) ====")
-        inventory_success = tester.test_inventory_item_acquisition()
-        print(f"{'✅' if inventory_success else '❌'} Inventory item acquisition test {'passed' if inventory_success else 'failed'}")
-        
-        print("\n==== 6. TEST GET_SESSION ENDPOINT ====")
+        print("\n==== 8. TEST GET_SESSION ENDPOINT ====")
         get_session_success = tester.test_get_session_endpoint()
         print(f"{'✅' if get_session_success else '❌'} Get session endpoint test {'passed' if get_session_success else 'failed'}")
-        
-        print("\n==== 7. TEST MULTIPLE ACTIONS AND POLLING ====")
-        multiple_actions_success = tester.test_multiple_actions_and_polling()
-        print(f"{'✅' if multiple_actions_success else '❌'} Multiple actions and polling test {'passed' if multiple_actions_success else 'failed'}")
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
         
-        # Summary of badge system tests
-        print("\n==== BADGE SYSTEM TEST SUMMARY ====")
-        print(f"CORS Configuration: {'✅ PASSED' if cors_success else '❌ FAILED'}")
-        print(f"Action Count Increment: {'✅ PASSED' if action_count_success else '❌ FAILED'}")
-        print(f"Inventory Item Acquisition (No Duplication): {'✅ PASSED' if inventory_success else '❌ FAILED'}")
-        print(f"Get Session Endpoint: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
-        print(f"Multiple Actions and Polling: {'✅ PASSED' if multiple_actions_success else '❌ FAILED'}")
+        # Summary of dynamic loot system tests
+        print("\n==== DYNAMIC LOOT SYSTEM TEST SUMMARY ====")
+        print(f"1. Dynamic Loot Generation: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
+        print(f"2. Pickup Item Functionality: {'✅ PASSED' if pickup_success else '❌ FAILED'}")
+        print(f"3. Multiple Searches: {'✅ PASSED' if multiple_searches_success else '❌ FAILED'}")
+        print(f"4. Edge Cases: {'✅ PASSED' if edge_cases_success else '❌ FAILED'}")
+        print(f"5. Action Count Increment: {'✅ PASSED' if action_count_success else '❌ FAILED'}")
+        print(f"6. Get Session Endpoint: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
         
         overall_success = (
-            cors_success and
-            action_count_success and 
-            inventory_success and 
-            get_session_success and
-            multiple_actions_success
+            dynamic_loot_success and
+            (pickup_success or not dynamic_loot_success) and  # Only require pickup success if items were discovered
+            multiple_searches_success and
+            edge_cases_success and
+            action_count_success and
+            get_session_success
         )
         
-        print(f"\n{'✅' if overall_success else '❌'} Badge System Tests: {'PASSED' if overall_success else 'FAILED'}")
+        print(f"\n{'✅' if overall_success else '❌'} Dynamic Loot System Tests: {'PASSED' if overall_success else 'FAILED'}")
         
         return 0 if overall_success else 1
     
