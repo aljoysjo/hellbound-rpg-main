@@ -537,6 +537,7 @@ class GameState {
       
       location: this.location,
       inventory: this.inventory,
+      discoveredItems: this.discoveredItems || [], // Añadir discoveredItems al estado
       narrativeLog: this.narrativeLog,
       mode: this.mode,
       campaignMeta: this.campaignMeta,
