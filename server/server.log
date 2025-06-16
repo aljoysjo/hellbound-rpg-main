@@ -4,18 +4,33 @@
    - Lore: 3 entries
    - Functions: 1 functions
    - Lexicon: 2 words
-🔌 Client connected: Jg8eoRUi0XXsIU-nAAAB
-🎨 Sandbox inicializado con concepto: "Detective paranormal investigando misterios..."
-🎯 Acciones dinámicas generadas: Acercarte a la sombra misteriosa, Tomar una foto del callejón, Escuchar atentamente el susurro, Buscar objetos en el entorno cercano
-🔍 ANALYZING ACTION: examino la habitación en busca de objetos
-🔍 ANALYZING ACTION: examino la habitación en busca de objetos
+🔌 Client connected: 7u4deZZoG77T369wAAAB
+🔌 Client connected: Ge2bE2L5S0MKzBxYAAAD
+🔌 Client connected: 3ah7Y3K_TEPd7Z3QAAAG
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar detenidamente la figura en la niebla, Activar percepción sobrenatural para detectar amenazas, Preparar un ritual de exorcismo en la habitación, Buscar objetos útiles en el entorno inmediato.
+🔌 Client disconnected: 3ah7Y3K_TEPd7Z3QAAAG
+🔌 Client connected: ixxyCBKrjYoBkAsdAAAI
+🔌 Client disconnected: ixxyCBKrjYoBkAsdAAAI
+🔌 Client connected: ecgvsGZSO1RAsvUBAAAL
+🔌 Client disconnected: Ge2bE2L5S0MKzBxYAAAD
+🎨 Sandbox inicializado con concepto: "Soy un arquitecto que está buscando las ruinas don..."
+🎯 Acciones dinámicas generadas: Estudiar el mapa detenidamente, Buscar pistas en los pergaminos, Decidir explorar el sendero menos recorrido, Preparar una lista de suministros necesarios.
+🔌 Client disconnected: ecgvsGZSO1RAsvUBAAAL
+🔌 Client connected: EcNZP4mCS1VWPABiAAAN
+🔍 ANALYZING ACTION: antes de irme, aprovecho de explorar un poco mas la biblioteca para buscar cosas de valor
+🔍 ANALYZING ACTION: antes de irme, aprovecho de explorar un poco mas la biblioteca para buscar cosas de valor
 📦 ITEMS DETECTADOS: []
 🔍 CURRENT INVENTORY: []
 🔍 Análisis IA raw: ```json
 {
   "vitalDelta": {},
-  "statusSet": {"miedo": 40, "alerta": 30},
-  "locationChange": "Habitación olvidada",
+  "statusSet": {},
+  "locationChange": "Biblioteca",
   "newSkill": {},
   "resourceDelta": {},
   "relationshipDelta": {},
@@ -26,8 +41,8 @@
 ```
 📊 Cambios detectados: {
   vitalDelta: {},
-  statusSet: { miedo: 40, alerta: 30 },
-  locationChange: 'Habitación olvidada',
+  statusSet: {},
+  locationChange: 'Biblioteca',
   newSkill: {},
   resourceDelta: {},
   relationshipDelta: {},
@@ -37,11 +52,8 @@
 }
 📊 Aplicando cambios de estado: {
   "vitalDelta": {},
-  "statusSet": {
-    "miedo": 40,
-    "alerta": 30
-  },
-  "locationChange": "Habitación olvidada",
+  "statusSet": {},
+  "locationChange": "Biblioteca",
   "newSkill": {},
   "resourceDelta": {},
   "relationshipDelta": {},
@@ -49,23 +61,223 @@
   "forceDeathCheck": false,
   "deathReason": ""
 }
-😊 miedo: 40%
-😊 alerta: 30%
-📍 Nueva ubicación: Habitación olvidada
+📍 Nueva ubicación: Biblioteca
 ⭐ Nueva habilidad (activa): undefined (Nivel undefined)
-🎯 Acciones dinámicas generadas: Abrir el baúl con cuidado, Examinar los libros antiguos, Recoger los papeles del suelo, Buscar símbolos en la habitación.
-🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "examino la habitación en busca de objetos"
+🎯 Acciones dinámicas generadas: Examinar el pergamino cuidadosamente, Tomar el cristal azul brillante, Investigar la estantería desgastada, Buscar más objetos en la biblioteca
+🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "antes de irme, aprovecho de explorar un poco mas la biblioteca para buscar cosas de valor"
 📖 Analizando narrativa para detectar items...
-📦 Items únicos extraídos: ninguno
-🎁 NARRATIVA SIN ITEMS: Generando loot dinámico con explicación
-🎯 Generando loot inteligente...
-🔍 Analizando contexto: action="examino la habitación en busca de objetos"
-🔍 Contextos detectados: knowledge
-🧠 Analizando sandbox concept: "Detective paranormal investigando misterios"
-🧠 Temas detectados: investigation
-🎯 Contextos finales: investigation, knowledge
-🎯 Categoría seleccionada: knowledge
-🎁 LOOT GENERADO: pergamino de datos 📜 (knowledge)
-🎁 LOOT DINÁMICO GENERADO (clickeable): pergamino de datos 📜
-📝 NARRATIVA EXTENDIDA: Al examinar más detenidamente, encuentras pergamino de datos 📜
-🎯 CONTEXTOS UTILIZADOS: investigation, knowledge
+🔍 Item detectado: "biblioteca"
+🔍 Item detectado: "aire de misterio"
+🔍 Item detectado: "estantería"
+🔍 Item detectado: "leve destello"
+🔍 Item detectado: "pequeño pergamino"
+📦 Items únicos extraídos: Biblioteca, Aire de misterio, Estantería, Leve destello, Pequeño pergamino
+📖 NARRATIVA CON ITEMS: Encontrados 5 items, extendiendo narrativa con decisión
+🎭 NARRATIVA EXTENDIDA:  ¿Qué haces con biblioteca, aire de misterio, estantería, leve destello y pequeño pergamino?
+🔍 ANALYZING ACTION: examinar el pergamino cuidadosamente
+🔍 ANALYZING ACTION: examinar el pergamino cuidadosamente
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 50, "alerta": 30},
+  "locationChange": "Selva de los Sueños",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {"mapa": +1},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+Error analizando cambios de estado: SyntaxError: Unexpected token '+', ..." {"mapa": +1},
+  "fo"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at analyzeNarrativeForStateChanges (file:///app/server/index.js:1237:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///app/server/index.js:1801:26
+🎯 Acciones dinámicas generadas: Investigar otros libros sobre la selva, Buscar un mapa antiguo en la biblioteca, Preguntar al bibliotecario sobre el símbolo, Preparar provisiones para la expedición.
+🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "Examinar el pergamino cuidadosamente"
+📖 Analizando narrativa para detectar items...
+🔍 Item detectado: "símbolo"
+🔍 Item detectado: "emoción y el temor se"
+📦 Items únicos extraídos: Símbolo, Emoción y el temor se
+📖 NARRATIVA CON ITEMS: Encontrados 2 items, extendiendo narrativa con decisión
+🎭 NARRATIVA EXTENDIDA:  ¿Decides tomar símbolo y emoción y el temor se?
+🔍 ANALYZING ACTION: examino el cristal azul
+🔍 ANALYZING ACTION: examino el cristal azul
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "Biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: {},
+  locationChange: 'Biblioteca',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "Biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📍 Nueva ubicación: Biblioteca
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Activar el cristal azul, Investigar libros sobre cristales mágicos, Buscar pistas sobre su origen, Guardar el cristal y salir a la selva
+🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "examino el cristal azul"
+📖 Analizando narrativa para detectar items...
+🔍 Item detectado: "cristal azul"
+🔍 Item detectado: "destello de vida latiese"
+📦 Items únicos extraídos: Cristal azul, Destello de vida latiese
+📖 NARRATIVA CON ITEMS: Encontrados 2 items, extendiendo narrativa con decisión
+🎭 NARRATIVA EXTENDIDA:  ¿Examinas más de cerca cristal azul y destello de vida latiese?
+🔍 ANALYZING ACTION: gusrdo el cristal y reviso la biblioteca un poco mas
+🔍 ANALYZING ACTION: gusrdo el cristal y reviso la biblioteca un poco mas
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "Biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: {},
+  locationChange: 'Biblioteca',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {},
+  "locationChange": "Biblioteca",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📍 Nueva ubicación: Biblioteca
+📈 Habilidad mejorada: undefined (Nivel NaN)
+🎯 Acciones dinámicas generadas: Leer más del diario antiguo, Examinar los libros encuadernados, Buscar trampas o mecanismos ocultos, Prepararte para la Selva de los Sueños
+🎲 Sistema híbrido no activado para: "gusrdo el cristal y reviso la biblioteca un poco mas"
+🔍 ANALYZING ACTION: busco en la biblioteca y me encuentro un libro sobre como iniciar rituales satanicos. aprendo ese conocimiento
+🔍 ANALYZING ACTION: busco en la biblioteca y me encuentro un libro sobre como iniciar rituales satanicos. aprendo ese conocimiento
+🔍 Texto completo detectado: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento"
+🔍 Texto limpio: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento"
+🔍 Items individuales detectados: [
+  'libro sobre como iniciar rituales satanicos. aprendo ese conocimiento'
+]
+🔍 Item individual limpio: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento"
+🔍 KEYWORDS DINÁMICAS DISPONIBLES: 168 total
+✅ Item válido detectado: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento"
+📦 ITEMS DETECTADOS: [
+  'libro sobre como iniciar rituales satanicos. aprendo ese conocimiento'
+]
+🔍 [LOCAL] Analizando: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento" → normalizado: "libro sobre como iniciar rituales satanicos aprendo ese conocimiento"
+✅ [LOCAL] Match encontrado: "libro" → Libro 📖
+📦 [LOCAL] Item procesado: "libro sobre como iniciar rituales satanicos. aprendo ese conocimiento" → Libro 📖 (high)
+📦 ITEM AÑADIDO: Libro 📖
+🔍 CURRENT INVENTORY: [ 'Libro 📖' ]
+🔍 Análisis IA raw: {
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 20},
+  "locationChange": "",
+  "newSkill": {"id": "rituales_oscuros", "level": 1, "category": "magia", "tags": ["invocación", "oscuridad"], "description": "Conocimiento sobre rituales oscuros y la invocación de entidades malignas."},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {"tema": 1},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 20 },
+  locationChange: '',
+  newSkill: {
+    id: 'rituales_oscuros',
+    level: 1,
+    category: 'magia',
+    tags: [ 'invocación', 'oscuridad' ],
+    description: 'Conocimiento sobre rituales oscuros y la invocación de entidades malignas.'
+  },
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: { tema: 1 },
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 20
+  },
+  "locationChange": "",
+  "newSkill": {
+    "id": "rituales_oscuros",
+    "level": 1,
+    "category": "magia",
+    "tags": [
+      "invocación",
+      "oscuridad"
+    ],
+    "description": "Conocimiento sobre rituales oscuros y la invocación de entidades malignas."
+  },
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {
+    "tema": 1
+  },
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 20%
+⭐ Nueva habilidad (magia): rituales_oscuros (Nivel 1)
+🧠 Conocimiento de tema: 1%
+🎯 Acciones dinámicas generadas: Practicar un ritual oscuro del libro, Investigar sobre el Arca de la Alianza, Buscar otros libros en la biblioteca, Salir hacia la Selva de los Sueños.
+🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "Busco en la biblioteca y me encuentro un libro sobre como iniciar rituales satanicos. aprendo ese conocimiento"
+📖 Analizando narrativa para detectar items...
+🔍 Item detectado: "curiosidad y el peligro se"
+🔍 Item detectado: "libro ahora"
+📦 Items únicos extraídos: Curiosidad y el peligro se, Libro ahora
+📖 NARRATIVA CON ITEMS: Encontrados 2 items, extendiendo narrativa con decisión
+🎭 NARRATIVA EXTENDIDA:  ¿Examinas más de cerca curiosidad y el peligro se y libro ahora?
+🔌 Client disconnected: EcNZP4mCS1VWPABiAAAN
