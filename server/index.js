@@ -1950,7 +1950,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           itemName = itemName.replace(/[,\.!?;]$/, '').trim();
           
           // Filtrar palabras demasiado cortas o genéricas
-          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 50) {
+          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 30 && !itemName.includes("mientras") && !itemName.includes("que se") && !itemName.includes("de la")) {
             foundItems.push(itemName);
             console.log(`🔍 Item detectado: "${itemName}"`);
           }
