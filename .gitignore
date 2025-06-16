@@ -14,3 +14,24 @@ node_modules/
 */node_modules/
 frontend/node_modules/
 server/node_modules/
+
+# 🚫 ARCHIVOS GRANDES QUE NO VAN A GITHUB
+*.tar.gz
+*.zip
+backups/
+
+# Logs del servidor
+server/server.log
+*/server.log
+*.log
+
+# Dependencias grandes
+yarn.lock
+package-lock.json
+
+# Archivos temporales
+*.tmp
+*.temp
+.DS_Store
+*.backup
+*.old
