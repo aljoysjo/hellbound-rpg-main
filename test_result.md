@@ -98,6 +98,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El sistema de polling funciona correctamente. Se observan logs de polling cada 2 segundos ('🔄 Haciendo polling request...', '🔄 POLLING RESPONSE', '🔄 Sin cambios significativos'). No se detectaron errores CORS ni 502 en las respuestas. El polling está funcionando como se espera."
+      
+  - task: "Sistema de loot dinámico"
+    implemented: true
+    working: false
+    file: "/app/server/index.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba del sistema de loot dinámico"
+      - working: false
+        agent: "testing"
+        comment: "Se detectó un problema con el sistema de loot dinámico. Aunque el código para generar items dinámicos está implementado en las líneas 1878-1897 y el sistema detecta correctamente las acciones de búsqueda (como 'busco algo valioso'), los items no aparecen en el campo 'discoveredItems' del game_state. La narrativa menciona el descubrimiento de items (ej: 'Descubres amuleto protector 🧿 en el lugar'), pero estos no se añaden al estado del juego. El endpoint /api/pickup_item no puede funcionar correctamente sin items en discoveredItems."
 
 frontend:
   - task: "Input fluido"
