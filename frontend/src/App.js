@@ -639,7 +639,7 @@ function App() {
         headers: { 
           'Content-Type': 'application/json',
           
-          'Accept': 'application/json'
+          
         },
         body: JSON.stringify(requestBody),
         signal: controller.signal,
