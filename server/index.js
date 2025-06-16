@@ -1336,11 +1336,6 @@ Responde SOLO con la narrativa, sin explicaciones.
           setTimeout(() => reject(new Error('OpenAI timeout')), 15000)
         )
       ]);
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('OpenAI timeout')), 15000) // 15 segundos timeout
-        )
-      ]);
 
       initialNarrative = conceptResponse.choices[0].message.content || 
         `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
