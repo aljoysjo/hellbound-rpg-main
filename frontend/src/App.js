@@ -692,13 +692,31 @@ function App() {
         name: err.name,
         BACKEND_URL,
         selectedMode,
+        userAgent: navigator.userAgent,
+        onLine: navigator.onLine,
         requestBody: {
           mode: selectedMode || 'sandbox',
           campaign: campaignName,
           sandboxConcept: sandboxConcept ? sandboxConcept.substring(0, 50) + '...' : undefined
         }
       });
-      setError(`Error al iniciar sesión: ${err.message}`);
+      
+      // 📱 MENSAJES DE ERROR ESPECÍFICOS PARA MÓVILES
+      let errorMessage = 'Error al iniciar sesión';
+      
+      if (err.name === 'AbortError') {
+        errorMessage = 'La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.';
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        errorMessage = 'Sin conexión al servidor. Verifica tu internet y intenta de nuevo.';
+      } else if (err.message.includes('CORS')) {
+        errorMessage = 'Error de configuración del servidor. Por favor reporta este problema.';
+      } else if (!navigator.onLine) {
+        errorMessage = 'Sin conexión a internet. Conéctate y intenta de nuevo.';
+      } else {
+        errorMessage = `Error de conexión: ${err.message}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
