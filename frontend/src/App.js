@@ -638,7 +638,7 @@ function App() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
+          
           'Accept': 'application/json'
         },
         body: JSON.stringify(requestBody),
