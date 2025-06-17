@@ -22,7 +22,8 @@ module.exports = {
   },
   rules: {
     // Reglas mínimas para no bloquear desarrollo
-    'tailwindcss/no-custom-classname': 'off'
+    'tailwindcss/no-custom-classname': 'off',
+    'tailwindcss/migration-from-tailwind-2': 'off'
   },
   settings: {
     tailwindcss: {
