@@ -967,11 +967,76 @@ function App() {
     return (
       <div className="relative flex size-full min-h-screen flex-col justify-between group/design-root overflow-x-hidden bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY')"}}>
         <div className="flex-grow bg-white/30 backdrop-blur-sm">
-          <header className="flex items-center p-4 sticky top-0 z-10 bg-gradient-to-b from-[var(--creamy-old)]/80 via-[var(--creamy-old)]/80 to-transparent">
-            <button className="text-[var(--cedar-brown)] p-2 rounded-full hover:bg-black/10 transition-colors">
-              <span className="material-icons text-3xl">arrow_back_ios_new</span>
-            </button>
-            <h2 className="text-[var(--cedar-brown)] text-xl font-bold leading-tight tracking-tight flex-1 text-center pr-10">Hellbound RPG</h2>
+          <header className="flex flex-col items-center p-4 sticky top-0 z-10 bg-gradient-to-b from-[var(--creamy-old)]/80 via-[var(--creamy-old)]/80 to-transparent">
+            {/* TÍTULO Y BOTÓN ATRÁS */}
+            <div className="flex items-center w-full mb-3">
+              <button className="text-[var(--cedar-brown)] p-2 rounded-full hover:bg-black/10 transition-colors">
+                <span className="material-icons text-3xl">arrow_back_ios_new</span>
+              </button>
+              <h2 className="text-[var(--cedar-brown)] text-xl font-bold leading-tight tracking-tight flex-1 text-center pr-10">Hellbound RPG</h2>
+            </div>
+
+            {/* BARRAS DE STATS INTEGRADAS */}
+            <div className="w-full max-w-md space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">❤️</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.health || 85))}%`,
+                      background: 'var(--health-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.health || 85}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🔮</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.mana || 60))}%`,
+                      background: 'var(--mana-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.mana || 60}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">⚡</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.stamina || 80))}%`,
+                      background: 'var(--stamina-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.stamina || 80}
+                </span>
+              </div>
+            </div>
+
+            {/* CONEXIÓN Y UBICACIÓN */}
+            <div className="flex items-center justify-between w-full max-w-md mt-2 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span style={{ color: 'var(--cedar-brown)' }}>Conectado</span>
+              </div>
+              <span style={{ color: 'var(--text-accent-custom)' }}>
+                📍 {gameState?.location || 'Alicante'}
+              </span>
+            </div>
           </header>
           
           <main className="flex-grow overflow-auto pt-2 pb-8">
