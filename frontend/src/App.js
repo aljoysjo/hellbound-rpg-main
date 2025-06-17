@@ -2093,7 +2093,7 @@ function App() {
         </div>
       ) : (
         <>
-          <GameHeader />
+          {/* Header integrado dentro de EnhancedNarrativeSection */}
           <EnhancedNarrativeSection />
           
           <div className="mobile-only">
