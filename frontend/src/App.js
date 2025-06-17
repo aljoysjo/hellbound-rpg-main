@@ -1903,7 +1903,10 @@ function App() {
               <div className="mode-buttons-container">
                 <button 
                   className="btn-primary-new" 
-                  onClick={() => setMode('sandbox')}
+                  onClick={() => {
+                    setMode('sandbox');
+                    setShowSandboxForm(true);
+                  }}
                 >
                   Modo Libre
                 </button>
