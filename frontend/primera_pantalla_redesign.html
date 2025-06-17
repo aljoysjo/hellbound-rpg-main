@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Lexend%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<title>Hellbound RPG - Rediseño</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+      :root {
+        /* 🎨 PALETA PERGAMINO ÁUREO */
+        --primary-color: #D14438;        /* DORADO IMPERIAL - Botones primarios, títulos */
+        --secondary-color: #583A1D;      /* MARRÓN OSCURO - Botones secundarios, sombras */
+        --background-color: #F3E7C6;     /* CREMA VIEJO - Fondo principal */
+        --text-color: #8C5B2C;           /* MARRÓN CEDRO - Texto, iconos */
+        --accent-color: #3F7251;         /* ESMERALDA - Contraste adicional */
+        --panel-color: #B98746;          /* CARAMELO CLARO - Paneles secundarios */
+        --placeholder-color: #A67B47;    /* Texto placeholder */
+        --font-family-lexend: "Lexend", sans-serif;
+      }
+      
+      body {
+        font-family: var(--font-family-lexend);
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+      
+      .game-logo {
+        font-weight: 900;
+        font-size: 2.5rem;
+        letter-spacing: 0.05em;
+        text-shadow: 2px 2px 4px rgba(88, 58, 29, 0.3);
+        color: var(--primary-color);
+      }
+      
+      .status-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: var(--secondary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(88, 58, 29, 0.2);
+      }
+      
+      .status-bar .material-icons {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+      }
+      
+      .status-bar span {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--background-color);
+      }
+      
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        font-weight: 700;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 4px 6px rgba(209, 68, 56, 0.2);
+      }
+      
+      .btn-primary:hover {
+        background-color: #B83A30;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(209, 68, 56, 0.3);
+      }
+      
+      .btn-secondary {
+        background-color: var(--panel-color);
+        color: var(--background-color);
+        font-weight: 700;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--panel-color);
+        box-shadow: 0 4px 6px rgba(185, 135, 70, 0.2);
+      }
+      
+      .btn-secondary:hover {
+        background-color: #A67B47;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(185, 135, 70, 0.3);
+      }
+      
+      .textarea-custom {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        border: 2px solid var(--panel-color);
+        border-radius: 0.75rem;
+        min-height: 120px;
+        box-shadow: inset 0 2px 4px rgba(88, 58, 29, 0.1);
+        transition: border-color 0.3s ease;
+      }
+      
+      .textarea-custom:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: inset 0 2px 4px rgba(88, 58, 29, 0.1), 0 0 0 3px rgba(209, 68, 56, 0.1);
+      }
+      
+      .textarea-custom::placeholder {
+        color: var(--placeholder-color);
+      }
+      
+      .main-container {
+        background: linear-gradient(135deg, var(--background-color) 0%, #EDE1B8 100%);
+        min-height: 100vh;
+      }
+      
+      .content-panel {
+        background-color: rgba(243, 231, 198, 0.9);
+        border: 2px solid var(--panel-color);
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px rgba(88, 58, 29, 0.15);
+        backdrop-filter: blur(10px);
+      }
+      
+      /* Responsive Design */
+      @media (min-width: 768px) {
+        .game-logo {
+          font-size: 3.5rem;
+        }
+        
+        .content-panel {
+          max-width: 500px;
+          margin: 0 auto;
+        }
+        
+        .status-bar {
+          padding: 0.75rem 1.5rem;
+        }
+        
+        .btn-primary, .btn-secondary {
+          padding: 1rem 2rem;
+          font-size: 1.1rem;
+        }
+      }
+      
+      @media (min-width: 1024px) {
+        .main-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .content-panel {
+          max-width: 600px;
+          padding: 3rem;
+        }
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+</style>
+</head>
+<body>
+<div class="main-container relative flex size-full min-h-screen flex-col justify-between group/design-root overflow-x-hidden">
+  <div class="flex flex-col items-center p-6 space-y-8">
+    <div class="content-panel w-full max-w-md p-6">
+      <header class="w-full flex flex-col items-center space-y-4 mb-8">
+        <h1 class="game-logo text-center">HELLBOUND RPG</h1>
+        <div class="flex justify-center items-center space-x-4">
+          <div class="status-bar">
+            <span class="material-icons">favorite</span>
+            <span>100/100</span>
+          </div>
+          <div class="status-bar">
+            <span class="material-icons">bolt</span>
+            <span>50/50</span>
+          </div>
+        </div>
+      </header>
+      
+      <p class="text-lg font-medium leading-normal text-center mb-8 px-4 text-[var(--text-color)]">
+        Elige tu camino en una aventura épica donde cada decisión forja tu destino...
+      </p>
+      
+      <div class="flex w-full gap-4 justify-center mb-6">
+        <button class="flex-1 btn-primary" id="sandboxBtn">
+          Modo Libre
+        </button>
+        <button class="flex-1 btn-secondary" id="campaignBtn">
+          Campaña
+        </button>
+      </div>
+      
+      <div class="w-full flex-col space-y-6 hidden" id="sandboxUI">
+        <label class="flex flex-col w-full">
+          <textarea 
+            class="form-input textarea-custom w-full p-4 text-base" 
+            placeholder="Describe tu concepto de aventura aquí... ej: 'Un detective paranormal investigando desapariciones misteriosas en una ciudad sombría.'">
+          </textarea>
+        </label>
+        <button class="w-full btn-primary">
+          Iniciar Aventura
+        </button>
+      </div>
+      
+      <div class="w-full flex-col space-y-4 hidden" id="campaignUI">
+        <button class="w-full btn-primary">
+          Iniciar Campaña
+        </button>
+        <button class="w-full btn-secondary" id="changeModeBtn">
+          Cambiar Modo
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="h-5 bg-transparent"></div>
+</div>
+
+<script>
+  const sandboxBtn = document.getElementById('sandboxBtn');
+  const campaignBtn = document.getElementById('campaignBtn');
+  const sandboxUI = document.getElementById('sandboxUI');
+  const campaignUI = document.getElementById('campaignUI');
+  const changeModeBtn = document.getElementById('changeModeBtn');
+  
+  function showSandbox() {
+    sandboxUI.classList.remove('hidden');
+    sandboxUI.classList.add('flex');
+    campaignUI.classList.add('hidden');
+    campaignUI.classList.remove('flex');
+    sandboxBtn.classList.remove('btn-secondary');
+    sandboxBtn.classList.add('btn-primary');
+    campaignBtn.classList.remove('btn-primary');
+    campaignBtn.classList.add('btn-secondary');
+  }
+  
+  function showCampaign() {
+    campaignUI.classList.remove('hidden');
+    campaignUI.classList.add('flex');
+    sandboxUI.classList.add('hidden');
+    sandboxUI.classList.remove('flex');
+    campaignBtn.classList.remove('btn-secondary');
+    campaignBtn.classList.add('btn-primary');
+    sandboxBtn.classList.remove('btn-primary');
+    sandboxBtn.classList.add('btn-secondary');
+  }
+  
+  sandboxBtn.addEventListener('click', showSandbox);
+  campaignBtn.addEventListener('click', showCampaign);
+  changeModeBtn.addEventListener('click', () => {
+    showSandbox();
+  });
+  
+  // Mostrar sandbox por defecto
+  // showSandbox();
+</script>
+
+</body>
+</html>
