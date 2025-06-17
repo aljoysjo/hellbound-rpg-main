@@ -2049,7 +2049,7 @@ function App() {
       ) : (
         <>
           <GameHeader />
-          <IntegratedCanvas />
+          <EnhancedNarrativeSection />
           
           <div className="mobile-only">
             <ControlsBar />
