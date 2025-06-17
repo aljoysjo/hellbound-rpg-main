@@ -1940,12 +1940,11 @@ function App() {
                 />
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="buttons-row">
                 <button
                   onClick={() => startNewSession('sandbox', null, sandboxConcept)}
                   disabled={loading || sandboxConcept.trim().length < 20}
                   className="btn-primary-new"
-                  style={{ width: '100%' }}
                 >
                   {loading ? 'Creando historia...' : 'Iniciar Aventura'}
                 </button>
@@ -1957,7 +1956,6 @@ function App() {
                   }}
                   disabled={loading}
                   className="btn-secondary-new"
-                  style={{ width: '100%' }}
                 >
                   Volver
                 </button>
