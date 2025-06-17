@@ -1171,8 +1171,6 @@ function App() {
       </header>
     );
   };
-  
-  };
 
   // Desktop Actions
   const DesktopActionsSection = () => (
