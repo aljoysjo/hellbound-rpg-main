@@ -1995,7 +1995,77 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir/.test(action.toLowerCase())) {
       console.log(`🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "${action}"`);
       
-      // PASO 1: Extraer items de la narrativa existente
+      // 🎯 NUEVO SISTEMA DE PROBABILIDAD VARIABLE (30% base)
+      let discoveryChance = 0.30; // 30% probabilidad base
+      const location = gameState.location || '';
+      const currentAction = action.toLowerCase();
+      
+      // 🔺 MODIFICADORES QUE AUMENTAN PROBABILIDAD
+      if (location.toLowerCase().includes('tesoro') || location.toLowerCase().includes('cofre') || 
+          location.toLowerCase().includes('biblioteca') || location.toLowerCase().includes('cueva') ||
+          location.toLowerCase().includes('ruinas') || location.toLowerCase().includes('templo')) {
+        discoveryChance += 0.25; // +25% en ubicaciones prometedoras
+        console.log(`🏛️ Ubicación prometedora detectada, probabilidad aumentada`);
+      }
+      
+      if (currentAction.includes('minuciosamente') || currentAction.includes('cuidadosamente') || 
+          currentAction.includes('detalladamente') || currentAction.includes('exhaustivamente')) {
+        discoveryChance += 0.20; // +20% por búsqueda detallada
+        console.log(`🔍 Búsqueda detallada detectada, probabilidad aumentada`);
+      }
+      
+      // Sistema de mercy - evitar sequías muy largas
+      if (!gameState.consecutiveEmptySearches) gameState.consecutiveEmptySearches = 0;
+      if (gameState.consecutiveEmptySearches >= 3) {
+        discoveryChance += 0.25; // +25% mercy después de 3 búsquedas vacías
+        console.log(`🎗️ Sistema mercy activado después de ${gameState.consecutiveEmptySearches} búsquedas vacías`);
+      }
+      
+      // 🔻 MODIFICADORES QUE REDUCEN PROBABILIDAD
+      if (!gameState.lastDiscoveryAction) gameState.lastDiscoveryAction = 0;
+      const timeSinceLastFind = gameState.actionCount - gameState.lastDiscoveryAction;
+      if (timeSinceLastFind < 3) {
+        discoveryChance *= 0.3; // Reducir drásticamente si acabas de encontrar algo
+        console.log(`⏰ Cooldown activo, probabilidad reducida (último hallazgo hace ${timeSinceLastFind} turnos)`);
+      }
+      
+      // Límites de probabilidad
+      discoveryChance = Math.max(0.05, Math.min(0.85, discoveryChance)); // Entre 5% y 85%
+      
+      console.log(`🎲 Probabilidad final de descubrimiento: ${(discoveryChance * 100).toFixed(1)}%`);
+      
+      // 🎲 TIRADA DE DADOS
+      const roll = Math.random();
+      const shouldGenerateItem = roll < discoveryChance;
+      
+      console.log(`🎰 Tirada: ${(roll * 100).toFixed(1)}% - ${shouldGenerateItem ? 'ÉXITO' : 'FALLO'}`);
+      
+      if (!shouldGenerateItem) {
+        // 📝 RESPUESTAS VARIADAS CUANDO NO HAY ITEMS
+        const emptySearchResponses = [
+          "Buscas cuidadosamente pero no encuentras nada de valor.",
+          "Tras una inspección minuciosa, el lugar parece vacío de objetos útiles.",
+          "Tu búsqueda no revela ningún objeto interesante esta vez.",
+          "Examinas cada rincón, pero no hay nada que llame tu atención.",
+          "Después de hurgar un rato, concluyes que no hay nada aprovechable aquí.",
+          "Tu exploración resulta infructuosa en esta ocasión.",
+          "Registras la zona pero no encuentras nada destacable."
+        ];
+        
+        const randomResponse = emptySearchResponses[Math.floor(Math.random() * emptySearchResponses.length)];
+        narrative += ` ${randomResponse}`;
+        
+        gameState.consecutiveEmptySearches++;
+        console.log(`🚫 Búsqueda vacía #${gameState.consecutiveEmptySearches}: ${randomResponse}`);
+        
+        // Continuar con el resto del procesamiento normal (sin loot)
+      } else {
+        // 🎁 GENERAR ITEM - LÓGICA ORIGINAL
+        gameState.lastDiscoveryAction = gameState.actionCount;
+        gameState.consecutiveEmptySearches = 0;
+        console.log(`✅ ¡Descubrimiento exitoso! Reseteando contadores`);
+      
+        // PASO 1: Extraer items de la narrativa existente
       const narrativeItems = extractItemsFromNarrative(narrative);
       
       if (narrativeItems.length > 0) {
