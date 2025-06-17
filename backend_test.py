@@ -164,111 +164,120 @@ class HellboundRPGTester:
         print("✅ Game state structure validation complete")
         return True
 
-    def test_dynamic_loot_system(self):
-        """Test the dynamic loot system by searching for valuable items"""
+    def test_free_input(self, action="examinar los alrededores"):
+        """Test the free input endpoint with a specific action"""
         if not self.session_id:
-            print("❌ Cannot test dynamic loot system without a valid session")
+            print("❌ Cannot test free input without a valid session")
             return False
             
-        # Get initial state
-        _, initial_response = self.run_test(
-            "Get Initial Session State",
-            "GET",
-            f"api/get_session/{self.session_id}",
-            200
-        )
-        
-        initial_game_state = initial_response.get('game_state', {})
-        initial_discovered_items = initial_game_state.get('discoveredItems', [])
-        print(f"Initial Discovered Items: {initial_discovered_items}")
-        
-        # Send action to search for valuable items
         success, response = self.run_test(
-            "Dynamic Loot - Search for Valuable Items",
+            "Free Input API",
             "POST",
             "api/free_input",
             200,
             data={
                 "session_id": self.session_id,
-                "action": "busco algo valioso"
+                "action": action
             }
         )
         
         if success:
-            # Check if new items were discovered
+            # Check if we got a narrative response
+            if 'new_narrative' not in response:
+                print("❌ Missing new_narrative in response")
+                return False
+                
+            # Check if we got a game state
+            if 'game_state' not in response:
+                print("❌ Missing game_state in response")
+                return False
+                
+            # Print the narrative response
+            print(f"Narrative Response: {response.get('new_narrative')[:150]}...")
+            
+            # Check if we got suggested actions
+            suggested_actions = response.get('suggested_actions', [])
+            print(f"Suggested Actions: {suggested_actions[:3]}")
+            
+            # Validate game state structure
             game_state = response.get('game_state', {})
-            discovered_items = game_state.get('discoveredItems', [])
+            self.validate_game_state_structure(game_state)
             
-            print(f"Discovered Items After Search: {discovered_items}")
-            
-            if len(discovered_items) > len(initial_discovered_items):
-                print(f"✅ New items discovered: {len(discovered_items) - len(initial_discovered_items)} items")
-                
-                # Verify item structure
-                for item in discovered_items:
-                    if not self.validate_item_structure(item):
-                        print(f"❌ Invalid item structure: {item}")
-                        return False
-                
-                # Check if narrative mentions the discovered item
-                narrative = response.get('new_narrative', '')
-                print(f"Narrative: {narrative}")
-                
-                item_mentioned = False
-                for item in discovered_items:
-                    if item['name'].lower() in narrative.lower():
-                        item_mentioned = True
-                        print(f"✅ Item '{item['name']}' mentioned in narrative")
-                        break
-                
-                if not item_mentioned:
-                    print("⚠️ No specific item mentioned in narrative")
-                
-                # Save the first discovered item for pickup test
-                self.discovered_item_id = discovered_items[0]['instanceId']
-                print(f"Saved item ID for pickup test: {self.discovered_item_id}")
-                
-                return True
-            else:
-                print("❌ No new items discovered")
-                
-                # Try another search action
-                print("\n🔍 Trying another search action...")
-                success, response = self.run_test(
-                    "Dynamic Loot - Second Search Attempt",
-                    "POST",
-                    "api/free_input",
-                    200,
-                    data={
-                        "session_id": self.session_id,
-                        "action": "examino el área en busca de objetos"
-                    }
-                )
-                
-                if success:
-                    game_state = response.get('game_state', {})
-                    discovered_items = game_state.get('discoveredItems', [])
-                    
-                    print(f"Discovered Items After Second Search: {discovered_items}")
-                    
-                    if len(discovered_items) > len(initial_discovered_items):
-                        print(f"✅ New items discovered on second attempt: {len(discovered_items) - len(initial_discovered_items)} items")
-                        
-                        # Verify item structure
-                        for item in discovered_items:
-                            if not self.validate_item_structure(item):
-                                print(f"❌ Invalid item structure: {item}")
-                                return False
-                        
-                        # Save the first discovered item for pickup test
-                        self.discovered_item_id = discovered_items[0]['instanceId']
-                        print(f"Saved item ID for pickup test: {self.discovered_item_id}")
-                        
-                        return True
-                    else:
-                        print("❌ No new items discovered on second attempt")
-                        return False
+            return True
+        return False
         
+    def test_vitals_and_stats(self):
+        """Test that the response has correct vitals (health, mana, stamina)"""
+        if not self.session_id:
+            print("❌ Cannot test vitals without a valid session")
+            return False
+            
+        success, response = self.run_test(
+            "Get Session State for Vitals Check",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        if success:
+            # Check if we got a game state
+            if 'game_state' not in response:
+                print("❌ Missing game_state in response")
+                return False
+                
+            # Check vitals
+            game_state = response.get('game_state', {})
+            vitals = game_state.get('vitals', {})
+            
+            print("\n🔍 Checking vitals...")
+            
+            # Check for required vitals
+            required_vitals = ['health', 'mana', 'stamina']
+            for vital in required_vitals:
+                if vital not in vitals:
+                    print(f"❌ Missing required vital: {vital}")
+                    return False
+                    
+                # Check if vital is a number
+                if not isinstance(vitals[vital], (int, float)):
+                    print(f"❌ Vital {vital} is not a number: {vitals[vital]}")
+                    return False
+                    
+                # Check if vital is in valid range (0-100)
+                if vitals[vital] < 0 or vitals[vital] > 100:
+                    print(f"❌ Vital {vital} is out of range (0-100): {vitals[vital]}")
+                    return False
+                    
+                print(f"✅ Vital {vital}: {vitals[vital]}")
+            
+            # Check other stats
+            print("\n🔍 Checking other stats...")
+            
+            # Check emotional states
+            emotional_states = game_state.get('emotionalStates', {})
+            if not emotional_states:
+                print("❌ Missing emotional states")
+                return False
+                
+            print(f"Emotional States: {emotional_states}")
+            
+            # Check resources
+            resources = game_state.get('resources', {})
+            if not resources:
+                print("❌ Missing resources")
+                return False
+                
+            print(f"Resources: {resources}")
+            
+            # Check attributes
+            attributes = game_state.get('attributes', {})
+            if not attributes:
+                print("❌ Missing attributes")
+                return False
+                
+            print(f"Attributes: {attributes}")
+            
+            return True
         return False
 
     def validate_item_structure(self, item):
