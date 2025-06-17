@@ -1071,32 +1071,90 @@ function App() {
             </div>
           </header>
           
-          <main className="flex flex-col h-[calc(100vh-var(--header-height))] pt-2">
-            <div className="px-4 @[480px]:px-6 flex-shrink-0">
-              <div className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden mb-6 @[480px]:rounded-2xl" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")'}}>
-              </div>
-            </div>
-            
-            <div className="px-4 @[480px]:px-6 flex flex-col flex-grow text-center">
-              <h1 className="text-[var(--cedar-brown)] text-3xl font-bold leading-tight tracking-tight flex-shrink-0">
-                Crónica de la Aventura
-              </h1>
+          {/* ÁREA PRINCIPAL DE NARRATIVA - APROVECHA TODA LA PANTALLA */}
+          <main className="flex flex-col flex-grow p-4">
               
-              {/* NARRATIVA ACUMULATIVA CON AUTO-SCROLL Y EFECTO ESCRITURA */}
-              <div id="narrative-log" className="flex-grow overflow-hidden relative mt-4 px-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                <div className="absolute inset-0 overflow-y-auto scrollbar-hide">
-                  {gameState?.narrativeLog?.map((entry, index) => (
-                    <div key={index} className="narrative-text-enter py-2 animate-typing">
-                      <p className="text-[var(--text-accent-custom)] text-lg font-medium leading-relaxed mb-1 opacity-90">
-                        <span className="material-icons align-middle text-xl mr-1">play_arrow</span> 
-                        "{safeStringify(entry.player_action, 'Acción del jugador')}"
-                      </p>
-                      <p className="text-[var(--text-primary-custom)] text-base font-normal leading-relaxed max-w-md mx-auto opacity-90">
-                        {safeStringify(entry.narrative, 'Narrativa del juego')}
-                      </p>
+            {/* NARRATIVA PERSISTENTE CON AUTO-SCROLL + ACCIONES INLINE + LOOT INTEGRADO */}
+            <div className="flex-grow flex flex-col">
+              <div 
+                ref={narrativeRef}
+                className="flex-grow overflow-y-auto max-h-[60vh] bg-white/20 backdrop-blur-sm rounded-lg p-4 space-y-4 scrollbar-hide"
+              >
+                {gameState?.narrativeLog?.length === 0 ? (
+                  <div className="text-center text-[var(--cedar-brown)]/70 italic">
+                    Tu aventura está a punto de comenzar...
+                  </div>
+                ) : (
+                  gameState?.narrativeLog?.map((entry, index) => (
+                    <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                      {/* ACCIÓN DEL JUGADOR */}
+                      <div className="mb-2">
+                        <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                          <span className="text-lg">▶️</span>
+                          "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                        </p>
+                      </div>
+                      
+                      {/* NARRATIVA DEL JUEGO */}
+                      <div className="mb-3">
+                        <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                          {safeStringify(entry.narrative, 'Narrativa del juego')}
+                        </p>
+                      </div>
+
+                      {/* ACCIONES INLINE EMBEBIDAS (Solo en última entrada) */}
+                      {index === gameState.narrativeLog.length - 1 && suggestedActions.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                          {suggestedActions.map((action, actionIndex) => (
+                            <button
+                              key={actionIndex}
+                              onClick={() => handleInlineAction(action)}
+                              disabled={loading || gameOver}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--imperial-gold)]/80 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-xs font-medium rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+                            >
+                              <span>{getActionIcon(action)}</span>
+                              <span>{action}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* LOOT INTEGRADO (Solo en última entrada si hay items) */}
+                      {index === gameState.narrativeLog.length - 1 && discoveredItems.length > 0 && (
+                        <div className="mt-4 p-3 bg-[var(--light-caramel)]/50 border border-[var(--imperial-gold)] rounded-lg">
+                          <h4 className="text-sm font-bold text-[var(--imperial-gold)] mb-2 flex items-center gap-1">
+                            ✨ Objetos encontrados
+                          </h4>
+                          {discoveredItems.slice(0, 2).map((item, itemIndex) => (
+                            <div key={item.instanceId || itemIndex} className="flex items-center justify-between mb-2 last:mb-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{item.icon || '📦'}</span>
+                                <span className="text-xs font-medium text-[var(--cedar-brown)]">
+                                  {safeStringify(item.name, 'Objeto')}
+                                </span>
+                              </div>
+                              <div className="flex gap-1">
+                                <button 
+                                  className="px-2 py-1 bg-[var(--imperial-gold)] text-[var(--creamy-old)] text-xs font-bold rounded hover:bg-[var(--imperial-gold)]/80 transition-all duration-150 shadow-sm"
+                                  onClick={() => pickupItem(item)}
+                                  disabled={pickupLoading === item.instanceId}
+                                >
+                                  {pickupLoading === item.instanceId ? '...' : 'Recoger'}
+                                </button>
+                                <button 
+                                  className="px-2 py-1 bg-transparent text-[var(--cedar-brown)] border border-[var(--cedar-brown)] text-xs font-bold rounded hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-150"
+                                  onClick={() => ignoreItem(item)}
+                                >
+                                  Ignorar
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  ))
+                )}
               </div>
 
               {/* CUADRO DE LOOT ENCONTRADO */}
