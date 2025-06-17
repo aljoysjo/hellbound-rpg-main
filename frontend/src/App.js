@@ -1076,67 +1076,48 @@ function App() {
   };
 
   // Header
-  const CompactHeader = () => {
+  const GameHeader = () => {
     const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
     
     return (
-      <header className="compact-header">
-        <div className="header-left">
-          <h1 className="header-title">
-            <span className="mobile-ultra-compact">
-              HELLBOUND | ❤️{vitals.health} 🔮{vitals.mana} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
-            </span>
-            <span className="desktop-full">
-              🔥 HELLBOUND RPG v2.0
-            </span>
-          </h1>
-          
-          {gameState?.location && (
-            <div className="header-location">
-              <span>📍</span>
-              <span>{safeStringify(gameState.location, '')}</span>
-            </div>
-          )}
+      <header className="game-header">
+        <div className="header-top-row">
+          <div className="online-indicator">
+            <div className="ping-dot"></div>
+            <span className="online-text">Conectado</span>
+          </div>
+          <h1 className="header-title">Hellbound RPG</h1>
+          <div style={{ width: '2rem' }}></div>
         </div>
         
-        <div className="header-stats-real-horizontal desktop-only">
-          <div className="stats-row">
-            <div className="stat-item">
-              <span className="stat-icon">❤️</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill health"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.health))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.health}</span>
+        <div className="stats-container">
+          <div className="stat-row">
+            <span className="stat-icon">❤️</span>
+            <div className="stat-bar">
+              <div 
+                className="stat-fill health"
+                style={{ width: `${Math.max(0, Math.min(100, vitals.health))}%` }}
+              />
             </div>
-            
-            <div className="stat-item">
-              <span className="stat-icon">🔮</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill mana"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.mana))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.mana}</span>
+          </div>
+          
+          <div className="stat-row">
+            <span className="stat-icon">🔮</span>
+            <div className="stat-bar">
+              <div 
+                className="stat-fill mana"
+                style={{ width: `${Math.max(0, Math.min(100, vitals.mana))}%` }}
+              />
             </div>
-            
-            <div className="stat-item">
-              <span className="stat-icon">⚡</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill stamina"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.stamina || 80}</span>
-            </div>
-            
-            <div className="connection-item">
-              <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-              <span className="status-text">Conectado</span>
+          </div>
+          
+          <div className="stat-row">
+            <span className="stat-icon">●</span>
+            <div className="stat-bar">
+              <div 
+                className="stat-fill stamina"
+                style={{ width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%` }}
+              />
             </div>
           </div>
         </div>
