@@ -110,6 +110,12 @@ function App() {
     setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
   };
 
+  // Función para ignorar items descubiertos
+  const ignoreItem = (item) => {
+    console.log('🚫 Ignorando item:', item);
+    setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
+  };
+
   // SISTEMA DE DETECCIÓN DE CAMBIOS BASADO EN INSTANCE ID (DEFINITIVO) - CORREGIDO PARA ITEMS SOLTADOS
   const detectInventoryChanges = (prevInventory, currentInventory) => {
     const prev = Array.isArray(prevInventory) ? prevInventory : [];
