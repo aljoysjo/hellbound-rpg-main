@@ -961,10 +961,7 @@ function App() {
     return '✨';
   };
 
-  // NUEVA NARRATIVA MEJORADA - Pergamino Áureo Style
-    const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
-    
-    return (
+  // Header
       <main className="flex-grow p-4" style={{ 
         background: 'linear-gradient(to bottom right, var(--creamy-old), var(--light-caramel))'
       }}>
