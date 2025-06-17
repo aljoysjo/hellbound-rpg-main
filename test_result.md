@@ -207,11 +207,11 @@ frontend:
 
   - task: "Header ultra-compacto"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -225,6 +225,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Se identificó el problema: hay una definición recursiva del componente EnhancedHeader en App.js línea 1176-1178. El componente se llama a sí mismo, lo que causa un error de recursión infinita. Se intentó corregir reemplazando la referencia a EnhancedHeader por GameHeader, pero persisten errores de sintaxis en App.js."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El header ahora se muestra correctamente con las barras de stats (salud, maná, stamina). No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Modal estados emocionales"
     implemented: true
