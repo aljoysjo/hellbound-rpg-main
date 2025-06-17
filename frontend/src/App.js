@@ -947,93 +947,15 @@ function App() {
     return '✨';
   };
 
-  // 🎮 LAYOUT REFACTORIZADO SEGÚN CHATGPT - H-SCREEN + SCROLL SOLO EN MAIN
+  // 🎮 LAYOUT REFACTORIZADO - HEADER MINIMALISTA + INPUT FIJO
   const EnhancedNarrativeSection = () => {
-    const vitals = gameState?.vitals || { health: 100, mana: 50, stamina: 100 };
-    const location = gameState?.location || 'Ubicación Desconocida';
-    
     return (
       <div className="flex flex-col h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
-        {/* HEADER COMPACTO CON STATS */}
-        <header className="flex-shrink-0 p-3 bg-gradient-to-b from-[var(--creamy-old)]/90 via-[var(--creamy-old)]/80 to-transparent backdrop-blur-sm border-b border-[var(--imperial-gold)]/30">
-          {/* TÍTULO Y STATUS */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="relative w-3 h-3">
-                <div className="absolute inset-0 rounded-full bg-emerald-500 opacity-60 animate-ping"></div>
-                <div className="relative w-1.5 h-1.5 rounded-full bg-emerald-500 m-auto border border-white"></div>
-              </div>
-              <span className="text-xs font-medium text-[var(--cedar-brown)]">
-                {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
-              </span>
-            </div>
-            <h2 className="text-[var(--cedar-brown)] text-lg font-bold">Hellbound RPG</h2>
-            <div className="w-20"></div>
-          </div>
+        
+        {/* HEADER MINIMALISTA OPCIÓN A */}
+        <MinimalHeader gameState={gameState} connectionStatus={connectionStatus} />
 
-          {/* BARRAS DE STATS COMPACTAS */}
-          <div className="space-y-1">
-            {/* SALUD */}
-            <div className="flex items-center gap-2">
-              <span className="text-lg">❤️</span>
-              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                <div 
-                  className="h-full rounded-full transition-all duration-500 ease-out"
-                  style={{ 
-                    width: `${Math.max(0, Math.min(100, vitals.health))}%`,
-                    background: 'var(--health-bar)'
-                  }}
-                />
-              </div>
-              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                {vitals.health}
-              </span>
-            </div>
-
-            {/* MANÁ */}
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🔮</span>
-              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                <div 
-                  className="h-full rounded-full transition-all duration-500 ease-out"
-                  style={{ 
-                    width: `${Math.max(0, Math.min(100, vitals.mana))}%`,
-                    background: 'var(--mana-bar)'
-                  }}
-                />
-              </div>
-              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                {vitals.mana}
-              </span>
-            </div>
-
-            {/* STAMINA */}
-            <div className="flex items-center gap-2">
-              <span className="text-lg">⚡</span>
-              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                <div 
-                  className="h-full rounded-full transition-all duration-500 ease-out"
-                  style={{ 
-                    width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%`,
-                    background: 'var(--stamina-bar)'
-                  }}
-                />
-              </div>
-              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                {vitals.stamina || 80}
-              </span>
-            </div>
-          </div>
-
-          {/* UBICACIÓN */}
-          <div className="text-center mt-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cedar-brown)]">
-              📍 <span className="font-bold text-[var(--text-accent-custom)]">{location}</span>
-            </p>
-          </div>
-        </header>
-
-        {/* MAIN CON SCROLL CONTENIDO - FLEX-1 OVERFLOW-Y-AUTO */}
+        {/* MAIN CON SCROLL CONTENIDO - SIN INPUT DENTRO */}
         <main className="flex-1 overflow-y-auto px-4 space-y-4">
           
           {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
@@ -1043,7 +965,7 @@ function App() {
           />
 
           {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
-          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4">
+          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
             {gameState?.narrativeLog?.length === 0 ? (
               <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
                 Tu aventura está a punto de comenzar...
@@ -1088,72 +1010,35 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
+          {/* 🎁 DISCOVERED ITEMS - ARREGLO: SOLO UNA VEZ, NO DUPLICADO */}
+          {discoveredItems.length > 0 && (
+            <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
+              <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
+                🎁 Items Descubiertos
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {discoveredItems.map((item, index) => (
+                  <div
+                    key={item.instanceId || index}
+                    onClick={() => pickupItem(item)}
+                    className={`p-3 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg cursor-pointer 
+                               hover:bg-[var(--imperial-gold)]/20 transition-all duration-200 text-center
+                               ${pickupLoading === item.instanceId ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                  >
+                    <div className="text-2xl mb-1">{item.icon || '📦'}</div>
+                    <div className="text-xs font-medium text-[var(--cedar-brown)]">
+                      {item.name || 'Item Misterioso'}
+                    </div>
+                    {pickupLoading === item.instanceId && (
+                      <div className="text-xs text-[var(--imperial-gold)] mt-1">Recogiendo...</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </main>
-
-        {/* INPUT FIELD FUERA DEL SCROLL - ARREGLO CRÍTICO */}
-        <div className="flex-shrink-0 p-4">
-          <StoryInput
-            onSubmit={submitAction}
-            loading={loading}
-            gameOver={gameOver}
-            placeholder="Escribe tu acción..."
-          />
-        </div>
-
-        {/* FOOTER FIJO FUERA DEL SCROLL */}
-        <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
-          <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
-            <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors relative"
-              onClick={toggleInventory}
-            >
-              {badges.inventory.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
-                  {badges.inventory.count}
-                </span>
-              )}
-              <span className="material-icons text-2xl">inventory</span>
-              <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
-            </button>
-            <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
-              onClick={toggleSkills}
-            >
-              {badges.skills.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
-                  {badges.skills.count}
-                </span>
-              )}
-              <span className="material-icons text-2xl">school</span>
-              <span className="text-xs font-medium">Habilidades</span>
-            </button>
-            <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
-              onClick={toggleObjectives}
-            >
-              {badges.objectives.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
-                  {badges.objectives.count}
-                </span>
-              )}
-              <span className="material-icons text-2xl">flag</span>
-              <span className="text-xs font-medium">Objetivos</span>
-            </button>
-            <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
-              onClick={toggleEmotionsModal}
-            >
-              {badges.emotions.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
-                  {badges.emotions.count}
-                </span>
-              )}
-              <span className="material-icons text-2xl">mood</span>
-              <span className="text-xs font-medium">Estados</span>
-            </button>
-          </nav>
-          <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
-        </footer>
       </div>
     );
   };
