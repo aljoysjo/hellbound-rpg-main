@@ -167,6 +167,63 @@ function App() {
     );
   };
 
+  // 🎮 SANDBOX CONCEPT FORM COMPONENT
+  const SandboxConceptForm = ({ onSubmit, loading }) => {
+    const [concept, setConcept] = useState('');
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (concept.trim() && !loading) {
+        onSubmit(concept.trim());
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
+        <div style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
+          <div className="sandbox-form-container">
+            <h2 className="text-2xl font-bold text-[var(--cedar-brown)] text-center mb-2">
+              Modo Sandbox - Historia Libre
+            </h2>
+            <p className="text-[var(--cedar-brown)] text-center mb-6">
+              Describe la historia que quieres vivir.
+            </p>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <textarea
+                value={concept}
+                onChange={(e) => setConcept(e.target.value)}
+                placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
+                disabled={loading}
+                rows={4}
+                className="w-full p-3 border-2 border-[var(--imperial-gold)] rounded-lg bg-[var(--creamy-old)]/50 text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]"
+                required
+                minLength={20}
+              />
+              
+              <button
+                type="submit"
+                disabled={loading || concept.trim().length < 20}
+                className="w-full py-3 px-6 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 transition-all duration-200"
+              >
+                {loading ? 'Creando historia...' : 'Comenzar Aventura'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setShowSandboxForm(false)}
+                className="w-full py-2 px-6 bg-transparent text-[var(--cedar-brown)] border border-[var(--cedar-brown)] rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
+              >
+                Volver
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Auto-scroll effect para narrativa persistente
   useEffect(() => {
     if (narrativeRef.current) {
