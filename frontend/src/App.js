@@ -328,6 +328,14 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
+  // 🔧 ARREGLO CRÍTICO: Auto-iniciar sandbox cuando se selecciona el modo
+  useEffect(() => {
+    if (mode === 'sandbox' && !gameState && !loading && !showSandboxForm) {
+      console.log('🎮 Auto-iniciando sandbox mode');
+      startNewSession('sandbox');
+    }
+  }, [mode, gameState, loading, showSandboxForm]);
+
   // Socket initialization CON DETECCIÓN AVANZADA + FALLBACK POLLING
   useEffect(() => {
     console.log('🔌 Iniciando conexión WebSocket a:', BACKEND_URL);
