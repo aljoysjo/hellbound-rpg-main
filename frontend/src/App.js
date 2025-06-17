@@ -961,147 +961,134 @@ function App() {
     return '✨';
   };
 
-  // NUEVA NARRATIVA MEJORADA - Pergamino Áureo Style
+  // NARRATIVA EXACTA SEGÚN CÓDIGO HTML PROPORCIONADO
   const EnhancedNarrativeSection = () => {
     const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
     
     return (
-      <main className="flex-grow p-4" style={{ 
-        background: 'linear-gradient(to bottom right, var(--creamy-old), var(--light-caramel))'
-      }}>
-        {/* IMAGEN DE FONDO/CANVAS */}
-        <div className="px-4 mb-6">
-          <div 
-            className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden"
-            style={{
-              backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")`
-            }}
-          />
-        </div>
-
-        {/* TÍTULO Y NARRATIVA */}
-        <div className="px-4 space-y-4 text-center">
-          <h1 className="text-3xl font-bold leading-tight tracking-tight" style={{ color: 'var(--cedar-brown)' }}>
-            {gameState?.mode === 'sandbox' ? 'Aventura Libre' : 'Crónica de la Aventura'}
-          </h1>
-
-          {/* CONTENEDOR DE NARRATIVA CON TRANSICIONES */}
-          <div className="min-h-[150px] flex flex-col justify-center items-center">
-            {narrativeVisible && latestEntry && (
-              <div className="narrative-text-enter w-full max-w-md mx-auto">
-                {/* ACCIÓN DEL JUGADOR */}
-                <p className="text-lg font-medium leading-relaxed mb-2 opacity-90" 
-                   style={{ color: 'var(--text-accent-custom)' }}>
-                  <span className="inline-block align-middle text-xl mr-1">▶</span>
-                  "{safeStringify(latestEntry.player_action, 'Acción del jugador')}"
-                </p>
-                
-                {/* NARRATIVA */}
-                <p className="text-base font-normal leading-relaxed opacity-90" 
-                   style={{ color: 'var(--text-primary-custom)' }}>
-                  {safeStringify(latestEntry.narrative, 'Narrativa')}
-                </p>
-              </div>
-            )}
-
-            {/* 🎁 LOOT DESCUBIERTO - INTEGRADO EN NARRATIVA */}
-            {discoveredItems.length > 0 && (
-              <div className="loot-card-enter mt-4 p-4 rounded-lg shadow-md max-w-md mx-auto w-full"
-                   style={{ 
-                     background: 'rgba(230, 200, 160, 0.5)', 
-                     border: '1px solid var(--imperial-gold)'
-                   }}>
-                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--imperial-gold)' }}>
-                  ✨ ¡Botín Encontrado!
-                </h3>
-                
-                {discoveredItems.slice(0, 1).map((item, index) => (
-                  <div key={item.instanceId || index}>
-                    <div className="flex items-center mb-3">
-                      <span className="text-3xl mr-3">{item.icon || '📦'}</span>
-                      <div>
-                        <p className="font-semibold" style={{ color: 'var(--cedar-brown)' }}>
-                          {safeStringify(item.name, 'Item Misterioso')}
-                        </p>
-                        <span className="text-sm font-medium px-2 py-0.5 rounded-full"
-                              style={{ 
-                                color: 'var(--emerald)',
-                                background: 'rgba(46, 204, 113, 0.1)'
-                              }}>
-                          Común
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-center gap-3">
-                      <button 
-                        className="loot-collect-btn flex items-center justify-center rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                        onClick={() => pickupItem(item)}
-                        disabled={pickupLoading === item.instanceId}
-                      >
-                        {pickupLoading === item.instanceId ? 'Recogiendo...' : 'Recoger'}
-                      </button>
-                      <button 
-                        className="loot-ignore-btn flex items-center justify-center rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                        onClick={() => ignoreItem(item)}
-                      >
-                        Ignorar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* BOTONES DE ACCIÓN MEJORADOS */}
-          <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
-            {suggestedActions.length === 0 ? (
-              <div className="col-span-2 text-center opacity-70" style={{ color: 'var(--cedar-brown)' }}>
-                Las acciones aparecerán según el contexto...
-              </div>
-            ) : (
-              suggestedActions.map((suggestedAction, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestedAction(suggestedAction)}
-                  disabled={loading || gameOver}
-                  className="action-button-enhanced flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                >
-                  <span className="mr-2">{getActionIcon(suggestedAction)}</span>
-                  <span className="truncate">{safeStringify(suggestedAction, 'Acción')}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* BOTÓN HISTORIA COMPLETA */}
-        {gameState?.narrativeLog?.length > 0 && (
-          <div className="fixed bottom-20 right-4 z-40">
-            <button 
-              className="w-12 h-12 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-              style={{ 
-                background: 'var(--imperial-gold)',
-                color: 'var(--cedar-brown)'
-              }}
-              onClick={toggleNarrativeModal}
-              title="Ver historia completa"
-            >
-              📜
+      <div className="relative flex size-full min-h-screen flex-col dark justify-between group/design-root overflow-x-hidden bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY')"}}>
+        <div className="flex-grow bg-white/30 backdrop-blur-sm">
+          <header className="flex items-center p-4 sticky top-0 z-10 bg-gradient-to-b from-[var(--creamy-old)]/80 via-[var(--creamy-old)]/80 to-transparent">
+            <button className="text-[var(--cedar-brown)] p-2 rounded-full hover:bg-black/10 transition-colors">
+              <span className="material-icons text-3xl">arrow_back_ios_new</span>
             </button>
-          </div>
-        )}
-
-        {/* LOADING INDICATOR */}
-        {loading && (
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="px-6 py-3 rounded-lg shadow-lg" style={{ background: 'var(--imperial-gold)' }}>
-              <span style={{ color: 'var(--cedar-brown)' }}>🎨 Generando respuesta...</span>
+            <h2 className="text-[var(--cedar-brown)] text-xl font-bold leading-tight tracking-tight flex-1 text-center pr-10">Hellbound RPG</h2>
+          </header>
+          <main className="pt-2 pb-8">
+            <div className="px-4 @[480px]:px-6">
+              <div className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden mb-6 @[480px]:rounded-2xl" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")'}}>
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+            <div className="px-4 @[480px]:px-6 space-y-4 text-center">
+              <h1 className="text-[var(--cedar-brown)] text-3xl font-bold leading-tight tracking-tight">
+                {gameState?.mode === 'sandbox' ? 'Adventure Chronicle' : 'Adventure Chronicle'}
+              </h1>
+              <div className="min-h-[150px] flex flex-col justify-center items-center" id="narrative-canvas">
+                {narrativeVisible && latestEntry && (
+                  <div className="narrative-text-enter">
+                    <p className="text-[var(--text-accent-custom)] text-lg font-medium leading-relaxed mb-1 opacity-90">
+                      <span className="material-icons align-middle text-xl mr-1">play_arrow</span> "{safeStringify(latestEntry.player_action, 'I pick up the sword')}"
+                    </p>
+                    <p className="text-[var(--text-primary-custom)] text-base font-normal leading-relaxed max-w-md mx-auto opacity-90">
+                      {safeStringify(latestEntry.narrative, 'The sword feels heavy in your hand, its blade gleaming ominously. A faint whisper seems to emanate from the metal, urging you to explore the depths of the cave. What will you do?')}
+                    </p>
+                  </div>
+                )}
+                {discoveredItems.length > 0 && (
+                  <div className="mt-4 p-4 bg-[var(--light-caramel)]/50 border border-[var(--imperial-gold)] rounded-lg shadow-md max-w-md mx-auto w-full">
+                    <h3 className="text-xl font-bold text-[var(--imperial-gold)] mb-3">✨ Loot Found!</h3>
+                    {discoveredItems.slice(0, 1).map((item, index) => (
+                      <div key={item.instanceId || index}>
+                        <div className="flex items-center mb-3">
+                          <span className="material-icons text-3xl text-[var(--cedar-brown)] mr-3">{item.icon || 'shield'}</span>
+                          <div>
+                            <p className="text-[var(--cedar-brown)] font-semibold">{safeStringify(item.name, 'Ancient Shield')}</p>
+                            <span className="text-sm font-medium text-[var(--emerald)] bg-emerald-500/10 px-2 py-0.5 rounded-full">Uncommon</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-center gap-3">
+                          <button 
+                            className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-[var(--imperial-gold)] text-[var(--creamy-old)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                            onClick={() => pickupItem(item)}
+                            disabled={pickupLoading === item.instanceId}
+                          >
+                            {pickupLoading === item.instanceId ? 'Collecting...' : 'Collect'}
+                          </button>
+                          <button 
+                            className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-transparent text-[var(--cedar-brown)] border-2 border-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 hover:bg-[var(--cedar-brown)] hover:text-[var(--emerald-highlight)] focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] focus:ring-opacity-75"
+                            onClick={() => ignoreItem(item)}
+                          >
+                            Ignore
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                {suggestedActions.length === 0 ? (
+                  <>
+                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                      <span className="mr-2">⚔️</span>
+                      <span className="truncate">Fight</span>
+                    </button>
+                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                      <span className="mr-2">🏃</span>
+                      <span className="truncate">Flee</span>
+                    </button>
+                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                      <span className="material-icons align-middle mr-2">explore</span>
+                      <span className="truncate">Explore</span>
+                    </button>
+                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                      <span className="material-icons align-middle mr-2">chat</span>
+                      <span className="truncate">Talk</span>
+                    </button>
+                  </>
+                ) : (
+                  suggestedActions.map((suggestedAction, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestedAction(suggestedAction)}
+                      disabled={loading || gameOver}
+                      className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                    >
+                      <span className="mr-2">{getActionIcon(suggestedAction)}</span>
+                      <span className="truncate">{safeStringify(suggestedAction, 'Action')}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </main>
+        </div>
+        <footer className="sticky bottom-0 z-10">
+          <nav className="flex gap-1 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md px-2 pt-2 pb-safe-bottom">
+            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors" href="#">
+              <span className="material-icons text-2xl">home</span>
+              <span className="text-xs font-medium text-[var(--cedar-brown)]">Home</span>
+            </a>
+            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
+              <span className="material-icons text-2xl">search</span>
+              <span className="text-xs font-medium">Explore</span>
+            </a>
+            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
+              <span className="material-icons text-2xl">add_circle_outline</span>
+              <span className="text-xs font-medium">Create</span>
+            </a>
+            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
+              <span className="material-icons text-2xl">group</span>
+              <span className="text-xs font-medium">Social</span>
+            </a>
+            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
+              <span className="material-icons text-2xl">settings</span>
+              <span className="text-xs font-medium">Settings</span>
+            </a>
+          </nav>
+          <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
+        </footer>
+      </div>
     );
   };
 
