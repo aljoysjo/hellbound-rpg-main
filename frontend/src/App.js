@@ -1037,6 +1037,68 @@ function App() {
                 📍 {gameState?.location || 'Alicante'}
               </span>
             </div>
+
+            {/* BARRAS DE STATS INTEGRADAS */}
+            <div className="w-full max-w-md space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">❤️</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.health || 85))}%`,
+                      background: 'var(--health-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.health || 85}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🔮</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.mana || 60))}%`,
+                      background: 'var(--mana-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.mana || 60}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">⚡</span>
+                <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden border border-[var(--border-color)]">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${Math.max(0, Math.min(100, gameState?.vitals?.stamina || 80))}%`,
+                      background: 'var(--stamina-bar)'
+                    }}
+                  />
+                </div>
+                <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
+                  {gameState?.vitals?.stamina || 80}
+                </span>
+              </div>
+            </div>
+
+            {/* CONEXIÓN Y UBICACIÓN */}
+            <div className="flex items-center justify-between w-full max-w-md mt-2 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span style={{ color: 'var(--cedar-brown)' }}>Conectado</span>
+              </div>
+              <span style={{ color: 'var(--text-accent-custom)' }}>
+                📍 {gameState?.location || 'Alicante'}
+              </span>
+            </div>
           </header>
           
           <main className="flex-grow overflow-auto pt-2 pb-8">
