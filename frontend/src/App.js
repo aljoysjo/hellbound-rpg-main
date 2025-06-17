@@ -1579,26 +1579,43 @@ function App() {
     );
   }
 
-  // Campaign selection
+  // Campaign selection - Solo para modo campaign
+  if (mode === 'campaign') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
+        <div className="mode-selection-container">
+          <p className="mode-selected-text">
+            Has seleccionado: <span className="mode-name">{mode}</span>
+          </p>
+          <div className="mode-buttons">
+            <button 
+              onClick={() => startNewSession('campaign', 'scenes_act1')}
+              disabled={loading}
+              className="campaign-button"
+            >
+              {loading ? 'Iniciando...' : 'Iniciar Campaña Principal'}
+            </button>
+            <button 
+              onClick={() => setMode(null)}
+              className="mode-change-button"
+            >
+              Cambiar Modo
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback - volver a selección de modo
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-      <div className="mode-selection-container">
-        <p className="mode-selected-text">
-          Has seleccionado: <span className="mode-name">{mode}</span>
-        </p>
-        <div className="mode-buttons">
-          <button 
-            onClick={() => startNewSession('campaign', 'scenes_act1')}
-            disabled={loading}
-            className="campaign-button"
-          >
-            {loading ? 'Iniciando...' : 'Iniciar Campaña Principal'}
-          </button>
-          <button 
-            onClick={() => setMode(null)}
-            className="mode-change-button"
-          >
-            Cambiar Modo
+    <div className="app-container">
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <h2 className="welcome-title">Error</h2>
+          <p className="welcome-subtitle">Modo no reconocido. Selecciona un modo válido.</p>
+          <button onClick={() => setMode(null)} className="campaign-button">
+            Volver a Selección
           </button>
         </div>
       </div>
