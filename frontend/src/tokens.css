@@ -2311,3 +2311,125 @@ body {
   --stamina-bar: #f0a500;
   --border-color: rgba(62, 39, 35, 0.2);
 }
+
+/* 🎬 NARRATIVA CON TRANSICIONES */
+.narrative-text-enter {
+  animation: fadeInNarrative 0.8s ease-in-out;
+}
+
+.narrative-text-exit {
+  animation: fadeOutNarrative 0.4s ease-in-out forwards;
+}
+
+@keyframes fadeInNarrative {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOutNarrative {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+/* 🎁 LOOT FOUND CARD */
+.loot-card-enter {
+  animation: lootCardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.loot-card-exit {
+  animation: lootCardDisappear 0.4s ease-in-out forwards;
+}
+
+@keyframes lootCardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lootCardDisappear {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+}
+
+/* 🏛️ HEADER NUEVO CON BLUR */
+.hellbound-header {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(to bottom, 
+    rgba(245, 245, 220, 0.95) 0%, 
+    rgba(245, 245, 220, 0.85) 100%);
+  border-bottom: 2px solid var(--imperial-gold);
+  box-shadow: 0 4px 6px rgba(62, 39, 35, 0.1);
+}
+
+.icon-shadow {
+  filter: drop-shadow(0 2px 4px rgba(62, 39, 35, 0.3));
+}
+
+.stats-bar-bg {
+  background: rgba(62, 39, 35, 0.15);
+  border: 1px solid var(--border-color);
+}
+
+/* 🎮 BOTONES DE ACCIÓN MEJORADOS */
+.action-button-enhanced {
+  background: linear-gradient(135deg, var(--imperial-gold) 0%, #e6b800 100%);
+  color: var(--cedar-brown);
+  border: 2px solid transparent;
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-button-enhanced:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(255, 193, 7, 0.4);
+  background: linear-gradient(135deg, #fff3cd 0%, var(--imperial-gold) 100%);
+}
+
+.action-button-enhanced:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+/* 🎁 BOTONES LOOT ESPECIALES */
+.loot-collect-btn {
+  background: linear-gradient(135deg, var(--imperial-gold) 0%, #e6b800 100%);
+  color: var(--cedar-brown);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+}
+
+.loot-ignore-btn {
+  background: transparent;
+  color: var(--cedar-brown);
+  border: 2px solid var(--cedar-brown);
+  box-shadow: 0 2px 8px rgba(62, 39, 35, 0.2);
+}
+
+.loot-ignore-btn:hover {
+  background: var(--cedar-brown);
+  color: var(--creamy-old);
+  transform: translateY(-1px);
+}
