@@ -154,7 +154,7 @@ function App() {
               
               <button
                 type="button"
-                onClick={() => setShowSandboxForm(false)}
+                onClick={() => { setShowSandboxForm(false); setMode(null); }}
                 className="w-full py-2 px-6 bg-transparent text-[var(--cedar-brown)] border border-[var(--cedar-brown)] rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
               >
                 Volver
