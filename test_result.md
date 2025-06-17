@@ -153,6 +153,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El input ahora funciona correctamente. Se puede iniciar una campaña y el textarea está presente y visible en la interfaz. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+      - working: false
+        agent: "testing"
+        comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El textarea está presente en el DOM pero no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
 
   - task: "Inicio de sesión"
     implemented: true
