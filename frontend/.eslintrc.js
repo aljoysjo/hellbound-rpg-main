@@ -1,5 +1,10 @@
 module.exports = {
-  extends: [],
+  extends: [
+    'plugin:tailwindcss/recommended'
+  ],
+  plugins: [
+    'tailwindcss'
+  ],
   env: {
     browser: true,
     es6: true,
@@ -17,5 +22,12 @@ module.exports = {
   },
   rules: {
     // Reglas mínimas para no bloquear desarrollo
+    'tailwindcss/no-custom-classname': 'off'
+  },
+  settings: {
+    tailwindcss: {
+      config: './tailwind.config.js',
+      calleable: ['classnames', 'cn']
+    }
   }
 };
