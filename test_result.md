@@ -125,7 +125,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: true
     status_history:
@@ -147,6 +147,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El input sigue sin funcionar correctamente. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
+      - working: false
+        agent: "testing"
+        comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Se detectó un error crítico en la consola: 'EnhancedHeader is not defined'. Este error impide que la aplicación cargue correctamente después de iniciar una aventura, lo que bloquea la funcionalidad de input y otras características de la interfaz."
 
   - task: "Inicio de sesión"
     implemented: true
@@ -165,6 +168,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y comenzar la aventura sin errores 'Failed to fetch'. La aplicación carga correctamente y muestra la interfaz del juego."
+      - working: true
+        agent: "testing"
+        comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Se confirmó que el inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y hacer clic en 'Iniciar Aventura'. La aplicación intenta cargar la aventura, pero luego muestra un error de JavaScript: 'EnhancedHeader is not defined'."
 
   - task: "Layout móvil"
     implemented: true
@@ -198,11 +204,11 @@ frontend:
 
   - task: "Header ultra-compacto"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -210,14 +216,17 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Header ultra-compacto verificado en móvil: 'HELLBOUND | ❤️100 🔮100 ● On'"
+      - working: false
+        agent: "testing"
+        comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Se detectó un error crítico: 'EnhancedHeader is not defined'. Este componente parece ser parte del nuevo header mejorado con barras de stats, pero no está definido correctamente en el código, lo que impide que se muestre."
 
   - task: "Modal estados emocionales"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -225,6 +234,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Modal de estados emocionales funciona correctamente en móvil. Muestra los estados con sus porcentajes."
+      - working: "NA"
+        agent: "testing"
+        comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
 
   - task: "Modal objetivos e inventario"
     implemented: true
@@ -240,6 +252,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar completamente debido a problemas de visibilidad de elementos en la interfaz."
+      - working: "NA"
+        agent: "testing"
+        comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
 
   - task: "Narrativa expandible"
     implemented: true
@@ -255,10 +270,13 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar completamente debido a que la narrativa no se cargó correctamente durante las pruebas."
+      - working: "NA"
+        agent: "testing"
+        comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
         
   - task: "Sistema de badges"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/frontend/src/App.js"
     stuck_count: 2
     priority: "high"
@@ -273,6 +291,24 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). No se pudo verificar la funcionalidad de los badges. Aunque el sistema de polling funciona correctamente (se observan logs de polling cada 2 segundos), no se pudo encontrar el botón de inventario ('Inv.') en la interfaz y no se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. Esto podría deberse a que no se pudo interactuar con el input para realizar acciones que generen cambios en el inventario."
+      - working: "NA"
+        agent: "testing"
+        comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
+        
+  - task: "Sistema de loot dinámico"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba del sistema de loot dinámico"
+      - working: "NA"
+        agent: "testing"
+        comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura. Este error bloquea la funcionalidad principal del juego, incluyendo el sistema de loot dinámico que es una característica crítica a verificar."
 
 metadata:
   created_by: "testing_agent"
