@@ -3,7 +3,6 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
-import EnhancedHeader from './components/EnhancedHeader';
 
 // 🎮 MAIN APP COMPONENT - SISTEMA POPUPS "VIVOS" COMPLETO + DISCOVERED ITEMS
 function App() {
