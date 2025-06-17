@@ -2118,6 +2118,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           }
         }
       }
+    } // ← CERRAR BLOQUE DEL SISTEMA DE PROBABILIDAD
     } else {
       console.log(`🎲 Sistema híbrido no activado para: "${action}"`);
     }
