@@ -72,7 +72,7 @@ class HellboundRPGTester:
                 return False
         return success
 
-    def test_start_session_sandbox(self):
+    def test_start_session_sandbox(self, concept="Detective paranormal investigando misterios"):
         """Test starting a new sandbox game session with a specific concept"""
         success, response = self.run_test(
             "Start Sandbox Session API",
@@ -81,7 +81,7 @@ class HellboundRPGTester:
             200,
             data={
                 "mode": "sandbox", 
-                "sandboxConcept": "Detective paranormal investigando misterios"
+                "sandboxConcept": concept
             }
         )
         if success and 'session_id' in response:
