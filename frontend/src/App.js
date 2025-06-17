@@ -1244,16 +1244,17 @@ function App() {
             </>
           )}
 
-          {/* INPUT FIELD OPTIMIZADO PARA MÓVIL - RESTAURADO */}
-          <div className="sticky bottom-4 z-20">
-            <StoryInput
-              onSubmit={submitAction}
-              loading={loading}
-              gameOver={gameOver}
-              placeholder="Escribe tu acción..."
-            />
-          </div>
         </main>
+
+        {/* INPUT FIELD FUERA DEL SCROLL - ARREGLO CRÍTICO */}
+        <div className="flex-shrink-0 p-4">
+          <StoryInput
+            onSubmit={submitAction}
+            loading={loading}
+            gameOver={gameOver}
+            placeholder="Escribe tu acción..."
+          />
+        </div>
 
         {/* FOOTER FIJO FUERA DEL SCROLL */}
         <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
