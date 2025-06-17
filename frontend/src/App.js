@@ -1111,7 +1111,7 @@ function App() {
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Escribe tu acción..."
                   disabled={loading || gameOver}
-                  className="w-full px-4 py-3 pr-12 bg-transparent text-[var(--cedar-brown)] placeholder-[var(--cedar-brown)]/60 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] font-medium"
+                  className="w-full px-4 py-3 pr-12 bg-transparent text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)] placeholder:opacity-60 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] font-medium"
                 />
                 <button
                   type="submit"
