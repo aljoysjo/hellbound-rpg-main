@@ -1040,8 +1040,8 @@ function App() {
                 </div>
               )}
 
-              {/* ACCIONES RÁPIDAS CONTEXTUALES */}
-              <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
+              {/* ACCIONES RÁPIDAS CONTEXTUALES - SIEMPRE VISIBLES */}
+              <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto flex-shrink-0">
                 {suggestedActions.length === 0 ? (
                   <>
                     <button 
