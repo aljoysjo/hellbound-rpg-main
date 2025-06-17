@@ -1172,10 +1172,6 @@ function App() {
     );
   };
   
-  // EnhancedHeader component that wraps GameHeader
-  // This was causing a recursive definition error - fixed by using GameHeader directly
-  const EnhancedHeaderWrapper = ({ gameState, connectionStatus }) => {
-    return <GameHeader />;
   };
 
   // Desktop Actions
