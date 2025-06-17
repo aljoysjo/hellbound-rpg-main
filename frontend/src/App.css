@@ -8,9 +8,9 @@
 }
 
 body {
-  font-family: var(--font-body);
-  background: var(--c-bg);
-  color: var(--c-text);
+  font-family: 'Lexend', 'Noto Sans', var(--font-body), sans-serif;
+  background: linear-gradient(to bottom right, var(--creamy-old), var(--light-caramel));
+  color: var(--text-primary-custom);
   line-height: 1.6;
 }
 
