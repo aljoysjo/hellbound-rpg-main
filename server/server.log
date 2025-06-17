@@ -418,3 +418,76 @@
 🔌 Client connected: MEsG-UOXzHKpc0dRAAC-
 🔌 Client disconnected: MEsG-UOXzHKpc0dRAAC-
 🔌 Client connected: AJPUknndL0q6ES6rAADA
+🔌 Client disconnected: AJPUknndL0q6ES6rAADA
+🔌 Client connected: bH31GBPubzma54ewAADC
+🔌 Client connected: _mJ5hJkm6UhtTLQCAADF
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar detalladamente la figura en la niebla, Activar percepción sobrenatural, Buscar un arma en la habitación, Salir lentamente para confrontar la presencia.
+🔌 Client disconnected: _mJ5hJkm6UhtTLQCAADF
+🔌 Client connected: 7oHxlASDlSyK8adTAADH
+🔍 ANALYZING ACTION: observar detalladamente la figura en la niebla
+🔍 ANALYZING ACTION: observar detalladamente la figura en la niebla
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 70},
+  "locationChange": "Ningún cambio de ubicación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 70 },
+  locationChange: 'Ningún cambio de ubicación',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 70
+  },
+  "locationChange": "Ningún cambio de ubicación",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 70%
+📍 Nueva ubicación: Ningún cambio de ubicación
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Abrir lentamente la ventana, Usar percepción sobrenatural, Preparar un ritual de exorcismo, Mantener la calma y observar la figura.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
+🎲 Sistema híbrido no activado para: "Observar detalladamente la figura en la niebla"
+🔌 Client disconnected: bH31GBPubzma54ewAADC
+🔌 Client connected: VeQS-lYU66bttZbdAADJ
+🔌 Client connected: ebazRKZk9s2evIlrAADM
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar cuidadosamente la figura en la niebla, Usar percepción sobrenatural para detectar presencias, Preparar un ritual de exorcismo, Revisar la habitación en busca de objetos útiles
+🔌 Client disconnected: ebazRKZk9s2evIlrAADM
+🔌 Client connected: JuAr1wOhc8jOE_fOAADO
+🔌 Client disconnected: VeQS-lYU66bttZbdAADJ
+🔌 Client disconnected: JuAr1wOhc8jOE_fOAADO
