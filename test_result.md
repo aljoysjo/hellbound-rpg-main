@@ -1,4 +1,3 @@
-
 backend:
   - task: "ActionCount incremento correcto"
     implemented: true
@@ -121,6 +120,21 @@ backend:
         comment: "Se ha verificado que el sistema de loot dinámico ahora funciona correctamente después de los arreglos. Las pruebas muestran que: 1) Al crear una nueva sesión Sandbox, el game_state incluye el campo 'discoveredItems: []'. 2) Al enviar una acción de búsqueda ('busco algo valioso'), el sistema detecta correctamente la acción y añade un item al array discoveredItems. 3) El endpoint /api/pickup_item funciona correctamente, moviendo el item de discoveredItems a inventory. 4) Se pueden generar diferentes tipos de items según el contexto de la acción. Los logs muestran los mensajes esperados: '🎲 ACTIVANDO SISTEMA DINÁMICO para acción', '🎁 ITEM DESCUBIERTO (clickeable)', '🎁 ITEM RECOGIDO'. El sistema anti-duplicados también funciona correctamente."
 
 frontend:
+  - task: "Modo campaña"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba de modo campaña"
+      - working: true
+        agent: "testing"
+        comment: "Prueba específica realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
+
   - task: "Input fluido"
     implemented: true
     working: true
@@ -374,16 +388,19 @@ agent_communication:
     message: "PRUEBA REALIZADA EL 17/06/2025: Se verificó que el backend responde correctamente a las solicitudes de inicio de sesión tanto para el modo Sandbox como para el modo Campaña. Sin embargo, la interfaz de usuario no se carga correctamente después de iniciar una aventura debido al error 'EnhancedHeader is not defined'. Este componente no está definido en el código, pero se hace referencia a él en algún lugar, lo que causa un error de JavaScript que impide que la aplicación funcione correctamente. No se encontró ninguna referencia directa a EnhancedHeader en el código fuente, lo que sugiere que podría estar en un archivo compilado o en una dependencia externa."
   - agent: "testing"
     message: "PRUEBA FINAL POST-LIMPIEZA CACHÉ: Se ha verificado que después de limpiar la caché, el error 'EnhancedHeader is not defined' ha desaparecido. La aplicación ahora carga correctamente tanto en modo Sandbox como en modo Campaña. Se puede interactuar con la interfaz, ver la narrativa, y acceder a los modales de objetivos, inventario, skills y estados emocionales. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos. El header con barras de stats se muestra correctamente. La limpieza de caché ha resuelto el problema principal que bloqueaba la funcionalidad de la aplicación."
+  - agent: "testing"
+    message: "PRUEBA ESPECÍFICA MODO CAMPAÑA: Se ha verificado que el modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 5
+  test_sequence: 6
 
 test_plan:
   current_focus:
     - "Configuración CORS"
     - "Polling para detección de cambios en badges"
+    - "Modo campaña"
   stuck_tasks:
     - "Configuración CORS"
     - "Polling para detección de cambios en badges"
