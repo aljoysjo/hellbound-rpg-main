@@ -9,16 +9,17 @@
   --color-secondary: #583A1D;    /* MARRÓN OSCURO - Botones secundarios, sombras */
   
   /* CONTRASTE */
-  --text-dark: #2D1810;
-  --text-medium: #5B3A1D;
-  --text-light: #F3E7C6;
-  --text-muted: #8C7853;
+  --text-dark: #8C5B2C;          /* MARRÓN CEDRO - Texto principal */
+  --text-medium: #583A1D;        /* MARRÓN OSCURO - Texto secundario */
+  --text-light: #F3E7C6;         /* CREMA VIEJO - Texto sobre fondos oscuros */
+  --text-muted: #A67B47;         /* CARAMELO MEDIO - Texto deshabilitado */
   
   /* FONDOS */
-  --bg-panel-dark: rgba(45, 24, 16, 0.95);
-  --bg-panel-light: rgba(243, 231, 198, 0.95);
-  --bg-overlay: rgba(45, 24, 16, 0.9);
-  --bg-card: #FFFFFF;
+  --bg-panel-dark: rgba(88, 58, 29, 0.95);     /* MARRÓN OSCURO */
+  --bg-panel-light: rgba(243, 231, 198, 0.95); /* CREMA VIEJO */
+  --bg-overlay: rgba(88, 58, 29, 0.9);         /* OVERLAY OSCURO */
+  --bg-card: #FFFFFF;                          /* BLANCO para cards */
+  --panel-color: #B98746;                      /* CARAMELO CLARO - Paneles secundarios */
   
   /* COLORES DE ESTADO */
   --color-health: #dc2626;
