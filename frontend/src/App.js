@@ -1882,9 +1882,9 @@ function App() {
         !mode ? (
           <div className="welcome-screen">
             <div className="welcome-container">
-              <header className="w-full flex flex-col items-center space-y-4 mb-8">
+              <header className="w-full flex flex-col items-center mb-8">
                 <h1 className="welcome-title">HELLBOUND RPG</h1>
-                <div className="flex justify-center items-center space-x-4">
+                <div className="status-bars-container">
                   <div className="status-bar-new">
                     <span className="material-icons">favorite</span>
                     <span>100/100</span>
