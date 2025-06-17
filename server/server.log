@@ -37,3 +37,185 @@
 🔌 Client connected: VeMahZgXO3jUzK3pAAAZ
 🔌 Client disconnected: VeMahZgXO3jUzK3pAAAZ
 🔌 Client connected: UEVmypUoA1X5DZYxAAAb
+🔌 Client connected: sCpEFukZJJgVcKIEAAAe
+🔌 Client connected: 05Z0wSyEmA3ovdM_AAAh
+🔌 Client disconnected: sCpEFukZJJgVcKIEAAAe
+🔌 Client connected: JrVgOmdcWiDpKo6qAAAk
+🔌 Client disconnected: 05Z0wSyEmA3ovdM_AAAh
+🔌 Client connected: f_XdGFZr1VnUXfvwAAAn
+🔌 Client disconnected: JrVgOmdcWiDpKo6qAAAk
+🔌 Client connected: ZluQ8SPfSoe9orRlAAAq
+🔌 Client disconnected: f_XdGFZr1VnUXfvwAAAn
+🔌 Client connected: UPkDLsEE9hfdVJVxAAAt
+🔌 Client connected: VHIVC5oz-Vyo3n5EAAAw
+🔌 Client disconnected: UEVmypUoA1X5DZYxAAAb
+🔌 Client disconnected: ZluQ8SPfSoe9orRlAAAq
+🔌 Client connected: q0S3TKRHfb98XC40AAAz
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar la figura desde la ventana, Usar percepción sobrenatural para investigar, Preparar el equipo de exorcista, Salir de la habitación sigilosamente.
+🔌 Client disconnected: UPkDLsEE9hfdVJVxAAAt
+🔌 Client connected: DRJiy9xXkYxNzRfBAAA1
+🔌 Client disconnected: VHIVC5oz-Vyo3n5EAAAw
+🔌 Client connected: 6_qCT6ejAE1vjou3AAA4
+🔌 Client connected: 2CZUERojl3XXzq-qAAA7
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar la figura a través de la ventana, Usar percepción sobrenatural para detectar amenazas, Equipar un objeto de protección, Abrir la ventana para investigar más.
+🔌 Client disconnected: 2CZUERojl3XXzq-qAAA7
+🔌 Client connected: 5Ufb9kyAj4kC5ucMAAA9
+🔌 Client disconnected: q0S3TKRHfb98XC40AAAz
+🔌 Client disconnected: DRJiy9xXkYxNzRfBAAA1
+🔍 ANALYZING ACTION: usar percepción sobrenatural para detectar amenazas
+🔍 ANALYZING ACTION: usar percepción sobrenatural para detectar amenazas
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔌 Client connected: QQZXbnXiHRFYGIj2AABA
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 20},
+  "locationChange": "",
+  "newSkill": {"id": "percepcion_sobrenatural", "level": 1, "category": "pasiva", "tags": ["perception"], "description": "Habilidad para detectar amenazas sobrenaturales."},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 20 },
+  locationChange: '',
+  newSkill: {
+    id: 'percepcion_sobrenatural',
+    level: 1,
+    category: 'pasiva',
+    tags: [ 'perception' ],
+    description: 'Habilidad para detectar amenazas sobrenaturales.'
+  },
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 20
+  },
+  "locationChange": "",
+  "newSkill": {
+    "id": "percepcion_sobrenatural",
+    "level": 1,
+    "category": "pasiva",
+    "tags": [
+      "perception"
+    ],
+    "description": "Habilidad para detectar amenazas sobrenaturales."
+  },
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 20%
+📈 Habilidad mejorada: percepcion_sobrenatural (Nivel 1)
+🎯 Acciones dinámicas generadas: Acercarte sigilosamente a la figura, Usar percepción sobrenatural para analizar la aura, Buscar un compañero en la habitación, Preparar un hechizo de exorcismo.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
+📋 Objetivo actualizado: Encontrar a los compañeros - 20%
+📋 Objetivo actualizado: Explorar Alicante nevada - 20%
+📈 Progreso del Acto 1: 15%
+🏷️ Flag añadido: COMPAÑERO:Interacción con compañero detectada:2025-06-17T11:56:46.553Z
+🎲 Sistema híbrido no activado para: "Usar percepción sobrenatural para detectar amenazas"
+🔌 Client disconnected: 6_qCT6ejAE1vjou3AAA4
+🔍 ANALYZING ACTION: busco algo valioso
+🔍 ANALYZING ACTION: busco algo valioso
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{}
+```
+📊 Cambios detectados: {}
+🎯 Acciones dinámicas generadas: Tomar el amuleto de obsidiana, Examinar el frasco de agua bendita, Leer el libro de rituales, Investigar la figura en la niebla
+📋 Objetivo actualizado: Investigar la figura misteriosa - 40%
+🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "busco algo valioso"
+📖 Analizando narrativa para detectar items...
+🔍 Item detectado: "figura"
+📦 Items únicos extraídos: Figura
+📖 NARRATIVA CON ITEMS: Encontrados 1 items, extendiendo narrativa con decisión
+🎭 NARRATIVA EXTENDIDA:  ¿Qué haces con figura?
+🔌 Client connected: P5qaz_pTS17Mx-2tAABD
+🔍 ANALYZING ACTION: tomar el amuleto de obsidiana
+🔍 ANALYZING ACTION: tomar el amuleto de obsidiana
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 70, "alerta": 90},
+  "locationChange": "Cerca de la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 70, alerta: 90 },
+  locationChange: 'Cerca de la ventana',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 70,
+    "alerta": 90
+  },
+  "locationChange": "Cerca de la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 70%
+😊 alerta: 90%
+📍 Nueva ubicación: Cerca de la ventana
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Abrir la ventana lentamente, Usar percepción sobrenatural, Preparar exorcismo en caso necesario, Observar la figura detenidamente.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 60%
+🎲 Sistema híbrido no activado para: "Tomar el amuleto de obsidiana"
+🔌 Client disconnected: QQZXbnXiHRFYGIj2AABA
+🔌 Client connected: fr-Aw92iWBymN-KiAABG
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar la figura desde la ventana, Usar percepción sobrenatural para identificar presencia, Salir a investigar la niebla, Preparar un hechizo de exorcismo.
+🔌 Client disconnected: fr-Aw92iWBymN-KiAABG
+🔌 Client connected: s2l4I5Dgn8B03L-6AABI
+🔌 Client disconnected: P5qaz_pTS17Mx-2tAABD
+🔌 Client disconnected: 5Ufb9kyAj4kC5ucMAAA9
+🔌 Client disconnected: s2l4I5Dgn8B03L-6AABI
