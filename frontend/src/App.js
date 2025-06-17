@@ -1187,54 +1187,61 @@ function App() {
           )}
 
           {/* 🎁 LOOT BOX PROMINENTE Y DESTACADO - COMO EN LA IMAGEN */}
-          {discoveredItems.length > 0 && (
-            <div className="mt-6 p-6 bg-gradient-to-br from-[var(--imperial-gold)]/20 to-[var(--light-caramel)]/30 border-2 border-[var(--imperial-gold)] rounded-xl shadow-lg">
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold text-[var(--imperial-gold)] flex items-center justify-center gap-2">
-                  ✨ ¡Has encontrado algo! ✨
-                </h3>
-                <p className="text-sm text-[var(--cedar-brown)] mt-1">
-                  Los siguientes objetos están disponibles para recoger
-                </p>
-              </div>
+          {discoveredItems.length > 0 ? (
+            <>
+              {console.log('🎁 FRONTEND: Renderizando loot box con', discoveredItems.length, 'items')}
+              <div className="mt-6 p-6 bg-gradient-to-br from-[var(--imperial-gold)]/20 to-[var(--light-caramel)]/30 border-2 border-[var(--imperial-gold)] rounded-xl shadow-lg">
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold text-[var(--imperial-gold)] flex items-center justify-center gap-2">
+                    ✨ ¡Has encontrado algo! ✨
+                  </h3>
+                  <p className="text-sm text-[var(--cedar-brown)] mt-1">
+                    Los siguientes objetos están disponibles para recoger
+                  </p>
+                </div>
               
-              <div className="space-y-4">
-                {discoveredItems.map((item, itemIndex) => (
-                  <div key={item.instanceId || itemIndex} className="bg-[var(--creamy-old)]/80 p-4 rounded-lg border border-[var(--imperial-gold)]/50 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl">{item.icon || '📦'}</span>
-                        <div>
-                          <h4 className="font-bold text-[var(--cedar-brown)] text-lg">
-                            {safeStringify(item.name, 'Objeto Misterioso')}
-                          </h4>
-                          {item.description && (
-                            <p className="text-sm text-[var(--cedar-brown)]/80 mt-1">
-                              {safeStringify(item.description, 'Un objeto intrigante...')}
-                            </p>
-                          )}
+                <div className="space-y-4">
+                  {discoveredItems.map((item, itemIndex) => (
+                    <div key={item.instanceId || itemIndex} className="bg-[var(--creamy-old)]/80 p-4 rounded-lg border border-[var(--imperial-gold)]/50 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{item.icon || '📦'}</span>
+                          <div>
+                            <h4 className="font-bold text-[var(--cedar-brown)] text-lg">
+                              {safeStringify(item.name, 'Objeto Misterioso')}
+                            </h4>
+                            {item.description && (
+                              <p className="text-sm text-[var(--cedar-brown)]/80 mt-1">
+                                {safeStringify(item.description, 'Un objeto intrigante...')}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button 
+                            className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg hover:bg-[var(--imperial-gold)]/80 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+                            onClick={() => pickupItem(item)}
+                            disabled={pickupLoading === item.instanceId}
+                          >
+                            {pickupLoading === item.instanceId ? 'Recogiendo...' : '📦 Recoger'}
+                          </button>
+                          <button 
+                            className="px-4 py-2 bg-transparent text-[var(--cedar-brown)] border-2 border-[var(--cedar-brown)] font-bold rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
+                            onClick={() => ignoreItem(item)}
+                          >
+                            🚫 Ignorar
+                          </button>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <button 
-                          className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg hover:bg-[var(--imperial-gold)]/80 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
-                          onClick={() => pickupItem(item)}
-                          disabled={pickupLoading === item.instanceId}
-                        >
-                          {pickupLoading === item.instanceId ? 'Recogiendo...' : '📦 Recoger'}
-                        </button>
-                        <button 
-                          className="px-4 py-2 bg-transparent text-[var(--cedar-brown)] border-2 border-[var(--cedar-brown)] font-bold rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
-                          onClick={() => ignoreItem(item)}
-                        >
-                          🚫 Ignorar
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              {console.log('🎁 FRONTEND: No hay discovered items para mostrar, length:', discoveredItems.length)}
+            </>
           )}
 
           {/* INPUT FIELD OPTIMIZADO PARA MÓVIL - RESTAURADO */}
