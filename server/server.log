@@ -60,3 +60,142 @@
 📦 Items únicos extraídos: Ligero temblor
 📖 NARRATIVA CON ITEMS: Encontrados 1 items, extendiendo narrativa con decisión
 🎭 NARRATIVA EXTENDIDA:  ¿Qué haces con ligero temblor?
+🎨 Sandbox inicializado con concepto: "Un aventurero en una ciudad misteriosa..."
+🎯 Acciones dinámicas generadas: Entrar en la taberna bulliciosa, Preguntar al anciano sobre la moneda, Explorar el oscuro callejón, Comprar especias exóticas a un comerciante.
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar detenidamente la figura en la niebla, Usar percepción sobrenatural para detectar presencia, Preparar equipo de exorcista en la habitación, Abrir la ventana para investigar más cerca.
+🔌 Client disconnected: P2W1F7m06LjE7hTpAAAB
+🔌 Client connected: R68TOFZxSLkyt9R_AAAD
+🔌 Client connected: BXnZe78pB3eNcc_bAAAF
+🔌 Client connected: FIOJfJUS48aw4sNaAAAI
+🔍 Loading full campaign: scenes_act1
+✅ Loaded campaign: "Caminos del Abismo"
+✅ Map with 5 locations
+✅ Ink text parsed, first narrative: "La nieve cae sobre Alicante. El jugador despierta ..."
+📜 Objetivos de campaña inicializados: 3 objetivos
+🎯 Acciones dinámicas generadas: Observar detenidamente la figura en la niebla, Usar percepción sobrenatural para investigar, Preparar un ritual de exorcismo, Buscar un objeto que ayude en la situación.
+🔌 Client disconnected: FIOJfJUS48aw4sNaAAAI
+🔌 Client connected: GGoL8A3hZvPueT3oAAAK
+🔍 ANALYZING ACTION: observar detenidamente la figura en la niebla
+🔍 ANALYZING ACTION: observar detenidamente la figura en la niebla
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 30},
+  "locationChange": "Alicante - Observando desde la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 30 },
+  locationChange: 'Alicante - Observando desde la ventana',
+  newSkill: {},
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 30
+  },
+  "locationChange": "Alicante - Observando desde la ventana",
+  "newSkill": {},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 30%
+📍 Nueva ubicación: Alicante - Observando desde la ventana
+⭐ Nueva habilidad (activa): undefined (Nivel undefined)
+🎯 Acciones dinámicas generadas: Aproximarte lentamente a la figura, Usar percepción sobrenatural para investigar, Abrir la ventana y llamar su atención, Preparar un hechizo de exorcismo.
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
+🏷️ Flag añadido: COMPAÑERO:Interacción con compañero detectada:2025-06-17T15:59:55.374Z
+🎲 Sistema híbrido no activado para: "Observar detenidamente la figura en la niebla"
+🔌 Client disconnected: BXnZe78pB3eNcc_bAAAF
+🔍 ANALYZING ACTION: usar percepción sobrenatural para detectar presencia
+🔍 ANALYZING ACTION: usar percepción sobrenatural para detectar presencia
+📦 ITEMS DETECTADOS: []
+🔍 CURRENT INVENTORY: []
+🔍 Análisis IA raw: ```json
+{
+  "vitalDelta": {},
+  "statusSet": {"miedo": 40, "alerta": 70},
+  "locationChange": "Afuera de la casa en Alicante",
+  "newSkill": {"id": "percepcion_sobrenatural", "level": 1, "category": "pasiva", "tags": ["perception"], "description": "Habilidad para detectar presencias sobrenaturales"},
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+```
+📊 Cambios detectados: {
+  vitalDelta: {},
+  statusSet: { miedo: 40, alerta: 70 },
+  locationChange: 'Afuera de la casa en Alicante',
+  newSkill: {
+    id: 'percepcion_sobrenatural',
+    level: 1,
+    category: 'pasiva',
+    tags: [ 'perception' ],
+    description: 'Habilidad para detectar presencias sobrenaturales'
+  },
+  resourceDelta: {},
+  relationshipDelta: {},
+  knowledgeDelta: {},
+  forceDeathCheck: false,
+  deathReason: ''
+}
+📊 Aplicando cambios de estado: {
+  "vitalDelta": {},
+  "statusSet": {
+    "miedo": 40,
+    "alerta": 70
+  },
+  "locationChange": "Afuera de la casa en Alicante",
+  "newSkill": {
+    "id": "percepcion_sobrenatural",
+    "level": 1,
+    "category": "pasiva",
+    "tags": [
+      "perception"
+    ],
+    "description": "Habilidad para detectar presencias sobrenaturales"
+  },
+  "resourceDelta": {},
+  "relationshipDelta": {},
+  "knowledgeDelta": {},
+  "forceDeathCheck": false,
+  "deathReason": ""
+}
+😊 miedo: 40%
+😊 alerta: 70%
+📍 Nueva ubicación: Afuera de la casa en Alicante
+📈 Habilidad mejorada: percepcion_sobrenatural (Nivel 1)
+🎯 Acciones dinámicas generadas: Acercarte lentamente a la figura, Intentar comunicarte con la entidad, Usar percepción sobrenatural para investigar, Preparar un exorcismo en caso necesario
+📋 Objetivo actualizado: Investigar la figura misteriosa - 20%
+🎲 Sistema híbrido no activado para: "Usar percepción sobrenatural para detectar presencia"
+🔌 Client disconnected: GGoL8A3hZvPueT3oAAAK
+🔌 Client connected: iXNrw0Bhdj83mK92AAAM
+🔌 Client disconnected: iXNrw0Bhdj83mK92AAAM
+🔌 Client disconnected: R68TOFZxSLkyt9R_AAAD
+🔌 Client connected: CYgpsnRUjL2oGb7HAAAO
