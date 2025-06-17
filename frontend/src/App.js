@@ -1248,18 +1248,20 @@ function App() {
     );
   }
 
-  // Mode selection screen - PANTALLA ORIGINAL RESTAURADA
+  // Mode selection screen - RESTAURADO AL ORIGINAL
   if (!mode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-          <h2 className="text-3xl font-bold text-[var(--cedar-brown)] mb-4">
-            Bienvenido al Infierno
-          </h2>
-          <p className="text-[var(--cedar-brown)] mb-8">
-            Elige tu camino en una aventura épica donde cada decisión forja tu destino.
-          </p>
-          <ModeSelector onSelect={setMode} />
+      <div className="app-container">
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
+          <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+            <h2 className="welcome-title">
+              Bienvenido al Infierno
+            </h2>
+            <p className="welcome-subtitle">
+              Elige tu camino en una aventura épica donde cada decisión forja tu destino.
+            </p>
+            <ModeSelector onSelect={setMode} />
+          </div>
         </div>
       </div>
     );
