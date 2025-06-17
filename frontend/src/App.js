@@ -962,7 +962,6 @@ function App() {
   };
 
   // NUEVA NARRATIVA MEJORADA - Pergamino Áureo Style
-  const EnhancedNarrativeSection = () => {
     const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
     
     return (
