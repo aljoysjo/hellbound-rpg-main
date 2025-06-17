@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 
 :root {
-  /* COLORES BASE */
-  --color-bg: #F3E7C6;
-  --color-primary: #D1A438;
-  --color-accent: #3F7251;
-  --color-secondary: #8C5E2A;
+  /* 🎨 PALETA PERGAMINO ÁUREO */
+  --color-bg: #F3E7C6;           /* CREMA VIEJO - Fondo principal */
+  --color-primary: #D14438;      /* DORADO IMPERIAL - Botones primarios, títulos */
+  --color-accent: #3F7251;       /* ESMERALDA - Contraste adicional */
+  --color-secondary: #583A1D;    /* MARRÓN OSCURO - Botones secundarios, sombras */
   
   /* CONTRASTE */
   --text-dark: #2D1810;
