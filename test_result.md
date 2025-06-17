@@ -231,11 +231,11 @@ frontend:
 
   - task: "Modal estados emocionales"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -246,6 +246,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El modal de estados emocionales está presente en la interfaz y se puede acceder a él. No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Modal objetivos e inventario"
     implemented: true
