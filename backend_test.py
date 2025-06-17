@@ -709,42 +709,49 @@ def main():
     except:
         backend_url = "http://localhost:8001"
     
+    # Use the provided URL from the test request if available
+    backend_url = "https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com"
+    
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
     
     # Setup tester
     tester = HellboundRPGTester(backend_url)
     
     try:
-        # Run tests
+        # Run tests based on the requested test plan
         print("\n==== 1. BACKEND HEALTHCHECK ====")
         if not tester.test_healthcheck():
             print("❌ Healthcheck failed, stopping tests")
             return 1
         
         print("\n==== 2. CREATE NEW SANDBOX SESSION ====")
-        if not tester.test_start_session_sandbox():
+        # Use the requested concept "Un aventurero en una ciudad misteriosa"
+        if not tester.test_start_session_sandbox("Un aventurero en una ciudad misteriosa"):
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST DYNAMIC LOOT SYSTEM ====")
+        print("\n==== 3. TEST FREE INPUT BASIC ====")
+        # Test the free input with "examinar los alrededores"
+        free_input_success = tester.test_free_input("examinar los alrededores")
+        print(f"{'✅' if free_input_success else '❌'} Free input test {'passed' if free_input_success else 'failed'}")
+        
+        print("\n==== 4. TEST VITALS AND STATS ====")
+        # Verify that the response has correct vitals (health, mana, stamina)
+        vitals_success = tester.test_vitals_and_stats()
+        print(f"{'✅' if vitals_success else '❌'} Vitals and stats test {'passed' if vitals_success else 'failed'}")
+        
+        print("\n==== 5. TEST DYNAMIC LOOT SYSTEM ====")
+        # Test the loot system with discovered items
         dynamic_loot_success = tester.test_dynamic_loot_system()
         print(f"{'✅' if dynamic_loot_success else '❌'} Dynamic loot system test {'passed' if dynamic_loot_success else 'failed'}")
         
         if dynamic_loot_success:
-            print("\n==== 4. TEST PICKUP ITEM ====")
+            print("\n==== 6. TEST PICKUP ITEM ====")
             pickup_success = tester.test_pickup_item()
             print(f"{'✅' if pickup_success else '❌'} Pickup item test {'passed' if pickup_success else 'failed'}")
         else:
             pickup_success = False
             print("⚠️ Skipping pickup item test as no items were discovered")
-        
-        print("\n==== 5. TEST MULTIPLE SEARCHES ====")
-        multiple_searches_success = tester.test_multiple_searches()
-        print(f"{'✅' if multiple_searches_success else '❌'} Multiple searches test {'passed' if multiple_searches_success else 'failed'}")
-        
-        print("\n==== 6. TEST EDGE CASES ====")
-        edge_cases_success = tester.test_edge_cases()
-        print(f"{'✅' if edge_cases_success else '❌'} Edge cases test {'passed' if edge_cases_success else 'failed'}")
         
         print("\n==== 7. TEST ACTION COUNT INCREMENT ====")
         action_count_success = tester.test_action_count_increment()
@@ -757,25 +764,23 @@ def main():
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
         
-        # Summary of dynamic loot system tests
-        print("\n==== DYNAMIC LOOT SYSTEM TEST SUMMARY ====")
-        print(f"1. Dynamic Loot Generation: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
-        print(f"2. Pickup Item Functionality: {'✅ PASSED' if pickup_success else '❌ FAILED'}")
-        print(f"3. Multiple Searches: {'✅ PASSED' if multiple_searches_success else '❌ FAILED'}")
-        print(f"4. Edge Cases: {'✅ PASSED' if edge_cases_success else '❌ FAILED'}")
-        print(f"5. Action Count Increment: {'✅ PASSED' if action_count_success else '❌ FAILED'}")
-        print(f"6. Get Session Endpoint: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
+        # Summary of tests based on the requested test plan
+        print("\n==== TEST SUMMARY ====")
+        print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
+        print(f"2. Sandbox Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
+        print(f"3. Free Input Basic: {'✅ PASSED' if free_input_success else '❌ FAILED'}")
+        print(f"4. Vitals and Stats: {'✅ PASSED' if vitals_success else '❌ FAILED'}")
+        print(f"5. Dynamic Loot System: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
         
         overall_success = (
-            dynamic_loot_success and
-            (pickup_success or not dynamic_loot_success) and  # Only require pickup success if items were discovered
-            multiple_searches_success and
-            edge_cases_success and
-            action_count_success and
-            get_session_success
+            tester.test_healthcheck() and
+            tester.session_id and
+            free_input_success and
+            vitals_success and
+            dynamic_loot_success
         )
         
-        print(f"\n{'✅' if overall_success else '❌'} Dynamic Loot System Tests: {'PASSED' if overall_success else 'FAILED'}")
+        print(f"\n{'✅' if overall_success else '❌'} Backend Tests: {'PASSED' if overall_success else 'FAILED'}")
         
         return 0 if overall_success else 1
     
