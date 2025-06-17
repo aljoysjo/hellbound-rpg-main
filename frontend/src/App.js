@@ -1976,12 +1976,11 @@ function App() {
                 </strong>
               </p>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="buttons-row">
                 <button
                   onClick={() => startNewSession(mode, 'scenes_act1')}
                   disabled={loading}
                   className="btn-primary-new"
-                  style={{ width: '100%' }}
                 >
                   {loading ? 'Iniciando...' : `Iniciar ${
                     mode === 'sandbox' ? 'Modo Libre' : 
@@ -1996,7 +1995,6 @@ function App() {
                   }}
                   disabled={loading}
                   className="btn-secondary-new"
-                  style={{ width: '100%' }}
                 >
                   Cambiar Modo
                 </button>
