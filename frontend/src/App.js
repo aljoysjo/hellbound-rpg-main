@@ -1879,56 +1879,125 @@ function App() {
     <div className="app-container">
       {!sessionId ? (
         !mode ? (
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-            <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-              <h2 className="welcome-title">
-                Bienvenido al Infierno
-              </h2>
+          <div className="welcome-screen">
+            <div className="welcome-container">
+              <header className="w-full flex flex-col items-center space-y-4 mb-8">
+                <h1 className="welcome-title">HELLBOUND RPG</h1>
+                <div className="flex justify-center items-center space-x-4">
+                  <div className="status-bar-new">
+                    <span className="material-icons">favorite</span>
+                    <span>100/100</span>
+                  </div>
+                  <div className="status-bar-new">
+                    <span className="material-icons">bolt</span>
+                    <span>50/50</span>
+                  </div>
+                </div>
+              </header>
+              
               <p className="welcome-subtitle">
-                Elige tu camino en una aventura épica donde cada decisión forja tu destino.
+                Elige tu camino en una aventura épica donde cada decisión forja tu destino...
               </p>
-              <ModeSelector onSelect={setMode} />
+              
+              <div className="mode-buttons-container">
+                <button 
+                  className="btn-primary-new" 
+                  onClick={() => setMode('sandbox')}
+                >
+                  Modo Libre
+                </button>
+                <button 
+                  className="btn-secondary-new" 
+                  onClick={() => setMode('campaign')}
+                >
+                  Campaña
+                </button>
+              </div>
             </div>
           </div>
         ) : showSandboxForm && mode === 'sandbox' ? (
-          <SandboxConceptForm 
-            onSubmit={(concept) => startNewSession('sandbox', null, concept)}
-            loading={loading}
-          />
+          <div className="welcome-screen">
+            <div className="welcome-container">
+              <h2 className="welcome-title" style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+                Modo Libre - Historia Personalizada
+              </h2>
+              <p className="welcome-subtitle">
+                Describe la historia que quieres vivir.
+              </p>
+              
+              <div style={{ marginBottom: '1.5rem' }}>
+                <textarea
+                  value={sandboxConcept}
+                  onChange={(e) => setSandboxConcept(e.target.value)}
+                  placeholder="Ejemplo: 'Detective paranormal investigando desapariciones misteriosas en una ciudad sombría.'"
+                  className="textarea-new"
+                  required
+                  minLength={20}
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <button
+                  onClick={() => startNewSession('sandbox', null, sandboxConcept)}
+                  disabled={loading || sandboxConcept.trim().length < 20}
+                  className="btn-primary-new"
+                  style={{ width: '100%' }}
+                >
+                  {loading ? 'Creando historia...' : 'Iniciar Aventura'}
+                </button>
+                <button
+                  onClick={() => {
+                    setMode(null);
+                    setShowSandboxForm(false);
+                    setSandboxConcept('');
+                  }}
+                  disabled={loading}
+                  className="btn-secondary-new"
+                  style={{ width: '100%' }}
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-            <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-              <div className="mode-selection-container">
-                <p className="mode-selected-text">
-                  Modo seleccionado: <span className="mode-name">
-                    {mode === 'sandbox' ? 'Sandbox' : 
-                     mode === 'campaign' ? 'Campaña' : 
-                     'Campaña Temporal'}
-                  </span>
-                </p>
-                <div className="mode-buttons">
-                  <CampaignButton
-                    onClick={() => startNewSession(mode, 'scenes_act1')}
-                    disabled={loading}
-                    loading={loading}
-                  >
-                    {`Iniciar ${
-                      mode === 'sandbox' ? 'Sandbox' : 
-                      mode === 'campaign' ? 'Campaña' : 
-                      'Campaña Temporal'
-                    }`}
-                  </CampaignButton>
-                  <button
-                    onClick={() => {
-                      setMode(null);
-                      setShowSandboxForm(false);
-                    }}
-                    disabled={loading}
-                    className="mode-change-button clickable"
-                  >
-                    Cambiar Modo
-                  </button>
-                </div>
+          <div className="welcome-screen">
+            <div className="welcome-container">
+              <h2 className="welcome-title" style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+                {mode === 'campaign' ? 'Campaña' : 'Modo Temporal'}
+              </h2>
+              <p className="welcome-subtitle">
+                Modo seleccionado: <strong>
+                  {mode === 'sandbox' ? 'Modo Libre' : 
+                   mode === 'campaign' ? 'Campaña' : 
+                   'Campaña Temporal'}
+                </strong>
+              </p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <button
+                  onClick={() => startNewSession(mode, 'scenes_act1')}
+                  disabled={loading}
+                  className="btn-primary-new"
+                  style={{ width: '100%' }}
+                >
+                  {loading ? 'Iniciando...' : `Iniciar ${
+                    mode === 'sandbox' ? 'Modo Libre' : 
+                    mode === 'campaign' ? 'Campaña' : 
+                    'Campaña Temporal'
+                  }`}
+                </button>
+                <button
+                  onClick={() => {
+                    setMode(null);
+                    setShowSandboxForm(false);
+                  }}
+                  disabled={loading}
+                  className="btn-secondary-new"
+                  style={{ width: '100%' }}
+                >
+                  Cambiar Modo
+                </button>
               </div>
             </div>
           </div>
