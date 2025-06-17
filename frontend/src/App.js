@@ -17,7 +17,6 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [sandboxConcept, setSandboxConcept] = useState(''); // 🎨 NUEVO: Para el rediseño
-  const [sandboxConcept, setSandboxConcept] = useState(''); // 🎨 NUEVO: Para el rediseño
   
   // UI States
   const [narrativeVisible, setNarrativeVisible] = useState(true);
