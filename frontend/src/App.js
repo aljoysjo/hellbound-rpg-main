@@ -1094,10 +1094,95 @@ function App() {
   if (gameState) {
     return (
       <div className="flex flex-col h-screen">
-        {/* NARRATIVA CON HEADER RESPONSIVO */}
-        <EnhancedNarrativeSection />
+        {/* HEADER RESPONSIVO */}
+        <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
-        {/* INPUT FIELD FIJO FUERA DEL SCROLL - RESTAURADO */}
+        {/* MAIN CON SCROLL CONTENIDO */}
+        <main className="flex-1 overflow-y-auto px-4 space-y-4">
+          
+          {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
+          <div
+            className="w-full aspect-[16/9] rounded-xl bg-center bg-cover shadow-lg"
+            style={{ backgroundImage: `url(${sceneImage})` }}
+          />
+
+          {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
+          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
+            {gameState?.narrativeLog?.length === 0 ? (
+              <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
+                Tu aventura está a punto de comenzar...
+              </div>
+            ) : (
+              gameState?.narrativeLog?.map((entry, index) => (
+                <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                  {/* ACCIÓN DEL JUGADOR */}
+                  <div className="mb-2">
+                    <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                      <span className="text-lg">▶️</span>
+                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                    </p>
+                  </div>
+                  
+                  {/* NARRATIVA DEL JUEGO */}
+                  <div className="mb-3">
+                    <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                      {safeStringify(entry.narrative, 'Narrativa del juego')}
+                    </p>
+                  </div>
+
+                  {/* CHIPS DE ACCIÓN INLINE (Solo en última entrada) */}
+                  {index === gameState.narrativeLog.length - 1 && suggestedActions.length > 0 && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {suggestedActions.map((action, actionIndex) => (
+                        <button
+                          key={actionIndex}
+                          onClick={() => handleInlineAction(action)}
+                          disabled={loading || gameOver}
+                          className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[var(--imperial-gold)]/10 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] font-medium transition-all duration-200 hover:scale-105 active:scale-95 border border-[var(--imperial-gold)]/30"
+                        >
+                          <span>{getActionIcon(action)}</span>
+                          <span>{action}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+            <div ref={narrativeRef} />
+          </article>
+
+          {/* 🎁 DISCOVERED ITEMS - UNA SOLA VEZ, NO DUPLICADO */}
+          {discoveredItems.length > 0 && (
+            <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
+              <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
+                🎁 Items Descubiertos
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {discoveredItems.map((item, index) => (
+                  <div
+                    key={item.instanceId || index}
+                    onClick={() => pickupItem(item)}
+                    className={`p-3 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg cursor-pointer 
+                               hover:bg-[var(--imperial-gold)]/20 transition-all duration-200 text-center
+                               ${pickupLoading === item.instanceId ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                  >
+                    <div className="text-2xl mb-1">{item.icon || '📦'}</div>
+                    <div className="text-xs font-medium text-[var(--cedar-brown)]">
+                      {item.name || 'Item Misterioso'}
+                    </div>
+                    {pickupLoading === item.instanceId && (
+                      <div className="text-xs text-[var(--imperial-gold)] mt-1">Recogiendo...</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </main>
+
+        {/* INPUT FIELD FIJO FUERA DEL SCROLL - CRÍTICO */}
         <div className="flex-shrink-0 p-4 bg-[var(--creamy-old)]/90 border-t border-[var(--imperial-gold)]/50">
           <StoryInput
             onSubmit={submitAction}
@@ -1107,7 +1192,7 @@ function App() {
           />
         </div>
 
-        {/* FOOTER FIJO CON NAVIGATION - RESTAURADO */}
+        {/* FOOTER FIJO CON NAVIGATION - CRÍTICO */}
         <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
           <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
             <button 
