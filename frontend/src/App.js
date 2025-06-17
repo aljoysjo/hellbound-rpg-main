@@ -51,7 +51,6 @@ function App() {
 
   // 🖼️ NUEVO: Estado para imagen de escena
   const [sceneImage, setSceneImage] = useState('/images/placeholder_scene.svg');
-  const [inputText, setInputText] = useState('');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
