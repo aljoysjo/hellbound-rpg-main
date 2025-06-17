@@ -1661,6 +1661,164 @@ body {
   }
 }
 
+/* ===== 🎨 PRIMERA PANTALLA - PERGAMINO ÁUREO ===== */
+
+.welcome-screen {
+  background: linear-gradient(135deg, var(--color-bg) 0%, #EDE1B8 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.welcome-container {
+  background-color: rgba(243, 231, 198, 0.9);
+  border: 2px solid var(--panel-color);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(88, 58, 29, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.welcome-title {
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: 2.5rem;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 4px rgba(88, 58, 29, 0.3);
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.welcome-subtitle {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.status-bar-new {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 4px rgba(88, 58, 29, 0.2);
+}
+
+.status-bar-new .material-icons {
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.status-bar-new span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.btn-primary-new {
+  background-color: var(--color-primary);
+  color: var(--text-light);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 4px 6px rgba(209, 68, 56, 0.2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.btn-primary-new:hover {
+  background-color: #B83A30;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(209, 68, 56, 0.3);
+}
+
+.btn-secondary-new {
+  background-color: var(--panel-color);
+  color: var(--text-light);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid var(--panel-color);
+  box-shadow: 0 4px 6px rgba(185, 135, 70, 0.2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.btn-secondary-new:hover {
+  background-color: #A67B47;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(185, 135, 70, 0.3);
+}
+
+.textarea-new {
+  background-color: var(--color-bg);
+  color: var(--text-dark);
+  border: 2px solid var(--panel-color);
+  border-radius: 0.75rem;
+  min-height: 120px;
+  box-shadow: inset 0 2px 4px rgba(88, 58, 29, 0.1);
+  transition: border-color 0.3s ease;
+  padding: 1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  width: 100%;
+  resize: vertical;
+}
+
+.textarea-new:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(88, 58, 29, 0.1), 0 0 0 3px rgba(209, 68, 56, 0.1);
+}
+
+.textarea-new::placeholder {
+  color: var(--text-muted);
+}
+
+.mode-buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mode-buttons-container button {
+  flex: 1;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .welcome-title {
+    font-size: 3.5rem;
+  }
+  
+  .welcome-container {
+    padding: 3rem;
+    max-width: 600px;
+  }
+  
+  .status-bar-new {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn-primary-new, .btn-secondary-new {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
 /* ===== VARIABLES DE COMPATIBILIDAD PARA App.css ===== */
 :root {
   /* Mapeo de variables para compatibilidad */
