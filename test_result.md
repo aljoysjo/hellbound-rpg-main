@@ -206,7 +206,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -219,6 +219,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Se detectó un error crítico: 'EnhancedHeader is not defined'. Este componente parece ser parte del nuevo header mejorado con barras de stats, pero no está definido correctamente en el código, lo que impide que se muestre."
+      - working: false
+        agent: "testing"
+        comment: "Se identificó el problema: hay una definición recursiva del componente EnhancedHeader en App.js línea 1176-1178. El componente se llama a sí mismo, lo que causa un error de recursión infinita. Se intentó corregir reemplazando la referencia a EnhancedHeader por GameHeader, pero persisten errores de sintaxis en App.js."
 
   - task: "Modal estados emocionales"
     implemented: true
