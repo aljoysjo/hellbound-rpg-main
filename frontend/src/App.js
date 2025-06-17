@@ -955,147 +955,123 @@ function App() {
     return '✨';
   };
 
-  // NUEVA NARRATIVA MEJORADA - Pergamino Áureo Style
-  const EnhancedNarrativeSection = () => {
-    const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
+  // Canvas
+  const IntegratedCanvas = () => {
+    const canvasRef = useRef(null);
     
+    useEffect(() => {
+      if (canvasRef.current && gameState) {
+        const ctx = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        
+        const container = canvas.parentElement;
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#8C5E2A');
+        gradient.addColorStop(1, '#5B3A1D');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#F3E7C6';
+        ctx.font = 'bold 24px Cinzel';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          `🖼️ ILUSTRACIÓN AI: ${safeStringify(gameState.location, 'Ubicación Desconocida')}`,
+          canvas.width / 2,
+          canvas.height / 2 - 15
+        );
+        
+        ctx.font = '16px Cormorant Garamond';
+        ctx.fillText(
+          `Modo: ${safeStringify(gameState.mode, 'RPG')} ${loading ? '(Generando...)' : ''}`,
+          canvas.width / 2,
+          canvas.height / 2 + 15
+        );
+      }
+    }, [gameState, loading]);
+
+    const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
+
     return (
-      <main className="flex-grow p-4" style={{ 
-        background: 'linear-gradient(to bottom right, var(--creamy-old), var(--light-caramel))'
-      }}>
-        {/* IMAGEN DE FONDO/CANVAS */}
-        <div className="px-4 mb-6">
-          <div 
-            className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden"
-            style={{
-              backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")`
-            }}
-          />
-        </div>
-
-        {/* TÍTULO Y NARRATIVA */}
-        <div className="px-4 space-y-4 text-center">
-          <h1 className="text-3xl font-bold leading-tight tracking-tight" style={{ color: 'var(--cedar-brown)' }}>
-            {gameState?.mode === 'sandbox' ? 'Aventura Libre' : 'Crónica de la Aventura'}
-          </h1>
-
-          {/* CONTENEDOR DE NARRATIVA CON TRANSICIONES */}
-          <div className="min-h-[150px] flex flex-col justify-center items-center">
-            {narrativeVisible && latestEntry && (
-              <div className="narrative-text-enter w-full max-w-md mx-auto">
-                {/* ACCIÓN DEL JUGADOR */}
-                <p className="text-lg font-medium leading-relaxed mb-2 opacity-90" 
-                   style={{ color: 'var(--text-accent-custom)' }}>
-                  <span className="inline-block align-middle text-xl mr-1">▶</span>
-                  "{safeStringify(latestEntry.player_action, 'Acción del jugador')}"
-                </p>
-                
-                {/* NARRATIVA */}
-                <p className="text-base font-normal leading-relaxed opacity-90" 
-                   style={{ color: 'var(--text-primary-custom)' }}>
-                  {safeStringify(latestEntry.narrative, 'Narrativa')}
-                </p>
-              </div>
-            )}
-
-            {/* 🎁 LOOT DESCUBIERTO - INTEGRADO EN NARRATIVA */}
-            {discoveredItems.length > 0 && (
-              <div className="loot-card-enter mt-4 p-4 rounded-lg shadow-md max-w-md mx-auto w-full"
-                   style={{ 
-                     background: 'rgba(230, 200, 160, 0.5)', 
-                     border: '1px solid var(--imperial-gold)'
-                   }}>
-                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--imperial-gold)' }}>
-                  ✨ ¡Botín Encontrado!
-                </h3>
-                
-                {discoveredItems.slice(0, 1).map((item, index) => (
-                  <div key={item.instanceId || index}>
-                    <div className="flex items-center mb-3">
-                      <span className="text-3xl mr-3">{item.icon || '📦'}</span>
-                      <div>
-                        <p className="font-semibold" style={{ color: 'var(--cedar-brown)' }}>
-                          {safeStringify(item.name, 'Item Misterioso')}
-                        </p>
-                        <span className="text-sm font-medium px-2 py-0.5 rounded-full"
-                              style={{ 
-                                color: 'var(--emerald)',
-                                background: 'rgba(46, 204, 113, 0.1)'
-                              }}>
-                          Común
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-center gap-3">
-                      <button 
-                        className="loot-collect-btn flex items-center justify-center rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                        onClick={() => pickupItem(item)}
-                        disabled={pickupLoading === item.instanceId}
-                      >
-                        {pickupLoading === item.instanceId ? 'Recogiendo...' : 'Recoger'}
-                      </button>
-                      <button 
-                        className="loot-ignore-btn flex items-center justify-center rounded-lg h-10 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                        onClick={() => ignoreItem(item)}
-                      >
-                        Ignorar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* BOTONES DE ACCIÓN MEJORADOS */}
-          <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
-            {suggestedActions.length === 0 ? (
-              <div className="col-span-2 text-center opacity-70" style={{ color: 'var(--cedar-brown)' }}>
-                Las acciones aparecerán según el contexto...
-              </div>
-            ) : (
-              suggestedActions.map((suggestedAction, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestedAction(suggestedAction)}
-                  disabled={loading || gameOver}
-                  className="action-button-enhanced flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95"
-                >
-                  <span className="mr-2">{getActionIcon(suggestedAction)}</span>
-                  <span className="truncate">{safeStringify(suggestedAction, 'Acción')}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* BOTÓN HISTORIA COMPLETA */}
-        {gameState?.narrativeLog?.length > 0 && (
-          <div className="fixed bottom-20 right-4 z-40">
-            <button 
-              className="w-12 h-12 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-              style={{ 
-                background: 'var(--imperial-gold)',
-                color: 'var(--cedar-brown)'
-              }}
-              onClick={toggleNarrativeModal}
-              title="Ver historia completa"
-            >
-              📜
-            </button>
-          </div>
-        )}
-
-        {/* LOADING INDICATOR */}
-        {loading && (
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="px-6 py-3 rounded-lg shadow-lg" style={{ background: 'var(--imperial-gold)' }}>
-              <span style={{ color: 'var(--cedar-brown)' }}>🎨 Generando respuesta...</span>
+      <div className="integrated-canvas-container">
+        <canvas 
+          ref={canvasRef} 
+          className="ai-canvas" 
+        />
+        
+        {narrativeVisible && latestEntry && (
+          <div className="narrative-overlay">
+            <div className="narrative-title">
+              📜 {gameState.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}
+            </div>
+            <div className="narrative-preview">
+              <strong>▶ {safeStringify(latestEntry.player_action, 'Acción del jugador')}</strong>
+            </div>
+            <div className="narrative-preview">
+              {(() => {
+                const narrative = safeStringify(latestEntry.narrative, '');
+                return narrative.length > 120 
+                  ? narrative.substring(0, 120) + '...' 
+                  : narrative;
+              })()}
+            </div>
+            <div className="narrative-hint">
+              Click en 📜 para ver historia completa
             </div>
           </div>
         )}
-      </main>
+        
+        {/* 🎁 NUEVO: Mostrar discovered items como overlay */}
+        {discoveredItems.length > 0 && (
+          <div className="discovered-items-overlay">
+            <div className="discovered-items-title">
+              🎁 Items Descubiertos ({discoveredItems.length})
+            </div>
+            <div className="discovered-items-grid">
+              {discoveredItems.slice(0, 3).map((item, index) => { // Mostrar máximo 3
+                const isNew = isElementNew('discovered', item?.instanceId || item?.name || JSON.stringify(item));
+                return (
+                  <button
+                    key={item.instanceId || index}
+                    className={`discovered-item-card clickable ${isNew ? 'new-item' : ''} ${pickupLoading === item.instanceId ? 'loading' : ''}`}
+                    onClick={() => pickupItem(item)}
+                    disabled={pickupLoading === item.instanceId}
+                    title={`Recoger ${item.name}`}
+                  >
+                    <div className="item-icon">{item.icon || '📦'}</div>
+                    <div className="item-name">{safeStringify(item.name, 'Item')}</div>
+                    {isNew && <div className="new-indicator">NEW!</div>}
+                    {pickupLoading === item.instanceId && <div className="pickup-loading">...</div>}
+                  </button>
+                );
+              })}
+              {discoveredItems.length > 3 && (
+                <button className="more-items-button clickable" onClick={toggleDiscoveredItems}>
+                  +{discoveredItems.length - 3} más
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {gameState?.narrativeLog?.length > 0 && (
+          <button 
+            className="narrative-smart-toggle clickable"
+            onClick={toggleNarrativeVisible}
+            title={narrativeVisible ? "Ver historia completa" : "Mostrar resumen"}
+          >
+            📜
+          </button>
+        )}
+        
+        {loading && (
+          <div className="loading-indicator">
+            🎨 Generando respuesta...
+          </div>
+        )}
+      </div>
     );
   };
 
