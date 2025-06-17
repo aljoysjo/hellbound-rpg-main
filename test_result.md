@@ -123,11 +123,11 @@ backend:
 frontend:
   - task: "Input fluido"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 3
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -150,6 +150,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Nueva prueba realizada en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Se detectó un error crítico en la consola: 'EnhancedHeader is not defined'. Este error impide que la aplicación cargue correctamente después de iniciar una aventura, lo que bloquea la funcionalidad de input y otras características de la interfaz."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El input ahora funciona correctamente. Se puede iniciar una campaña y el textarea está presente y visible en la interfaz. No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Inicio de sesión"
     implemented: true
