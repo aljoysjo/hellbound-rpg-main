@@ -3,7 +3,6 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
-import StoryInput from './components/StoryInput';
 
 // 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
