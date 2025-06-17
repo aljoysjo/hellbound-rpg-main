@@ -2291,3 +2291,23 @@ body {
   --c-mana: var(--color-mana);
   --c-stamina: var(--color-stamina);
 }
+
+/* ✨ NUEVA PALETA PERGAMINO ÁUREO */
+:root {
+  --creamy-old: #f5f5dc;
+  --light-caramel: #e6c8a0;
+  --imperial-gold: #ffc107;
+  --cedar-brown: #3e2723;
+  --emerald-highlight: #2ecc71;
+  
+  /* 🎨 COLORES SEMÁNTICOS */
+  --text-primary-custom: #3e2723;
+  --text-accent-custom: #ffc107;
+  --emerald: #2ecc71;
+  
+  /* 📊 STATS BARS */
+  --health-bar: #e92933;
+  --mana-bar: #573dff;
+  --stamina-bar: #f0a500;
+  --border-color: rgba(62, 39, 35, 0.2);
+}
