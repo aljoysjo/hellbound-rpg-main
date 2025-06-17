@@ -1074,31 +1074,18 @@ function App() {
     );
   }
 
-  // Mode selection screen - RESTAURADO AL ORIGINAL
+  // Mode selection screen - NUEVO DISEÑO PROFESIONAL
   if (!mode) {
-    return (
-      <div className="app-container">
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-          <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-            <h2 className="welcome-title">
-              Bienvenido al Infierno
-            </h2>
-            <p className="welcome-subtitle">
-              Elige tu camino en una aventura épica donde cada decisión forja tu destino.
-            </p>
-            <ModeSelector onSelect={setMode} />
-          </div>
-        </div>
-      </div>
-    );
+    return <WelcomeScreen onSelect={handleModeSelect} />;
   }
 
-  // Sandbox form - FLUJO RESTAURADO
+  // Sandbox form - NUEVO COMPONENTE
   if (showSandboxForm && mode === 'sandbox') {
     return (
-      <SandboxConceptForm 
-        onSubmit={(concept) => startNewSession('sandbox', null, concept)}
+      <SandboxForm 
+        onSubmit={handleSandboxSubmit}
         loading={loading}
+        onBack={handleBackToModeSelection}
       />
     );
   }
