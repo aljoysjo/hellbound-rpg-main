@@ -1093,9 +1093,74 @@ function App() {
   // Main game screen
   if (gameState) {
     return (
-      <>
-        {/* Header integrado dentro de EnhancedNarrativeSection */}
+      <div className="flex flex-col h-screen">
+        {/* NARRATIVA CON HEADER MINIMALISTA */}
         <EnhancedNarrativeSection />
+
+        {/* INPUT FIELD FIJO FUERA DEL SCROLL - ARREGLO CRÍTICO */}
+        <div className="flex-shrink-0 p-4 bg-[var(--creamy-old)]/90 border-t border-[var(--imperial-gold)]/50">
+          <StoryInput
+            onSubmit={submitAction}
+            loading={loading}
+            gameOver={gameOver}
+            placeholder="Escribe tu acción..."
+          />
+        </div>
+
+        {/* FOOTER FIJO CON NAVIGATION */}
+        <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
+          <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors relative"
+              onClick={toggleInventory}
+            >
+              {badges.inventory.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.inventory.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">inventory</span>
+              <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleSkills}
+            >
+              {badges.skills.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.skills.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">school</span>
+              <span className="text-xs font-medium">Habilidades</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleObjectives}
+            >
+              {badges.objectives.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.objectives.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">flag</span>
+              <span className="text-xs font-medium">Objetivos</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleEmotionsModal}
+            >
+              {badges.emotions.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.emotions.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">mood</span>
+              <span className="text-xs font-medium">Estados</span>
+            </button>
+          </nav>
+          <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
+        </footer>
 
         {/* Error display */}
         {error && (
@@ -1312,7 +1377,7 @@ function App() {
             )}
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
