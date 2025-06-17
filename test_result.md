@@ -310,27 +310,6 @@ frontend:
         agent: "testing"
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura. Este error bloquea la funcionalidad principal del juego, incluyendo el sistema de loot dinámico que es una característica crítica a verificar."
 
-metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 4
-
-test_plan:
-  current_focus:
-    - "Configuración CORS"
-    - "Polling para detección de cambios en badges"
-    - "Input fluido"
-    - "Modal objetivos e inventario"
-    - "Narrativa expandible"
-    - "Sistema de badges"
-  stuck_tasks:
-    - "Input fluido"
-    - "Configuración CORS"
-    - "Polling para detección de cambios en badges"
-    - "Sistema de badges"
-  test_all: true
-  test_priority: "high_first"
-
 agent_communication:
   - agent: "testing"
     message: "Iniciando pruebas completas de HELLBOUND RPG v2.0 según las especificaciones proporcionadas."
@@ -362,3 +341,30 @@ agent_communication:
     message: "ACTUALIZACIÓN SOBRE EL SISTEMA DE LOOT DINÁMICO: Se identificó que el problema es que el campo 'discoveredItems' no está incluido en el método toDict() de la clase GameState, por lo que no se devuelve en las respuestas de la API. Se modificó el método toDict() para incluir 'discoveredItems: this.discoveredItems || []', pero el problema persiste. Los items se añaden correctamente al array discoveredItems en el servidor, pero no se incluyen en la respuesta de la API. Esto impide que el frontend pueda mostrar los items descubiertos y que el usuario pueda recogerlos."
   - agent: "testing"
     message: "SISTEMA DE LOOT DINÁMICO CORREGIDO: Se ha verificado que el sistema de loot dinámico ahora funciona correctamente después de los arreglos. Las pruebas muestran que: 1) Al crear una nueva sesión Sandbox, el game_state incluye el campo 'discoveredItems: []'. 2) Al enviar una acción de búsqueda ('busco algo valioso'), el sistema detecta correctamente la acción y añade un item al array discoveredItems. 3) El endpoint /api/pickup_item funciona correctamente, moviendo el item de discoveredItems a inventory. 4) Se pueden generar diferentes tipos de items según el contexto de la acción. Los logs muestran los mensajes esperados: '🎲 ACTIVANDO SISTEMA DINÁMICO para acción', '🎁 ITEM DESCUBIERTO (clickeable)', '🎁 ITEM RECOGIDO'. El sistema anti-duplicados también funciona correctamente."
+  - agent: "testing"
+    message: "ERROR CRÍTICO DETECTADO: Se ha identificado un error crítico en la aplicación. Al intentar iniciar una aventura, la aplicación muestra un error de JavaScript: 'EnhancedHeader is not defined'. Este error impide que la aplicación cargue correctamente después de iniciar una aventura, lo que bloquea la funcionalidad principal del juego, incluyendo el sistema de loot dinámico y otras características de la interfaz. Este componente parece ser parte del nuevo header mejorado con barras de stats, pero no está definido correctamente en el código."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 5
+
+test_plan:
+  current_focus:
+    - "Configuración CORS"
+    - "Polling para detección de cambios en badges"
+    - "Input fluido"
+    - "Modal objetivos e inventario"
+    - "Narrativa expandible"
+    - "Sistema de badges"
+    - "Sistema de loot dinámico"
+    - "Header ultra-compacto"
+  stuck_tasks:
+    - "Input fluido"
+    - "Configuración CORS"
+    - "Polling para detección de cambios en badges"
+    - "Sistema de badges"
+    - "Header ultra-compacto"
+    - "Sistema de loot dinámico"
+  test_all: true
+  test_priority: "high_first"
