@@ -1312,7 +1312,7 @@ function App() {
   if (!mode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <ModeSelector onModeSelect={setMode} />
+        <ModeSelector onSelect={setMode} />
       </div>
     );
   }
