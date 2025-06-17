@@ -173,15 +173,6 @@ function App() {
     }
   }, [gameState?.narrativeLog]);
 
-  // Handler para input de texto
-  const handleInputSubmit = (e) => {
-    e.preventDefault();
-    if (inputText.trim() && !loading) {
-      submitAction(inputText.trim());
-      setInputText('');
-    }
-  };
-
   // Handler para acciones embebidas
   const handleInlineAction = (action) => {
     handleSuggestedAction(action);
