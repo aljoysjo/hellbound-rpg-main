@@ -318,11 +318,11 @@ frontend:
         
   - task: "Sistema de loot dinámico"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -330,6 +330,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura. Este error bloquea la funcionalidad principal del juego, incluyendo el sistema de loot dinámico que es una característica crítica a verificar."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). El sistema de loot dinámico está presente en la interfaz y funciona correctamente. Se puede iniciar una campaña y se muestran los elementos de la interfaz correctamente. No se detectó el error 'EnhancedHeader is not defined' en la consola. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos."
 
 agent_communication:
   - agent: "testing"
