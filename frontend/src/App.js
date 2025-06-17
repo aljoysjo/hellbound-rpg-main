@@ -1170,6 +1170,11 @@ function App() {
       </header>
     );
   };
+  
+  // EnhancedHeader component that wraps GameHeader
+  const EnhancedHeader = ({ gameState, connectionStatus }) => {
+    return <GameHeader />;
+  };
 
   // Desktop Actions
   const DesktopActionsSection = () => (
