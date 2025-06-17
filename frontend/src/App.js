@@ -961,12 +961,11 @@ function App() {
     return '✨';
   };
 
-  // NARRATIVA EXACTA SEGÚN CÓDIGO HTML PROPORCIONADO
+  // NARRATIVA EXACTA SEGÚN CÓDIGO HTML + MEJORAS CHATGPT + ESPAÑOL
   const EnhancedNarrativeSection = () => {
-    const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
     
     return (
-      <div className="relative flex size-full min-h-screen flex-col dark justify-between group/design-root overflow-x-hidden bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY')"}}>
+      <div className="relative flex size-full min-h-screen flex-col justify-between group/design-root overflow-x-hidden bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY')"}}>
         <div className="flex-grow bg-white/30 backdrop-blur-sm">
           <header className="flex items-center p-4 sticky top-0 z-10 bg-gradient-to-b from-[var(--creamy-old)]/80 via-[var(--creamy-old)]/80 to-transparent">
             <button className="text-[var(--cedar-brown)] p-2 rounded-full hover:bg-black/10 transition-colors">
@@ -974,76 +973,101 @@ function App() {
             </button>
             <h2 className="text-[var(--cedar-brown)] text-xl font-bold leading-tight tracking-tight flex-1 text-center pr-10">Hellbound RPG</h2>
           </header>
-          <main className="pt-2 pb-8">
+          
+          <main className="flex-grow overflow-auto pt-2 pb-8">
             <div className="px-4 @[480px]:px-6">
               <div className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden mb-6 @[480px]:rounded-2xl" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")'}}>
               </div>
             </div>
+            
             <div className="px-4 @[480px]:px-6 space-y-4 text-center">
               <h1 className="text-[var(--cedar-brown)] text-3xl font-bold leading-tight tracking-tight">
-                {gameState?.mode === 'sandbox' ? 'Adventure Chronicle' : 'Adventure Chronicle'}
+                Crónica de la Aventura
               </h1>
-              <div className="min-h-[150px] flex flex-col justify-center items-center" id="narrative-canvas">
-                {narrativeVisible && latestEntry && (
-                  <div className="narrative-text-enter">
+              
+              {/* NARRATIVA ACUMULATIVA CON SCROLL */}
+              <div id="narrative-log" className="max-h-[300px] overflow-y-auto px-4 space-y-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                {gameState?.narrativeLog?.map((entry, index) => (
+                  <div key={index} className="narrative-text-enter py-2">
                     <p className="text-[var(--text-accent-custom)] text-lg font-medium leading-relaxed mb-1 opacity-90">
-                      <span className="material-icons align-middle text-xl mr-1">play_arrow</span> "{safeStringify(latestEntry.player_action, 'I pick up the sword')}"
+                      <span className="material-icons align-middle text-xl mr-1">play_arrow</span> 
+                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
                     </p>
                     <p className="text-[var(--text-primary-custom)] text-base font-normal leading-relaxed max-w-md mx-auto opacity-90">
-                      {safeStringify(latestEntry.narrative, 'The sword feels heavy in your hand, its blade gleaming ominously. A faint whisper seems to emanate from the metal, urging you to explore the depths of the cave. What will you do?')}
+                      {safeStringify(entry.narrative, 'Narrativa del juego')}
                     </p>
                   </div>
-                )}
-                {discoveredItems.length > 0 && (
-                  <div className="mt-4 p-4 bg-[var(--light-caramel)]/50 border border-[var(--imperial-gold)] rounded-lg shadow-md max-w-md mx-auto w-full">
-                    <h3 className="text-xl font-bold text-[var(--imperial-gold)] mb-3">✨ Loot Found!</h3>
-                    {discoveredItems.slice(0, 1).map((item, index) => (
-                      <div key={item.instanceId || index}>
-                        <div className="flex items-center mb-3">
-                          <span className="material-icons text-3xl text-[var(--cedar-brown)] mr-3">{item.icon || 'shield'}</span>
-                          <div>
-                            <p className="text-[var(--cedar-brown)] font-semibold">{safeStringify(item.name, 'Ancient Shield')}</p>
-                            <span className="text-sm font-medium text-[var(--emerald)] bg-emerald-500/10 px-2 py-0.5 rounded-full">Uncommon</span>
-                          </div>
-                        </div>
-                        <div className="flex justify-center gap-3">
-                          <button 
-                            className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-[var(--imperial-gold)] text-[var(--creamy-old)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
-                            onClick={() => pickupItem(item)}
-                            disabled={pickupLoading === item.instanceId}
-                          >
-                            {pickupLoading === item.instanceId ? 'Collecting...' : 'Collect'}
-                          </button>
-                          <button 
-                            className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-transparent text-[var(--cedar-brown)] border-2 border-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 hover:bg-[var(--cedar-brown)] hover:text-[var(--emerald-highlight)] focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] focus:ring-opacity-75"
-                            onClick={() => ignoreItem(item)}
-                          >
-                            Ignore
-                          </button>
+                ))}
+              </div>
+
+              {/* CUADRO DE LOOT ENCONTRADO */}
+              {discoveredItems.length > 0 && (
+                <div className="mt-4 p-4 bg-[var(--light-caramel)]/50 border border-[var(--imperial-gold)] rounded-lg shadow-md max-w-md mx-auto w-full">
+                  <h3 className="text-xl font-bold text-[var(--imperial-gold)] mb-3">✨ ¡Botín Encontrado!</h3>
+                  {discoveredItems.slice(0, 1).map((item, index) => (
+                    <div key={item.instanceId || index}>
+                      <div className="flex items-center mb-3">
+                        <span className="material-icons text-3xl text-[var(--cedar-brown)] mr-3">{item.icon || 'shield'}</span>
+                        <div>
+                          <p className="text-[var(--cedar-brown)] font-semibold">{safeStringify(item.name, 'Escudo Antiguo')}</p>
+                          <span className="text-sm font-medium text-[var(--emerald)] bg-emerald-500/10 px-2 py-0.5 rounded-full">Poco común</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      <div className="flex justify-center gap-3">
+                        <button 
+                          className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-[var(--imperial-gold)] text-[var(--creamy-old)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                          onClick={() => pickupItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                        >
+                          {pickupLoading === item.instanceId ? 'Recogiendo...' : 'Recoger'}
+                        </button>
+                        <button 
+                          className="ripple-effect flex items-center justify-center rounded-lg h-10 px-4 bg-transparent text-[var(--cedar-brown)] border-2 border-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 hover:bg-[var(--cedar-brown)] hover:text-[var(--emerald-highlight)] focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] focus:ring-opacity-75"
+                          onClick={() => ignoreItem(item)}
+                        >
+                          Ignorar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ACCIONES RÁPIDAS CONTEXTUALES */}
               <div className="pt-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
                 {suggestedActions.length === 0 ? (
                   <>
-                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                    <button 
+                      className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                      onClick={() => handleSuggestedAction('Luchar')}
+                      disabled={loading || gameOver}
+                    >
                       <span className="mr-2">⚔️</span>
-                      <span className="truncate">Fight</span>
+                      <span className="truncate">Luchar</span>
                     </button>
-                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                    <button 
+                      className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                      onClick={() => handleSuggestedAction('Huir')}
+                      disabled={loading || gameOver}
+                    >
                       <span className="mr-2">🏃</span>
-                      <span className="truncate">Flee</span>
+                      <span className="truncate">Huir</span>
                     </button>
-                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                    <button 
+                      className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                      onClick={() => handleSuggestedAction('Explorar')}
+                      disabled={loading || gameOver}
+                    >
                       <span className="material-icons align-middle mr-2">explore</span>
-                      <span className="truncate">Explore</span>
+                      <span className="truncate">Explorar</span>
                     </button>
-                    <button className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75">
+                    <button 
+                      className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
+                      onClick={() => handleSuggestedAction('Hablar')}
+                      disabled={loading || gameOver}
+                    >
                       <span className="material-icons align-middle mr-2">chat</span>
-                      <span className="truncate">Talk</span>
+                      <span className="truncate">Hablar</span>
                     </button>
                   </>
                 ) : (
@@ -1055,7 +1079,7 @@ function App() {
                       className="ripple-effect flex items-center justify-center overflow-hidden rounded-xl h-12 px-4 bg-[var(--imperial-gold)] text-[var(--cedar-brown)] text-sm font-bold leading-normal tracking-wide shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--emerald-highlight)] focus:ring-opacity-75"
                     >
                       <span className="mr-2">{getActionIcon(suggestedAction)}</span>
-                      <span className="truncate">{safeStringify(suggestedAction, 'Action')}</span>
+                      <span className="truncate">{safeStringify(suggestedAction, 'Acción')}</span>
                     </button>
                   ))
                 )}
@@ -1063,28 +1087,38 @@ function App() {
             </div>
           </main>
         </div>
+
+        {/* FOOTER STICKY CON 4 BOTONES CORRECTOS */}
         <footer className="sticky bottom-0 z-10">
           <nav className="flex gap-1 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md px-2 pt-2 pb-safe-bottom">
-            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors" href="#">
-              <span className="material-icons text-2xl">home</span>
-              <span className="text-xs font-medium text-[var(--cedar-brown)]">Home</span>
-            </a>
-            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
-              <span className="material-icons text-2xl">search</span>
-              <span className="text-xs font-medium">Explore</span>
-            </a>
-            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
-              <span className="material-icons text-2xl">add_circle_outline</span>
-              <span className="text-xs font-medium">Create</span>
-            </a>
-            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
-              <span className="material-icons text-2xl">group</span>
-              <span className="text-xs font-medium">Social</span>
-            </a>
-            <a className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors" href="#">
-              <span className="material-icons text-2xl">settings</span>
-              <span className="text-xs font-medium">Settings</span>
-            </a>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors"
+              onClick={toggleInventoryModal}
+            >
+              <span className="material-icons text-2xl">inventory</span>
+              <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors"
+              onClick={toggleSkillsModal}
+            >
+              <span className="material-icons text-2xl">school</span>
+              <span className="text-xs font-medium">Habilidades</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors"
+              onClick={toggleObjectivesModal}
+            >
+              <span className="material-icons text-2xl">flag</span>
+              <span className="text-xs font-medium">Objetivos</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors"
+              onClick={toggleEmotionsModal}
+            >
+              <span className="material-icons text-2xl">mood</span>
+              <span className="text-xs font-medium">Estados</span>
+            </button>
           </nav>
           <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
         </footer>
