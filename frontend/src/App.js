@@ -1293,6 +1293,32 @@ function App() {
                   </div>
                 </form>
               </div>
+              {/* INPUT FIELD STICKY BOTTOM - FINALMENTE IMPLEMENTADO */}
+              <div className="mt-4 sticky bottom-20 z-20">
+                <form onSubmit={handleInputSubmit} className="relative">
+                  <div className="relative bg-[var(--creamy-old)]/90 backdrop-blur-md rounded-full border-2 border-[var(--imperial-gold)] shadow-lg">
+                    <input
+                      type="text"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="Escribe tu acción..."
+                      disabled={loading || gameOver}
+                      className="w-full px-4 py-3 pr-12 bg-transparent text-[var(--cedar-brown)] placeholder-[var(--cedar-brown)]/60 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)] font-medium"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading || gameOver || !inputText.trim()}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-[var(--imperial-gold)] text-[var(--creamy-old)] rounded-full flex items-center justify-center disabled:opacity-50 hover:bg-[var(--imperial-gold)]/80 transition-all duration-200 hover:scale-105 active:scale-95"
+                    >
+                      {loading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-[var(--creamy-old)] border-t-transparent"></div>
+                      ) : (
+                        <span className="material-icons text-sm">send</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </main>
         </div>
