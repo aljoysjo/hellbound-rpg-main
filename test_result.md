@@ -381,18 +381,8 @@ test_plan:
   current_focus:
     - "Configuración CORS"
     - "Polling para detección de cambios en badges"
-    - "Input fluido"
-    - "Modal objetivos e inventario"
-    - "Narrativa expandible"
-    - "Sistema de badges"
-    - "Sistema de loot dinámico"
-    - "Header ultra-compacto"
   stuck_tasks:
-    - "Input fluido"
     - "Configuración CORS"
     - "Polling para detección de cambios en badges"
-    - "Sistema de badges"
-    - "Header ultra-compacto"
-    - "Sistema de loot dinámico"
-  test_all: true
+  test_all: false
   test_priority: "high_first"
