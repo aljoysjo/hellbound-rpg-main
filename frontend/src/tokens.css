@@ -2308,6 +2308,9 @@ body {
   --mana-bar: #573dff;
   --stamina-bar: #f0a500;
   --border-color: rgba(62, 39, 35, 0.2);
+  
+  /* 📱 LAYOUT HEIGHTS */
+  --header-height: 200px;
 }
 
 /* 🎬 ANIMACIONES EXACTAS DEL CÓDIGO HTML */
@@ -2339,6 +2342,32 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+}
+
+/* ✍️ EFECTO ESCRITURA PARA NARRATIVA */
+.animate-typing {
+  animation: typing 1s steps(40, end);
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+/* 📜 SCROLL OPTIMIZADO SOLO PARA NARRATIVA */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* 🌊 RIPPLE EFFECT EXACTO DEL CÓDIGO HTML */
