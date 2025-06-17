@@ -252,11 +252,11 @@ frontend:
 
   - task: "Modal objetivos e inventario"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -267,6 +267,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com). Los modales de objetivos e inventario están presentes en la interfaz y se puede acceder a ellos. No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Narrativa expandible"
     implemented: true
