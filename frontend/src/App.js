@@ -1267,14 +1267,11 @@ function App() {
     );
   }
 
-  // Sandbox form
-  if (showSandboxForm) {
+  // Sandbox form - FLUJO RESTAURADO
+  if (showSandboxForm && mode === 'sandbox') {
     return (
       <SandboxConceptForm 
-        onSubmit={(concept) => {
-          setSandboxConcept(concept);
-          startNewSession('sandbox', null, concept);
-        }}
+        onSubmit={(concept) => startNewSession('sandbox', null, concept)}
         loading={loading}
       />
     );
