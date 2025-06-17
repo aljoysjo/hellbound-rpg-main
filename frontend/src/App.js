@@ -979,30 +979,32 @@ function App() {
             {/* BARRAS DE STATS INTEGRADAS */}
           </header>
           
-          <main className="flex-grow overflow-auto pt-2 pb-8">
-            <div className="px-4 @[480px]:px-6">
+          <main className="flex flex-col h-[calc(100vh-var(--header-height))] pt-2">
+            <div className="px-4 @[480px]:px-6 flex-shrink-0">
               <div className="w-full aspect-[16/7] bg-center bg-no-repeat bg-cover rounded-xl shadow-xl overflow-hidden mb-6 @[480px]:rounded-2xl" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs")'}}>
               </div>
             </div>
             
-            <div className="px-4 @[480px]:px-6 space-y-4 text-center">
-              <h1 className="text-[var(--cedar-brown)] text-3xl font-bold leading-tight tracking-tight">
+            <div className="px-4 @[480px]:px-6 flex flex-col flex-grow text-center">
+              <h1 className="text-[var(--cedar-brown)] text-3xl font-bold leading-tight tracking-tight flex-shrink-0">
                 Crónica de la Aventura
               </h1>
               
-              {/* NARRATIVA ACUMULATIVA CON SCROLL */}
-              <div id="narrative-log" className="max-h-[300px] overflow-y-auto px-4 space-y-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                {gameState?.narrativeLog?.map((entry, index) => (
-                  <div key={index} className="narrative-text-enter py-2">
-                    <p className="text-[var(--text-accent-custom)] text-lg font-medium leading-relaxed mb-1 opacity-90">
-                      <span className="material-icons align-middle text-xl mr-1">play_arrow</span> 
-                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
-                    </p>
-                    <p className="text-[var(--text-primary-custom)] text-base font-normal leading-relaxed max-w-md mx-auto opacity-90">
-                      {safeStringify(entry.narrative, 'Narrativa del juego')}
-                    </p>
-                  </div>
-                ))}
+              {/* NARRATIVA ACUMULATIVA CON AUTO-SCROLL Y EFECTO ESCRITURA */}
+              <div id="narrative-log" className="flex-grow overflow-hidden relative mt-4 px-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                <div className="absolute inset-0 overflow-y-auto scrollbar-hide">
+                  {gameState?.narrativeLog?.map((entry, index) => (
+                    <div key={index} className="narrative-text-enter py-2 animate-typing">
+                      <p className="text-[var(--text-accent-custom)] text-lg font-medium leading-relaxed mb-1 opacity-90">
+                        <span className="material-icons align-middle text-xl mr-1">play_arrow</span> 
+                        "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                      </p>
+                      <p className="text-[var(--text-primary-custom)] text-base font-normal leading-relaxed max-w-md mx-auto opacity-90">
+                        {safeStringify(entry.narrative, 'Narrativa del juego')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* CUADRO DE LOOT ENCONTRADO */}
