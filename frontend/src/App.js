@@ -1093,21 +1093,21 @@ function App() {
           <nav className="flex gap-1 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md px-2 pt-2 pb-safe-bottom">
             <button 
               className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors"
-              onClick={toggleInventoryModal}
+              onClick={toggleInventory}
             >
               <span className="material-icons text-2xl">inventory</span>
               <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
             </button>
             <button 
               className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors"
-              onClick={toggleSkillsModal}
+              onClick={toggleSkills}
             >
               <span className="material-icons text-2xl">school</span>
               <span className="text-xs font-medium">Habilidades</span>
             </button>
             <button 
               className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors"
-              onClick={toggleObjectivesModal}
+              onClick={toggleObjectives}
             >
               <span className="material-icons text-2xl">flag</span>
               <span className="text-xs font-medium">Objetivos</span>
