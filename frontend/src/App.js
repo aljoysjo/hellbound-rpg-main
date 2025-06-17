@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
-import StoryInput from './components/StoryInput';
 
-// 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO SEGÚN CHATGPT + PLACEHOLDER VISUAL
+// 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -110,7 +109,7 @@ function App() {
     setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
   };
 
-  // 🎮 SANDBOX CONCEPT FORM COMPONENT
+  // 🎮 SANDBOX CONCEPT FORM COMPONENT - RESTAURADO
   const SandboxConceptForm = ({ onSubmit, loading }) => {
     const [concept, setConcept] = useState('');
 
@@ -125,11 +124,11 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
         <div style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
-          <div className="sandbox-form-container">
-            <h2 className="text-2xl font-bold text-[var(--cedar-brown)] text-center mb-2">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-[var(--cedar-brown)] mb-2">
               Modo Sandbox - Historia Libre
             </h2>
-            <p className="text-[var(--cedar-brown)] text-center mb-6">
+            <p className="text-[var(--cedar-brown)] mb-6">
               Describe la historia que quieres vivir.
             </p>
             
@@ -140,121 +139,7 @@ function App() {
                 placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
                 disabled={loading}
                 rows={4}
-                className="w-full p-3 border-2 border-[var(--imperial-gold)] rounded-lg bg-[var(--creamy-old)]/50 text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]"
-                required
-                minLength={20}
-              />
-              
-              <button
-                type="submit"
-                disabled={loading || concept.trim().length < 20}
-                className="w-full py-3 px-6 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 transition-all duration-200"
-              >
-                {loading ? 'Creando historia...' : 'Comenzar Aventura'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => setShowSandboxForm(false)}
-                className="w-full py-2 px-6 bg-transparent text-[var(--cedar-brown)] border border-[var(--cedar-brown)] rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
-              >
-                Volver
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // 🎮 SANDBOX CONCEPT FORM COMPONENT
-  const SandboxConceptForm = ({ onSubmit, loading }) => {
-    const [concept, setConcept] = useState('');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (concept.trim() && !loading) {
-        onSubmit(concept.trim());
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <div style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
-          <div className="sandbox-form-container">
-            <h2 className="text-2xl font-bold text-[var(--cedar-brown)] text-center mb-2">
-              Modo Sandbox - Historia Libre
-            </h2>
-            <p className="text-[var(--cedar-brown)] text-center mb-6">
-              Describe la historia que quieres vivir.
-            </p>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <textarea
-                value={concept}
-                onChange={(e) => setConcept(e.target.value)}
-                placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
-                disabled={loading}
-                rows={4}
-                className="w-full p-3 border-2 border-[var(--imperial-gold)] rounded-lg bg-[var(--creamy-old)]/50 text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]"
-                required
-                minLength={20}
-              />
-              
-              <button
-                type="submit"
-                disabled={loading || concept.trim().length < 20}
-                className="w-full py-3 px-6 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 transition-all duration-200"
-              >
-                {loading ? 'Creando historia...' : 'Comenzar Aventura'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => setShowSandboxForm(false)}
-                className="w-full py-2 px-6 bg-transparent text-[var(--cedar-brown)] border border-[var(--cedar-brown)] rounded-lg hover:bg-[var(--cedar-brown)] hover:text-[var(--creamy-old)] transition-all duration-200"
-              >
-                Volver
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-    // 🎮 SANDBOX CONCEPT FORM COMPONENT
-  const SandboxConceptForm = ({ onSubmit, loading }) => {
-    const [concept, setConcept] = useState('');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (concept.trim() && !loading) {
-        onSubmit(concept.trim());
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <div style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
-          <div className="sandbox-form-container">
-            <h2 className="text-2xl font-bold text-[var(--cedar-brown)] text-center mb-2">
-              Modo Sandbox - Historia Libre
-            </h2>
-            <p className="text-[var(--cedar-brown)] text-center mb-6">
-              Describe la historia que quieres vivir.
-            </p>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <textarea
-                value={concept}
-                onChange={(e) => setConcept(e.target.value)}
-                placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
-                disabled={loading}
-                rows={4}
-                className="w-full p-3 border-2 border-[var(--imperial-gold)] rounded-lg bg-[var(--creamy-old)]/50 text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]"
+                className="w-full p-3 border-2 border-[var(--imperial-gold)] rounded-lg bg-[var(--creamy-old)]/50 text-[var(--cedar-brown)] placeholder:text-[var(--cedar-brown)] placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]"
                 required
                 minLength={20}
               />
@@ -1358,96 +1243,6 @@ function App() {
     );
   };
 
-  // Header
-  const GameHeader = () => {
-    const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
-    const location = gameState?.location || 'Ubicación Desconocida';
-    
-    return (
-      <header className="hellbound-header sticky top-0 z-50 p-3">
-        {/* STATUS Y TÍTULO */}
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="flex items-center gap-2">
-            <div className="relative w-4 h-4">
-              <div className="absolute inset-0 rounded-full bg-emerald-500 opacity-60 animate-ping"></div>
-              <div className="relative w-2 h-2 rounded-full bg-emerald-500 m-auto border border-white"></div>
-            </div>
-            <span className="text-xs font-medium" style={{ color: 'var(--cedar-brown)' }}>
-              {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
-            </span>
-          </div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--cedar-brown)' }}>
-            Hellbound RPG
-          </h1>
-          <div className="w-8"></div>
-        </div>
-
-        {/* STATS BARS */}
-        <div className="space-y-2">
-          {/* SALUD */}
-          <div className="flex items-center gap-2">
-            <span className="text-2xl icon-shadow">❤️</span>
-            <div className="w-full h-3 stats-bar-bg rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, vitals.health))}%`,
-                  background: 'var(--health-bar)'
-                }}
-              />
-            </div>
-            <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
-              {vitals.health}
-            </span>
-          </div>
-
-          {/* MANÁ */}
-          <div className="flex items-center gap-2">
-            <span className="text-2xl icon-shadow">🔮</span>
-            <div className="w-full h-3 stats-bar-bg rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, vitals.mana))}%`,
-                  background: 'var(--mana-bar)'
-                }}
-              />
-            </div>
-            <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
-              {vitals.mana}
-            </span>
-          </div>
-
-          {/* STAMINA */}
-          <div className="flex items-center gap-2">
-            <span className="text-2xl icon-shadow">⚡</span>
-            <div className="w-full h-3 stats-bar-bg rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all duration-500 ease-out"
-                style={{ 
-                  width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%`,
-                  background: 'var(--stamina-bar)'
-                }}
-              />
-            </div>
-            <span className="text-xs font-medium min-w-[30px]" style={{ color: 'var(--cedar-brown)' }}>
-              {vitals.stamina || 80}
-            </span>
-          </div>
-        </div>
-
-        {/* UBICACIÓN */}
-        <div className="mt-2 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--cedar-brown)' }}>
-            Ubicación: <span className="font-bold" style={{ color: 'var(--text-accent-custom)' }}>
-              {location}
-            </span>
-          </p>
-        </div>
-      </header>
-    );
-  };
-
   // Game Over screen
   if (gameOver) {
     return (
@@ -1479,11 +1274,19 @@ function App() {
     );
   }
 
-  // Mode selection screen
+  // Mode selection screen - PANTALLA ORIGINAL RESTAURADA
   if (!mode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <ModeSelector onSelect={setMode} />
+        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <h2 className="text-3xl font-bold text-[var(--cedar-brown)] mb-4">
+            Bienvenido al Infierno
+          </h2>
+          <p className="text-[var(--cedar-brown)] mb-8">
+            Elige tu camino en una aventura épica donde cada decisión forja tu destino.
+          </p>
+          <ModeSelector onSelect={setMode} />
+        </div>
       </div>
     );
   }
@@ -1491,15 +1294,13 @@ function App() {
   // Sandbox form
   if (showSandboxForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
-        <StoryInput 
-          onStart={(concept) => {
-            setSandboxConcept(concept);
-            startNewSession('sandbox', null, concept);
-          }}
-          onBack={() => setShowSandboxForm(false)}
-        />
-      </div>
+      <SandboxConceptForm 
+        onSubmit={(concept) => {
+          setSandboxConcept(concept);
+          startNewSession('sandbox', null, concept);
+        }}
+        loading={loading}
+      />
     );
   }
 
