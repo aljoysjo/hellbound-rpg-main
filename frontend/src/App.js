@@ -2002,7 +2002,7 @@ function App() {
         </div>
       ) : (
         <>
-          <CompactHeader />
+          <EnhancedHeader gameState={gameState} connectionStatus={connectionStatus} />
           <IntegratedCanvas />
           
           <div className="mobile-only">
