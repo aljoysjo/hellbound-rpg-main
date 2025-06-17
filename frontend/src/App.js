@@ -5,7 +5,7 @@ import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
 import WelcomeScreen from './components/WelcomeScreen';
 import SandboxForm from './components/SandboxForm';
-import MinimalHeader from './components/MinimalHeader';
+import ResponsiveHeader from './components/ResponsiveHeader';
 
 // 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
@@ -947,13 +947,13 @@ function App() {
     return '✨';
   };
 
-  // 🎮 LAYOUT REFACTORIZADO - HEADER MINIMALISTA + INPUT FIJO
+  // 🎮 LAYOUT PRINCIPAL COMPLETO CON TODO FUNCIONANDO
   const EnhancedNarrativeSection = () => {
     return (
       <div className="flex flex-col h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
         
-        {/* HEADER MINIMALISTA OPCIÓN A */}
-        <MinimalHeader gameState={gameState} connectionStatus={connectionStatus} />
+        {/* HEADER RESPONSIVO: MINIMALISTA MÓVIL + COMPLETO DESKTOP */}
+        <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
         {/* MAIN CON SCROLL CONTENIDO - SIN INPUT DENTRO */}
         <main className="flex-1 overflow-y-auto px-4 space-y-4">
@@ -1010,7 +1010,7 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🎁 DISCOVERED ITEMS - ARREGLO: SOLO UNA VEZ, NO DUPLICADO */}
+          {/* 🎁 DISCOVERED ITEMS - UNA SOLA VEZ, NO DUPLICADO */}
           {discoveredItems.length > 0 && (
             <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
               <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
@@ -1074,12 +1074,12 @@ function App() {
     );
   }
 
-  // Mode selection screen - NUEVO DISEÑO PROFESIONAL
+  // Mode selection screen - NUEVO DISEÑO PROFESIONAL EN ESPAÑOL
   if (!mode) {
     return <WelcomeScreen onSelect={handleModeSelect} />;
   }
 
-  // Sandbox form - NUEVO COMPONENTE
+  // Sandbox form - NUEVO COMPONENTE EN ESPAÑOL
   if (showSandboxForm && mode === 'sandbox') {
     return (
       <SandboxForm 
@@ -1090,14 +1090,14 @@ function App() {
     );
   }
 
-  // Main game screen
+  // Main game screen - LAYOUT COMPLETO CON TODO FUNCIONAL
   if (gameState) {
     return (
       <div className="flex flex-col h-screen">
-        {/* NARRATIVA CON HEADER MINIMALISTA */}
+        {/* NARRATIVA CON HEADER RESPONSIVO */}
         <EnhancedNarrativeSection />
 
-        {/* INPUT FIELD FIJO FUERA DEL SCROLL - ARREGLO CRÍTICO */}
+        {/* INPUT FIELD FIJO FUERA DEL SCROLL - RESTAURADO */}
         <div className="flex-shrink-0 p-4 bg-[var(--creamy-old)]/90 border-t border-[var(--imperial-gold)]/50">
           <StoryInput
             onSubmit={submitAction}
@@ -1107,7 +1107,7 @@ function App() {
           />
         </div>
 
-        {/* FOOTER FIJO CON NAVIGATION */}
+        {/* FOOTER FIJO CON NAVIGATION - RESTAURADO */}
         <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
           <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
             <button 
@@ -1182,7 +1182,7 @@ function App() {
           </div>
         )}
 
-        {/* Modals (código existente de modales...) */}
+        {/* TODOS LOS MODALES RESTAURADOS */}
         {/* Inventory Modal */}
         <div className={`popup-modal inventory-popup ${showInventory ? 'show' : ''}`}>
           <div className="modal-header">

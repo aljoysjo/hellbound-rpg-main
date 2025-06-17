@@ -28,9 +28,9 @@ const WelcomeScreen = ({ onSelect }) => {
           </div>
         </div>
 
-        {/* SUBTITLE ELEGANTE */}
+        {/* SUBTITLE EN ESPAÑOL */}
         <p className="text-lg font-medium text-[#583A1D] mb-8 leading-relaxed px-4">
-          Choose your path in an epic adventure...
+          Elige tu camino en una aventura épica...
         </p>
 
         {/* BOTONES CON HOVER EFFECTS PROFESIONALES */}
@@ -52,7 +52,7 @@ const WelcomeScreen = ({ onSelect }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            Campaign
+            Campaña
           </button>
         </div>
       </div>

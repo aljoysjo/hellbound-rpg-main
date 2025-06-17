@@ -14,16 +14,16 @@ const SandboxForm = ({ onSubmit, loading, onBack }) => {
     <div className="min-h-screen bg-gradient-to-br from-[#F3E7C6] to-[#E8D5A6] flex items-center justify-center p-6">
       <div className="bg-[#F3E7C6]/90 border-2 border-[#B98746] rounded-3xl shadow-2xl backdrop-blur-lg p-10 max-w-lg w-full">
         
-        {/* TÍTULO */}
+        {/* TÍTULO EN ESPAÑOL */}
         <h2 
           className="text-3xl font-bold text-[#D14438] mb-4 text-center"
           style={{ fontFamily: 'Cinzel, serif' }}
         >
-          Sandbox Mode - Free Story
+          Modo Sandbox - Historia Libre
         </h2>
         
         <p className="text-[#583A1D] mb-8 text-center text-lg leading-relaxed">
-          Describe the story you want to live.
+          Describe la historia que quieres vivir.
         </p>
         
         {/* FORMULARIO */}
@@ -31,7 +31,7 @@ const SandboxForm = ({ onSubmit, loading, onBack }) => {
           <textarea
             value={concept}
             onChange={(e) => setConcept(e.target.value)}
-            placeholder="Example: 'Paranormal detective investigating disappearances'..."
+            placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
             disabled={loading}
             rows={5}
             className="w-full p-4 border-2 border-[#B98746] rounded-xl bg-[#F3E7C6]/80 
@@ -43,7 +43,7 @@ const SandboxForm = ({ onSubmit, loading, onBack }) => {
             minLength={20}
           />
           
-          {/* BOTONES */}
+          {/* BOTONES EN ESPAÑOL */}
           <button
             type="submit"
             disabled={loading || concept.trim().length < 20}
@@ -53,7 +53,7 @@ const SandboxForm = ({ onSubmit, loading, onBack }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            {loading ? 'Creating story...' : 'Start Adventure'}
+            {loading ? 'Creando historia...' : 'Comenzar Aventura'}
           </button>
           
           <button
@@ -64,7 +64,7 @@ const SandboxForm = ({ onSubmit, loading, onBack }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            Back
+            Volver
           </button>
         </form>
       </div>
