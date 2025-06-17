@@ -1174,7 +1174,7 @@ function App() {
   
   // EnhancedHeader component that wraps GameHeader
   const EnhancedHeader = ({ gameState, connectionStatus }) => {
-    return <GameHeader />;
+    return <EnhancedHeader gameState={gameState} connectionStatus={connectionStatus} />;
   };
 
   // Desktop Actions
@@ -2054,7 +2054,7 @@ function App() {
         </div>
       ) : (
         <>
-          <GameHeader />
+          <EnhancedHeader gameState={gameState} connectionStatus={connectionStatus} />
           <IntegratedCanvas />
           
           <div className="mobile-only">
