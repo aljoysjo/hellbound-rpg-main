@@ -991,85 +991,85 @@ function App() {
     };
     
     return (
-      <div className="relative flex size-full min-h-screen flex-col justify-between group/design-root overflow-x-hidden bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY')"}}>
-        <div className="flex-grow bg-white/30 backdrop-blur-sm">
-          <header className="flex flex-col items-center p-4 sticky top-0 z-10 bg-gradient-to-b from-[var(--creamy-old)]/80 via-[var(--creamy-old)]/80 to-transparent">
-            {/* TÍTULO Y STATUS */}
-            <div className="flex items-center w-full mb-3">
-              <div className="flex items-center gap-2">
-                <div className="relative w-3 h-3">
-                  <div className="absolute inset-0 rounded-full bg-emerald-500 opacity-60 animate-ping"></div>
-                  <div className="relative w-1.5 h-1.5 rounded-full bg-emerald-500 m-auto border border-white"></div>
-                </div>
-                <span className="text-xs font-medium text-[var(--cedar-brown)]">
-                  {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
-                </span>
+      <div className="flex flex-col h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] border-4 border-[var(--imperial-gold)]">
+        {/* HEADER COMPACTO CON STATS */}
+        <header className="flex-shrink-0 p-3 bg-gradient-to-b from-[var(--creamy-old)]/90 via-[var(--creamy-old)]/80 to-transparent backdrop-blur-sm border-b border-[var(--imperial-gold)]/30">
+          {/* TÍTULO Y STATUS */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="relative w-3 h-3">
+                <div className="absolute inset-0 rounded-full bg-emerald-500 opacity-60 animate-ping"></div>
+                <div className="relative w-1.5 h-1.5 rounded-full bg-emerald-500 m-auto border border-white"></div>
               </div>
-              <h2 className="text-[var(--cedar-brown)] text-xl font-bold leading-tight tracking-tight flex-1 text-center">Hellbound RPG</h2>
-              <div className="w-20"></div>
+              <span className="text-xs font-medium text-[var(--cedar-brown)]">
+                {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+              </span>
+            </div>
+            <h2 className="text-[var(--cedar-brown)] text-lg font-bold">Hellbound RPG</h2>
+            <div className="w-20"></div>
+          </div>
+
+          {/* BARRAS DE STATS COMPACTAS */}
+          <div className="space-y-1">
+            {/* SALUD */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">❤️</span>
+              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
+                <div 
+                  className="h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, vitals.health))}%`,
+                    background: 'var(--health-bar)'
+                  }}
+                />
+              </div>
+              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
+                {vitals.health}
+              </span>
             </div>
 
-            {/* BARRAS DE STATS INTEGRADAS - FINALMENTE VISIBLES */}
-            <div className="w-full space-y-2 mb-2">
-              {/* SALUD */}
-              <div className="flex items-center gap-2">
-                <span className="text-xl">❤️</span>
-                <div className="w-full h-2.5 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                  <div 
-                    className="h-full rounded-full transition-all duration-500 ease-out"
-                    style={{ 
-                      width: `${Math.max(0, Math.min(100, vitals.health))}%`,
-                      background: 'var(--health-bar)'
-                    }}
-                  />
-                </div>
-                <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                  {vitals.health}
-                </span>
+            {/* MANÁ */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🔮</span>
+              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
+                <div 
+                  className="h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, vitals.mana))}%`,
+                    background: 'var(--mana-bar)'
+                  }}
+                />
               </div>
-
-              {/* MANÁ */}
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🔮</span>
-                <div className="w-full h-2.5 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                  <div 
-                    className="h-full rounded-full transition-all duration-500 ease-out"
-                    style={{ 
-                      width: `${Math.max(0, Math.min(100, vitals.mana))}%`,
-                      background: 'var(--mana-bar)'
-                    }}
-                  />
-                </div>
-                <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                  {vitals.mana}
-                </span>
-              </div>
-
-              {/* STAMINA */}
-              <div className="flex items-center gap-2">
-                <span className="text-xl">⚡</span>
-                <div className="w-full h-2.5 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
-                  <div 
-                    className="h-full rounded-full transition-all duration-500 ease-out"
-                    style={{ 
-                      width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%`,
-                      background: 'var(--stamina-bar)'
-                    }}
-                  />
-                </div>
-                <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
-                  {vitals.stamina || 80}
-                </span>
-              </div>
+              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
+                {vitals.mana}
+              </span>
             </div>
 
-            {/* UBICACIÓN */}
-            <div className="text-center">
-              <p className="text-xs font-medium uppercase tracking-wider text-[var(--cedar-brown)]">
-                📍 <span className="font-bold text-[var(--text-accent-custom)]">{location}</span>
-              </p>
+            {/* STAMINA */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚡</span>
+              <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden border border-[var(--cedar-brown)]/30">
+                <div 
+                  className="h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ 
+                    width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%`,
+                    background: 'var(--stamina-bar)'
+                  }}
+                />
+              </div>
+              <span className="text-xs font-bold text-[var(--cedar-brown)] min-w-[25px]">
+                {vitals.stamina || 80}
+              </span>
             </div>
-          </header>
+          </div>
+
+          {/* UBICACIÓN */}
+          <div className="text-center mt-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--cedar-brown)]">
+              📍 <span className="font-bold text-[var(--text-accent-custom)]">{location}</span>
+            </p>
+          </div>
+        </header>
           
           {/* ÁREA PRINCIPAL DE NARRATIVA - APROVECHA TODA LA PANTALLA */}
           <main className="flex flex-col flex-grow p-4">
