@@ -375,7 +375,10 @@ function App() {
             }
             
             if (data.game_state.discoveredItems) {
+              console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
               setDiscoveredItems(data.game_state.discoveredItems);
+            } else {
+              console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
             }
             
             // SISTEMA DE BADGES AVANZADO
