@@ -1529,6 +1529,9 @@ SESGO DE TONO ACTUAL: ${gameState.toneBias} (-5=luminoso, +5=oscuro)
 - Los stats y habilidades emergen orgánicamente
 - Tono natural y adaptativo
 - LAS ACCIONES PELIGROSAS PUEDEN SER MORTALES
+
+RESTRICCIONES IMPORTANTES DEL CONCEPTO SANDBOX:
+${generateSandboxRestrictions(gameState.sandboxConcept)}
 `;
     }
     
