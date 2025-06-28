@@ -2002,18 +2002,52 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           
           // Filtrar palabras demasiado cortas o genéricas
           if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 30 && !itemName.includes("mientras") && !itemName.includes("que se") && !itemName.includes("de la")) {
-            foundItems.push(itemName);
-            console.log(`🔍 Item detectado: "${itemName}"`);
+            
+            // 🎯 NUEVO: CONVERTIR TEXTO A ITEM REAL DE DATABASE
+            const realItem = convertTextToRealItem(itemName);
+            if (realItem) {
+              foundItems.push(realItem);
+              console.log(`🔍 Item real detectado: ${realItem.name} ${realItem.icon}`);
+            } else {
+              console.log(`❌ Item no reconocido: "${itemName}"`);
+            }
           }
         }
       });
       
-      // Eliminar duplicados y limpiar
-      const uniqueItems = [...new Set(foundItems.map(item => item.toLowerCase()))]
-        .map(item => item.charAt(0).toUpperCase() + item.slice(1));
+      // Eliminar duplicados por instanceId
+      const uniqueItems = foundItems.filter((item, index, self) => 
+        index === self.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase())
+      );
       
-      console.log(`📦 Items únicos extraídos: ${uniqueItems.length > 0 ? uniqueItems.join(', ') : 'ninguno'}`);
+      console.log(`📦 Items reales extraídos: ${uniqueItems.length > 0 ? uniqueItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
       return uniqueItems;
+    }
+    
+    // 🎯 NUEVA FUNCIÓN: CONVERTIR TEXTO DE NARRATIVA A ITEM REAL
+    function convertTextToRealItem(itemText) {
+      const textLower = itemText.toLowerCase();
+      
+      // Buscar en ITEM_DATABASE por keywords
+      for (const dbItem of ITEM_DATABASE) {
+        for (const keyword of dbItem.keywords) {
+          if (textLower.includes(keyword.toLowerCase())) {
+            console.log(`✅ Match encontrado: "${itemText}" → ${dbItem.type} (keyword: "${keyword}")`);
+            
+            return {
+              name: itemText, // Usar nombre original de la narrativa
+              icon: dbItem.icon,
+              type: dbItem.type,
+              description: `${itemText} encontrado en la narrativa`,
+              rarity: 'common',
+              source: 'narrative_extraction',
+              instanceId: crypto.randomUUID()
+            };
+          }
+        }
+      }
+      
+      return null; // No se encontró match
     }
     
     // 🔧 FUNCIÓN: GENERAR PREGUNTA NARRATIVA PARA ITEMS
