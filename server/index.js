@@ -2102,7 +2102,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         // CASO B: No hay items → Generar loot dinámico + explicación
         console.log(`🎁 NARRATIVA SIN ITEMS: Generando loot dinámico con explicación`);
         
-        const intelligentLoot = rollIntelligentLoot(gameState, action, narrative);
+        const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
         
         if (intelligentLoot) {
           // Verificar anti-duplicados
