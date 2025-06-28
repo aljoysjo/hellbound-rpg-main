@@ -1491,7 +1491,6 @@ app.post('/api/free_input', async (req, res) => {
       });
     }
     
-    // 🎯 FUNCIÓN: GENERAR RESTRICCIONES CONTEXTUALES DEL SANDBOX
 function generateSandboxRestrictions(sandboxConcept) {
   if (!sandboxConcept) return '- Sin restricciones específicas';
   
