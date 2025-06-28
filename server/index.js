@@ -1540,7 +1540,6 @@ function generateSandboxRestrictions(sandboxConcept) {
   return restrictions.join('\n');
 }
 
-// 🎯 FUNCIÓN: GENERAR RESTRICCIONES CONTEXTUALES DEL SANDBOX
 // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
     
