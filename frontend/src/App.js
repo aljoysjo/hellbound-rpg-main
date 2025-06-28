@@ -96,7 +96,41 @@ function App() {
       const data = await response.json();
       console.log('✅ Item recogido exitosamente:', data);
       
-      setGameState(data.game_state);
+      // 🎮 ACTUALIZAR GAMESTATE Y ACTIVAR BADGES
+      setGameState(prevState => {
+        if (prevState && data.game_state) {
+          // 🏆 DETECTAR CAMBIOS DE INVENTARIO PARA BADGES
+          const inventoryChanges = detectInventoryChanges(
+            prevState.inventory, 
+            data.game_state.inventory
+          );
+          
+          if (inventoryChanges.totalCount > 0) {
+            console.log('🏆 ACTIVANDO BADGE POR PICKUP:', inventoryChanges);
+            
+            // Actualizar badges
+            setBadges(prevBadges => ({
+              ...prevBadges,
+              inventory: {
+                count: prevBadges.inventory.count + inventoryChanges.totalCount,
+                newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
+              }
+            }));
+            
+            // Marcar como nuevo elemento
+            setNewElements(prevNew => ({
+              ...prevNew,
+              inventory: new Set([
+                ...prevNew.inventory,
+                ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+              ])
+            }));
+          }
+        }
+        
+        return data.game_state;
+      });
+      
       setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
       
     } catch (error) {
