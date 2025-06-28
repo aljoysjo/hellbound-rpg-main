@@ -19,7 +19,6 @@ const ITEM_DATABASE = [
   { type: 'hacha', icon: '🪓', keywords: ['hacha', 'axe', 'machete', 'hachuela'] },
   { type: 'arco', icon: '🏹', keywords: ['arco', 'ballesta', 'bow', 'flecha', 'arrow'] },
   { type: 'revolver', icon: '🔫', keywords: ['revolver', 'pistola', 'arma', 'gun', 'weapon', 'firearm'] },
-  { type: 'revolver', icon: '🔫', keywords: ['revolver', 'pistola', 'arma', 'gun', 'weapon', 'firearm'] },
   
   // 🛡️ DEFENSAS
   { type: 'escudo', icon: '🛡️', keywords: ['escudo', 'shield', 'broquel', 'rodela', 'buckler'] },
