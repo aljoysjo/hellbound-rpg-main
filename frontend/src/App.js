@@ -1176,28 +1176,52 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🎁 DISCOVERED ITEMS - UNA SOLA VEZ, NO DUPLICADO */}
+          {/* 🎁 DISCOVERED ITEMS - CON BOTONES RECOGER/DEJAR */}
           {discoveredItems.length > 0 && (
             <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
               <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
                 🎁 Items Descubiertos
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="space-y-3">
                 {discoveredItems.map((item, index) => (
                   <div
                     key={item.instanceId || index}
-                    onClick={() => pickupItem(item)}
-                    className={`p-3 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg cursor-pointer 
-                               hover:bg-[var(--imperial-gold)]/20 transition-all duration-200 text-center
-                               ${pickupLoading === item.instanceId ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                    className="p-4 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg"
                   >
-                    <div className="text-2xl mb-1">{item.icon || '📦'}</div>
-                    <div className="text-xs font-medium text-[var(--cedar-brown)]">
-                      {item.name || 'Item Misterioso'}
+                    <div className="flex items-center gap-4">
+                      {/* ICONO Y INFO DEL ITEM */}
+                      <div className="text-3xl">{item.icon || '📦'}</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-[var(--cedar-brown)]">
+                          {item.name || 'Item Misterioso'}
+                        </div>
+                        <div className="text-xs text-[var(--cedar-brown)]/70">
+                          {item.description || 'Un objeto encontrado durante tu exploración'}
+                        </div>
+                      </div>
+                      
+                      {/* BOTONES RECOGER/DEJAR */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => pickupItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          {pickupLoading === item.instanceId ? 'Recogiendo...' : '✋ Recoger'}
+                        </button>
+                        <button
+                          onClick={() => ignoreItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--cedar-brown)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--cedar-brown)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          🚫 Dejar
+                        </button>
+                      </div>
                     </div>
-                    {pickupLoading === item.instanceId && (
-                      <div className="text-xs text-[var(--imperial-gold)] mt-1">Recogiendo...</div>
-                    )}
                   </div>
                 ))}
               </div>
