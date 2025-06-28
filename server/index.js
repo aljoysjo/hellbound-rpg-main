@@ -2439,6 +2439,59 @@ app.post('/api/ignore_item', async (req, res) => {
   }
 });
 
+// 🚫 ENDPOINT: IGNORAR ITEM PERSISTENTEMENTE
+app.post('/api/ignore_item', async (req, res) => {
+  try {
+    const { session_id, item_id } = req.body;
+    
+    if (!session_id || !gameSessions.has(session_id)) {
+      return res.status(400).json({ error: 'Invalid session' });
+    }
+    
+    if (!item_id) {
+      return res.status(400).json({ error: 'No item_id provided' });
+    }
+    
+    const gameState = gameSessions.get(session_id);
+    
+    // Inicializar array de items ignorados si no existe
+    if (!gameState.ignoredItems) {
+      gameState.ignoredItems = [];
+    }
+    
+    // Añadir item a lista de ignorados (si no está ya)
+    if (!gameState.ignoredItems.includes(item_id)) {
+      gameState.ignoredItems.push(item_id);
+      console.log(`🚫 Item ignorado permanentemente: ${item_id}`);
+    }
+    
+    // Remover de discoveredItems si está presente
+    if (gameState.discoveredItems) {
+      gameState.discoveredItems = gameState.discoveredItems.filter(
+        item => item.instanceId !== item_id
+      );
+    }
+    
+    // Save to MongoDB
+    if (db) {
+      await db.collection('sessions').replaceOne(
+        { sessionId: session_id },
+        gameState.toDict()
+      );
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Item ignored permanently',
+      game_state: gameState.toDict()
+    });
+    
+  } catch (error) {
+    console.error('Error ignoring item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 🎁 ENDPOINT: Recoger item descubierto
 app.post('/api/pickup_item', async (req, res) => {
   try {
