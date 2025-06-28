@@ -190,8 +190,8 @@ const INTELLIGENT_LOOT = {
   ]
 };
 
-function rollIntelligentLoot(gameState, action, narrative) {
-  console.log(`🎯 Generando loot inteligente...`);
+function rollIntelligentLoot(gameState, action, narrative, quality = 'common') {
+  console.log(`🎯 Generando loot inteligente con calidad: ${quality}...`);
   
   // Detectar contextos
   const narrativeContexts = detectNarrativeContext(narrative, action);
@@ -217,13 +217,27 @@ function rollIntelligentLoot(gameState, action, narrative) {
   
   console.log(`🎯 Categoría seleccionada: ${selectedCategory}`);
   
-  // Generar item
+  // Generar item - MEJORADO CON SISTEMA DE CALIDAD
   const lootTable = INTELLIGENT_LOOT[selectedCategory] || INTELLIGENT_LOOT.exploration;
-  const totalWeight = lootTable.reduce((sum, item) => sum + item.weight, 0);
+  
+  // 🎯 FILTRAR POR CALIDAD
+  let filteredLoot = lootTable;
+  if (quality === 'rare') {
+    // Para items raros, preferir items con mayor peso (más valiosos)
+    filteredLoot = lootTable.filter(item => item.weight >= 15);
+    if (filteredLoot.length === 0) filteredLoot = lootTable; // Fallback
+  } else if (quality === 'epic') {
+    // Para items épicos, preferir los más pesados y añadir prefijos especiales
+    filteredLoot = lootTable.filter(item => item.weight >= 20);
+    if (filteredLoot.length === 0) filteredLoot = lootTable.filter(item => item.weight >= 15);
+    if (filteredLoot.length === 0) filteredLoot = lootTable; // Fallback
+  }
+  
+  const totalWeight = filteredLoot.reduce((sum, item) => sum + item.weight, 0);
   let randomWeight = Math.random() * totalWeight;
   
   let selectedItem = null;
-  for (const item of lootTable) {
+  for (const item of filteredLoot) {
     if (randomWeight < item.weight) {
       selectedItem = item;
       break;
@@ -231,20 +245,32 @@ function rollIntelligentLoot(gameState, action, narrative) {
     randomWeight -= item.weight;
   }
   
-  if (!selectedItem) selectedItem = lootTable[0];
+  if (!selectedItem) selectedItem = filteredLoot[0];
+  
+  // 🌟 APLICAR MODIFICADORES DE CALIDAD AL NOMBRE
+  let finalName = selectedItem.name;
+  if (quality === 'rare') {
+    const rarePrefixes = ['Refinado', 'Resistente', 'Mejorado', 'Superior', 'Excelente'];
+    const randomPrefix = rarePrefixes[Math.floor(Math.random() * rarePrefixes.length)];
+    finalName = `${randomPrefix} ${selectedItem.name}`;
+  } else if (quality === 'epic') {
+    const epicPrefixes = ['Legendario', 'Encantado', 'Mágico', 'Perfecto', 'Ancestral'];
+    const randomPrefix = epicPrefixes[Math.floor(Math.random() * epicPrefixes.length)];
+    finalName = `${randomPrefix} ${selectedItem.name}`;
+  }
   
   const finalItem = {
-    name: selectedItem.name,
+    name: finalName,
     icon: selectedItem.icon,
     type: selectedCategory,
-    description: `${selectedItem.name} encontrado durante la exploración`,
-    rarity: 'common',
+    description: `${finalName} encontrado durante la exploración`,
+    rarity: quality,
     source: 'dynamic_intelligent',
     contexts: allContexts,
     instanceId: crypto.randomUUID()
   };
   
-  console.log(`🎁 LOOT GENERADO: ${finalItem.name} ${finalItem.icon} (${selectedCategory})`);
+  console.log(`🎁 LOOT GENERADO: ${finalItem.name} ${finalItem.icon} (${selectedCategory}, ${quality})`);
   return finalItem;
 }
 
