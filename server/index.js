@@ -2311,6 +2311,18 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
         
         if (intelligentLoot) {
+          // 🚫 VERIFICAR ITEMS IGNORADOS PERMANENTEMENTE
+          if (!gameState.ignoredItems) gameState.ignoredItems = [];
+          const wasIgnored = gameState.ignoredItems.some(ignoredId => 
+            ignoredId === intelligentLoot.instanceId || 
+            gameState.ignoredItems.some(id => id.includes(intelligentLoot.name.toLowerCase()))
+          );
+          
+          if (wasIgnored) {
+            console.log(`🚫 Item previamente ignorado, no se añadirá: ${intelligentLoot.name}`);
+            return; // No añadir item ignorado
+          }
+          
           // Verificar anti-duplicados
           const existsInInventory = gameState.inventory.some(item => 
             item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
