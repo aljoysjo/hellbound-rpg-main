@@ -2129,6 +2129,29 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     function convertTextToRealItem(itemText) {
       const textLower = itemText.toLowerCase();
       
+      // 🚫 FILTRO DE PORTABILIDAD: Items que NO se pueden llevar
+      const nonPortableKeywords = [
+        'mapa muy grande', 'mapa grande', 'mapa enorme', 'mapa gigante',
+        'edificio', 'casa', 'puerta', 'ventana', 'pared', 'suelo', 'techo',
+        'mesa grande', 'escritorio grande', 'armario', 'estantería',
+        'árbol', 'roca grande', 'piedra grande', 'estatua grande',
+        'fuente', 'pozo', 'columna', 'pilar', 'escalera', 'escalón'
+      ];
+      
+      for (const nonPortable of nonPortableKeywords) {
+        if (textLower.includes(nonPortable)) {
+          console.log(`🚫 Item NO portable detectado: "${itemText}" (keyword: "${nonPortable}")`);
+          return null; // No es portable
+        }
+      }
+      
+      // Evaluar tamaño por contexto
+      if (textLower.includes('muy grande') || textLower.includes('enorme') || 
+          textLower.includes('gigante') || textLower.includes('masivo')) {
+        console.log(`🚫 Item demasiado grande: "${itemText}"`);
+        return null;
+      }
+      
       // Buscar en ITEM_DATABASE por keywords
       for (const dbItem of ITEM_DATABASE) {
         for (const keyword of dbItem.keywords) {
@@ -2139,7 +2162,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
               name: itemText, // Usar nombre original de la narrativa
               icon: dbItem.icon,
               type: dbItem.type,
-              description: `${itemText} encontrado en la narrativa`,
+              description: generateContextualDescription(itemText, dbItem.type),
               rarity: 'common',
               source: 'narrative_extraction',
               instanceId: crypto.randomUUID()
@@ -2149,6 +2172,43 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       }
       
       return null; // No se encontró match
+    }
+    
+    // 🎯 NUEVA FUNCIÓN: GENERAR DESCRIPCIONES CONTEXTUALES ÚTILES
+    function generateContextualDescription(itemName, itemType) {
+      const nameLower = itemName.toLowerCase();
+      
+      // Descripciones específicas por tipo de item
+      if (itemType === 'revolver' || itemType === 'daga' || itemType === 'arco') {
+        return `Un arma que podría ser útil para defenderte en situaciones peligrosas.`;
+      }
+      
+      if (itemType === 'libro' || itemType === 'pergamino') {
+        return `Podría contener información valiosa o conocimientos importantes.`;
+      }
+      
+      if (itemType === 'llave') {
+        return `Probablemente abre algo importante en esta área.`;
+      }
+      
+      if (itemType === 'poción' || itemType === 'bebida') {
+        return `Un líquido que podría tener efectos beneficiosos si lo consumes.`;
+      }
+      
+      if (itemType === 'moneda' || itemType === 'gema') {
+        return `Tiene valor monetario y podría ser útil para intercambios.`;
+      }
+      
+      if (itemType === 'anillo' || itemType === 'collar') {
+        return `Una pieza de joyería que podría tener valor o significado especial.`;
+      }
+      
+      if (itemType === 'metal') {
+        return `Material resistente que podría servir como herramienta o arma improvisada.`;
+      }
+      
+      // Descripción genérica pero útil
+      return `Un objeto que encontraste y que podría ser útil en tu aventura.`;
     }
     
     // 🔧 FUNCIÓN: GENERAR PREGUNTA NARRATIVA PARA ITEMS REALES
