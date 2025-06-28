@@ -3,8 +3,11 @@ import './tokens.css';
 import io from 'socket.io-client';
 import ModeSelector from './components/ModeSelector';
 import StoryInput from './components/StoryInput';
+import WelcomeScreen from './components/WelcomeScreen';
+import SandboxForm from './components/SandboxForm';
+import ResponsiveHeader from './components/ResponsiveHeader';
 
-// 🎮 MAIN APP COMPONENT - SISTEMA POPUPS "VIVOS" COMPLETO + DISCOVERED ITEMS
+// 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
   const [gameState, setGameState] = useState(null);
   const [sessionId, setSessionId] = useState(null);
@@ -16,6 +19,7 @@ function App() {
   const [suggestedActions, setSuggestedActions] = useState([]);
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [sandboxConcept, setSandboxConcept] = useState('');
   
   // UI States
   const [narrativeVisible, setNarrativeVisible] = useState(true);
@@ -26,17 +30,17 @@ function App() {
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
   const [showDiscoveredItems, setShowDiscoveredItems] = useState(false);
 
-  // 🎁 SISTEMA DISCOVERED ITEMS - NUEVO
+  // 🎁 SISTEMA DISCOVERED ITEMS
   const [discoveredItems, setDiscoveredItems] = useState([]);
-  const [pickupLoading, setPickupLoading] = useState(null); // item siendo recogido
+  const [pickupLoading, setPickupLoading] = useState(null);
 
-  // SISTEMA BADGES "VIVOS" MEJORADO - INCLUYE ITEMS SOLTADOS
+  // SISTEMA BADGES "VIVOS" MEJORADO
   const [badges, setBadges] = useState({
-    inventory: { count: 0, newItems: [], removedItems: [] }, // AGREGADO: removedItems
+    inventory: { count: 0, newItems: [], removedItems: [] },
     objectives: { count: 0, newObjectives: [], completedObjectives: [] },
     skills: { count: 0, newSkills: [], levelUps: [] },
     emotions: { count: 0, significantChanges: [] },
-    discovered: { count: 0, newItems: [] } // NUEVO: badge para discovered items
+    discovered: { count: 0, newItems: [] }
   });
 
   // Persistencia de elementos "NEW"
@@ -45,11 +49,15 @@ function App() {
     objectives: new Set(), 
     skills: new Set(),
     emotions: new Set(),
-    discovered: new Set() // NUEVO: para discovered items
+    discovered: new Set()
   });
+
+  // 🖼️ NUEVO: Estado para imagen de escena
+  const [sceneImage, setSceneImage] = useState('/images/placeholder_scene.svg');
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
   const fadeTimeoutRef = useRef(null);
+  const narrativeRef = useRef(null);
   
   // HELPER: Safe string conversion
   const safeStringify = (value, fallback = '') => {
@@ -62,7 +70,7 @@ function App() {
     return String(value);
   };
 
-  // 🎁 FUNCIÓN PICKUP ITEM - NUEVA
+  // 🎁 FUNCIÓN PICKUP ITEM
   const pickupItem = async (item) => {
     if (!sessionId || !item || pickupLoading) return;
     
@@ -88,12 +96,42 @@ function App() {
       const data = await response.json();
       console.log('✅ Item recogido exitosamente:', data);
       
-      // Actualizar estado local inmediatamente
-      setGameState(data.game_state);
-      setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
+      // 🎮 ACTUALIZAR GAMESTATE Y ACTIVAR BADGES
+      setGameState(prevState => {
+        if (prevState && data.game_state) {
+          // 🏆 DETECTAR CAMBIOS DE INVENTARIO PARA BADGES
+          const inventoryChanges = detectInventoryChanges(
+            prevState.inventory, 
+            data.game_state.inventory
+          );
+          
+          if (inventoryChanges.totalCount > 0) {
+            console.log('🏆 ACTIVANDO BADGE POR PICKUP:', inventoryChanges);
+            
+            // Actualizar badges
+            setBadges(prevBadges => ({
+              ...prevBadges,
+              inventory: {
+                count: prevBadges.inventory.count + inventoryChanges.totalCount,
+                newItems: [...prevBadges.inventory.newItems, ...inventoryChanges.newItems]
+              }
+            }));
+            
+            // Marcar como nuevo elemento
+            setNewElements(prevNew => ({
+              ...prevNew,
+              inventory: new Set([
+                ...prevNew.inventory,
+                ...inventoryChanges.newItems.map(item => item?.id || item?.name || JSON.stringify(item))
+              ])
+            }));
+          }
+        }
+        
+        return data.game_state;
+      });
       
-      // Mostrar feedback visual (se puede mejorar más adelante)
-      // TODO: Añadir notificación toast
+      setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
       
     } catch (error) {
       console.error('❌ Error recogiendo item:', error);
@@ -103,44 +141,97 @@ function App() {
     }
   };
 
-  // SISTEMA DE DETECCIÓN DE CAMBIOS BASADO EN INSTANCE ID (DEFINITIVO) - CORREGIDO PARA ITEMS SOLTADOS
+  // 🔧 ESTADO PARA ITEMS IGNORADOS PERSISTENTES
+  const [ignoredItems, setIgnoredItems] = useState(new Set());
+
+  const ignoreItem = (item) => {
+    console.log('🚫 Ignorando item permanentemente:', item);
+    
+    // Añadir a lista de ignorados
+    setIgnoredItems(prev => new Set([...prev, item.instanceId]));
+    
+    // Remover de discovered items
+    setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
+    
+    // 📡 COMUNICAR AL BACKEND QUE SE IGNORÓ EL ITEM
+    if (sessionId) {
+      fetch(`${BACKEND_URL}/api/ignore_item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          item_id: item.instanceId
+        })
+      }).catch(error => {
+        console.error('❌ Error comunicando item ignorado:', error);
+      });
+    }
+  };
+
+  // 🔧 ARREGLO: Funciones de manejo para componentes nuevos
+  const handleModeSelect = (selectedMode) => {
+    setMode(selectedMode);
+  };
+
+  const handleSandboxSubmit = (concept) => {
+    startNewSession('sandbox', null, concept);
+  };
+
+  const handleBackToModeSelection = () => {
+    setShowSandboxForm(false);
+    setMode(null);
+  };
+
+  // Auto-scroll effect para narrativa persistente
+  useEffect(() => {
+    if (narrativeRef.current) {
+      narrativeRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [gameState?.narrativeLog]);
+
+  // Handler para acciones embebidas
+  const handleInlineAction = (action) => {
+    handleSuggestedAction(action);
+  };
+
+  // 🖼️ SISTEMA DE IMAGEN CONTEXTUAL
+  const getContextualImage = (location, narrative) => {
+    // Placeholder por defecto
+    const defaultPlaceholder = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAm6u8nnWv-JiuMn-jRh5QHLwXtoBWwvHDYjbp58LipPXqnKl_bxngkbZMEfbpbPq_JogV8gh7VFojqy2M2l7Qzl5dv-nbu5SYDuB-rIsT3JZgACXWOxNeas25kigZu65isTVYl5-rBgzkuWHB5DF4hJRQ7fKQe2v3GJ_lbUlXiSB2pEvMsKSTlDg9w02KtOdKqnlWqiRbUQCZGuCGX0pXVSMf-3xyesYbdn3K1wPJP3ecu6cipjCWaF9wmqRlRsahCe41b6Pd_igs';
+    
+    // TODO: Aquí se puede implementar lógica para cambiar imagen según contexto
+    if (location?.toLowerCase().includes('alicante')) {
+      return 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJWH6EnSX-8Xkhnosm7oS2bl_sKSqRdDChZEN7-PuoUUIU6zlqiS9llB7magO-XHBs_1teM4UBnYJyCxZcPdZakJHfhOq3kwM3a9W31YiPpaP81SyIMm9gdFl_SEwPYk5nkH0GUzOZVBhRhOXSCuXVq_CBR8IYg6k1k4hFdrPe0qsj9Bi6r4U7n_65tYw3-fMBpe1_Jl7wzMcdYwUXCoSHCFpWEiibVXic4EW4RvneThgIHeMv_kmoiMY1iYDxRse-fRf-JsLjGmY';
+    }
+    
+    return defaultPlaceholder;
+  };
+
+  // DETECCIÓN DE CAMBIOS Y BADGES (código existente)
   const detectInventoryChanges = (prevInventory, currentInventory) => {
     const prev = Array.isArray(prevInventory) ? prevInventory : [];
     const current = Array.isArray(currentInventory) ? currentInventory : [];
     
-    // Usar instanceId para detección precisa
     const prevIds = new Set(prev.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
     const currentIds = new Set(current.map(item => item?.instanceId || item?.name || JSON.stringify(item)));
     
-    // Detectar items realmente nuevos (RECOGIDOS)
     const newItems = current.filter(item => {
       const itemId = item?.instanceId || item?.name || JSON.stringify(item);
       return !prevIds.has(itemId);
     });
     
-    // 🔥 NUEVO: Detectar items eliminados (SOLTADOS)
     const removedItems = prev.filter(item => {
       const itemId = item?.instanceId || item?.name || JSON.stringify(item);
       return !currentIds.has(itemId);
     });
     
-    console.log('📦 INVENTORY CHANGES DETECTED:', { 
-      prevCount: prev.length, 
-      currentCount: current.length,
-      prevIds: Array.from(prevIds),
-      currentIds: Array.from(currentIds),
-      newItems: newItems.map(i => i?.name),
-      removedItems: removedItems.map(i => i?.name) // NUEVO LOG
-    });
-    
     return {
       newItems,
-      removedItems, // NUEVO: items soltados
-      totalCount: newItems.length + removedItems.length // NUEVO: contar ambos tipos
+      removedItems,
+      totalCount: newItems.length + removedItems.length
     };
   };
 
-  // 🎁 NUEVO: Detectar cambios en discovered items
   const detectDiscoveredChanges = (prevDiscovered, currentDiscovered) => {
     const prev = Array.isArray(prevDiscovered) ? prevDiscovered : [];
     const current = Array.isArray(currentDiscovered) ? currentDiscovered : [];
@@ -153,12 +244,6 @@ function App() {
       return !prevIds.has(itemId);
     });
     
-    console.log('🎁 DISCOVERED CHANGES DETECTED:', { 
-      prevCount: prev.length, 
-      currentCount: current.length,
-      newItems: newItems.map(i => i?.name)
-    });
-    
     return {
       newItems,
       totalCount: newItems.length
@@ -169,27 +254,18 @@ function App() {
     const prev = Array.isArray(prevObjectives) ? prevObjectives : [];
     const current = Array.isArray(currentObjectives) ? currentObjectives : [];
     
-    console.log('🔍 OBJECTIVES DEBUG:', { prev: prev.length, current: current.length });
-    
     const prevIds = prev.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
     const currentIds = current.map(obj => obj?.id || obj?.description || JSON.stringify(obj));
     
     const prevCompleted = prev.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
     const currentCompleted = current.filter(obj => obj?.completed).map(obj => obj?.id || obj?.description);
     
-    // CORRECCIÓN: Nuevos objetivos son los que NO están en prevIds
     const newObjectives = current.filter(obj => {
       const objId = obj?.id || obj?.description || JSON.stringify(obj);
       return !prevIds.includes(objId);
     });
     
-    // CORRECCIÓN: Objetivos recién completados
     const completedObjectives = currentCompleted.filter(id => !prevCompleted.includes(id));
-    
-    console.log('🎯 OBJECTIVES CHANGES:', { 
-      prevIds, currentIds, newObjectives, 
-      prevCompleted, currentCompleted, completedObjectives 
-    });
     
     return {
       newObjectives,
@@ -202,18 +278,14 @@ function App() {
     const prev = Array.isArray(prevSkills) ? prevSkills : [];
     const current = Array.isArray(currentSkills) ? currentSkills : [];
     
-    console.log('🔍 SKILLS DEBUG:', { prev: prev.length, current: current.length });
-    
     const prevIds = prev.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
     const currentIds = current.map(skill => skill?.id || skill?.name || JSON.stringify(skill));
     
-    // CORRECCIÓN: Nuevas skills son las que NO están en prevIds
     const newSkills = current.filter(skill => {
       const skillId = skill?.id || skill?.name || JSON.stringify(skill);
       return !prevIds.includes(skillId);
     });
     
-    // Detectar level ups
     const levelUps = [];
     current.forEach(currentSkill => {
       const prevSkill = prev.find(p => (p?.id || p?.name) === (currentSkill?.id || currentSkill?.name));
@@ -221,8 +293,6 @@ function App() {
         levelUps.push(currentSkill);
       }
     });
-    
-    console.log('⭐ SKILLS CHANGES:', { prevIds, currentIds, newSkills, levelUps });
     
     return {
       newSkills,
@@ -235,15 +305,12 @@ function App() {
     const prev = prevEmotions || {};
     const current = currentEmotions || {};
     
-    console.log('🔍 EMOTIONS DEBUG:', { prev, current });
-    
     const significantChanges = [];
     
     Object.keys(current).forEach(emotion => {
       const prevValue = prev[emotion] || 0;
       const currentValue = current[emotion] || 0;
       
-      // Cambio significativo: ±15 puntos
       if (Math.abs(currentValue - prevValue) >= 15) {
         significantChanges.push({
           emotion,
@@ -252,8 +319,6 @@ function App() {
         });
       }
     });
-    
-    console.log('😊 EMOTIONS CHANGES:', { significantChanges });
     
     return {
       significantChanges,
@@ -279,11 +344,19 @@ function App() {
     };
   }, [narrativeVisible, gameState?.narrativeLog]);
 
+  // 🔧 ARREGLO CRÍTICO: Auto-iniciar sandbox cuando se selecciona el modo
+  useEffect(() => {
+    if (mode === 'sandbox' && !gameState && !loading && !showSandboxForm) {
+      console.log('🎮 Auto-iniciando sandbox mode');
+      startNewSession('sandbox');
+    }
+  }, [mode, gameState, loading, showSandboxForm]);
+
   // Socket initialization CON DETECCIÓN AVANZADA + FALLBACK POLLING
   useEffect(() => {
     console.log('🔌 Iniciando conexión WebSocket a:', BACKEND_URL);
     const newSocket = io(BACKEND_URL, {
-      transports: ['polling', 'websocket'], // Fallback a polling si websocket falla
+      transports: ['polling', 'websocket'],
       forceNew: true
     });
     setSocket(newSocket);
@@ -311,39 +384,42 @@ function App() {
           if (!prevState || data.game_state.actionCount > prevState.actionCount) {
             setNarrativeVisible(true);
             
-            // 🎁 ACTUALIZAR DISCOVERED ITEMS
+            // 🖼️ ACTUALIZAR IMAGEN CONTEXTUAL
+            const newImage = getContextualImage(data.game_state.location, data.game_state.narrativeLog?.[data.game_state.narrativeLog.length - 1]?.narrative);
+            if (newImage !== sceneImage) {
+              setSceneImage(newImage);
+            }
+            
             if (data.game_state.discoveredItems) {
+              console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
               setDiscoveredItems(data.game_state.discoveredItems);
+            } else {
+              console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
             }
             
             // SISTEMA DE BADGES AVANZADO
             if (prevState) {
               console.log('🔍 DETECTING CHANGES...');
-              // Detectar cambios en inventario
               const inventoryChanges = detectInventoryChanges(
                 prevState.inventory, 
                 data.game_state.inventory
               );
               
-              // 🎁 NUEVO: Detectar cambios en discovered items
               const discoveredChanges = detectDiscoveredChanges(
                 prevState.discoveredItems,
                 data.game_state.discoveredItems
               );
               
-              // Detectar cambios en objetivos
               const objectivesChanges = detectObjectivesChanges(
                 prevState.questObjectives,
                 data.game_state.questObjectives
               );
               
-              // Detectar cambios en skills
               const skillsChanges = detectSkillsChanges(
                 prevState.skills,
                 data.game_state.skills
               );
               
-              // Detectar cambios en estados emocionales
               const emotionsChanges = detectEmotionsChanges(
                 prevState.emotionalStates,
                 data.game_state.emotionalStates
@@ -351,7 +427,6 @@ function App() {
               
               console.log('🎯 CHANGES DETECTED:', { inventoryChanges, discoveredChanges, objectivesChanges, skillsChanges, emotionsChanges });
               
-              // Actualizar badges si hay cambios
               if (inventoryChanges.totalCount > 0 || discoveredChanges.totalCount > 0 || objectivesChanges.totalCount > 0 || 
                   skillsChanges.totalCount > 0 || emotionsChanges.totalCount > 0) {
                 
@@ -383,11 +458,9 @@ function App() {
                   };
                   console.log('🏆 NEW BADGES STATE:', newBadges);
                   
-                  // BADGES PERSISTEN HASTA QUE SE ABRA EL MODAL
                   return newBadges;
                 });
                 
-                // Actualizar elementos NEW
                 setNewElements(prevNew => ({
                   inventory: new Set([
                     ...prevNew.inventory,
@@ -438,7 +511,7 @@ function App() {
     return () => newSocket.close();
   }, [BACKEND_URL, sessionId]);
 
-  // SISTEMA DE POLLING ÚNICO PARA BADGES (CORREGIDO - SIN DUPLICACIÓN) + DISCOVERED ITEMS
+  // SISTEMA DE POLLING ÚNICO PARA BADGES
   useEffect(() => {
     if (!sessionId) return;
     
@@ -460,14 +533,12 @@ function App() {
           setGameState(prevState => {
             if (!prevState) {
               console.log('🔄 No prevState, returning new state');
-              // 🎁 SINCRONIZAR DISCOVERED ITEMS EN PRIMER ESTADO
               if (data.game_state.discoveredItems) {
                 setDiscoveredItems(data.game_state.discoveredItems);
               }
               return data.game_state;
             }
             
-            // MEJORADO: Detectar cambios por múltiples campos, incluyendo discoveredItems
             const hasInventoryChanges = (data.game_state.inventory?.length || 0) > (prevState.inventory?.length || 0);
             const hasDiscoveredChanges = (data.game_state.discoveredItems?.length || 0) !== (prevState.discoveredItems?.length || 0);
             const hasSkillsChanges = (data.game_state.skills?.length || 0) > (prevState.skills?.length || 0);
@@ -485,12 +556,10 @@ function App() {
               
               setNarrativeVisible(true);
               
-              // 🎁 ACTUALIZAR DISCOVERED ITEMS
               if (data.game_state.discoveredItems) {
                 setDiscoveredItems(data.game_state.discoveredItems);
               }
               
-              // DETECTAR CAMBIOS ESPECÍFICOS PARA BADGES
               const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
               const discoveredChanges = detectDiscoveredChanges(prevState.discoveredItems, data.game_state.discoveredItems);
               const objectivesChanges = detectObjectivesChanges(prevState.questObjectives, data.game_state.questObjectives);
@@ -519,11 +588,9 @@ function App() {
                     emotions: { count: prev.emotions.count + emotionsChanges.totalCount, significantChanges: [...prev.emotions.significantChanges, ...emotionsChanges.significantChanges] }
                   };
                   
-                  // BADGES PERSISTEN HASTA QUE SE ABRA EL MODAL
                   return newBadges;
                 });
                 
-                // Actualizar elementos NEW
                 setNewElements(prevNew => ({
                   inventory: new Set([
                     ...prevNew.inventory,
@@ -570,13 +637,12 @@ function App() {
     };
   }, [sessionId, BACKEND_URL]);
 
-  // Start new session - SOLUCION DEFINITIVA CON DEBUGGING COMPLETO
+  // Start new session
   const startNewSession = async (selectedMode = mode, campaignName, sandboxConcept) => {
     setLoading(true);
     setError(null);
     setGameOver(false);
     
-    // 🔥 DEBUGGING COMPLETO OBLIGATORIO
     console.log('🚀 INICIANDO NUEVA SESIÓN:', {
       selectedMode,
       campaignName,
@@ -585,13 +651,12 @@ function App() {
       fullEndpoint: `${BACKEND_URL}/api/start_session`
     });
     
-    // Reset badges y elementos new
     setBadges({
-      inventory: { count: 0, newItems: [], removedItems: [] }, // CORREGIDO: incluir removedItems
+      inventory: { count: 0, newItems: [], removedItems: [] },
       objectives: { count: 0, newObjectives: [], completedObjectives: [] },
       skills: { count: 0, newSkills: [], levelUps: [] },
       emotions: { count: 0, significantChanges: [] },
-      discovered: { count: 0, newItems: [] } // NUEVO: reset discovered badge
+      discovered: { count: 0, newItems: [] }
     });
     
     setNewElements({
@@ -599,10 +664,9 @@ function App() {
       objectives: new Set(),
       skills: new Set(),
       emotions: new Set(),
-      discovered: new Set() // NUEVO: reset discovered elements
+      discovered: new Set()
     });
     
-    // 🎁 RESET DISCOVERED ITEMS
     setDiscoveredItems([]);
     
     try {
@@ -621,7 +685,6 @@ function App() {
         requestBody.sandboxConcept = sandboxConcept;
       }
       
-      // Verificar que la URL no esté undefined
       if (!BACKEND_URL) {
         throw new Error('BACKEND_URL está undefined - revisar .env');
       }
@@ -630,22 +693,18 @@ function App() {
       console.log('📤 Haciendo fetch a:', endpoint);
       console.log('📦 Enviando body:', requestBody);
 
-      // 📱 CONFIGURACIÓN MEJORADA PARA MÓVILES
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-          'Accept': 'application/json'
         },
         body: JSON.stringify(requestBody),
         signal: controller.signal,
-        // Configuración adicional para móviles
         mode: 'cors',
-        credentials: 'omit', // Simplificar para móviles
+        credentials: 'omit',
         keepalive: false
       });
 
@@ -672,7 +731,10 @@ function App() {
       setShowSandboxForm(false);
       setNarrativeVisible(true);
       
-      // 🎁 INICIALIZAR DISCOVERED ITEMS
+      // 🖼️ ESTABLECER IMAGEN INICIAL
+      const initialImage = getContextualImage(data.game_state.location, data.game_state.narrativeLog?.[0]?.narrative);
+      setSceneImage(initialImage);
+      
       if (data.game_state.discoveredItems) {
         setDiscoveredItems(data.game_state.discoveredItems);
       }
@@ -701,7 +763,6 @@ function App() {
         }
       });
       
-      // 📱 MENSAJES DE ERROR ESPECÍFICOS PARA MÓVILES
       let errorMessage = 'Error al iniciar sesión';
       
       if (err.name === 'AbortError') {
@@ -722,14 +783,13 @@ function App() {
     }
   };
 
-  // Submit action - SOLUCION DEFINITIVA CON DEBUGGING COMPLETO
+  // Submit action
   const submitAction = useCallback(async (actionText) => {
     if (!sessionId || loading || gameOver) return;
 
     setLoading(true);
     setError(null);
 
-    // 🔥 DEBUGGING COMPLETO OBLIGATORIO
     console.log('🚀 INICIANDO ENVÍO DE ACCIÓN:', {
       actionText,
       sessionId,
@@ -740,7 +800,6 @@ function App() {
     try {
       const endpoint = `${BACKEND_URL}/api/free_input`;
       
-      // Verificar que la URL no esté undefined
       if (!BACKEND_URL) {
         throw new Error('BACKEND_URL está undefined - revisar .env');
       }
@@ -776,9 +835,17 @@ function App() {
         setGameState(data.game_state);
         setNarrativeVisible(true);
         
-        // 🎁 ACTUALIZAR DISCOVERED ITEMS
+        // 🖼️ ACTUALIZAR IMAGEN CONTEXTUAL
+        const newImage = getContextualImage(data.game_state.location, data.game_state.narrativeLog?.[data.game_state.narrativeLog.length - 1]?.narrative);
+        if (newImage !== sceneImage) {
+          setSceneImage(newImage);
+        }
+        
         if (data.game_state.discoveredItems) {
+          console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
           setDiscoveredItems(data.game_state.discoveredItems);
+        } else {
+          console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
         }
         
         if (data.suggested_actions) {
@@ -806,7 +873,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [sessionId, loading, gameOver, BACKEND_URL]);
+  }, [sessionId, loading, gameOver, BACKEND_URL, sceneImage]);
 
   const handleSuggestedAction = useCallback((suggestedAction) => {
     submitAction(suggestedAction);
@@ -837,7 +904,6 @@ function App() {
     forceBlurAll();
     setShowObjectives(!showObjectives);
     if (!showObjectives) {
-      // Reset badge al abrir
       setBadges(prev => ({ ...prev, objectives: { count: 0, newObjectives: [], completedObjectives: [] } }));
     }
   };
@@ -848,8 +914,7 @@ function App() {
     forceBlurAll();
     setShowInventory(!showInventory);
     if (!showInventory) {
-      // Reset badge al abrir
-      setBadges(prev => ({ ...prev, inventory: { count: 0, newItems: [], removedItems: [] } })); // CORREGIDO: reset removedItems también
+      setBadges(prev => ({ ...prev, inventory: { count: 0, newItems: [], removedItems: [] } }));
     }
   };
 
@@ -859,7 +924,6 @@ function App() {
     forceBlurAll();
     setShowSkills(!showSkills);
     if (!showSkills) {
-      // Reset badge al abrir
       setBadges(prev => ({ ...prev, skills: { count: 0, newSkills: [], levelUps: [] } }));
     }
   };
@@ -870,7 +934,6 @@ function App() {
     forceBlurAll();
     setShowEmotionsModal(!showEmotionsModal);
     if (!showEmotionsModal) {
-      // Reset badge al abrir
       setBadges(prev => ({ ...prev, emotions: { count: 0, significantChanges: [] } }));
     }
   };
@@ -892,14 +955,12 @@ function App() {
     }
   };
 
-  // 🎁 NUEVO: Toggle discovered items modal
   const toggleDiscoveredItems = (e) => {
     e.preventDefault();
     e.stopPropagation();
     forceBlurAll();
     setShowDiscoveredItems(!showDiscoveredItems);
     if (!showDiscoveredItems) {
-      // Reset badge al abrir
       setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
     }
   };
@@ -927,1061 +988,630 @@ function App() {
     if (actionLower.includes('huir') || actionLower.includes('escapar')) return '🏃';
     if (actionLower.includes('buscar') || actionLower.includes('examinar') || actionLower.includes('observar')) return '👁️';
     if (actionLower.includes('hablar') || actionLower.includes('conversar')) return '🗣️';
-    if (actionLower.includes('defender') || actionLower.includes('proteger')) return '🛡️';
-    if (actionLower.includes('usar') || actionLower.includes('activar')) return '🎒';
-    if (actionLower.includes('preparar') || actionLower.includes('ritual')) return '📿';
-    if (actionLower.includes('salir') || actionLower.includes('moverse')) return '🚪';
+    if (actionLower.includes('usar') || actionLower.includes('utilizar')) return '🛠️';
+    if (actionLower.includes('abrir') || actionLower.includes('entrar')) return '🚪';
+    if (actionLower.includes('explorar') || actionLower.includes('investigar')) return '🔍';
     return '⚡';
   };
 
-  const getEmotionIcon = (emotion) => {
-    const icons = {
-      miedo: '😰', alerta: '⚠️', euforia: '😄', fatiga: '😴', 
-      ira: '😡', serenidad: '😌'
-    };
-    return icons[emotion] || '😐';
-  };
-
-  const getSkillIcon = (skill) => {
-    const skillName = safeStringify(skill?.id || skill, '').toLowerCase();
-    if (!skillName) return '✨';
-    
-    if (skillName.includes('exorcismo')) return '🔥';
-    if (skillName.includes('percep')) return '⚡';
+  const getSkillIcon = (skillName) => {
+    if (!skillName || typeof skillName !== 'string') return '⭐';
     if (skillName.includes('combate')) return '⚔️';
     if (skillName.includes('magia')) return '🔮';
+    if (skillName.includes('stealth')) return '🥷';
     if (skillName.includes('social')) return '🗣️';
     return '✨';
   };
 
-  // Canvas
-  const IntegratedCanvas = () => {
-    const canvasRef = useRef(null);
-    
-    useEffect(() => {
-      if (canvasRef.current && gameState) {
-        const ctx = canvasRef.current.getContext('2d');
-        const canvas = canvasRef.current;
-        
-        const container = canvas.parentElement;
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
-        
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#8C5E2A');
-        gradient.addColorStop(1, '#5B3A1D');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = '#F3E7C6';
-        ctx.font = 'bold 24px Cinzel';
-        ctx.textAlign = 'center';
-        ctx.fillText(
-          `🖼️ ILUSTRACIÓN AI: ${safeStringify(gameState.location, 'Ubicación Desconocida')}`,
-          canvas.width / 2,
-          canvas.height / 2 - 15
-        );
-        
-        ctx.font = '16px Cormorant Garamond';
-        ctx.fillText(
-          `Modo: ${safeStringify(gameState.mode, 'RPG')} ${loading ? '(Generando...)' : ''}`,
-          canvas.width / 2,
-          canvas.height / 2 + 15
-        );
-      }
-    }, [gameState, loading]);
-
-    const latestEntry = gameState?.narrativeLog?.slice(-1)[0];
-
+  // 🎮 LAYOUT PRINCIPAL COMPLETO CON TODO FUNCIONANDO
+  const EnhancedNarrativeSection = () => {
     return (
-      <div className="integrated-canvas-container">
-        <canvas 
-          ref={canvasRef} 
-          className="ai-canvas" 
-        />
+      <div className="flex flex-col h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
         
-        {narrativeVisible && latestEntry && (
-          <div className="narrative-overlay">
-            <div className="narrative-title">
-              📜 {gameState.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}
-            </div>
-            <div className="narrative-preview">
-              <strong>▶ {safeStringify(latestEntry.player_action, 'Acción del jugador')}</strong>
-            </div>
-            <div className="narrative-preview">
-              {(() => {
-                const narrative = safeStringify(latestEntry.narrative, '');
-                return narrative.length > 120 
-                  ? narrative.substring(0, 120) + '...' 
-                  : narrative;
-              })()}
-            </div>
-            <div className="narrative-hint">
-              Click en 📜 para ver historia completa
-            </div>
-          </div>
-        )}
-        
-        {/* 🎁 NUEVO: Mostrar discovered items como overlay */}
-        {discoveredItems.length > 0 && (
-          <div className="discovered-items-overlay">
-            <div className="discovered-items-title">
-              🎁 Items Descubiertos ({discoveredItems.length})
-            </div>
-            <div className="discovered-items-grid">
-              {discoveredItems.slice(0, 3).map((item, index) => { // Mostrar máximo 3
-                const isNew = isElementNew('discovered', item?.instanceId || item?.name || JSON.stringify(item));
-                return (
-                  <button
-                    key={item.instanceId || index}
-                    className={`discovered-item-card clickable ${isNew ? 'new-item' : ''} ${pickupLoading === item.instanceId ? 'loading' : ''}`}
-                    onClick={() => pickupItem(item)}
-                    disabled={pickupLoading === item.instanceId}
-                    title={`Recoger ${item.name}`}
-                  >
-                    <div className="item-icon">{item.icon || '📦'}</div>
-                    <div className="item-name">{safeStringify(item.name, 'Item')}</div>
-                    {isNew && <div className="new-indicator">NEW!</div>}
-                    {pickupLoading === item.instanceId && <div className="pickup-loading">...</div>}
-                  </button>
-                );
-              })}
-              {discoveredItems.length > 3 && (
-                <button className="more-items-button clickable" onClick={toggleDiscoveredItems}>
-                  +{discoveredItems.length - 3} más
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-        
-        {gameState?.narrativeLog?.length > 0 && (
-          <button 
-            className="narrative-smart-toggle clickable"
-            onClick={toggleNarrativeVisible}
-            title={narrativeVisible ? "Ver historia completa" : "Mostrar resumen"}
-          >
-            📜
-          </button>
-        )}
-        
-        {loading && (
-          <div className="loading-indicator">
-            🎨 Generando respuesta...
-          </div>
-        )}
-      </div>
-    );
-  };
+        {/* HEADER RESPONSIVO: MINIMALISTA MÓVIL + COMPLETO DESKTOP */}
+        <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
-  // Header
-  const CompactHeader = () => {
-    const vitals = gameState?.vitals || { health: 85, mana: 60, stamina: 80 };
-    
-    return (
-      <header className="compact-header">
-        <div className="header-left">
-          <h1 className="header-title">
-            <span className="mobile-ultra-compact">
-              HELLBOUND | ❤️{vitals.health} 🔮{vitals.mana} ● {connectionStatus === 'connected' ? 'On' : 'Off'}
-            </span>
-            <span className="desktop-full">
-              🔥 HELLBOUND RPG v2.0
-            </span>
-          </h1>
+        {/* MAIN CON SCROLL CONTENIDO - SIN INPUT DENTRO */}
+        <main className="flex-1 overflow-y-auto px-4 space-y-4">
           
-          {gameState?.location && (
-            <div className="header-location">
-              <span>📍</span>
-              <span>{safeStringify(gameState.location, '')}</span>
+          {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
+          <div
+            className="w-full aspect-[16/9] rounded-xl bg-center bg-cover shadow-lg"
+            style={{ backgroundImage: `url(${sceneImage})` }}
+          />
+
+          {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
+          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
+            {gameState?.narrativeLog?.length === 0 ? (
+              <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
+                Tu aventura está a punto de comenzar...
+              </div>
+            ) : (
+              gameState?.narrativeLog?.map((entry, index) => (
+                <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                  {/* ACCIÓN DEL JUGADOR */}
+                  <div className="mb-2">
+                    <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                      <span className="text-lg">▶️</span>
+                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                    </p>
+                  </div>
+                  
+                  {/* NARRATIVA DEL JUEGO */}
+                  <div className="mb-3">
+                    <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                      {safeStringify(entry.narrative, 'Narrativa del juego')}
+                    </p>
+                  </div>
+
+                  {/* CHIPS DE ACCIÓN INLINE (Solo en última entrada) */}
+                  {index === gameState.narrativeLog.length - 1 && suggestedActions.length > 0 && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {suggestedActions.map((action, actionIndex) => (
+                        <button
+                          key={actionIndex}
+                          onClick={() => handleInlineAction(action)}
+                          disabled={loading || gameOver}
+                          className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[var(--imperial-gold)]/10 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] font-medium transition-all duration-200 hover:scale-105 active:scale-95 border border-[var(--imperial-gold)]/30"
+                        >
+                          <span>{getActionIcon(action)}</span>
+                          <span>{action}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+            <div ref={narrativeRef} />
+          </article>
+
+          {/* 🎁 DISCOVERED ITEMS - CON BOTONES RECOGER/DEJAR */}
+          {discoveredItems.length > 0 && (
+            <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
+              <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
+                🎁 Items Descubiertos
+              </h3>
+              <div className="space-y-3">
+                {discoveredItems.map((item, index) => (
+                  <div
+                    key={item.instanceId || index}
+                    className="p-4 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* ICONO Y INFO DEL ITEM */}
+                      <div className="text-3xl">{item.icon || '📦'}</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-[var(--cedar-brown)]">
+                          {item.name || 'Item Misterioso'}
+                        </div>
+                        <div className="text-xs text-[var(--cedar-brown)]/70">
+                          {item.description || 'Un objeto encontrado durante tu exploración'}
+                        </div>
+                      </div>
+                      
+                      {/* BOTONES RECOGER/DEJAR */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => pickupItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          {pickupLoading === item.instanceId ? 'Recogiendo...' : '✋ Recoger'}
+                        </button>
+                        <button
+                          onClick={() => ignoreItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--cedar-brown)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--cedar-brown)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          🚫 Dejar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </div>
-        
-        <div className="header-stats-real-horizontal desktop-only">
-          <div className="stats-row">
-            <div className="stat-item">
-              <span className="stat-icon">❤️</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill health"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.health))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.health}</span>
-            </div>
-            
-            <div className="stat-item">
-              <span className="stat-icon">🔮</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill mana"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.mana))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.mana}</span>
-            </div>
-            
-            <div className="stat-item">
-              <span className="stat-icon">⚡</span>
-              <div className="stat-bar-inline">
-                <div 
-                  className="stat-fill stamina"
-                  style={{ width: `${Math.max(0, Math.min(100, vitals.stamina || 80))}%` }}
-                />
-              </div>
-              <span className="stat-text">{vitals.stamina || 80}</span>
-            </div>
-            
-            <div className="connection-item">
-              <div className={`status-dot ${connectionStatus === 'connected' ? 'connected' : ''}`} />
-              <span className="status-text">Conectado</span>
-            </div>
-          </div>
-        </div>
-      </header>
+
+        </main>
+      </div>
     );
   };
 
-  // Desktop Actions
-  const DesktopActionsSection = () => (
-    <div className="desktop-actions-top">
-      <div className="actions-label">Acciones Sugeridas:</div>
-      <div className="actions-buttons">
-        {suggestedActions.length === 0 ? (
-          <div className="no-actions-text">
-            Las acciones aparecerán aquí según el contexto...
-          </div>
-        ) : (
-          suggestedActions.map((suggestedAction, index) => (
-            <button
-              key={index}
-              onClick={() => handleSuggestedAction(suggestedAction)}
-              disabled={loading || gameOver}
-              className="desktop-action-full clickable"
-            >
-              <span>{getActionIcon(suggestedAction)}</span>
-              <span>{safeStringify(suggestedAction, 'Acción')}</span>
-            </button>
-          ))
-        )}
-      </div>
-    </div>
-  );
-
-  // Mobile Actions
-  const MobileActionsPanel = () => (
-    <div className="mobile-actions-panel">
-      <div className="mobile-actions-scroll">
-        {suggestedActions.length === 0 ? (
-          <div className="no-actions-text">
-            Las acciones aparecerán aquí...
-          </div>
-        ) : (
-          suggestedActions.map((suggestedAction, index) => (
-            <button
-              key={index}
-              onClick={() => handleSuggestedAction(suggestedAction)}
-              disabled={loading || gameOver}
-              className="mobile-action-with-text clickable"
-            >
-              <span>{getActionIcon(suggestedAction)}</span>
-              <span>{safeStringify(suggestedAction, 'Acción')}</span>
-            </button>
-          ))
-        )}
-      </div>
-    </div>
-  );
-
-  // BARRA POPUPS CON BADGES VIVOS - CORREGIDO CON CSS INLINE + DISCOVERED ITEMS
-  const PopupsBar = () => (
-    <div className="popups-bar">
-      <button 
-        className="popup-button clickable"
-        onClick={toggleInventory}
-        aria-label="Inventario"
-        style={{ position: 'relative' }}
-      >
-        📦
-        <span className="popup-label">Inv.</span>
-        {/* BADGE INVENTARIO: CSS inline funcionando */}
-        {badges.inventory.count > 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#dc2626',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            animation: 'pulse 2s infinite'
-          }}>
-            {badges.inventory.count}
-          </div>
-        ) : null}
-      </button>
-      
-      {/* 🎁 NUEVO: Botón discovered items */}
-      <button 
-        className="popup-button clickable"
-        onClick={toggleDiscoveredItems}
-        aria-label="Items Descubiertos"
-        style={{ position: 'relative' }}
-      >
-        🎁
-        <span className="popup-label">Items</span>
-        {/* BADGE DISCOVERED: CSS inline funcionando */}
-        {badges.discovered.count > 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#f59e0b',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            animation: 'pulse 2s infinite'
-          }}>
-            {badges.discovered.count}
-          </div>
-        ) : null}
-        {/* Mostrar badge también si hay items sin recoger */}
-        {discoveredItems.length > 0 && badges.discovered.count === 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#10b981',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10
-          }}>
-            {discoveredItems.length}
-          </div>
-        ) : null}
-      </button>
-      
-      <button 
-        className="popup-button clickable"
-        onClick={toggleObjectives}
-        aria-label="Objetivos"
-        style={{ position: 'relative' }}
-      >
-        🎯
-        <span className="popup-label">Obj.</span>
-        {/* BADGE OBJETIVOS: CSS inline funcionando */}
-        {badges.objectives.count > 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#dc2626',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            animation: 'pulse 2s infinite'
-          }}>
-            {badges.objectives.count}
-          </div>
-        ) : null}
-      </button>
-      
-      <button 
-        className="popup-button clickable"
-        onClick={toggleSkills}
-        aria-label="Habilidades"
-        style={{ position: 'relative' }}
-      >
-        📚
-        <span className="popup-label">Skills</span>
-        {/* BADGE SKILLS: CORREGIDO - CSS inline */}
-        {badges.skills.count > 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#dc2626',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            animation: 'pulse 2s infinite'
-          }}>
-            {badges.skills.count}
-          </div>
-        ) : null}
-      </button>
-      
-      <button 
-        className="popup-button clickable"
-        onClick={toggleEmotionsModal}
-        aria-label="Estados"
-        style={{ position: 'relative' }}
-      >
-        😌
-        <span className="popup-label">Estados</span>
-        {/* BADGE EMOTIONS: CORREGIDO - CSS inline */}
-        {badges.emotions.count > 0 ? (
-          <div style={{
-            position: 'absolute',
-            top: '-8px', 
-            right: '-8px',
-            background: '#dc2626',
-            color: 'white',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            animation: 'pulse 2s infinite'
-          }}>
-            {badges.emotions.count}
-          </div>
-        ) : null}
-      </button>
-    </div>
-  );
-
-  // Controls Bar
-  const ControlsBar = () => (
-    <div className="controls-bar">
-      <div className="controls-content-clean">
-        <StoryInput 
-          
-          onSubmit={submitAction}
-          loading={loading}
-          gameOver={gameOver}
-        />
-        
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            const form = e.target.closest('.controls-bar').querySelector('form');
-            if (form) {
-              form.requestSubmit();
-            }
-          }}
-          disabled={loading || gameOver}
-          className="actuar-button clickable"
-        >
-          {loading ? '...' : 'ACTUAR'}
-        </button>
-        
-        <div className="desktop-only desktop-popups-only">
-          <PopupsBar />
+  // Game Over screen
+  if (gameOver) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-900 to-black flex items-center justify-center">
+        <div className="game-over-container">
+          <h1 className="game-over-title">GAME OVER</h1>
+          <p className="game-over-text">
+            Tu aventura ha llegado a su fin. Las decisiones tienen consecuencias...
+          </p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="campaign-button"
+          >
+            Reiniciar Aventura
+          </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  // MODAL SKILLS CON BADGES Y ELEMENTOS NEW
-  const SkillsModal = () => {
-    const skills = gameState?.skills || [];
-    const [activeTab, setActiveTab] = useState('activas');
-
-    const categorizedSkills = {
-      activas: skills.filter(skill => {
-        const category = skill?.category || skill?.type;
-        return category === 'activa' || category === 'active' || !category;
-      }),
-      magia: skills.filter(skill => {
-        const category = skill?.category || skill?.type;
-        return category === 'magia' || category === 'magic';
-      }),
-      pasivas: skills.filter(skill => {
-        const category = skill?.category || skill?.type;
-        return category === 'pasiva' || category === 'passive';
-      })
-    };
-
-    const tabs = [
-      { id: 'activas', label: 'Activas', skills: categorizedSkills.activas },
-      { id: 'magia', label: 'Magia', skills: categorizedSkills.magia },
-      { id: 'pasivas', label: 'Pasivas', skills: categorizedSkills.pasivas }
-    ];
-
-    const currentSkills = categorizedSkills[activeTab] || [];
-
+  // Loading states
+  if (loading && !gameState) {
     return (
-      <>
-        <div 
-          className={`modal-overlay ${showSkills ? 'show' : ''}`}
-          onClick={() => setShowSkills(false)}
-        />
-        <div className={`popup-modal skills-popup ${showSkills ? 'show' : ''}`}>
-          <div className="modal-header">
-            <span>📚 Habilidades</span>
+      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center">
+        <div className="loading-indicator">
+          Cargando tu aventura...
+        </div>
+      </div>
+    );
+  }
+
+  // Mode selection screen - NUEVO DISEÑO PROFESIONAL EN ESPAÑOL
+  if (!mode) {
+    return <WelcomeScreen onSelect={handleModeSelect} />;
+  }
+
+  // Sandbox form - NUEVO COMPONENTE EN ESPAÑOL
+  if (showSandboxForm && mode === 'sandbox') {
+    return (
+      <SandboxForm 
+        onSubmit={handleSandboxSubmit}
+        loading={loading}
+        onBack={handleBackToModeSelection}
+      />
+    );
+  }
+
+  // Main game screen - LAYOUT COMPLETO CON TODO FUNCIONAL
+  if (gameState) {
+    return (
+      <div className="flex flex-col h-screen">
+        {/* HEADER RESPONSIVO */}
+        <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
+
+        {/* MAIN CON SCROLL CONTENIDO */}
+        <main className="flex-1 overflow-y-auto px-4 space-y-4">
+          
+          {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
+          <div
+            className="w-full aspect-[16/9] rounded-xl bg-center bg-cover shadow-lg"
+            style={{ backgroundImage: `url(${sceneImage})` }}
+          />
+
+          {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
+          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
+            {gameState?.narrativeLog?.length === 0 ? (
+              <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
+                Tu aventura está a punto de comenzar...
+              </div>
+            ) : (
+              gameState?.narrativeLog?.map((entry, index) => (
+                <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                  {/* ACCIÓN DEL JUGADOR */}
+                  <div className="mb-2">
+                    <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                      <span className="text-lg">▶️</span>
+                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                    </p>
+                  </div>
+                  
+                  {/* NARRATIVA DEL JUEGO */}
+                  <div className="mb-3">
+                    <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                      {safeStringify(entry.narrative, 'Narrativa del juego')}
+                    </p>
+                  </div>
+
+                  {/* CHIPS DE ACCIÓN INLINE (Solo en última entrada) */}
+                  {index === gameState.narrativeLog.length - 1 && suggestedActions.length > 0 && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {suggestedActions.map((action, actionIndex) => (
+                        <button
+                          key={actionIndex}
+                          onClick={() => handleInlineAction(action)}
+                          disabled={loading || gameOver}
+                          className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[var(--imperial-gold)]/10 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] font-medium transition-all duration-200 hover:scale-105 active:scale-95 border border-[var(--imperial-gold)]/30"
+                        >
+                          <span>{getActionIcon(action)}</span>
+                          <span>{action}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+            <div ref={narrativeRef} />
+          </article>
+
+          {/* 🎁 DISCOVERED ITEMS - CON BOTONES RECOGER/DEJAR */}
+          {discoveredItems.length > 0 && (
+            <div className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl">
+              <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
+                🎁 Items Descubiertos
+              </h3>
+              <div className="space-y-3">
+                {discoveredItems.map((item, index) => (
+                  <div
+                    key={item.instanceId || index}
+                    className="p-4 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* ICONO Y INFO DEL ITEM */}
+                      <div className="text-3xl">{item.icon || '📦'}</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-[var(--cedar-brown)]">
+                          {item.name || 'Item Misterioso'}
+                        </div>
+                        <div className="text-xs text-[var(--cedar-brown)]/70">
+                          {item.description || 'Un objeto encontrado durante tu exploración'}
+                        </div>
+                      </div>
+                      
+                      {/* BOTONES RECOGER/DEJAR */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => pickupItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          {pickupLoading === item.instanceId ? 'Recogiendo...' : '✋ Recoger'}
+                        </button>
+                        <button
+                          onClick={() => ignoreItem(item)}
+                          disabled={pickupLoading === item.instanceId}
+                          className="px-4 py-2 bg-[var(--cedar-brown)] text-[var(--creamy-old)] font-bold rounded-lg 
+                                     hover:bg-[var(--cedar-brown)]/80 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-sm"
+                        >
+                          🚫 Dejar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </main>
+
+        {/* INPUT FIELD FIJO FUERA DEL SCROLL - CRÍTICO */}
+        <div className="flex-shrink-0 p-4 bg-[var(--creamy-old)]/90 border-t border-[var(--imperial-gold)]/50">
+          <StoryInput
+            onSubmit={submitAction}
+            loading={loading}
+            gameOver={gameOver}
+            placeholder="Escribe tu acción..."
+          />
+        </div>
+
+        {/* FOOTER FIJO CON NAVIGATION - CRÍTICO */}
+        <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
+          <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
             <button 
-              className="modal-close clickable" 
-              onClick={() => setShowSkills(false)}
-              type="button"
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors relative"
+              onClick={toggleInventory}
             >
-              ✕
+              {badges.inventory.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.inventory.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">inventory</span>
+              <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleSkills}
+            >
+              {badges.skills.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.skills.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">school</span>
+              <span className="text-xs font-medium">Habilidades</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleObjectives}
+            >
+              {badges.objectives.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.objectives.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">flag</span>
+              <span className="text-xs font-medium">Objetivos</span>
+            </button>
+            <button 
+              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              onClick={toggleEmotionsModal}
+            >
+              {badges.emotions.count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                  {badges.emotions.count}
+                </span>
+              )}
+              <span className="material-icons text-2xl">mood</span>
+              <span className="text-xs font-medium">Estados</span>
+            </button>
+          </nav>
+          <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
+        </footer>
+
+        {/* Error display */}
+        {error && (
+          <div className="error-display">
+            {error}
+            <button 
+              onClick={() => setError(null)}
+              className="ml-2 text-sm underline"
+            >
+              Cerrar
             </button>
           </div>
-          
-          <div className="skills-tabs">
-            {tabs.map(tab => {
-              const hasNewSkills = tab.skills.some(skill => 
-                isElementNew('skills', skill?.id || skill?.name || JSON.stringify(skill))
-              );
-              
-              return (
-                <button
-                  key={tab.id}
-                  className={`skill-tab ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  {tab.label}
-                  {tab.skills.length > 0 && (
-                    <span className="tab-count">({tab.skills.length})</span>
-                  )}
-                  {hasNewSkills && <span className="tab-new-indicator">●</span>}
-                </button>
-              );
-            })}
+        )}
+
+        {/* Loading indicator */}
+        {loading && (
+          <div className="loading-indicator">
+            Procesando...
           </div>
-          
+        )}
+
+        {/* TODOS LOS MODALES RESTAURADOS */}
+        {/* Inventory Modal */}
+        <div className={`popup-modal inventory-popup ${showInventory ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>📦 Inventario ({gameState.inventory?.length || 0})</span>
+            <button onClick={toggleInventory} className="modal-close">×</button>
+          </div>
           <div className="modal-content">
-            {currentSkills.length === 0 ? (
-              <p className="no-skills-message">
-                No tienes habilidades {activeTab} aún.
-              </p>
+            {gameState.inventory?.length > 0 ? (
+              <div className="inventory-grid">
+                {gameState.inventory.map((item, index) => {
+                  const itemId = item?.id || item?.name || JSON.stringify(item);
+                  const isNew = isElementNew('inventory', itemId);
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className={`inventory-slot ${isNew ? 'animate-pulse bg-green-100' : ''}`}
+                      onClick={() => isNew && markElementSeen('inventory', itemId)}
+                    >
+                      {isNew && <span className="absolute top-1 right-1 text-xs bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">!</span>}
+                      <div className="slot-icon">{item?.icon || '📦'}</div>
+                      <div className="slot-name">{safeStringify(item?.name, 'Item')}</div>
+                    </div>
+                  );
+                })}
+                {Array.from({ length: Math.max(0, 12 - (gameState.inventory?.length || 0)) }).map((_, index) => (
+                  <div key={`empty-${index}`} className="inventory-slot empty">
+                    <div className="slot-icon">⬜</div>
+                    <div className="slot-name">Vacío</div>
+                  </div>
+                ))}
+              </div>
             ) : (
+              <div className="no-skills-message">Tu inventario está vacío</div>
+            )}
+          </div>
+        </div>
+
+        {/* Skills Modal */}
+        <div className={`popup-modal skills-popup ${showSkills ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>⭐ Habilidades ({gameState.skills?.length || 0})</span>
+            <button onClick={toggleSkills} className="modal-close">×</button>
+          </div>
+          <div className="modal-content">
+            {gameState.skills?.length > 0 ? (
               <div className="skills-detailed-list">
-                {currentSkills.map((skill, index) => {
+                {gameState.skills.map((skill, index) => {
                   const skillId = skill?.id || skill?.name || JSON.stringify(skill);
                   const isNew = isElementNew('skills', skillId);
                   const isLevelUp = isElementNew('skills', `${skillId}-levelup`);
                   
                   return (
                     <div 
-                      key={skillId || index} 
-                      className={`skill-detailed-item ${isNew || isLevelUp ? 'highlight-new' : ''}`}
+                      key={index} 
+                      className={`skill-detailed-item ${(isNew || isLevelUp) ? 'animate-pulse bg-blue-100' : ''}`}
                       onClick={() => {
                         if (isNew) markElementSeen('skills', skillId);
                         if (isLevelUp) markElementSeen('skills', `${skillId}-levelup`);
                       }}
                     >
-                      <div className="skill-icon-large">{getSkillIcon(skill)}</div>
+                      {(isNew || isLevelUp) && <span className="absolute top-2 right-2 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center">{isLevelUp ? '↗' : '!'}</span>}
+                      <div className="skill-icon-large">{getSkillIcon(skill?.id || skill?.name)}</div>
                       <div className="skill-detailed-info">
                         <div className="skill-detailed-name">
-                          {safeStringify(skill?.id || skill, 'Habilidad')}
-                          {isNew && <span className="new-badge fade-in">NEW</span>}
-                          {isLevelUp && <span className="levelup-badge fade-in">LEVEL UP!</span>}
+                          {safeStringify(skill?.id || skill?.name, 'Habilidad')}
+                          {isLevelUp && <span className="text-yellow-500 text-sm ml-1">LEVEL UP!</span>}
                         </div>
-                        {skill?.level && (
-                          <div className="skill-detailed-level">Nivel {skill.level}</div>
-                        )}
-                        {skill?.description && (
-                          <div className="skill-detailed-desc">{safeStringify(skill.description, '')}</div>
-                        )}
-                        {skill?.effects && (
-                          <div className="skill-effects">
-                            Efectos: {safeStringify(skill.effects, '')}
-                          </div>
-                        )}
+                        <div className="skill-detailed-level">Nivel {skill?.level || 1}</div>
+                        <div className="skill-detailed-desc">{safeStringify(skill?.description, 'Habilidad misteriosa')}</div>
+                        <div className="skill-effects">Tags: {skill?.tags?.join(', ') || 'Ninguno'}</div>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            ) : (
+              <div className="no-skills-message">Aún no has desarrollado habilidades específicas</div>
             )}
           </div>
         </div>
-      </>
-    );
-  };
 
-  // MODAL ESTADOS CON CAMBIOS SIGNIFICATIVOS
-  const EmotionsModal = () => {
-    const emotionalStates = gameState?.emotionalStates || {};
-    const allEmotions = [
-      'serenidad', 'alerta', 'miedo', 'euforia', 'fatiga', 'ira'
-    ];
-
-    return (
-      <>
-        <div 
-          className={`modal-overlay ${showEmotionsModal ? 'show' : ''}`}
-          onClick={() => setShowEmotionsModal(false)}
-        />
-        <div className={`popup-modal ${showEmotionsModal ? 'show' : ''}`}>
-          <div className="modal-header">
-            <span>😌 Estados Mentales</span>
-            <button 
-              className="modal-close clickable" 
-              onClick={() => setShowEmotionsModal(false)}
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="modal-content">
-            <div className="emotions-list">
-              {allEmotions.map((emotion) => {
-                const value = emotionalStates[emotion] || 0;
-                const hasRecentChange = isElementNew('emotions', emotion);
-                
-                return (
-                  <div 
-                    key={emotion} 
-                    className={`emotion-row ${hasRecentChange ? 'highlight-change' : ''}`}
-                    onClick={() => hasRecentChange && markElementSeen('emotions', emotion)}
-                  >
-                    <div className="emotion-icon">{getEmotionIcon(emotion)}</div>
-                    <div className="emotion-info">
-                      <div className="emotion-name">
-                        {emotion}
-                        {hasRecentChange && <span className="change-indicator fade-in">!</span>}
-                      </div>
-                      <div className="emotion-value">{Math.round(value)}%</div>
-                    </div>
-                    <div className="emotion-bar">
-                      <div 
-                        className="emotion-fill"
-                        style={{ width: `${Math.round(value)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  // MODAL OBJETIVOS CON NUEVOS Y COMPLETADOS
-  const ObjectivesModal = () => {
-    const defaultObjectives = [
-      { description: "Investigar la figura misteriosa", completed: false },
-      { description: "Encontrar a los compañeros", completed: false },
-      { description: "Explorar Alicante nevada", completed: false }
-    ];
-    
-    const objectives = gameState?.questObjectives || defaultObjectives;
-
-    return (
-      <>
-        <div 
-          className={`modal-overlay ${showObjectives ? 'show' : ''}`}
-          onClick={() => setShowObjectives(false)}
-        />
+        {/* Objectives Modal */}
         <div className={`popup-modal ${showObjectives ? 'show' : ''}`}>
           <div className="modal-header">
-            <span>🎯 Objetivos</span>
-            <button 
-              className="modal-close clickable" 
-              onClick={() => setShowObjectives(false)}
-              type="button"
-            >
-              ✕
-            </button>
+            <span>🎯 Objetivos ({gameState.questObjectives?.length || 0})</span>
+            <button onClick={toggleObjectives} className="modal-close">×</button>
           </div>
           <div className="modal-content">
-            <div className="objective-list">
-              {objectives.map((objective, index) => {
-                const objectiveId = objective?.id || objective?.description || JSON.stringify(objective);
-                const isNew = isElementNew('objectives', objectiveId);
-                
-                return (
-                  <div 
-                    key={index} 
-                    className={`objective-item ${objective.completed ? 'objective-completed' : ''} ${isNew ? 'highlight-new' : ''}`}
-                    onClick={() => isNew && markElementSeen('objectives', objectiveId)}
-                  >
-                    <span className="objective-checkbox">
-                      {objective.completed ? '☑️' : '☐'}
-                    </span>
-                    <span className="objective-text">
-                      {safeStringify(objective?.description || objective, 'Objetivo sin descripción')}
-                      {isNew && <span className="new-badge fade-in">NEW</span>}
-                      {objective.completed && isNew && <span className="completed-badge fade-in">COMPLETADO</span>}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  // MODAL INVENTARIO CON NUEVOS ITEMS
-  const InventoryModal = () => {
-    const items = gameState?.inventory || [];
-    const totalSlots = 9;
-    const emptySlots = Math.max(0, totalSlots - items.length);
-
-    return (
-      <>
-        <div 
-          className={`modal-overlay ${showInventory ? 'show' : ''}`}
-          onClick={() => setShowInventory(false)}
-        />
-        <div className={`popup-modal inventory-popup ${showInventory ? 'show' : ''}`}>
-          <div className="modal-header">
-            <span>📦 Inventario</span>
-            <button 
-              className="modal-close clickable" 
-              onClick={() => setShowInventory(false)}
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="modal-content">
-            <div className="inventory-grid">
-              {items.map((item, index) => {
-                const itemId = item?.id || item?.name || JSON.stringify(item);
-                const isNew = isElementNew('inventory', itemId);
-                
-                return (
-                  <div 
-                    key={index} 
-                    className={`inventory-slot clickable ${isNew ? 'highlight-new' : ''}`}
-                    onClick={() => isNew && markElementSeen('inventory', itemId)}
-                  >
-                    <div className="slot-icon">{item.icon || '📦'}</div>
-                    <div className="slot-name">{safeStringify(item.name, `Item ${index + 1}`)}</div>
-                    {isNew && <div className="item-new-indicator fade-in">NEW</div>}
-                  </div>
-                );
-              })}
-              {Array.from({ length: emptySlots }, (_, index) => (
-                <div key={`empty-${index}`} className="inventory-slot empty">
-                  <div className="slot-icon">+</div>
-                  <div className="slot-name">Vacío</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  // 🎁 NUEVO: Modal Discovered Items
-  const DiscoveredItemsModal = () => {
-    return (
-      <>
-        <div 
-          className={`modal-overlay ${showDiscoveredItems ? 'show' : ''}`}
-          onClick={() => setShowDiscoveredItems(false)}
-        />
-        <div className={`popup-modal discovered-popup ${showDiscoveredItems ? 'show' : ''}`}>
-          <div className="modal-header">
-            <span>🎁 Items Descubiertos ({discoveredItems.length})</span>
-            <button 
-              className="modal-close clickable" 
-              onClick={() => setShowDiscoveredItems(false)}
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="modal-content">
-            {discoveredItems.length === 0 ? (
-              <p className="no-items-message">
-                No hay items descubiertos. Usa acciones como "busco algo valioso" para encontrar tesoros.
-              </p>
-            ) : (
-              <div className="discovered-items-grid-large">
-                {discoveredItems.map((item, index) => {
-                  const isNew = isElementNew('discovered', item?.instanceId || item?.name || JSON.stringify(item));
+            {gameState.questObjectives?.length > 0 ? (
+              <div className="objective-list">
+                {gameState.questObjectives.map((objective, index) => {
+                  const objId = objective?.id || objective?.description || JSON.stringify(objective);
+                  const isNew = isElementNew('objectives', objId);
+                  const isCompleted = objective?.completed;
+                  
                   return (
                     <div 
-                      key={item.instanceId || index} 
-                      className={`discovered-item-card-large clickable ${isNew ? 'new-item' : ''} ${pickupLoading === item.instanceId ? 'loading' : ''}`}
-                      onClick={() => {
-                        if (isNew) markElementSeen('discovered', item?.instanceId || item?.name || JSON.stringify(item));
-                        pickupItem(item);
-                      }}
-                      disabled={pickupLoading === item.instanceId}
+                      key={index} 
+                      className={`objective-item ${isNew ? 'animate-pulse bg-green-100' : ''} ${isCompleted ? 'objective-completed' : ''}`}
+                      onClick={() => isNew && markElementSeen('objectives', objId)}
                     >
-                      <div className="item-icon-large">{item.icon || '📦'}</div>
-                      <div className="item-info">
-                        <div className="item-name-large">{safeStringify(item.name, 'Item Desconocido')}</div>
-                        {item.description && (
-                          <div className="item-description">{safeStringify(item.description, '')}</div>
-                        )}
-                        {item.type && (
-                          <div className="item-type">Tipo: {safeStringify(item.type, '')}</div>
-                        )}
-                        {item.contexts && item.contexts.length > 0 && (
-                          <div className="item-contexts">
-                            Contexto: {item.contexts.join(', ')}
-                          </div>
+                      {isNew && <span className="absolute top-2 right-2 text-xs bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center">!</span>}
+                      <div className="objective-checkbox">
+                        {isCompleted ? '✅' : '🎯'}
+                      </div>
+                      <div className="objective-text">
+                        <span>{safeStringify(objective?.description, 'Objetivo misterioso')}</span>
+                        {objective?.progress !== undefined && (
+                          <span className="text-sm text-gray-600 ml-2">({objective.progress}%)</span>
                         )}
                       </div>
-                      {isNew && <div className="new-indicator-large">NEW!</div>}
-                      {pickupLoading === item.instanceId ? (
-                        <div className="pickup-loading-large">Recogiendo...</div>
-                      ) : (
-                        <div className="pickup-hint">Click para recoger</div>
-                      )}
                     </div>
                   );
                 })}
               </div>
+            ) : (
+              <div className="no-skills-message">No tienes objetivos activos</div>
             )}
           </div>
         </div>
-      </>
-    );
-  };
 
-  // Modal Narrativa
-  const NarrativeModal = () => (
-    <>
-      <div 
-        className={`modal-overlay ${showNarrativeModal ? 'show' : ''}`}
-        onClick={() => setShowNarrativeModal(false)}
-      />
-      <div className={`popup-modal narrative-popup ${showNarrativeModal ? 'show' : ''}`}>
-        <div className="modal-header">
-          <span>📜 {gameState?.mode === 'sandbox' ? 'Tu Historia' : 'Crónica de la Aventura'}</span>
-          <button 
-            className="modal-close clickable" 
-            onClick={() => setShowNarrativeModal(false)}
-            type="button"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="modal-content">
-          {gameState?.narrativeLog?.length === 0 ? (
-            <p className="no-narrative-message">
-              Tu historia comienza aquí...
-            </p>
-          ) : (
-            <div className="narrative-entries">
-              {gameState?.narrativeLog?.map((entry, index) => (
-                <div key={`${entry.timestamp}-${index}`} className="narrative-entry">
-                  <p className="narrative-action">
-                    ▶ {safeStringify(entry.player_action, 'Acción del jugador')}
-                  </p>
-                  <p className="narrative-text">
-                    {safeStringify(entry.narrative, 'Narrativa')}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
-
-  // Components para pantallas de inicio
-  const CampaignButton = ({ onClick, disabled, loading, children }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="campaign-button clickable"
-    >
-      {loading ? 'Iniciando...' : children}
-    </button>
-  );
-
-  const SandboxConceptForm = ({ onSubmit, loading }) => {
-    const [concept, setConcept] = useState('');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (concept.trim() && !loading) {
-        onSubmit(concept.trim());
-      }
-    };
-
-    return (
-      <div className="app-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ maxWidth: '500px', width: '100%', padding: 'var(--space-lg)' }}>
-          <div className="sandbox-form-container">
-            <h2 className="sandbox-title">
-              Modo Sandbox - Historia Libre
-            </h2>
-            <p className="sandbox-subtitle">
-              Describe la historia que quieres vivir.
-            </p>
-            
-            <form onSubmit={handleSubmit} className="sandbox-form">
-              <textarea
-                value={concept}
-                onChange={(e) => setConcept(e.target.value)}
-                placeholder="Ejemplo: 'Detective paranormal investigando desapariciones'..."
-                disabled={loading}
-                rows={4}
-                className="sandbox-textarea clickable"
-                required
-                minLength={20}
-              />
-              
-              <button
-                type="submit"
-                disabled={loading || concept.trim().length < 20}
-                className="campaign-button clickable"
-              >
-                {loading ? 'Creando historia...' : 'Comenzar Aventura'}
-              </button>
-            </form>
+        {/* Emotions Modal */}
+        <div className={`popup-modal ${showEmotionsModal ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>😌 Estados Emocionales</span>
+            <button onClick={toggleEmotionsModal} className="modal-close">×</button>
           </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="app-container">
-      {!sessionId ? (
-        !mode ? (
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-            <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-              <h2 className="welcome-title">
-                Bienvenido al Infierno
-              </h2>
-              <p className="welcome-subtitle">
-                Elige tu camino en una aventura épica donde cada decisión forja tu destino.
-              </p>
-              <ModeSelector onSelect={setMode} />
-            </div>
-          </div>
-        ) : showSandboxForm && mode === 'sandbox' ? (
-          <SandboxConceptForm 
-            onSubmit={(concept) => startNewSession('sandbox', null, concept)}
-            loading={loading}
-          />
-        ) : (
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-            <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-              <div className="mode-selection-container">
-                <p className="mode-selected-text">
-                  Modo seleccionado: <span className="mode-name">
-                    {mode === 'sandbox' ? 'Sandbox' : 
-                     mode === 'campaign' ? 'Campaña' : 
-                     'Campaña Temporal'}
-                  </span>
-                </p>
-                <div className="mode-buttons">
-                  <CampaignButton
-                    onClick={() => startNewSession(mode, 'scenes_act1')}
-                    disabled={loading}
-                    loading={loading}
-                  >
-                    {`Iniciar ${
-                      mode === 'sandbox' ? 'Sandbox' : 
-                      mode === 'campaign' ? 'Campaña' : 
-                      'Campaña Temporal'
-                    }`}
-                  </CampaignButton>
-                  <button
-                    onClick={() => {
-                      setMode(null);
-                      setShowSandboxForm(false);
-                    }}
-                    disabled={loading}
-                    className="mode-change-button clickable"
-                  >
-                    Cambiar Modo
-                  </button>
-                </div>
+          <div className="modal-content">
+            {gameState.emotionalStates ? (
+              <div className="emotions-list">
+                {Object.entries(gameState.emotionalStates).map(([emotion, value]) => {
+                  const isSignificant = isElementNew('emotions', emotion);
+                  
+                  return (
+                    <div 
+                      key={emotion} 
+                      className={`emotion-row ${isSignificant ? 'animate-pulse bg-purple-100' : ''}`}
+                      onClick={() => isSignificant && markElementSeen('emotions', emotion)}
+                    >
+                      {isSignificant && <span className="absolute top-2 right-2 text-xs bg-purple-500 text-white rounded-full w-5 h-5 flex items-center justify-center">!</span>}
+                      <div className="emotion-icon">
+                        {emotion === 'miedo' && '😱'}
+                        {emotion === 'alerta' && '👁️'}
+                        {emotion === 'euforia' && '🎉'}
+                        {emotion === 'fatiga' && '😴'}
+                        {emotion === 'ira' && '😡'}
+                        {emotion === 'serenidad' && '😌'}
+                      </div>
+                      <div className="emotion-info">
+                        <div className="emotion-name">{emotion}</div>
+                        <div className="emotion-value">{value}%</div>
+                      </div>
+                      <div className="emotion-bar">
+                        <div 
+                          className="emotion-fill" 
+                          style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
+            ) : (
+              <div className="no-skills-message">Estados emocionales no disponibles</div>
+            )}
           </div>
-        )
-      ) : gameOver ? (
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
-          <div className="game-over-container">
-            <h3 className="game-over-title">
-              💀 GAME OVER 💀
-            </h3>
-            <p className="game-over-text">
-              Tu aventura ha llegado a su fin. ¿Quieres intentarlo de nuevo?
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="campaign-button clickable"
+        </div>
+
+        {/* Narrative Modal */}
+        <div className={`popup-modal narrative-popup ${showNarrativeModal ? 'show' : ''}`}>
+          <div className="modal-header">
+            <span>📖 Historial Narrativo</span>
+            <button onClick={toggleNarrativeModal} className="modal-close">×</button>
+          </div>
+          <div className="modal-content">
+            {gameState.narrativeLog?.length > 0 ? (
+              <div className="narrative-entries">
+                {gameState.narrativeLog.map((entry, index) => (
+                  <div key={index} className="narrative-entry">
+                    <div className="narrative-action">
+                      "{safeStringify(entry.player_action, 'Acción del jugador')}"
+                    </div>
+                    <div className="narrative-text">
+                      {safeStringify(entry.narrative, 'Narrativa del juego')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-narrative-message">Aún no hay historia que contar</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Campaign selection - Solo para modo campaign
+  if (mode === 'campaign') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
+        <div className="mode-selection-container">
+          <p className="mode-selected-text">
+            Has seleccionado: <span className="mode-name">{mode}</span>
+          </p>
+          <div className="mode-buttons">
+            <button 
+              onClick={() => startNewSession('campaign', 'scenes_act1')}
+              disabled={loading}
+              className="campaign-button"
             >
-              Reiniciar Partida
+              {loading ? 'Iniciando...' : 'Iniciar Campaña Principal'}
+            </button>
+            <button 
+              onClick={() => setMode(null)}
+              className="mode-change-button"
+            >
+              Cambiar Modo
             </button>
           </div>
         </div>
-      ) : (
-        <>
-          <CompactHeader />
-          <IntegratedCanvas />
-          
-          <div className="mobile-only">
-            <ControlsBar />
-            <MobileActionsPanel />
-            <PopupsBar />
-          </div>
-          
-          <div className="desktop-only">
-            <DesktopActionsSection />
-            <ControlsBar />
-          </div>
-          
-          <SkillsModal />
-          <ObjectivesModal />
-          <InventoryModal />
-          <DiscoveredItemsModal />
-          <EmotionsModal />
-          <NarrativeModal />
-        </>
-      )}
+      </div>
+    );
+  }
 
-      {error && (
-        <div className="error-display">
-          {safeStringify(error, 'Error desconocido')}
+  // Fallback - volver a selección de modo
+  return (
+    <div className="app-container">
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-lg)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <h2 className="welcome-title">Error</h2>
+          <p className="welcome-subtitle">Modo no reconocido. Selecciona un modo válido.</p>
+          <button onClick={() => setMode(null)} className="campaign-button">
+            Volver a Selección
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-export default React.memo(App);
+export default App;
