@@ -141,9 +141,31 @@ function App() {
     }
   };
 
+  // 🔧 ESTADO PARA ITEMS IGNORADOS PERSISTENTES
+  const [ignoredItems, setIgnoredItems] = useState(new Set());
+
   const ignoreItem = (item) => {
-    console.log('🚫 Ignorando item:', item);
+    console.log('🚫 Ignorando item permanentemente:', item);
+    
+    // Añadir a lista de ignorados
+    setIgnoredItems(prev => new Set([...prev, item.instanceId]));
+    
+    // Remover de discovered items
     setDiscoveredItems(prev => prev.filter(i => i.instanceId !== item.instanceId));
+    
+    // 📡 COMUNICAR AL BACKEND QUE SE IGNORÓ EL ITEM
+    if (sessionId) {
+      fetch(`${BACKEND_URL}/api/ignore_item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          item_id: item.instanceId
+        })
+      }).catch(error => {
+        console.error('❌ Error comunicando item ignorado:', error);
+      });
+    }
   };
 
   // 🔧 ARREGLO: Funciones de manejo para componentes nuevos
