@@ -287,8 +287,8 @@ const io = new Server(server, {
 
 // Middleware - CORS PERMANENTE Y ROBUSTO
 const allowedOrigins = [
-  'https://hellbound-rpg.preview.emergentagent.com',
-  'https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com',
+  'https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com',
+  'https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com',
   'http://localhost:3000', // Para desarrollo local
   'http://localhost:3001', // Puerto alternativo
   process.env.FRONTEND_URL // URL dinámica desde .env si existe

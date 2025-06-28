@@ -719,7 +719,7 @@ def main():
         backend_url = "http://localhost:8001"
     
     # Use the provided URL from the test request if available
-    backend_url = "https://395489aa-5539-429e-a4a6-465e1fc3acd1.preview.emergentagent.com"
+    backend_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
     
