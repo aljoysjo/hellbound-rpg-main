@@ -2050,28 +2050,38 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return null; // No se encontró match
     }
     
-    // 🔧 FUNCIÓN: GENERAR PREGUNTA NARRATIVA PARA ITEMS
+    // 🔧 FUNCIÓN: GENERAR PREGUNTA NARRATIVA PARA ITEMS REALES
     function generateItemChoiceNarrative(items) {
       if (items.length === 0) return '';
       
+      // Añadir items a discoveredItems para que aparezcan en la UI
+      if (!gameState.discoveredItems) gameState.discoveredItems = [];
+      
+      items.forEach(item => {
+        // Verificar anti-duplicados
+        const existsInInventory = gameState.inventory.some(invItem => 
+          invItem.name.toLowerCase() === item.name.toLowerCase()
+        );
+        const existsInDiscovered = gameState.discoveredItems.some(discItem => 
+          discItem.name.toLowerCase() === item.name.toLowerCase()
+        );
+        
+        if (!existsInInventory && !existsInDiscovered) {
+          gameState.discoveredItems.push(item);
+          console.log(`🎁 Item de narrativa añadido a discovered: ${item.name} ${item.icon}`);
+        }
+      });
+      
       const phrases = [
-        '¿Qué haces con',
-        '¿Cómo procedes con',
-        '¿Decides tomar',
-        '¿Te interesa',
-        '¿Examinas más de cerca'
+        'Encuentras varios objetos interesantes.',
+        'Descubres algunos items que podrían ser útiles.',
+        'Hay varios objetos que llaman tu atención.',
+        'Observas algunos items que podrían interesarte.',
+        'Localizas varios objetos durante tu búsqueda.'
       ];
       
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      
-      if (items.length === 1) {
-        return ` ${randomPhrase} ${items[0].toLowerCase()}?`;
-      } else if (items.length === 2) {
-        return ` ${randomPhrase} ${items[0].toLowerCase()} y ${items[1].toLowerCase()}?`;
-      } else {
-        const lastItem = items.pop();
-        return ` ${randomPhrase} ${items.join(', ').toLowerCase()} y ${lastItem.toLowerCase()}?`;
-      }
+      return ` ${randomPhrase}`;
     }
     
     // 🎲 SISTEMA HÍBRIDO DE LOOT INTELIGENTE
