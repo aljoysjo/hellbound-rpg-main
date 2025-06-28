@@ -1078,37 +1078,52 @@ function App() {
                     key={item.instanceId || index}
                     className="p-4 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg"
                   >
-                    <div className="flex items-center gap-4">
-                      {/* ICONO Y INFO DEL ITEM */}
-                      <div className="text-3xl">{item.icon || '📦'}</div>
-                      <div className="flex-1">
-                        <div className="font-medium text-[var(--cedar-brown)]">
+                    <div className="flex items-center gap-3">
+                      {/* ICONO MINIMALISTA EN CONTENEDOR */}
+                      <div className="flex-shrink-0 w-10 h-10 bg-[var(--imperial-gold)]/20 rounded-lg flex items-center justify-center">
+                        <span className="text-lg">{item.icon || '📦'}</span>
+                      </div>
+                      
+                      {/* INFO DEL ITEM OPTIMIZADA */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-[var(--cedar-brown)] truncate">
                           {item.name || 'Item Misterioso'}
                         </div>
-                        <div className="text-xs text-[var(--cedar-brown)]/70">
+                        <div className="text-xs text-[var(--cedar-brown)]/70 line-clamp-2">
                           {item.description || 'Un objeto encontrado durante tu exploración'}
                         </div>
                       </div>
                       
-                      {/* BOTONES RECOGER/DEJAR */}
-                      <div className="flex gap-2">
+                      {/* BOTONES COMPACTOS Y ELEGANTES */}
+                      <div className="flex gap-2 flex-shrink-0">
                         <button
                           onClick={() => pickupItem(item)}
                           disabled={pickupLoading === item.instanceId}
-                          className="px-4 py-2 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-bold rounded-lg 
+                          className="px-3 py-1.5 bg-[var(--imperial-gold)] text-[var(--creamy-old)] font-medium rounded-md 
                                      hover:bg-[var(--imperial-gold)]/80 disabled:opacity-50 disabled:cursor-not-allowed
-                                     transition-all duration-200 text-sm"
+                                     transition-all duration-200 text-xs flex items-center gap-1"
                         >
-                          {pickupLoading === item.instanceId ? 'Recogiendo...' : '✋ Recoger'}
+                          {pickupLoading === item.instanceId ? (
+                            <>
+                              <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>✓</span>
+                              <span>Tomar</span>
+                            </>
+                          )}
                         </button>
                         <button
                           onClick={() => ignoreItem(item)}
                           disabled={pickupLoading === item.instanceId}
-                          className="px-4 py-2 bg-[var(--cedar-brown)] text-[var(--creamy-old)] font-bold rounded-lg 
-                                     hover:bg-[var(--cedar-brown)]/80 disabled:opacity-50 disabled:cursor-not-allowed
-                                     transition-all duration-200 text-sm"
+                          className="px-3 py-1.5 bg-[var(--cedar-brown)]/20 text-[var(--cedar-brown)] font-medium rounded-md 
+                                     hover:bg-[var(--cedar-brown)]/30 disabled:opacity-50 disabled:cursor-not-allowed
+                                     transition-all duration-200 text-xs flex items-center gap-1"
                         >
-                          🚫 Dejar
+                          <span>✕</span>
+                          <span>Dejar</span>
                         </button>
                       </div>
                     </div>
