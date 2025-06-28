@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 📱 MOBILE FIX - VIEWPORT RESPONSIVE */
+/* Evita el "zoom" automático al enfocar inputs en iOS/Android */
+input, textarea {
+  font-size: 16px !important;
+}
+
+/* Asegura que .h-screen ocupe todo el alto real del viewport móvil */
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
 /* Additional global styles */
 body {
   margin: 0;
