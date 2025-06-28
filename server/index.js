@@ -59,6 +59,14 @@ const ITEM_DATABASE = [
   { type: 'trofeo', icon: '🏆', keywords: ['trofeo', 'trophy', 'premio', 'medalla', 'copa', 'galardón'] },
   { type: 'reliquia', icon: '⚗️', keywords: ['reliquia', 'relic', 'artefacto', 'artifact', 'objeto sagrado', 'antigüedad'] },
   { type: 'cuerpo', icon: '💀', keywords: ['cabeza', 'cráneo', 'hueso', 'esqueleto', 'calavera', 'skull', 'bone', 'head'] },
+  
+  // 💍 JOYERÍA Y ACCESORIOS
+  { type: 'anillo', icon: '💍', keywords: ['anillo', 'ring', 'sortija', 'aro', 'alianza'] },
+  { type: 'collar', icon: '📿', keywords: ['collar', 'necklace', 'cadena', 'pendiente'] },
+  { type: 'brazalete', icon: '🔗', keywords: ['brazalete', 'pulsera', 'bracelet'] },
+  
+  // 🔧 MATERIALES Y METALES  
+  { type: 'metal', icon: '🔩', keywords: ['hierro', 'acero', 'metal', 'barra de hierro', 'lingote', 'varilla', 'barra de acero', 'chatarra'] },
 ];
 
 // 🎲 SISTEMA DE LOOT DINÁMICO CORREGIDO - OPCIONES 2+4+5
