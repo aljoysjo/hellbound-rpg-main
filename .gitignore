@@ -1,0 +1,43 @@
+.godot/
+*.import
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.key
+*/.env
+server/.env
+
+# Node.js dependencies
+node_modules/
+*/node_modules/
+frontend/node_modules/
+server/node_modules/
+
+# Build directories
+build/
+dist/
+*/build/
+*/dist/
+
+# 🚫 ARCHIVOS GRANDES QUE NO VAN A GITHUB
+*.tar.gz
+*.zip
+backups/
+
+# Logs del servidor
+server/server.log
+*/server.log
+*.log
+
+# Dependencias grandes
+yarn.lock
+package-lock.json
+
+# Archivos temporales
+*.tmp
+*.temp
+.DS_Store
+*.backup
+*.old

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico HELLBOUND RPG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #2d5a2d; }
+        .error { background: #5a2d2d; }
+        .warning { background: #5a5a2d; }
+        button {
+            background: #4a4a4a;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:active { background: #666; }
+        #logs {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Diagnóstico HELLBOUND RPG</h1>
+    <p>Herramienta para diagnosticar problemas de conectividad móvil</p>
+    
+    <button onclick="testConnection()">🌐 Probar Conexión Backend</button>
+    <button onclick="testSessionStart()">🎮 Probar Inicio de Sesión</button>
+    <button onclick="testMobileFeatures()">📱 Probar Características Móviles</button>
+    <button onclick="clearLogs()">🗑️ Limpiar Logs</button>
+    
+    <div id="results"></div>
+    <div id="logs"></div>
+
+    <script>
+        const BACKEND_URL = 'https://hellbound-rpg.preview.emergentagent.com';
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            document.getElementById('logs').innerHTML += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        function showResult(type, message) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testConnection() {
+            log('🌐 Probando conexión al backend...');
+            try {
+                const start = Date.now();
+                const response = await fetch(`${BACKEND_URL}/api/healthcheck`, {
+                    method: 'GET',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                const duration = Date.now() - start;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('success', `✅ Backend conectado (${duration}ms)`);
+                    log(`✅ Backend status: ${data.status}, OpenAI: ${data.openai_configured}, MongoDB: ${data.mongo_connected}`);
+                } else {
+                    showResult('error', `❌ Backend error: ${response.status}`);
+                    log(`❌ Response status: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                showResult('error', `❌ Error de conexión: ${error.message}`);
+                log(`❌ Connection error: ${error.name} - ${error.message}`);
+            }
+        }
+        
+        async function testSessionStart() {
+            log('🎮 Probando inicio de sesión...');
+            try {
+                const start = Date.now();
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    log('⏰ Timeout activado - cancelando petición');
+                }, 60000);
+                
+                const response = await fetch(`${BACKEND_URL}/api/start_session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    body: JSON.stringify({
+                        mode: 'sandbox',
+                        sandboxConcept: 'Detective paranormal test'
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                const duration = Date.now() - start;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('success', `✅ Sesión iniciada (${duration}ms)`);
+                    log(`✅ Session ID: ${data.session_id}`);
+                    log(`✅ Game state location: ${data.game_state.location}`);
+                } else {
+                    const errorText = await response.text();
+                    showResult('error', `❌ Error ${response.status}: ${errorText}`);
+                    log(`❌ Start session error: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                showResult('error', `❌ Error inicio sesión: ${error.message}`);
+                log(`❌ Start session error: ${error.name} - ${error.message}`);
+                
+                if (error.name === 'AbortError') {
+                    showResult('warning', '⏰ La petición tardó más de 60 segundos');
+                }
+            }
+        }
+        
+        async function testMobileFeatures() {
+            log('📱 Probando características móviles...');
+            
+            // Test 1: Conexión a internet
+            if (navigator.onLine) {
+                showResult('success', '✅ Conectado a internet');
+                log('✅ navigator.onLine: true');
+            } else {
+                showResult('error', '❌ Sin conexión a internet');
+                log('❌ navigator.onLine: false');
+            }
+            
+            // Test 2: User Agent
+            const userAgent = navigator.userAgent;
+            log(`📱 User Agent: ${userAgent}`);
+            
+            if (userAgent.includes('Mobile')) {
+                showResult('success', '✅ Dispositivo móvil detectado');
+            } else {
+                showResult('warning', '⚠️ No se detectó como móvil');
+            }
+            
+            // Test 3: Viewport
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            log(`📱 Viewport: ${width}x${height}`);
+            
+            if (width <= 768) {
+                showResult('success', '✅ Viewport móvil detectado');
+            } else {
+                showResult('warning', '⚠️ Viewport desktop');
+            }
+            
+            // Test 4: Performance API
+            if ('performance' in window && 'timing' in window.performance) {
+                const timing = window.performance.timing;
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                log(`📱 Tiempo de carga de página: ${loadTime}ms`);
+                
+                if (loadTime < 5000) {
+                    showResult('success', `✅ Carga rápida (${loadTime}ms)`);
+                } else {
+                    showResult('warning', `⚠️ Carga lenta (${loadTime}ms)`);
+                }
+            }
+            
+            // Test 5: Fetch support
+            if ('fetch' in window) {
+                showResult('success', '✅ Fetch API soportado');
+                log('✅ Fetch API disponible');
+            } else {
+                showResult('error', '❌ Fetch API no soportado');
+                log('❌ Fetch API no disponible');
+            }
+            
+            // Test 6: AbortController support
+            if ('AbortController' in window) {
+                showResult('success', '✅ AbortController soportado');
+                log('✅ AbortController disponible');
+            } else {
+                showResult('warning', '⚠️ AbortController no soportado');
+                log('⚠️ AbortController no disponible');
+            }
+        }
+        
+        // Auto-ejecutar al cargar
+        window.addEventListener('load', () => {
+            log('🔧 Diagnóstico iniciado');
+            testMobileFeatures();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+@import './tokens.css';
+
+/* Reset y base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.6;
+}
+
+/* Fondo principal con textura pergamino */
+.main-background {
+  background: linear-gradient(135deg, var(--c-bg) 0%, #E8D5A6 100%);
+  position: relative;
+}
+
+.main-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(209, 164, 56, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(140, 91, 44, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(185, 135, 70, 0.03) 0%, transparent 50%);
+  background-size: 200px 200px, 300px 300px, 150px 150px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Layout principal */
+.game-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  min-height: calc(100vh - 120px);
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 1024px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Paneles del HUD */
+.hud-panel {
+  background: var(--c-panel);
+  border: 2px solid var(--c-border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(2px);
+  transition: all 0.3s ease;
+}
+
+.hud-panel:hover {
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-1px);
+}
+
+.hud-panel h3 {
+  font-family: var(--font-title);
+  color: var(--c-border);
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Área narrativa */
+.narrative-area {
+  background: rgba(243, 231, 198, 0.95);
+  border: 2px solid var(--c-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-body);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.narrative-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  letter-spacing: 0.025em;
+  color: var(--c-text);
+}
+
+/* Botones */
+.btn-primary {
+  background: var(--c-border);
+  color: var(--c-bg);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary:hover {
+  background: var(--c-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-secondary {
+  background: var(--c-cedar);
+  color: var(--c-bg);
+}
+
+.btn-success {
+  background: var(--c-emerald);
+  color: var(--c-bg);
+}
+
+.btn-suggested {
+  background: rgba(209, 164, 56, 0.2);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.btn-suggested:hover {
+  background: var(--c-border);
+  color: var(--c-bg);
+}
+
+/* Orbs de stats */
+.stat-orb {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.stat-orb-health .stat-bar {
+  background: linear-gradient(90deg, var(--c-health), #b91c1c);
+}
+
+.stat-orb-mana .stat-bar {
+  background: linear-gradient(90deg, var(--c-mana), #1d4ed8);
+}
+
+.stat-orb-stamina .stat-bar {
+  background: linear-gradient(90deg, var(--c-stamina), #15803d);
+}
+
+.stat-bar {
+  height: 12px;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Estados emocionales */
+.emotion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0.125rem;
+  transition: all 0.3s ease;
+}
+
+.emotion-high { background: rgba(220, 38, 38, 0.2); border: 1px solid #dc2626; }
+.emotion-medium { background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; }
+.emotion-low { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+
+/* Habilidades grid */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-slot {
+  width: 48px;
+  height: 48px;
+  background: rgba(140, 91, 44, 0.1);
+  border: 2px solid var(--c-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.skill-slot:hover {
+  background: rgba(209, 164, 56, 0.2);
+  transform: scale(1.05);
+}
+
+.skill-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(91, 58, 29, 0.95);
+  color: var(--c-bg);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.skill-slot:hover .skill-tooltip {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .narrative-area {
+    max-width: 100%;
+  }
+  
+  .hud-panel {
+    padding: 0.75rem;
+  }
+}
+
+/* ===== BADGES Y NOTIFICACIONES ===== */
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex !important; /* Forzar display en móvil */
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  border: 2px solid var(--color-bg);
+  z-index: 10;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.new-badge {
+  background: #10b981;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.levelup-badge {
+  background: #f59e0b;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.completed-badge {
+  background: #8b5cf6;
+  color: white;
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Asegurar badges visibles en TODOS los dispositivos */
+.popup-button {
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .notification-badge {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
