@@ -869,7 +869,7 @@ def main():
     backend_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
-    print(f"🔍 PRUEBA FINAL: Verificación Sistema Items Compuestos Arreglado")
+    print(f"🔍 PRUEBA DEFINITIVA: Sistema Items Ya Recogidos Independiente")
     
     # Setup tester
     tester = HellboundRPGTester(backend_url)
@@ -887,8 +887,8 @@ def main():
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST NARRATIVE WITH COMPOUND ITEMS ====")
-        # Test the narrative with items already picked up
+        print("\n==== 3. TEST NARRATIVE WITH COMPOUND ITEMS (WITHOUT SEARCH KEYWORDS) ====")
+        # Test the narrative with items already picked up without using search keywords
         narrative_items_success = tester.test_narrative_with_items()
         print(f"{'✅' if narrative_items_success else '❌'} Compound items test {'passed' if narrative_items_success else 'failed'}")
         
@@ -899,7 +899,7 @@ def main():
         print("\n==== TEST SUMMARY ====")
         print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
         print(f"2. Sandbox Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"3. Compound Items Test: {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
+        print(f"3. Compound Items Test (Without Search Keywords): {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
         
         overall_success = (
             tester.test_healthcheck() and
