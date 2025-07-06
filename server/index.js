@@ -2230,9 +2230,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return ` ${randomPhrase}`;
     }
     
-    // 🎁 PASO 0: DETECTAR ITEMS YA RECOGIDOS EN NARRATIVA (INDEPENDIENTE DE BÚSQUEDA)
-    console.log(`🔍 PASO 0: Analizando narrativa para items ya recogidos...`);
-    const narrativeExtraction = extractItemsFromNarrative(narrative);
+    // 🎁 PASO 0: DETECTAR ITEMS YA RECOGIDOS EN NARRATIVA Y ACCIÓN (INDEPENDIENTE DE BÚSQUEDA)
+    console.log(`🔍 PASO 0: Analizando narrativa y acción del usuario para items ya recogidos...`);
+    
+    // Analizar tanto la narrativa generada como la acción del usuario
+    const fullText = `${action} ${narrative}`;
+    console.log(`🔍 Texto completo para análisis: "${fullText}"`);
+    
+    const narrativeExtraction = extractItemsFromNarrative(fullText);
     const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
     
     // 🎁 PROCESAR ITEMS YA RECOGIDOS (directo a inventario) 
