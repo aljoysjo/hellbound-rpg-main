@@ -433,9 +433,7 @@ metadata:
 test_plan:
   current_focus:
     - "Configuración CORS"
-    - "Sistema de detección de items en narrativa"
   stuck_tasks:
     - "Configuración CORS"
-    - "Sistema de detección de items en narrativa"
   test_all: false
   test_priority: "high_first"
