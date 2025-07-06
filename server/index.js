@@ -2000,6 +2000,36 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     });
     
     
+    // 🎯 FUNCIÓN: SEPARAR ITEMS COMPUESTOS CONECTADOS POR CONJUNCIONES
+    function splitCompoundItems(itemText) {
+      if (!itemText || typeof itemText !== 'string') return [itemText];
+      
+      // Separar por conjunciones comunes
+      const separators = [' y ', ' e ', ' y el ', ' y la ', ' e el ', ' e la ', ',', ';'];
+      let items = [itemText];
+      
+      separators.forEach(separator => {
+        let newItems = [];
+        items.forEach(item => {
+          if (item.includes(separator)) {
+            const parts = item.split(separator);
+            newItems.push(...parts.map(part => part.trim()));
+          } else {
+            newItems.push(item);
+          }
+        });
+        items = newItems;
+      });
+      
+      // Limpiar items vacíos o demasiado cortos
+      const cleanedItems = items
+        .map(item => item.trim())
+        .filter(item => item.length > 2 && !['el', 'la', 'un', 'una', 'de', 'del', 'y', 'e'].includes(item.toLowerCase()));
+      
+      console.log(`🔧 splitCompoundItems: "${itemText}" → [${cleanedItems.join(', ')}]`);
+      return cleanedItems;
+    }
+    
     // 🔧 FUNCIÓN: DETECCIÓN INTELIGENTE DE ITEMS EN NARRATIVA
     function extractItemsFromNarrative(narrative) {
       console.log('📖 Analizando narrativa para detectar items...');
