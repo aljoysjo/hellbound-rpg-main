@@ -2117,15 +2117,24 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           }
         }
       });
-      });
       
-      // Eliminar duplicados por instanceId
+      // Eliminar duplicados para items disponibles
       const uniqueItems = foundItems.filter((item, index, self) => 
         index === self.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase())
       );
       
-      console.log(`📦 Items reales extraídos: ${uniqueItems.length > 0 ? uniqueItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
-      return uniqueItems;
+      // Eliminar duplicados para items ya recogidos
+      const uniquePickedItems = alreadyPickedItems.filter((item, index, self) => 
+        index === self.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase())
+      );
+      
+      console.log(`📦 Items disponibles extraídos: ${uniqueItems.length > 0 ? uniqueItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
+      console.log(`🎁 Items ya recogidos extraídos: ${uniquePickedItems.length > 0 ? uniquePickedItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
+      
+      return {
+        availableItems: uniqueItems,
+        alreadyPickedItems: uniquePickedItems
+      };
     }
     
     // 🎯 NUEVA FUNCIÓN: CONVERTIR TEXTO DE NARRATIVA A ITEM REAL
