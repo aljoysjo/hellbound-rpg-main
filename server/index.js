@@ -2278,7 +2278,31 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return ` ${randomPhrase}`;
     }
     
-    // 🎲 SISTEMA HÍBRIDO DE LOOT INTELIGENTE
+    // 🎁 PASO 0: DETECTAR ITEMS YA RECOGIDOS EN NARRATIVA (INDEPENDIENTE DE BÚSQUEDA)
+    console.log(`🔍 PASO 0: Analizando narrativa para items ya recogidos...`);
+    const narrativeExtraction = extractItemsFromNarrative(narrative);
+    const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
+    
+    // 🎁 PROCESAR ITEMS YA RECOGIDOS (directo a inventario) 
+    if (alreadyPickedItems.length > 0) {
+      console.log(`🎁 ITEMS YA RECOGIDOS DETECTADOS: ${alreadyPickedItems.length} items añadiendo al inventario`);
+      
+      alreadyPickedItems.forEach(item => {
+        // Verificar que no existe ya en inventario
+        const existsInInventory = gameState.inventory.some(invItem => 
+          invItem.name.toLowerCase() === item.name.toLowerCase()
+        );
+        
+        if (!existsInInventory) {
+          gameState.inventory.push(item);
+          console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon}`);
+        } else {
+          console.log(`⚠️ Item ya existe en inventario: ${item.name}`);
+        }
+      });
+    }
+    
+    // 🎲 SISTEMA HÍBRIDO DE LOOT INTELIGENTE (SOLO PARA BÚSQUEDAS)
     
     // Solo activar cuando el usuario busca/explora activamente
     if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir/.test(action.toLowerCase())) {
