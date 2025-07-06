@@ -641,6 +641,64 @@ class HellboundRPGTester:
             return True
         
         return False
+        
+    def test_dynamic_loot_system(self):
+        """Test the dynamic loot system with search actions"""
+        if not self.session_id:
+            print("❌ Cannot test dynamic loot system without a valid session")
+            return False
+            
+        # Get initial state
+        _, initial_response = self.run_test(
+            "Get Initial State Before Search",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_discovered_items = initial_game_state.get('discoveredItems', [])
+        
+        print(f"Initial Discovered Items: {initial_discovered_items}")
+        
+        # Send a search action
+        success, response = self.run_test(
+            "Dynamic Loot System - Search Action",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": self.session_id,
+                "action": "busco algo valioso en este lugar"
+            }
+        )
+        
+        if success:
+            # Check the narrative response
+            narrative = response.get('new_narrative', '')
+            print(f"Narrative Response: {narrative[:200]}...")
+            
+            # Check the updated discoveredItems
+            game_state = response.get('game_state', {})
+            discovered_items = game_state.get('discoveredItems', [])
+            
+            print(f"Discovered Items After Search: {discovered_items}")
+            
+            # Check if new items were discovered
+            if len(discovered_items) > len(initial_discovered_items):
+                print(f"✅ New items discovered: {len(discovered_items) - len(initial_discovered_items)}")
+                
+                # Save the first discovered item for pickup test
+                if discovered_items:
+                    self.discovered_item_id = discovered_items[0].get('instanceId')
+                    print(f"✅ Saved discovered item for pickup test: {discovered_items[0].get('name')} (ID: {self.discovered_item_id})")
+                
+                return True
+            else:
+                print("❌ No new items discovered")
+                return False
+        
+        return False
 
     def connect_websocket(self):
         """Connect to WebSocket for real-time updates"""
