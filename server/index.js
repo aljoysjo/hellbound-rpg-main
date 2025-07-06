@@ -2305,13 +2305,35 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         console.log(`✅ ¡Descubrimiento exitoso! Reseteando contadores`);
       
         // PASO 1: Extraer items de la narrativa existente
-      const narrativeItems = extractItemsFromNarrative(narrative);
+      const narrativeExtraction = extractItemsFromNarrative(narrative);
+      const availableItems = narrativeExtraction.availableItems || [];
+      const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
       
-      if (narrativeItems.length > 0) {
-        // CASO A: Hay items en la narrativa → Preguntar al jugador
-        console.log(`📖 NARRATIVA CON ITEMS: Encontrados ${narrativeItems.length} items, extendiendo narrativa con decisión`);
+      // 🎁 PASO 1A: PROCESAR ITEMS YA RECOGIDOS (directo a inventario)
+      if (alreadyPickedItems.length > 0) {
+        console.log(`🎁 ITEMS YA RECOGIDOS DETECTADOS: ${alreadyPickedItems.length} items añadiendo al inventario`);
         
-        const itemChoiceText = generateItemChoiceNarrative(narrativeItems);
+        alreadyPickedItems.forEach(item => {
+          // Verificar que no existe ya en inventario
+          const existsInInventory = gameState.inventory.some(invItem => 
+            invItem.name.toLowerCase() === item.name.toLowerCase()
+          );
+          
+          if (!existsInInventory) {
+            gameState.inventory.push(item);
+            console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon}`);
+          } else {
+            console.log(`⚠️ Item ya existe en inventario: ${item.name}`);
+          }
+        });
+      }
+      
+      // 🔍 PASO 1B: PROCESAR ITEMS DISPONIBLES (discovered items)
+      if (availableItems.length > 0) {
+        // CASO A: Hay items disponibles en la narrativa → Preguntar al jugador
+        console.log(`📖 NARRATIVA CON ITEMS DISPONIBLES: Encontrados ${availableItems.length} items, extendiendo narrativa con decisión`);
+        
+        const itemChoiceText = generateItemChoiceNarrative(availableItems);
         narrative += itemChoiceText;
         
         console.log(`🎭 NARRATIVA EXTENDIDA: ${itemChoiceText}`);
