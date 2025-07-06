@@ -706,8 +706,8 @@ class HellboundRPGTester:
             self.ws.close()
             if self.ws_thread:
                 self.ws_thread.join(timeout=1)
-
-def test_narrative_with_items(self):
+                
+    def test_narrative_with_items(self):
         """Test a narrative that mentions items being picked up"""
         if not self.session_id:
             print("❌ Cannot test narrative with items without a valid session")
