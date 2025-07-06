@@ -787,7 +787,7 @@ class HellboundRPGTester:
         print(f"Initial Discovered Items: {initial_discovered}")
         
         # Send an action that should generate a narrative with compound items already picked up
-        print("\n🔍 Testing compound items functionality with action: 'decidiste que el crucifijo y el frasco de sal serán tus aliados en este momento incierto'")
+        print("\n🔍 Testing compound items functionality with action: 'tomas el crucifijo y el frasco de sal para protegerte'")
         success, response = self.run_test(
             "Compound Items Test",
             "POST",
@@ -795,7 +795,7 @@ class HellboundRPGTester:
             200,
             data={
                 "session_id": self.session_id,
-                "action": "decidiste que el crucifijo y el frasco de sal serán tus aliados en este momento incierto"
+                "action": "tomas el crucifijo y el frasco de sal para protegerte"
             }
         )
         
