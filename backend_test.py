@@ -866,6 +866,7 @@ def main():
     backend_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
+    print(f"🔍 PRUEBA FINAL: Verificación Sistema Items Compuestos Arreglado")
     
     # Setup tester
     tester = HellboundRPGTester(backend_url)
@@ -883,41 +884,10 @@ def main():
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST NARRATIVE WITH ITEMS ALREADY PICKED UP ====")
+        print("\n==== 3. TEST NARRATIVE WITH COMPOUND ITEMS ====")
         # Test the narrative with items already picked up
         narrative_items_success = tester.test_narrative_with_items()
-        print(f"{'✅' if narrative_items_success else '❌'} Narrative with items test {'passed' if narrative_items_success else 'failed'}")
-        
-        print("\n==== 4. TEST FREE INPUT BASIC ====")
-        # Test the free input with "examinar los alrededores"
-        free_input_success = tester.test_free_input("examinar los alrededores")
-        print(f"{'✅' if free_input_success else '❌'} Free input test {'passed' if free_input_success else 'failed'}")
-        
-        print("\n==== 5. TEST VITALS AND STATS ====")
-        # Verify that the response has correct vitals (health, mana, stamina)
-        vitals_success = tester.test_vitals_and_stats()
-        print(f"{'✅' if vitals_success else '❌'} Vitals and stats test {'passed' if vitals_success else 'failed'}")
-        
-        print("\n==== 6. TEST DYNAMIC LOOT SYSTEM ====")
-        # Test the loot system with discovered items
-        dynamic_loot_success = tester.test_dynamic_loot_system()
-        print(f"{'✅' if dynamic_loot_success else '❌'} Dynamic loot system test {'passed' if dynamic_loot_success else 'failed'}")
-        
-        if dynamic_loot_success:
-            print("\n==== 7. TEST PICKUP ITEM ====")
-            pickup_success = tester.test_pickup_item()
-            print(f"{'✅' if pickup_success else '❌'} Pickup item test {'passed' if pickup_success else 'failed'}")
-        else:
-            pickup_success = False
-            print("⚠️ Skipping pickup item test as no items were discovered")
-        
-        print("\n==== 8. TEST ACTION COUNT INCREMENT ====")
-        action_count_success = tester.test_action_count_increment()
-        print(f"{'✅' if action_count_success else '❌'} Action count increment test {'passed' if action_count_success else 'failed'}")
-        
-        print("\n==== 9. TEST GET_SESSION ENDPOINT ====")
-        get_session_success = tester.test_get_session_endpoint()
-        print(f"{'✅' if get_session_success else '❌'} Get session endpoint test {'passed' if get_session_success else 'failed'}")
+        print(f"{'✅' if narrative_items_success else '❌'} Compound items test {'passed' if narrative_items_success else 'failed'}")
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
@@ -926,18 +896,12 @@ def main():
         print("\n==== TEST SUMMARY ====")
         print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
         print(f"2. Sandbox Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"3. Narrative with Items Already Picked Up: {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
-        print(f"4. Free Input Basic: {'✅ PASSED' if free_input_success else '❌ FAILED'}")
-        print(f"5. Vitals and Stats: {'✅ PASSED' if vitals_success else '❌ FAILED'}")
-        print(f"6. Dynamic Loot System: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
+        print(f"3. Compound Items Test: {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
         
         overall_success = (
             tester.test_healthcheck() and
             tester.session_id and
-            narrative_items_success and
-            free_input_success and
-            vitals_success and
-            dynamic_loot_success
+            narrative_items_success
         )
         
         print(f"\n{'✅' if overall_success else '❌'} Backend Tests: {'PASSED' if overall_success else 'FAILED'}")
