@@ -123,7 +123,7 @@ backend:
     implemented: true
     working: false
     file: "/app/server/index.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
@@ -133,6 +133,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Se ha detectado un problema crítico con el sistema de detección de items en narrativa. Cuando la narrativa menciona que el personaje ya ha recogido items (ej: 'decidiste que el crucifijo y el frasco de sal serán tus aliados'), estos no se añaden automáticamente al inventario. Las pruebas muestran que al enviar una acción con esta narrativa, ni 'crucifijo' ni 'frasco de sal' aparecen en el inventario o en discoveredItems. El sistema extractItemsFromNarrative() en las líneas 2019-2076 solo detecta items cuando se usan patrones específicos como 'encuentras', 'descubres', etc., pero no detecta items que ya se mencionan como recogidos o en posesión del personaje."
+      - working: false
+        agent: "testing"
+        comment: "Se ha identificado el problema específico: la función extractItemsFromNarrative() no maneja correctamente los items compuestos como 'crucifijo y el frasco de sal'. El patrón detecta correctamente la frase completa, pero la trata como un solo item en lugar de separarla en dos items distintos. Se necesita implementar una función splitCompoundItems() que divida los items cuando hay conjunciones como 'y' o 'e', y luego procesar cada item individualmente. Las pruebas de patrones confirman que la expresión regular funciona correctamente, pero falta el procesamiento de items compuestos."
 
 frontend:
   - task: "Modo campaña"
