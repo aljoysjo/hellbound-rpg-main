@@ -2160,7 +2160,12 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     
     // 🎯 NUEVA FUNCIÓN: CONVERTIR TEXTO DE NARRATIVA A ITEM REAL
     function convertTextToRealItem(itemText) {
-      const textLower = itemText.toLowerCase();
+      const textLower = itemText.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
+        .replace(/\b(el|la|los|las|un|una|unos|unas|de|del|al)\b/g, "") // quita artículos
+        .trim();
+      
+      console.log(`🪄 Text→Item: "${itemText}" → normalizado: "${textLower}"`);
       
       // 🚫 FILTRO DE PORTABILIDAD: Items que NO se pueden llevar
       const nonPortableKeywords = [
@@ -2188,10 +2193,11 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       // Buscar en ITEM_DATABASE por keywords
       for (const dbItem of ITEM_DATABASE) {
         for (const keyword of dbItem.keywords) {
-          if (textLower.includes(keyword.toLowerCase())) {
+          const normalizedKeyword = keyword.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (textLower.includes(normalizedKeyword)) {
             console.log(`✅ Match encontrado: "${itemText}" → ${dbItem.type} (keyword: "${keyword}")`);
             
-            return {
+            const foundItem = {
               name: itemText, // Usar nombre original de la narrativa
               icon: dbItem.icon,
               type: dbItem.type,
@@ -2200,10 +2206,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
               source: 'narrative_extraction',
               instanceId: crypto.randomUUID()
             };
+            
+            console.log(`🪄 Text→Item resultado: ${foundItem.name} → ${foundItem.type} ${foundItem.icon}`);
+            return foundItem;
           }
         }
       }
       
+      console.log(`🪄 Text→Item: "${itemText}" → NO ENCONTRADO`);
       return null; // No se encontró match
     }
     
