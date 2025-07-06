@@ -1476,55 +1476,7 @@ app.post('/api/free_input', async (req, res) => {
       });
     }
     
-function generateSandboxRestrictions(sandboxConcept) {
-  if (!sandboxConcept) return '- Sin restricciones específicas';
-  
-  const concept = sandboxConcept.toLowerCase();
-  let restrictions = [];
-  
-  // Detectar temas y aplicar restricciones correspondientes
-  if (concept.includes('real') || concept.includes('realista') || concept.includes('sin magia') || 
-      concept.includes('sin sobrenatural') || concept.includes('normal') || concept.includes('mundano')) {
-    restrictions.push('- NO incluir magia, hechizos, poderes sobrenaturales o elementos fantásticos');
-    restrictions.push('- Mantener todo realista y creíble en el mundo real');
-    restrictions.push('- Las acciones sugeridas deben ser realistas y posibles para un humano normal');
-  }
-  
-  if (concept.includes('moderno') || concept.includes('contemporáneo') || concept.includes('actual')) {
-    restrictions.push('- Ambientación moderna/contemporánea (tecnología actual)');
-    restrictions.push('- No incluir elementos medievales o anacronismos');
-  }
-  
-  if (concept.includes('pacífico') || concept.includes('sin violencia') || concept.includes('tranquilo')) {
-    restrictions.push('- Evitar violencia, combates o situaciones agresivas');
-    restrictions.push('- Enfocarse en resolución pacífica de conflictos');
-  }
-  
-  if (concept.includes('serio') || concept.includes('profesional') || concept.includes('formal')) {
-    restrictions.push('- Mantener tono serio y profesional');
-    restrictions.push('- Evitar humor o situaciones cómicas');
-  }
-  
-  if (concept.includes('investigación') || concept.includes('detective') || concept.includes('misterio')) {
-    restrictions.push('- Enfocarse en pistas, deducciones y metodología investigativa');
-    restrictions.push('- Las acciones deben ser propias de un investigador o detective');
-  }
-  
-  if (concept.includes('urbano') || concept.includes('ciudad') || concept.includes('metropolitano')) {
-    restrictions.push('- Mantener ambientación urbana/citadina');
-    restrictions.push('- No incluir elementos rurales o salvajes sin justificación');
-  }
-  
-  // Si no se detectan restricciones específicas, dar flexibilidad
-  if (restrictions.length === 0) {
-    restrictions.push('- Respetar el tono y tema general del concepto proporcionado');
-    restrictions.push('- Mantener coherencia con la visión original del usuario');
-  }
-  
-  return restrictions.join('\n');
-}
-
-// Create enhanced system prompt following Sombra Arcana DM v2.0
+    // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
     
     if (gameState.campaignMeta) {
