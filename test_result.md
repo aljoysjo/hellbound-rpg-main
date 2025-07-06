@@ -123,7 +123,7 @@ backend:
     implemented: true
     working: false
     file: "/app/server/index.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -136,6 +136,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Se ha identificado el problema específico: la función extractItemsFromNarrative() no maneja correctamente los items compuestos como 'crucifijo y el frasco de sal'. El patrón detecta correctamente la frase completa, pero la trata como un solo item en lugar de separarla en dos items distintos. Se necesita implementar una función splitCompoundItems() que divida los items cuando hay conjunciones como 'y' o 'e', y luego procesar cada item individualmente. Las pruebas de patrones confirman que la expresión regular funciona correctamente, pero falta el procesamiento de items compuestos."
+      - working: false
+        agent: "testing"
+        comment: "PRUEBA FINAL: Se ha verificado que aunque la función splitCompoundItems() ha sido implementada en las líneas 2004-2031 y está siendo llamada correctamente en extractItemsFromNarrative() en la línea 2122, los items compuestos ('crucifijo y el frasco de sal') no se están añadiendo al inventario. Las pruebas muestran que al enviar acciones como 'decidiste que el crucifijo y el frasco de sal serán tus aliados' o 'tomas el crucifijo y el frasco de sal para protegerte', los items no aparecen en el inventario. La función splitCompoundItems() parece estar funcionando correctamente (separa los items), pero hay un problema en la integración con el sistema de inventario."
 
 frontend:
   - task: "Modo campaña"
