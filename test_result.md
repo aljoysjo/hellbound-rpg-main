@@ -119,6 +119,21 @@ backend:
         agent: "testing"
         comment: "Se ha verificado que el sistema de loot dinámico ahora funciona correctamente después de los arreglos. Las pruebas muestran que: 1) Al crear una nueva sesión Sandbox, el game_state incluye el campo 'discoveredItems: []'. 2) Al enviar una acción de búsqueda ('busco algo valioso'), el sistema detecta correctamente la acción y añade un item al array discoveredItems. 3) El endpoint /api/pickup_item funciona correctamente, moviendo el item de discoveredItems a inventory. 4) Se pueden generar diferentes tipos de items según el contexto de la acción. Los logs muestran los mensajes esperados: '🎲 ACTIVANDO SISTEMA DINÁMICO para acción', '🎁 ITEM DESCUBIERTO (clickeable)', '🎁 ITEM RECOGIDO'. El sistema anti-duplicados también funciona correctamente."
 
+  - task: "Sistema de detección de items en narrativa"
+    implemented: true
+    working: false
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba del sistema de detección de items en narrativa"
+      - working: false
+        agent: "testing"
+        comment: "Se ha detectado un problema crítico con el sistema de detección de items en narrativa. Cuando la narrativa menciona que el personaje ya ha recogido items (ej: 'decidiste que el crucifijo y el frasco de sal serán tus aliados'), estos no se añaden automáticamente al inventario. Las pruebas muestran que al enviar una acción con esta narrativa, ni 'crucifijo' ni 'frasco de sal' aparecen en el inventario o en discoveredItems. El sistema extractItemsFromNarrative() en las líneas 2019-2076 solo detecta items cuando se usan patrones específicos como 'encuentras', 'descubres', etc., pero no detecta items que ya se mencionan como recogidos o en posesión del personaje."
+
 frontend:
   - task: "Modo campaña"
     implemented: true
@@ -392,19 +407,20 @@ agent_communication:
     message: "PRUEBA ESPECÍFICA MODO CAMPAÑA: Se ha verificado que el modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
   - agent: "testing"
     message: "VERIFICACIÓN POST-CORRECCIÓN SINTAXIS: Se ha verificado que el error de sintaxis ha sido corregido. La aplicación carga correctamente sin errores de compilación. Se puede iniciar una aventura en modo Campaña sin problemas. La nueva UI con estilo Pergamino Áureo se muestra correctamente, incluyendo el header con barras de stats y el título 'Crónica de la Aventura'. No se detectaron errores JavaScript en la consola. El error 'Unexpected token (1245:4)' ha sido solucionado."
+  - agent: "testing"
+    message: "PRUEBA DEL SISTEMA DE DETECCIÓN DE ITEMS EN NARRATIVA: Se ha detectado un problema crítico con el sistema de detección de items en narrativa. Cuando la narrativa menciona que el personaje ya ha recogido items (ej: 'decidiste que el crucifijo y el frasco de sal serán tus aliados'), estos no se añaden automáticamente al inventario. Las pruebas muestran que al enviar una acción con esta narrativa, ni 'crucifijo' ni 'frasco de sal' aparecen en el inventario o en discoveredItems. El sistema extractItemsFromNarrative() en las líneas 2019-2076 solo detecta items cuando se usan patrones específicos como 'encuentras', 'descubres', etc., pero no detecta items que ya se mencionan como recogidos o en posesión del personaje."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 6
+  test_sequence: 7
 
 test_plan:
   current_focus:
     - "Configuración CORS"
-    - "Polling para detección de cambios en badges"
-    - "Modo campaña"
+    - "Sistema de detección de items en narrativa"
   stuck_tasks:
     - "Configuración CORS"
-    - "Polling para detección de cambios en badges"
+    - "Sistema de detección de items en narrativa"
   test_all: false
   test_priority: "high_first"
