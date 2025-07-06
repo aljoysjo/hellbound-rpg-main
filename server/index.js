@@ -2049,7 +2049,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       ];
       
       let foundItems = [];
+      let alreadyPickedItems = [];
       
+      // 🔍 PROCESAR PATRONES DE ITEMS DISPONIBLES (para discovered items)
       patterns.forEach((pattern, index) => {
         let match;
         while ((match = pattern.exec(narrative)) !== null) {
@@ -2073,12 +2075,48 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
             const realItem = convertTextToRealItem(itemName);
             if (realItem) {
               foundItems.push(realItem);
-              console.log(`🔍 Item real detectado: ${realItem.name} ${realItem.icon}`);
+              console.log(`🔍 Item disponible detectado: ${realItem.name} ${realItem.icon}`);
             } else {
               console.log(`❌ Item no reconocido: "${itemName}"`);
             }
           }
         }
+      });
+      
+      // 🎁 PROCESAR PATRONES DE ITEMS YA RECOGIDOS (directo a inventario)
+      alreadyPickedPatterns.forEach((pattern, index) => {
+        let match;
+        while ((match = pattern.exec(narrative)) !== null) {
+          let itemName = '';
+          
+          // Según el patrón, extraer el nombre del item
+          if (index === 0) { // "decidiste que X será"
+            itemName = match[2].trim();
+          } else if (index < 7) { // "tomas X", "recoges X", etc.
+            itemName = match[2].trim();
+          } else if (index === 7) { // "X será tu aliado"
+            itemName = match[2].trim();
+          } else { // "tienes X", "portas X"
+            itemName = match[2].trim();
+          }
+          
+          // Limpiar y validar el item
+          itemName = itemName.replace(/[,\.!?;]$/, '').trim();
+          
+          // Filtrar palabras demasiado cortas o genéricas
+          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 30 && !itemName.includes("mientras") && !itemName.includes("que se") && !itemName.includes("de la")) {
+            
+            // 🎯 CONVERTIR TEXTO A ITEM REAL DE DATABASE
+            const realItem = convertTextToRealItem(itemName);
+            if (realItem) {
+              alreadyPickedItems.push(realItem);
+              console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon}`);
+            } else {
+              console.log(`❌ Item ya recogido no reconocido: "${itemName}"`);
+            }
+          }
+        }
+      });
       });
       
       // Eliminar duplicados por instanceId
