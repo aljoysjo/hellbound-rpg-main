@@ -995,7 +995,6 @@ def main():
         print("\n==== 3. TEST NARRATIVE WITH COMPOUND ITEMS (WITHOUT SEARCH KEYWORDS) ====")
         # Test the narrative with items already picked up without using search keywords
         narrative_items_success = tester.test_narrative_with_items()
-        print(f"{'✅' if narrative_items_success else '❌'} Compound items test {'passed' if narrative_items_success else 'failed'}")
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
