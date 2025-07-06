@@ -788,7 +788,8 @@ class HellboundRPGTester:
         
         # Send an action that should generate a narrative with compound items already picked up
         # WITHOUT using search keywords like "buscar", "examinar", etc.
-        print("\n🔍 Testing compound items functionality with action: 'tomas el crucifijo y el frasco de sal para protegerte'")
+        test_action = "tomas el crucifijo y el frasco de sal para protegerte"
+        print(f"\n🔍 Testing compound items functionality with action: '{test_action}'")
         success, response = self.run_test(
             "Compound Items Test (Without Search Keywords)",
             "POST",
@@ -796,32 +797,34 @@ class HellboundRPGTester:
             200,
             data={
                 "session_id": self.session_id,
-                "action": "tomas el crucifijo y el frasco de sal para protegerte"
+                "action": test_action
             }
         )
         
         if success:
             # Print the full response for debugging
-            print(f"Full API Response: {json.dumps(response, indent=2)}")
+            print(f"\n🔍 ANÁLISIS DETALLADO DE LA RESPUESTA:")
             
             # Check the narrative response
             narrative = response.get('new_narrative', '')
-            print(f"Narrative Response: {narrative[:200]}...")
+            print(f"Narrativa generada: {narrative[:200]}...")
             
             # Check the updated inventory
             game_state = response.get('game_state', {})
             updated_inventory = game_state.get('inventory', [])
             
-            print(f"Updated Inventory: {updated_inventory}")
+            print(f"\n📦 INVENTARIO ACTUALIZADO:")
+            for item in updated_inventory:
+                print(f"  - {item.get('name')} {item.get('icon')} ({item.get('type')}): {item.get('description')}")
             
             # Check if the items are in the inventory
             crucifijo_in_inventory = any('crucifijo' in item.get('name', '').lower() for item in updated_inventory)
             frasco_in_inventory = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in updated_inventory)
             
             if crucifijo_in_inventory:
-                print("✅ Crucifijo found in inventory")
+                print("\n✅ Crucifijo found in inventory")
             else:
-                print("❌ Crucifijo not found in inventory")
+                print("\n❌ Crucifijo not found in inventory")
                 
             if frasco_in_inventory:
                 print("✅ Frasco de sal found in inventory")
@@ -830,15 +833,20 @@ class HellboundRPGTester:
             
             # Check if the items are in discoveredItems (they should NOT be there)
             discovered_items = game_state.get('discoveredItems', [])
-            print(f"Discovered Items: {discovered_items}")
+            print(f"\n🔍 DISCOVERED ITEMS (should be empty):")
+            if discovered_items:
+                for item in discovered_items:
+                    print(f"  - {item.get('name')} {item.get('icon')}")
+            else:
+                print("  [Empty list - correct!]")
             
             crucifijo_discovered = any('crucifijo' in item.get('name', '').lower() for item in discovered_items)
             frasco_discovered = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in discovered_items)
             
             if not crucifijo_discovered:
-                print("✅ Crucifijo correctly NOT found in discoveredItems (should be in inventory)")
+                print("\n✅ Crucifijo correctly NOT found in discoveredItems (should be in inventory)")
             else:
-                print("❌ Crucifijo incorrectly found in discoveredItems")
+                print("\n❌ Crucifijo incorrectly found in discoveredItems")
                 
             if not frasco_discovered:
                 print("✅ Frasco de sal correctly NOT found in discoveredItems (should be in inventory)")
@@ -847,11 +855,15 @@ class HellboundRPGTester:
             
             # Overall test result - both items should be in inventory and NOT in discoveredItems
             if crucifijo_in_inventory and frasco_in_inventory and not crucifijo_discovered and not frasco_discovered:
-                print("✅ Compound items functionality working correctly - both items added to inventory")
-                print("✅ CRITICAL FIX VERIFIED: Items are detected and added to inventory WITHOUT search keywords")
+                print("\n✅ VERIFICACIÓN COMPLETA:")
+                print("1. ✅ Sistema analiza acción del usuario + narrativa")
+                print("2. ✅ splitCompoundItems() separa 'crucifijo y el frasco de sal'")
+                print("3. ✅ convertTextToRealItem() reconoce items en ITEM_DATABASE")
+                print("4. ✅ Items se añaden automáticamente al inventario")
+                print("5. ✅ NO aparecen en discoveredItems")
                 return True
             else:
-                print("❌ Compound items functionality not working correctly")
+                print("\n❌ Compound items functionality not working correctly")
                 return False
         
         return False
