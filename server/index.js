@@ -2020,6 +2020,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log('📖 Analizando narrativa para detectar items...');
       
       const patterns = [
+        // 🔍 PATRONES PARA ITEMS DISPONIBLES (van a discovered)
         /encuentras? (una?|el|la) ([^,.!?]+)/gi,
         /descubres? (una?|el|la) ([^,.!?]+)/gi,
         /hallas? (una?|el|la) ([^,.!?]+)/gi,
@@ -2031,6 +2032,20 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         /notas? (una?|el|la) ([^,.!?]+)/gi,
         /(una?|el|la) ([^,.!?]+) (sobre|en|bajo|dentro de|junto a)/gi,
         /se encuentra (una?|el|la) ([^,.!?]+)/gi
+      ];
+      
+      // 🎁 NUEVOS PATRONES PARA ITEMS YA RECOGIDOS AUTOMÁTICAMENTE (van directo a inventario)
+      const alreadyPickedPatterns = [
+        /decidiste? que (el|la|una?|un) ([^,.!?]+) (será|serán)/gi,
+        /tomas? (el|la|una?|un) ([^,.!?]+)/gi,
+        /recoges? (el|la|una?|un) ([^,.!?]+)/gi,
+        /llevas? (el|la|una?|un) ([^,.!?]+)/gi,
+        /agarras? (el|la|una?|un) ([^,.!?]+)/gi,
+        /coges? (el|la|una?|un) ([^,.!?]+)/gi,
+        /equipas? (el|la|una?|un) ([^,.!?]+)/gi,
+        /(el|la|una?|un) ([^,.!?]+) (será|serán) (tu|tus) (aliado|aliados|herramienta)/gi,
+        /tienes? (el|la|una?|un) ([^,.!?]+)/gi,
+        /portas? (el|la|una?|un) ([^,.!?]+)/gi
       ];
       
       let foundItems = [];
