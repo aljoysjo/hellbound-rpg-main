@@ -781,12 +781,15 @@ class HellboundRPGTester:
         
         initial_game_state = initial_response.get('game_state', {})
         initial_inventory = initial_game_state.get('inventory', [])
+        initial_discovered = initial_game_state.get('discoveredItems', [])
         
         print(f"Initial Inventory: {initial_inventory}")
+        print(f"Initial Discovered Items: {initial_discovered}")
         
-        # Send an action that should generate a narrative with items already picked up
+        # Send an action that should generate a narrative with compound items already picked up
+        print("\n🔍 Testing compound items functionality with action: 'decidiste que el crucifijo y el frasco de sal serán tus aliados en este momento incierto'")
         success, response = self.run_test(
-            "Narrative With Items Already Picked Up",
+            "Compound Items Test",
             "POST",
             "api/free_input",
             200,
@@ -800,12 +803,6 @@ class HellboundRPGTester:
             # Check the narrative response
             narrative = response.get('new_narrative', '')
             print(f"Narrative Response: {narrative[:200]}...")
-            
-            # Check if the narrative mentions the items
-            if 'crucifijo' in narrative.lower() and 'frasco' in narrative.lower() and 'sal' in narrative.lower():
-                print("✅ Narrative mentions crucifijo and frasco de sal")
-            else:
-                print("❌ Narrative does not mention crucifijo and frasco de sal")
             
             # Check the updated inventory
             game_state = response.get('game_state', {})
@@ -827,29 +824,29 @@ class HellboundRPGTester:
             else:
                 print("❌ Frasco de sal not found in inventory")
             
-            # Check if the items are in discoveredItems
+            # Check if the items are in discoveredItems (they should NOT be there)
             discovered_items = game_state.get('discoveredItems', [])
             print(f"Discovered Items: {discovered_items}")
             
             crucifijo_discovered = any('crucifijo' in item.get('name', '').lower() for item in discovered_items)
             frasco_discovered = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in discovered_items)
             
-            if crucifijo_discovered:
-                print("✅ Crucifijo found in discoveredItems")
+            if not crucifijo_discovered:
+                print("✅ Crucifijo correctly NOT found in discoveredItems (should be in inventory)")
             else:
-                print("❌ Crucifijo not found in discoveredItems")
+                print("❌ Crucifijo incorrectly found in discoveredItems")
                 
-            if frasco_discovered:
-                print("✅ Frasco de sal found in discoveredItems")
+            if not frasco_discovered:
+                print("✅ Frasco de sal correctly NOT found in discoveredItems (should be in inventory)")
             else:
-                print("❌ Frasco de sal not found in discoveredItems")
+                print("❌ Frasco de sal incorrectly found in discoveredItems")
             
-            # Overall test result
-            if (crucifijo_in_inventory or crucifijo_discovered) and (frasco_in_inventory or frasco_discovered):
-                print("✅ Items mentioned in narrative are properly detected")
+            # Overall test result - both items should be in inventory and NOT in discoveredItems
+            if crucifijo_in_inventory and frasco_in_inventory and not crucifijo_discovered and not frasco_discovered:
+                print("✅ Compound items functionality working correctly - both items added to inventory")
                 return True
             else:
-                print("❌ Items mentioned in narrative are not properly detected")
+                print("❌ Compound items functionality not working correctly")
                 return False
         
         return False
