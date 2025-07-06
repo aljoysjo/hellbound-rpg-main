@@ -2338,9 +2338,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         
         console.log(`🎭 NARRATIVA EXTENDIDA: ${itemChoiceText}`);
         
-      } else {
-        // CASO B: No hay items → Generar loot dinámico + explicación
-        console.log(`🎁 NARRATIVA SIN ITEMS: Generando loot dinámico con explicación`);
+      } else if (availableItems.length === 0) {
+        // CASO B: No hay items disponibles → Generar loot dinámico + explicación
+        console.log(`🎁 NARRATIVA SIN ITEMS DISPONIBLES: Generando loot dinámico con explicación`);
         
         const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
         
