@@ -60,7 +60,7 @@ const ITEM_DATABASE = [
   { type: 'trofeo', icon: '🏆', keywords: ['trofeo', 'trophy', 'premio', 'medalla', 'copa', 'galardón'] },
   { type: 'reliquia', icon: '⚗️', keywords: ['reliquia', 'relic', 'artefacto', 'artifact', 'objeto sagrado', 'antigüedad'] },
   { type: 'cuerpo', icon: '💀', keywords: ['cabeza', 'cráneo', 'hueso', 'esqueleto', 'calavera', 'skull', 'bone', 'head'] },
-  { type: 'crucifijo', icon: '✝️', keywords: ['crucifijo', 'cruz', 'cross', 'símbolo religioso', 'cruz de plata', 'cruz adornada'] },
+  { type: 'crucifijo', icon: '✝️', keywords: ['crucifijo', 'el crucifijo', 'cruz', 'santo crucifijo', 'cross', 'símbolo religioso', 'cruz de plata', 'cruz adornada'] },
   
   // 💍 JOYERÍA Y ACCESORIOS
   { type: 'anillo', icon: '💍', keywords: ['anillo', 'ring', 'sortija', 'aro', 'alianza'] },
