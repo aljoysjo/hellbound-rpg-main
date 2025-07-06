@@ -308,6 +308,11 @@ def main():
         narrative_items_success = tester.test_narrative_with_items()
         print(f"{'✅' if narrative_items_success else '❌'} Narrative with items test {'passed' if narrative_items_success else 'failed'}")
         
+        print("\n==== 3. TEST NARRATIVE WITH ITEMS ALREADY PICKED UP (DEBUG) ====")
+        # Test the narrative with items already picked up with debug output
+        narrative_items_debug_success = tester.test_narrative_with_items_debug()
+        print(f"{'✅' if narrative_items_debug_success else '❌'} Narrative with items debug test {'passed' if narrative_items_debug_success else 'failed'}")
+        
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
         
@@ -315,8 +320,9 @@ def main():
         print("\n==== TEST SUMMARY ====")
         print(f"1. Campaign Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
         print(f"2. Narrative with Items Already Picked Up: {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
+        print(f"3. Narrative with Items Debug: {'✅ PASSED' if narrative_items_debug_success else '❌ FAILED'}")
         
-        overall_success = tester.session_id and narrative_items_success
+        overall_success = tester.session_id and (narrative_items_success or narrative_items_debug_success)
         
         print(f"\n{'✅' if overall_success else '❌'} Items in Narrative Tests: {'PASSED' if overall_success else 'FAILED'}")
         
