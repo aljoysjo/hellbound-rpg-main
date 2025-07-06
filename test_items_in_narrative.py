@@ -2,6 +2,7 @@ import requests
 import sys
 import time
 import json
+import re
 from datetime import datetime
 
 class ItemsInNarrativeTester:
