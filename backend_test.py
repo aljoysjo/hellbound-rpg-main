@@ -707,6 +707,95 @@ class HellboundRPGTester:
             if self.ws_thread:
                 self.ws_thread.join(timeout=1)
 
+def test_narrative_with_items(self):
+        """Test a narrative that mentions items being picked up"""
+        if not self.session_id:
+            print("❌ Cannot test narrative with items without a valid session")
+            return False
+            
+        # First, get the initial state to check inventory
+        _, initial_response = self.run_test(
+            "Get Initial State Before Item Narrative",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_inventory = initial_game_state.get('inventory', [])
+        
+        print(f"Initial Inventory: {initial_inventory}")
+        
+        # Send an action that should generate a narrative with items already picked up
+        success, response = self.run_test(
+            "Narrative With Items Already Picked Up",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": self.session_id,
+                "action": "decidiste que el crucifijo y el frasco de sal serán tus aliados en este momento incierto"
+            }
+        )
+        
+        if success:
+            # Check the narrative response
+            narrative = response.get('new_narrative', '')
+            print(f"Narrative Response: {narrative[:200]}...")
+            
+            # Check if the narrative mentions the items
+            if 'crucifijo' in narrative.lower() and 'frasco' in narrative.lower() and 'sal' in narrative.lower():
+                print("✅ Narrative mentions crucifijo and frasco de sal")
+            else:
+                print("❌ Narrative does not mention crucifijo and frasco de sal")
+            
+            # Check the updated inventory
+            game_state = response.get('game_state', {})
+            updated_inventory = game_state.get('inventory', [])
+            
+            print(f"Updated Inventory: {updated_inventory}")
+            
+            # Check if the items are in the inventory
+            crucifijo_in_inventory = any('crucifijo' in item.get('name', '').lower() for item in updated_inventory)
+            frasco_in_inventory = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in updated_inventory)
+            
+            if crucifijo_in_inventory:
+                print("✅ Crucifijo found in inventory")
+            else:
+                print("❌ Crucifijo not found in inventory")
+                
+            if frasco_in_inventory:
+                print("✅ Frasco de sal found in inventory")
+            else:
+                print("❌ Frasco de sal not found in inventory")
+            
+            # Check if the items are in discoveredItems
+            discovered_items = game_state.get('discoveredItems', [])
+            print(f"Discovered Items: {discovered_items}")
+            
+            crucifijo_discovered = any('crucifijo' in item.get('name', '').lower() for item in discovered_items)
+            frasco_discovered = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in discovered_items)
+            
+            if crucifijo_discovered:
+                print("✅ Crucifijo found in discoveredItems")
+            else:
+                print("❌ Crucifijo not found in discoveredItems")
+                
+            if frasco_discovered:
+                print("✅ Frasco de sal found in discoveredItems")
+            else:
+                print("❌ Frasco de sal not found in discoveredItems")
+            
+            # Overall test result
+            if (crucifijo_in_inventory or crucifijo_discovered) and (frasco_in_inventory or frasco_discovered):
+                print("✅ Items mentioned in narrative are properly detected")
+                return True
+            else:
+                print("❌ Items mentioned in narrative are not properly detected")
+                return False
+        
+        return False
+
 def main():
     # Get backend URL from frontend .env file
     try:
@@ -739,34 +828,39 @@ def main():
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST FREE INPUT BASIC ====")
+        print("\n==== 3. TEST NARRATIVE WITH ITEMS ALREADY PICKED UP ====")
+        # Test the narrative with items already picked up
+        narrative_items_success = tester.test_narrative_with_items()
+        print(f"{'✅' if narrative_items_success else '❌'} Narrative with items test {'passed' if narrative_items_success else 'failed'}")
+        
+        print("\n==== 4. TEST FREE INPUT BASIC ====")
         # Test the free input with "examinar los alrededores"
         free_input_success = tester.test_free_input("examinar los alrededores")
         print(f"{'✅' if free_input_success else '❌'} Free input test {'passed' if free_input_success else 'failed'}")
         
-        print("\n==== 4. TEST VITALS AND STATS ====")
+        print("\n==== 5. TEST VITALS AND STATS ====")
         # Verify that the response has correct vitals (health, mana, stamina)
         vitals_success = tester.test_vitals_and_stats()
         print(f"{'✅' if vitals_success else '❌'} Vitals and stats test {'passed' if vitals_success else 'failed'}")
         
-        print("\n==== 5. TEST DYNAMIC LOOT SYSTEM ====")
+        print("\n==== 6. TEST DYNAMIC LOOT SYSTEM ====")
         # Test the loot system with discovered items
         dynamic_loot_success = tester.test_dynamic_loot_system()
         print(f"{'✅' if dynamic_loot_success else '❌'} Dynamic loot system test {'passed' if dynamic_loot_success else 'failed'}")
         
         if dynamic_loot_success:
-            print("\n==== 6. TEST PICKUP ITEM ====")
+            print("\n==== 7. TEST PICKUP ITEM ====")
             pickup_success = tester.test_pickup_item()
             print(f"{'✅' if pickup_success else '❌'} Pickup item test {'passed' if pickup_success else 'failed'}")
         else:
             pickup_success = False
             print("⚠️ Skipping pickup item test as no items were discovered")
         
-        print("\n==== 7. TEST ACTION COUNT INCREMENT ====")
+        print("\n==== 8. TEST ACTION COUNT INCREMENT ====")
         action_count_success = tester.test_action_count_increment()
         print(f"{'✅' if action_count_success else '❌'} Action count increment test {'passed' if action_count_success else 'failed'}")
         
-        print("\n==== 8. TEST GET_SESSION ENDPOINT ====")
+        print("\n==== 9. TEST GET_SESSION ENDPOINT ====")
         get_session_success = tester.test_get_session_endpoint()
         print(f"{'✅' if get_session_success else '❌'} Get session endpoint test {'passed' if get_session_success else 'failed'}")
         
@@ -777,13 +871,15 @@ def main():
         print("\n==== TEST SUMMARY ====")
         print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
         print(f"2. Sandbox Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"3. Free Input Basic: {'✅ PASSED' if free_input_success else '❌ FAILED'}")
-        print(f"4. Vitals and Stats: {'✅ PASSED' if vitals_success else '❌ FAILED'}")
-        print(f"5. Dynamic Loot System: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
+        print(f"3. Narrative with Items Already Picked Up: {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
+        print(f"4. Free Input Basic: {'✅ PASSED' if free_input_success else '❌ FAILED'}")
+        print(f"5. Vitals and Stats: {'✅ PASSED' if vitals_success else '❌ FAILED'}")
+        print(f"6. Dynamic Loot System: {'✅ PASSED' if dynamic_loot_success else '❌ FAILED'}")
         
         overall_success = (
             tester.test_healthcheck() and
             tester.session_id and
+            narrative_items_success and
             free_input_success and
             vitals_success and
             dynamic_loot_success
