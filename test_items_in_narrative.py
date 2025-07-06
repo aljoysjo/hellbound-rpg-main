@@ -193,6 +193,100 @@ class ItemsInNarrativeTester:
                 return False
         
         return False
+        
+    def test_narrative_with_items_debug(self):
+        """Test a narrative that mentions items being picked up with debug output"""
+        if not self.session_id:
+            print("❌ Cannot test narrative with items without a valid session")
+            return False
+            
+        # First, get the initial state to check inventory
+        _, initial_response = self.run_test(
+            "Get Initial State Before Item Narrative",
+            "GET",
+            f"api/get_session/{self.session_id}",
+            200
+        )
+        
+        initial_game_state = initial_response.get('game_state', {})
+        initial_inventory = initial_game_state.get('inventory', [])
+        
+        print(f"Initial Inventory: {initial_inventory}")
+        
+        # Send an action that should generate a narrative with items already picked up
+        success, response = self.run_test(
+            "Narrative With Items Already Picked Up (Debug)",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": self.session_id,
+                "action": "decidiste que el crucifijo y el frasco de sal serán tus aliados en este momento incierto"
+            }
+        )
+        
+        if success:
+            # Check the narrative response
+            narrative = response.get('new_narrative', '')
+            print(f"Narrative Response: {narrative[:200]}...")
+            
+            # Check the updated inventory
+            game_state = response.get('game_state', {})
+            updated_inventory = game_state.get('inventory', [])
+            
+            print(f"Updated Inventory: {updated_inventory}")
+            
+            # Check if the items are in the inventory
+            crucifijo_in_inventory = any('crucifijo' in item.get('name', '').lower() for item in updated_inventory)
+            frasco_in_inventory = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in updated_inventory)
+            
+            # Check if the items are in discoveredItems
+            discovered_items = game_state.get('discoveredItems', [])
+            print(f"Discovered Items: {discovered_items}")
+            
+            crucifijo_discovered = any('crucifijo' in item.get('name', '').lower() for item in discovered_items)
+            frasco_discovered = any('frasco' in item.get('name', '').lower() and 'sal' in item.get('name', '').lower() for item in discovered_items)
+            
+            # Check the raw response for debug information
+            raw_response = response
+            print("\n🔍 Checking raw response for debug information...")
+            
+            # Look for specific log messages in the response
+            crucifijo_detected = False
+            frasco_detected = False
+            items_added = False
+            
+            # Print all keys in the response
+            print(f"Response keys: {raw_response.keys()}")
+            
+            # Check if there's any debug information in the response
+            if 'debug' in raw_response:
+                debug_info = raw_response['debug']
+                print(f"Debug info: {debug_info}")
+                
+                # Look for specific log messages
+                if isinstance(debug_info, str):
+                    if '🎁 Item ya recogido detectado: crucifijo' in debug_info:
+                        crucifijo_detected = True
+                        print("✅ Debug shows crucifijo was detected")
+                    
+                    if '🎁 Item ya recogido detectado: frasco de sal' in debug_info:
+                        frasco_detected = True
+                        print("✅ Debug shows frasco de sal was detected")
+                    
+                    if '🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE' in debug_info:
+                        items_added = True
+                        print("✅ Debug shows items were added to inventory")
+            
+            # Overall test result
+            if (crucifijo_in_inventory or crucifijo_discovered) and (frasco_in_inventory or frasco_discovered):
+                print("✅ Items mentioned in narrative are properly detected")
+                return True
+            else:
+                print("❌ Items mentioned in narrative are not properly detected")
+                return False
+        
+        return False
 
 def main():
     # Use the provided URL from the test request
