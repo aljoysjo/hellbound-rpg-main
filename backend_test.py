@@ -766,7 +766,7 @@ class HellboundRPGTester:
                 self.ws_thread.join(timeout=1)
                 
     def test_narrative_with_items(self):
-        """Test a narrative that mentions items being picked up"""
+        """Test a narrative that mentions items being picked up without using search keywords"""
         if not self.session_id:
             print("❌ Cannot test narrative with items without a valid session")
             return False
@@ -787,9 +787,10 @@ class HellboundRPGTester:
         print(f"Initial Discovered Items: {initial_discovered}")
         
         # Send an action that should generate a narrative with compound items already picked up
+        # WITHOUT using search keywords like "buscar", "examinar", etc.
         print("\n🔍 Testing compound items functionality with action: 'tomas el crucifijo y el frasco de sal para protegerte'")
         success, response = self.run_test(
-            "Compound Items Test",
+            "Compound Items Test (Without Search Keywords)",
             "POST",
             "api/free_input",
             200,
@@ -847,6 +848,7 @@ class HellboundRPGTester:
             # Overall test result - both items should be in inventory and NOT in discoveredItems
             if crucifijo_in_inventory and frasco_in_inventory and not crucifijo_discovered and not frasco_discovered:
                 print("✅ Compound items functionality working correctly - both items added to inventory")
+                print("✅ CRITICAL FIX VERIFIED: Items are detected and added to inventory WITHOUT search keywords")
                 return True
             else:
                 print("❌ Compound items functionality not working correctly")
