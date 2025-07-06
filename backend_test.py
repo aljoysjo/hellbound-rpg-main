@@ -800,6 +800,9 @@ class HellboundRPGTester:
         )
         
         if success:
+            # Print the full response for debugging
+            print(f"Full API Response: {json.dumps(response, indent=2)}")
+            
             # Check the narrative response
             narrative = response.get('new_narrative', '')
             print(f"Narrative Response: {narrative[:200]}...")
