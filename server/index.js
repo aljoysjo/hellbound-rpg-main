@@ -2088,18 +2088,24 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           // Limpiar y validar el item
           itemName = itemName.replace(/[,\.!?;]$/, '').trim();
           
-          // Filtrar palabras demasiado cortas o genéricas
-          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 30 && !itemName.includes("mientras") && !itemName.includes("que se") && !itemName.includes("de la")) {
-            
-            // 🎯 CONVERTIR TEXTO A ITEM REAL DE DATABASE
-            const realItem = convertTextToRealItem(itemName);
-            if (realItem) {
-              alreadyPickedItems.push(realItem);
-              console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon}`);
-            } else {
-              console.log(`❌ Item ya recogido no reconocido: "${itemName}"`);
+          // 🎯 NUEVA FUNCIÓN: SEPARAR ITEMS COMPUESTOS
+          const individualItems = splitCompoundItems(itemName);
+          console.log(`🔍 Items compuestos separados: "${itemName}" → [${individualItems.join(', ')}]`);
+          
+          individualItems.forEach(singleItemName => {
+            // Filtrar palabras demasiado cortas o genéricas
+            if (singleItemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(singleItemName.toLowerCase()) && singleItemName.length < 30 && !singleItemName.includes("mientras") && !singleItemName.includes("que se") && !singleItemName.includes("de la")) {
+              
+              // 🎯 CONVERTIR TEXTO A ITEM REAL DE DATABASE
+              const realItem = convertTextToRealItem(singleItemName);
+              if (realItem) {
+                alreadyPickedItems.push(realItem);
+                console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon}`);
+              } else {
+                console.log(`❌ Item ya recogido no reconocido: "${singleItemName}"`);
+              }
             }
-          }
+          });
         }
       });
       
