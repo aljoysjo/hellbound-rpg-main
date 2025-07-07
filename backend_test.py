@@ -6,10 +6,11 @@ import json
 import websocket
 import threading
 import queue
+import random
 from datetime import datetime
 
 class HellboundRPGTester:
-    def __init__(self, base_url="http://localhost:8001"):
+    def __init__(self, base_url="https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
