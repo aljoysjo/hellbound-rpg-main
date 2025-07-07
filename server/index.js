@@ -2650,6 +2650,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           gameState.inventory.push(item);
           
           // 🎯 EMITIR INVENTORY UPDATE VIA WEBSOCKET (CHATGPT SOLUTION)
+          const socketSessionId = gameState.sessionId;
+          io.to(socketSessionId).emit('inventory_update', {
+            inventory: gameState.inventory,
+            discoveredItems: []
+          });
+          console.log(`📡 Inventory update emitted via WebSocket for ${alreadyPickedItems.length} items`);
+          
+          // 🎯 EMITIR INVENTORY UPDATE VIA WEBSOCKET (CHATGPT SOLUTION)
           if (alreadyPickedItems.length > 0) {
             const socketSessionId = gameState.sessionId;
             io.to(socketSessionId).emit('inventory_update', {
