@@ -316,16 +316,20 @@ function rollD20AndApplyConsequences(event, gameState) {
   
   // Aplicar consecuencias al gameState
   if (consequence.health) {
-    gameState.updateVitals({ health: consequence.health });
+    gameState.vitals.health = Math.max(0, Math.min(100, gameState.vitals.health + consequence.health));
+    console.log(`💗 Salud actualizada: ${gameState.vitals.health}`);
   }
   if (consequence.mana) {
-    gameState.updateVitals({ mana: consequence.mana });
+    gameState.vitals.mana = Math.max(0, Math.min(100, gameState.vitals.mana + consequence.mana));
+    console.log(`💙 Maná actualizado: ${gameState.vitals.mana}`);
   }
   if (consequence.stamina) {
-    gameState.updateVitals({ stamina: consequence.stamina });
+    gameState.vitals.stamina = Math.max(0, Math.min(100, gameState.vitals.stamina + consequence.stamina));
+    console.log(`💚 Stamina actualizada: ${gameState.vitals.stamina}`);
   }
   if (consequence.gold) {
-    gameState.updateResources({ gold: consequence.gold });
+    gameState.resources.gold = Math.max(0, gameState.resources.gold + consequence.gold);
+    console.log(`💰 Oro actualizado: ${gameState.resources.gold}`);
   }
   if (consequence.emotions) {
     Object.entries(consequence.emotions).forEach(([emotion, value]) => {
