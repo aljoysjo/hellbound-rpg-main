@@ -2467,7 +2467,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     function convertTextToRealItem(itemText) {
       const textLower = itemText.toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
-        .replace(/\b(el|la|los|las|un|una|unos|unas|de|del|al)\b/g, "") // quita artículos
+        .replace(/[^a-z0-9áéíóúüñ\s]/g, ' ') // quita símbolos pero mantiene espacios
+        .replace(/\b(el|la|los|las|un|una|unos|unas|del|de|y|junto|junto del|con)\b/g, ' ') // quita artículos y conectores
+        .replace(/\s+/g, ' ') // normaliza espacios múltiples
         .trim();
       
       console.log(`🪄 Text→Item: "${itemText}" → normalizado: "${textLower}"`);
