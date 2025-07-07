@@ -349,76 +349,43 @@ class HellboundRPGTester:
             print("⚠️ No random event was triggered after all actions. This is possible due to probability, but should be rare.")
             return False
         
-    def test_vitals_and_stats(self):
-        """Test that the response has correct vitals (health, mana, stamina)"""
-        if not self.session_id:
-            print("❌ Cannot test vitals without a valid session")
-            return False
-            
+    def test_start_session_campaign(self):
+        """Test starting a new campaign game session"""
         success, response = self.run_test(
-            "Get Session State for Vitals Check",
-            "GET",
-            f"api/get_session/{self.session_id}",
-            200
+            "Start Campaign Session API",
+            "POST",
+            "api/start_session",
+            200,
+            data={
+                "mode": "campaign", 
+                "campaignId": "caminos_del_abismo"
+            }
         )
-        
-        if success:
-            # Check if we got a game state
-            if 'game_state' not in response:
-                print("❌ Missing game_state in response")
-                return False
-                
-            # Check vitals
+        if success and 'session_id' in response:
+            self.session_id = response['session_id']
+            print(f"Session ID: {self.session_id}")
+            print(f"Initial Narrative: {response.get('initial_narrative')[:150]}...")
+            
+            # Check game state
             game_state = response.get('game_state', {})
-            vitals = game_state.get('vitals', {})
+            self.validate_game_state_structure(game_state)
             
-            print("\n🔍 Checking vitals...")
-            
-            # Check for required vitals
-            required_vitals = ['health', 'mana', 'stamina']
-            for vital in required_vitals:
-                if vital not in vitals:
-                    print(f"❌ Missing required vital: {vital}")
-                    return False
-                    
-                # Check if vital is a number
-                if not isinstance(vitals[vital], (int, float)):
-                    print(f"❌ Vital {vital} is not a number: {vitals[vital]}")
-                    return False
-                    
-                # Check if vital is in valid range (0-100)
-                if vitals[vital] < 0 or vitals[vital] > 100:
-                    print(f"❌ Vital {vital} is out of range (0-100): {vitals[vital]}")
-                    return False
-                    
-                print(f"✅ Vital {vital}: {vitals[vital]}")
-            
-            # Check other stats
-            print("\n🔍 Checking other stats...")
-            
-            # Check emotional states
-            emotional_states = game_state.get('emotionalStates', {})
-            if not emotional_states:
-                print("❌ Missing emotional states")
+            # Verify campaign-specific elements
+            if game_state.get('mode') != 'campaign':
+                print("❌ Game mode is not set to campaign")
                 return False
                 
-            print(f"Emotional States: {emotional_states}")
-            
-            # Check resources
-            resources = game_state.get('resources', {})
-            if not resources:
-                print("❌ Missing resources")
+            # Check for campaign metadata
+            if not game_state.get('campaignMeta'):
+                print("❌ Campaign metadata not found")
                 return False
                 
-            print(f"Resources: {resources}")
+            print(f"Campaign Mode: {game_state.get('mode')}")
+            print(f"Campaign Title: {game_state.get('campaignMeta', {}).get('titulo')}")
+            print(f"Initial Action Count: {game_state.get('actionCount', 0)}")
             
-            # Check attributes
-            attributes = game_state.get('attributes', {})
-            if not attributes:
-                print("❌ Missing attributes")
-                return False
-                
-            print(f"Attributes: {attributes}")
+            # Connect to WebSocket for this session
+            self.connect_websocket()
             
             return True
         return False
