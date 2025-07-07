@@ -438,6 +438,7 @@ metadata:
 test_plan:
   current_focus:
     - "Configuración CORS"
+    - "Sistema de eventos aleatorios D20"
   stuck_tasks:
     - "Configuración CORS"
   test_all: false
