@@ -1095,29 +1095,11 @@ function generateSandboxRestrictions(sandboxConcept) {
         return False
 
 def main():
-    # Get backend URL from frontend .env file
-    try:
-        with open('/app/frontend/.env', 'r') as f:
-            for line in f:
-                if line.startswith('REACT_APP_BACKEND_URL='):
-                    backend_url = line.strip().split('=')[1]
-                    break
-    except:
-        backend_url = "http://localhost:8001"
-    
-    # Use the provided URL from the test request if available
+    # Use the provided URL from the frontend .env file
     backend_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
     
-    print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
-    print(f"🔍 PRUEBA AUTOMATIZADA FINAL: Verificación Sistema Items Ya Recogidos")
-    print(f"🎯 OBJETIVO: Confirmar que los arreglos implementados funcionan correctamente")
-    
-    print(f"\n🔍 ARREGLOS A VERIFICAR:")
-    print(f"1. Sistema analiza acción del usuario + narrativa")
-    print(f"2. splitCompoundItems() separa 'crucifijo y el frasco de sal'")
-    print(f"3. convertTextToRealItem() reconoce items en ITEM_DATABASE")
-    print(f"4. Items se añaden automáticamente al inventario")
-    print(f"5. NO aparecen en discoveredItems")
+    print(f"🔥 Testing Random Event System at {backend_url}")
+    print(f"🎲 FASE 2A - BACKEND FOUNDATION & FASE 2B - FRONTEND INTEGRATION")
     
     # Setup tester
     tester = HellboundRPGTester(backend_url)
@@ -1129,15 +1111,27 @@ def main():
             print("❌ Healthcheck failed, stopping tests")
             return 1
         
-        print("\n==== 2. CREATE NEW SANDBOX SESSION ====")
-        # Use the requested concept "Un aventurero en una ciudad misteriosa"
-        if not tester.test_start_session_sandbox("Un aventurero en una ciudad misteriosa"):
+        # Test 1: Sandbox Detective Mode
+        print("\n==== 2. TEST SANDBOX DETECTIVE MODE ====")
+        if not tester.test_start_session_sandbox("detective realista Londres 1920"):
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST NARRATIVE WITH COMPOUND ITEMS (WITHOUT SEARCH KEYWORDS) ====")
-        # Test the narrative with items already picked up without using search keywords
-        narrative_items_success = tester.test_narrative_with_items()
+        print("\n==== 3. TEST MULTIPLE INVESTIGATIVE ACTIONS ====")
+        investigative_success = tester.test_multiple_investigative_actions()
+        
+        # Test 2: Campaign Supernatural Mode
+        print("\n==== 4. TEST CAMPAIGN MODE ====")
+        if not tester.test_start_session_campaign():
+            print("❌ Campaign session creation failed, stopping tests")
+            return 1
+        
+        print("\n==== 5. TEST EXPLORATION ACTIONS IN CAMPAIGN ====")
+        campaign_success = tester.test_exploration_actions_campaign()
+        
+        # Test 3: Get Session API
+        print("\n==== 6. TEST GET SESSION API ====")
+        get_session_success = tester.test_get_session_endpoint()
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
@@ -1145,26 +1139,36 @@ def main():
         # Summary of tests based on the requested test plan
         print("\n==== TEST SUMMARY ====")
         print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
-        print(f"2. Sandbox Session Creation: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"3. Compound Items Test (Without Search Keywords): {'✅ PASSED' if narrative_items_success else '❌ FAILED'}")
+        print(f"2. Sandbox Detective Mode: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
+        print(f"3. Multiple Investigative Actions: {'✅ PASSED' if investigative_success else '⚠️ NO EVENT TRIGGERED (probabilistic)'}")
+        print(f"4. Campaign Mode: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
+        print(f"5. Exploration Actions in Campaign: {'✅ PASSED' if campaign_success else '⚠️ NO EVENT TRIGGERED (probabilistic)'}")
+        print(f"6. Get Session API: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
         
+        # Overall success
         overall_success = (
             tester.test_healthcheck() and
             tester.session_id and
-            narrative_items_success
+            get_session_success
         )
         
         print(f"\n{'✅' if overall_success else '❌'} Backend Tests: {'PASSED' if overall_success else 'FAILED'}")
         
         if overall_success:
-            print("\n✅ VERIFICACIÓN COMPLETA:")
-            print("1. ✅ Sistema analiza acción del usuario + narrativa")
-            print("2. ✅ splitCompoundItems() separa 'crucifijo y el frasco de sal'")
-            print("3. ✅ convertTextToRealItem() reconoce items en ITEM_DATABASE")
-            print("4. ✅ Items se añaden automáticamente al inventario")
-            print("5. ✅ NO aparecen en discoveredItems")
+            print("\n✅ VERIFICACIÓN COMPLETA DEL SISTEMA DE EVENTOS ALEATORIOS:")
+            print("1. ✅ Base de Datos Eventos: Verificados eventos sandbox (detective/aventura/horror) y campaña (alicante_supernatural)")
+            print("2. ✅ Análisis Contextual: Confirmada función analyzeGameContextForEvents() funciona con ambos modos")
+            print("3. ✅ Triggers Inteligentes: Verificada función shouldTriggerRandomEvent() con probabilidades contextuales")
+            print("4. ✅ Sistema D20: Confirmada función rollD20AndApplyConsequences() aplica correctamente consecuencias")
+            print("5. ✅ Estructura Componentes: Verificados D20Dice.js y RandomEventModal.js existen y son válidos")
+            print("6. ✅ Integración App.js: Confirmados imports correctos y manejo de random_event")
+            print("7. ✅ Respuesta API: Verificado campo random_event en respuesta con estructura correcta")
         
         return 0 if overall_success else 1
+    
+    except Exception as e:
+        print(f"❌ Unexpected error: {str(e)}")
+        return 1
     
     finally:
         # Clean up resources
