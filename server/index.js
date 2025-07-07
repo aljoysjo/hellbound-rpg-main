@@ -2639,16 +2639,18 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log(`🎁 ITEMS YA RECOGIDOS DETECTADOS: ${alreadyPickedItems.length} items añadiendo al inventario`);
       
       alreadyPickedItems.forEach(item => {
-        // Verificar que no existe ya en inventario
-        const existsInInventory = gameState.inventory.some(invItem => 
-          invItem.name.toLowerCase() === item.name.toLowerCase()
-        );
+        // Verificar que no existe ya en inventario usando canonical name (CHATGPT SOLUTION)
+        const canonicalId = item.canonicalId || canonicalName(item.name);
+        const existsInInventory = gameState.inventory.some(invItem => {
+          const invCanonicalId = invItem.canonicalId || canonicalName(invItem.name);
+          return invCanonicalId === canonicalId;
+        });
         
         if (!existsInInventory) {
           gameState.inventory.push(item);
-          console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon}`);
+          console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon} (canonical: ${canonicalId})`);
         } else {
-          console.log(`⚠️ Item ya existe en inventario: ${item.name}`);
+          console.log(`⚠️ Item ya existe en inventario (canonical match): ${item.name} ≈ ${canonicalId}`);
         }
       });
     }
