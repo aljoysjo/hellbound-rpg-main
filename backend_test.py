@@ -184,8 +184,8 @@ class HellboundRPGTester:
         
         if success:
             # Check if we got a narrative response
-            if 'new_narrative' not in response:
-                print("❌ Missing new_narrative in response")
+            if 'narrative' not in response:
+                print("❌ Missing narrative in response")
                 return False
                 
             # Check if we got a game state
@@ -194,7 +194,7 @@ class HellboundRPGTester:
                 return False
                 
             # Print the narrative response
-            print(f"Narrative Response: {response.get('new_narrative')[:150]}...")
+            print(f"Narrative Response: {response.get('narrative')[:150]}...")
             
             # Check if we got suggested actions
             suggested_actions = response.get('suggested_actions', [])
@@ -204,8 +204,150 @@ class HellboundRPGTester:
             game_state = response.get('game_state', {})
             self.validate_game_state_structure(game_state)
             
+            # Check for random_event field
+            if 'random_event' in response and response['random_event']:
+                print("\n🎲 Random Event detected in response!")
+                self.analyze_random_event(response.get('random_event'))
+            
             return True
         return False
+        
+    def analyze_random_event(self, random_event):
+        """Analyze a random event response"""
+        if not random_event:
+            print("❌ Random event is null or empty")
+            return False
+        
+        print("\n🎲 RANDOM EVENT ANALYSIS:")
+        print(f"Success: {random_event.get('success')}")
+        print(f"Roll: {random_event.get('roll')}")
+        print(f"Event: {random_event.get('event', {}).get('title')}")
+        print(f"Description: {random_event.get('event', {}).get('description')}")
+        print(f"Difficulty: {random_event.get('event', {}).get('difficulty')}")
+        print(f"Narrative: {random_event.get('narrative')[:100]}...")
+        
+        # Check applied consequences
+        if 'appliedConsequences' in random_event:
+            consequences = random_event.get('appliedConsequences', {})
+            print("\n🎲 Applied Consequences:")
+            for key, value in consequences.items():
+                print(f"  - {key}: {value}")
+        
+        return True
+        
+    def test_multiple_investigative_actions(self):
+        """Test multiple investigative actions to trigger a random event"""
+        if not self.session_id:
+            print("❌ Cannot test multiple actions without a valid session")
+            return False
+        
+        investigative_actions = [
+            "examinar la escena del crimen",
+            "buscar pistas en el suelo",
+            "investigar las huellas",
+            "analizar las manchas de sangre",
+            "buscar testigos en la zona",
+            "revisar los documentos de la víctima"
+        ]
+        
+        random_event_triggered = False
+        
+        print("\n🔍 Executing multiple investigative actions to trigger a random event...")
+        
+        for i, action in enumerate(investigative_actions):
+            print(f"\n🔍 Action {i+1}: {action}")
+            success, response = self.run_test(
+                f"Investigative Action {i+1}",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": self.session_id,
+                    "action": action
+                }
+            )
+            
+            if success:
+                # Check if a random event was triggered
+                if 'random_event' in response and response['random_event']:
+                    random_event_triggered = True
+                    print(f"🎲 Random event triggered on action {i+1}!")
+                    self.analyze_random_event(response['random_event'])
+                    break
+                
+                # Check action count increment
+                game_state = response.get('game_state', {})
+                print(f"Action Count: {game_state.get('actionCount', 0)}")
+                
+                # Wait a bit between requests to avoid rate limiting
+                time.sleep(1)
+            else:
+                print(f"❌ Action {i+1} failed")
+                return False
+        
+        if random_event_triggered:
+            print("✅ Successfully triggered a random event with investigative actions")
+            return True
+        else:
+            print("⚠️ No random event was triggered after all actions. This is possible due to probability, but should be rare.")
+            return False
+            
+    def test_exploration_actions_campaign(self):
+        """Test exploration actions in campaign mode to trigger a random event"""
+        if not self.session_id:
+            print("❌ Cannot test exploration actions without a valid session")
+            return False
+        
+        exploration_actions = [
+            "explorar los alrededores",
+            "caminar por las calles de Alicante",
+            "observar la figura misteriosa",
+            "investigar los rumores locales",
+            "buscar pistas sobre los Errantes",
+            "patrullar la zona"
+        ]
+        
+        random_event_triggered = False
+        
+        print("\n🔍 Executing exploration actions in campaign mode to trigger a random event...")
+        
+        for i, action in enumerate(exploration_actions):
+            print(f"\n🔍 Action {i+1}: {action}")
+            success, response = self.run_test(
+                f"Exploration Action {i+1}",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": self.session_id,
+                    "action": action
+                }
+            )
+            
+            if success:
+                # Check if a random event was triggered
+                if 'random_event' in response and response['random_event']:
+                    random_event_triggered = True
+                    print(f"🎲 Random event triggered on action {i+1}!")
+                    self.analyze_random_event(response['random_event'])
+                    break
+                
+                # Check action count increment
+                game_state = response.get('game_state', {})
+                print(f"Action Count: {game_state.get('actionCount', 0)}")
+                
+                # Wait a bit between requests to avoid rate limiting
+                time.sleep(1)
+            else:
+                print(f"❌ Action {i+1} failed")
+                return False
+        
+        if random_event_triggered:
+            print("✅ Successfully triggered a random event with exploration actions")
+            return True
+        else:
+            print("⚠️ No random event was triggered after all actions. This is possible due to probability, but should be rare.")
+            return False
         
     def test_vitals_and_stats(self):
         """Test that the response has correct vitals (health, mana, stamina)"""
