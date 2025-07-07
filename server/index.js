@@ -2681,12 +2681,34 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log(`🎲 Sistema híbrido no activado para: "${action}"`);
     }
     
+    // 🎲 PASO FINAL: SISTEMA DE EVENTOS ALEATORIOS D20
+    let randomEventResult = null;
+    
+    // Verificar si debe activarse un evento aleatorio
+    if (shouldTriggerRandomEvent(gameState, action)) {
+      console.log(`🎲 ACTIVANDO SISTEMA DE EVENTOS ALEATORIOS`);
+      
+      const context = analyzeGameContextForEvents(gameState, action, narrative);
+      const availableEvents = filterEventsForContext(context);
+      
+      if (availableEvents.length > 0) {
+        const selectedEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+        randomEventResult = rollD20AndApplyConsequences(selectedEvent, gameState);
+        
+        // Extender narrativa con el evento
+        narrative += `\n\n🎲 **${selectedEvent.title}**: ${selectedEvent.description}\n\n*[Lanzas un D20... Resultado: ${randomEventResult.roll}]*\n\n${randomEventResult.narrative}`;
+        
+        console.log(`🎲 EVENTO EJECUTADO: ${selectedEvent.title} (${randomEventResult.success ? 'ÉXITO' : 'FRACASO'})`);
+      }
+    }
+    
     res.json({
       success: true,
       narrative: narrative,
       suggested_actions: suggestedActions,
       game_state: gameState.toDict(),
-      state_changes: stateChanges
+      state_changes: stateChanges,
+      random_event: randomEventResult // Para el frontend
     });
     
   } catch (error) {
