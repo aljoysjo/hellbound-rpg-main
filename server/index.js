@@ -2627,19 +2627,48 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       return ` ${randomPhrase}`;
     }
     
-    // 🎁 PASO 0: DETECTAR ITEMS YA RECOGIDOS EN NARRATIVA Y ACCIÓN (INDEPENDIENTE DE BÚSQUEDA)
-    console.log(`🔍 PASO 0: Analizando narrativa y acción del usuario para items ya recogidos...`);
+    // 🎁 PASO 0: EXTRAER TODOS LOS CANDIDATOS Y REORDENAR FLUJO (CHATGPT SOLUTION)
+    console.log(`🔍 PASO 0: Extrayendo candidatos de narrativa y acción para procesamiento ordenado...`);
     
     // Analizar tanto la narrativa generada como la acción del usuario
     const fullText = `${action} ${narrative}`;
     console.log(`🔍 Texto completo para análisis: "${fullText}"`);
     
     const narrativeExtraction = extractItemsFromNarrative(fullText);
-    const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
+    const allCandidates = [
+      ...(narrativeExtraction.availableItems || []),
+      ...(narrativeExtraction.alreadyPickedItems || [])
+    ];
     
-    // 🎁 PROCESAR ITEMS YA RECOGIDOS (directo a inventario) 
+    console.log(`📦 CANDIDATOS TOTALES EXTRAÍDOS: ${allCandidates.length} items`);
+    
+    // 🎯 PASO 0A: PROCESAR DISCOVERED ITEMS PRIMERO (CHATGPT SOLUTION - PRIORIDAD AL MODAL)
+    const candidatesForDiscovered = narrativeExtraction.availableItems || [];
+    if (candidatesForDiscovered.length > 0) {
+      console.log(`🎁 DISCOVERED ITEMS DETECTADOS: ${candidatesForDiscovered.length} items para modal`);
+      
+      // Añadir a discoveredItems para que aparezcan en modal
+      if (!gameState.discoveredItems) gameState.discoveredItems = [];
+      
+      candidatesForDiscovered.forEach(item => {
+        const existsInInventory = gameState.inventory.some(invItem => 
+          invItem.name.toLowerCase() === item.name.toLowerCase()
+        );
+        const existsInDiscovered = gameState.discoveredItems.some(discItem => 
+          discItem.name.toLowerCase() === item.name.toLowerCase()
+        );
+        
+        if (!existsInInventory && !existsInDiscovered) {
+          gameState.discoveredItems.push(item);
+          console.log(`🎁 Item añadido a discovered para modal: ${item.name} ${item.icon}`);
+        }
+      });
+    }
+    
+    // 🎯 PASO 0B: PROCESAR AUTO-PICK DESPUÉS (CHATGPT SOLUTION - SECUNDARIO)
+    const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
     if (alreadyPickedItems.length > 0) {
-      console.log(`🎁 ITEMS YA RECOGIDOS DETECTADOS: ${alreadyPickedItems.length} items añadiendo al inventario`);
+      console.log(`🤖 AUTO-PICK DETECTADO: ${alreadyPickedItems.length} items para inventario directo`);
       
       alreadyPickedItems.forEach(item => {
         // Verificar que no existe ya en inventario usando canonical name (CHATGPT SOLUTION)
@@ -2651,21 +2680,19 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         
         if (!existsInInventory) {
           gameState.inventory.push(item);
-          console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon} (canonical: ${canonicalId})`);
+          console.log(`🤖 AUTO-PICK: Item añadido al inventario: ${item.name} ${item.icon} (canonical: ${canonicalId})`);
         } else {
-          console.log(`⚠️ Item ya existe en inventario (canonical match): ${item.name} ≈ ${canonicalId}`);
+          console.log(`⚠️ AUTO-PICK: Item ya existe en inventario (canonical match): ${item.name} ≈ ${canonicalId}`);
         }
       });
       
       // 🎯 EMITIR INVENTORY UPDATE VIA WEBSOCKET (CHATGPT SOLUTION)
-      if (alreadyPickedItems.length > 0) {
-        const socketSessionId = gameState.sessionId;
-        io.to(socketSessionId).emit('inventory_update', {
-          inventory: gameState.inventory,
-          discoveredItems: []
-        });
-        console.log(`📡 Inventory update emitted via WebSocket for ${alreadyPickedItems.length} items`);
-      }
+      const socketSessionId = gameState.sessionId;
+      io.to(socketSessionId).emit('inventory_update', {
+        inventory: gameState.inventory,
+        discoveredItems: gameState.discoveredItems || []
+      });
+      console.log(`📡 AUTO-PICK: Inventory update emitted via WebSocket for ${alreadyPickedItems.length} items`);
     }
     
     // 🎲 SISTEMA HÍBRIDO DE LOOT INTELIGENTE (SOLO PARA BÚSQUEDAS)
