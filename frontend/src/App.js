@@ -7,6 +7,10 @@ import SandboxForm from './components/SandboxForm';
 import ResponsiveHeader from './components/ResponsiveHeader';
 import RandomEventModal from './components/RandomEventModal';
 
+// 🎲 ESTADO EVENTOS ALEATORIOS
+const [randomEvent, setRandomEvent] = useState(null);
+const [showRandomEventModal, setShowRandomEventModal] = useState(false);
+
 // 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
   const [gameState, setGameState] = useState(null);
