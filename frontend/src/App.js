@@ -840,7 +840,7 @@ function App() {
         setNarrativeVisible(true);
         
         // 🎲 MANEJAR EVENTOS ALEATORIOS
-        if (response.data.random_event) {
+        if (response.data && response.data.random_event) {
           console.log('🎲 Evento aleatorio recibido:', response.data.random_event);
           setRandomEvent(response.data.random_event);
           setShowRandomEventModal(true);
