@@ -54,6 +54,7 @@ const ITEM_DATABASE = [
   
   // 📚 CONOCIMIENTO
   { type: 'libro', icon: '📖', keywords: ['libro', 'grimorio', 'tomo', 'manuscrito', 'volumen', 'text'] },
+  { type: 'diario', icon: '📓', keywords: ['diario', 'diario antiguo', 'diario personal', 'antiguo diario'] },
   { type: 'pergamino', icon: '📜', keywords: ['pergamino', 'scroll', 'mapa', 'carta', 'plano', 'documento'] },
   
   // 🏆 OBJETOS ESPECIALES
