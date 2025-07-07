@@ -594,57 +594,22 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
-// Middleware - CORS PERMANENTE Y ROBUSTO
-const allowedOrigins = [
-  'https://hellbound-game.preview.emergentagent.com',
-  'https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com',
-  'http://localhost:3000', // Para desarrollo local
-  'http://localhost:3001', // Puerto alternativo
-  process.env.FRONTEND_URL // URL dinámica desde .env si existe
-].filter(Boolean); // Filtrar valores undefined/null
+// Middleware - CORS SIMPLIFICADO Y DIRECTO
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
+                     || 'https://hellbound-game.preview.emergentagent.com';
 
-console.log('🌐 CORS allowedOrigins:', allowedOrigins);
+console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
 
 app.use(cors({
-  origin: function (origin, callback) {
-    console.log('🌐 CORS request from origin:', origin);
-    
-    // Permitir requests sin origin (como aplicaciones móviles, curl, etc.)
-    if (!origin) {
-      console.log('✅ CORS: Allowing request without origin');
-      return callback(null, true);
-    }
-    
-    // Permitir cualquier subdominio de emergentagent.com
-    if (origin.includes('.preview.emergentagent.com') || origin.includes('emergentagent.com')) {
-      console.log('✅ CORS: Allowing emergentagent.com subdomain');
-      return callback(null, true);
-    }
-    
-    // Permitir orígenes específicos
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('✅ CORS: Allowing specific origin');
-      return callback(null, true);
-    }
-    
-    // Para desarrollo, permitir localhost
-    if (origin.includes('localhost')) {
-      console.log('✅ CORS: Allowing localhost');
-      return callback(null, true);
-    }
-    
-    console.log('✅ CORS: Allowing all origins (temporary)');
-    return callback(null, true); // TEMPORAL: Permitir todo mientras se estabiliza
-  },
+  origin: FRONTEND_ORIGIN,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Accept', 'Origin'],
-  optionsSuccessStatus: 200 // Para browsers legacy
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Accept', 'Origin']
 }));
 
 // Headers adicionales para asegurar CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Origin', FRONTEND_ORIGIN);
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Accept,Origin');
   res.header('Access-Control-Allow-Credentials', 'true');
