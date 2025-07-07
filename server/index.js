@@ -569,27 +569,9 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: function (origin, callback) {
-      console.log('🔌 Socket.IO CORS request from origin:', origin);
-      
-      // Permitir requests sin origin
-      if (!origin) return callback(null, true);
-      
-      // Permitir cualquier subdominio de emergentagent.com
-      if (origin.includes('.preview.emergentagent.com') || origin.includes('emergentagent.com')) {
-        return callback(null, true);
-      }
-      
-      // Permitir localhost para desarrollo
-      if (origin.includes('localhost')) {
-        return callback(null, true);
-      }
-      
-      return callback(null, true); // Permitir todo temporalmente
-    },
+    origin: FRONTEND_ORIGIN,
     methods: ['GET', 'POST'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    credentials: true
   },
   transports: ['websocket', 'polling']
 });
