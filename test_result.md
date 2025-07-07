@@ -146,6 +146,21 @@ backend:
         agent: "testing"
         comment: "PRUEBA FINAL POST-ARREGLO: Se ha verificado que el sistema de detección de items en narrativa funciona correctamente después de añadir la función generateSandboxRestrictions(). Las pruebas muestran que al enviar la acción 'tomas el crucifijo y el frasco de sal para protegerte', ambos items se añaden correctamente al inventario y no aparecen en discoveredItems. La función splitCompoundItems() separa correctamente los items compuestos, y la función convertTextToRealItem() reconoce los items en ITEM_DATABASE. El sistema funciona según lo esperado, detectando y procesando correctamente los items mencionados en la narrativa."
 
+  - task: "Sistema de eventos aleatorios D20"
+    implemented: true
+    working: true
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba del sistema de eventos aleatorios D20"
+      - working: true
+        agent: "testing"
+        comment: "Se ha verificado que el sistema de eventos aleatorios D20 funciona correctamente. Las pruebas muestran que: 1) La base de datos de eventos incluye eventos para sandbox (detective/aventura/horror) y campaña (alicante_supernatural). 2) La función analyzeGameContextForEvents() funciona correctamente con ambos modos, detectando el contexto y seleccionando eventos apropiados. 3) La función shouldTriggerRandomEvent() implementa correctamente las probabilidades contextuales, aumentando la probabilidad según el tipo de acción y ubicación. 4) La función rollD20AndApplyConsequences() aplica correctamente las consecuencias al estado del juego según el resultado del dado. 5) La respuesta de la API incluye el campo random_event con la estructura correcta (success, roll, event, narrative, appliedConsequences). 6) Se ha verificado que los componentes D20Dice.js y RandomEventModal.js existen y son válidos para mostrar la animación del dado y el modal de eventos."
+
 frontend:
   - task: "Modo campaña"
     implemented: true
