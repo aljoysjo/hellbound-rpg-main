@@ -2446,11 +2446,17 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
             // Filtrar palabras demasiado cortas o genéricas
             if (singleItemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(singleItemName.toLowerCase()) && singleItemName.length < 30 && !singleItemName.includes("mientras") && !singleItemName.includes("que se") && !singleItemName.includes("de la")) {
               
-              // 🎯 CONVERTIR TEXTO A ITEM REAL DE DATABASE
+              // 🎯 CONVERTIR TEXTO A ITEM REAL CON CANONICAL NAME (CHATGPT SOLUTION)
               const realItem = convertTextToRealItem(singleItemName);
               if (realItem) {
-                alreadyPickedItems.push(realItem);
-                console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon}`);
+                // Usar canonical name para evitar duplicaciones
+                const canonicalId = canonicalName(realItem.name);
+                const itemWithCanonical = {
+                  ...realItem,
+                  canonicalId: canonicalId
+                };
+                alreadyPickedItems.push(itemWithCanonical);
+                console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon} (canonical: ${canonicalId})`);
               } else {
                 console.log(`❌ Item ya recogido no reconocido: "${singleItemName}"`);
               }
