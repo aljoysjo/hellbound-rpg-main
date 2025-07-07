@@ -2648,6 +2648,16 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         
         if (!existsInInventory) {
           gameState.inventory.push(item);
+          
+          // 🎯 EMITIR INVENTORY UPDATE VIA WEBSOCKET (CHATGPT SOLUTION)
+          if (alreadyPickedItems.length > 0) {
+            const socketSessionId = gameState.sessionId;
+            io.to(socketSessionId).emit('inventory_update', {
+              inventory: gameState.inventory,
+              discoveredItems: []
+            });
+            console.log(`📡 Inventory update emitted via WebSocket for ${alreadyPickedItems.length} items`);
+          }
           console.log(`🎁 ITEM AÑADIDO AL INVENTARIO AUTOMÁTICAMENTE: ${item.name} ${item.icon} (canonical: ${canonicalId})`);
         } else {
           console.log(`⚠️ Item ya existe en inventario (canonical match): ${item.name} ≈ ${canonicalId}`);
