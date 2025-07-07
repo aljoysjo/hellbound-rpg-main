@@ -567,6 +567,13 @@ function rollIntelligentLoot(gameState, action, narrative, quality = 'common') {
 
 const app = express();
 const server = createServer(app);
+
+// Middleware - CORS SIMPLIFICADO Y DIRECTO
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
+                     || 'https://hellbound-game.preview.emergentagent.com';
+
+console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
+
 const io = new Server(server, {
   cors: {
     origin: FRONTEND_ORIGIN,
@@ -575,12 +582,6 @@ const io = new Server(server, {
   },
   transports: ['websocket', 'polling']
 });
-
-// Middleware - CORS SIMPLIFICADO Y DIRECTO
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
-                     || 'https://hellbound-game.preview.emergentagent.com';
-
-console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
