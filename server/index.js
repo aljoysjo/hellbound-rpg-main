@@ -73,6 +73,28 @@ const ITEM_DATABASE = [
   { type: 'metal', icon: '🔩', keywords: ['hierro', 'acero', 'metal', 'barra de hierro', 'lingote', 'varilla', 'barra de acero', 'chatarra'] },
 ];
 
+// 🎯 TABLA DE ALIASES PARA ITEMS SIMILARES (CHATGPT SOLUTION)
+const ITEM_ALIASES = {
+  'metal afilado': 'improvised_knife',
+  'improvisado cuchillo': 'improvised_knife', 
+  'cuchillo improvisado': 'improvised_knife',
+  'trozo de metal': 'improvised_knife',
+  'fragmento de metal': 'improvised_knife',
+  'hoja afilada': 'improvised_knife',
+  'frasco de cristal': 'frasco_cristal',
+  'frasco cristalino': 'frasco_cristal',
+  'recipiente de cristal': 'frasco_cristal',
+  'diario antiguo': 'diario',
+  'diario personal': 'diario',
+  'viejo diario': 'diario'
+};
+
+// 🎯 FUNCIÓN: NORMALIZAR NOMBRES DE ITEMS (CHATGPT SOLUTION)
+function canonicalName(raw) {
+  const key = raw.toLowerCase().trim();
+  return ITEM_ALIASES[key] || key;
+}
+
 // 🎲 SISTEMA DE EVENTOS ALEATORIOS D20
 const RANDOM_EVENTS_DATABASE = {
   // 🎨 EVENTOS SANDBOX POR TEMÁTICA
