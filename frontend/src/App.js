@@ -8,6 +8,8 @@ import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
 
+// this is test comment
+
 // 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
 function App() {
   // 🎲 ESTADO EVENTOS ALEATORIOS
