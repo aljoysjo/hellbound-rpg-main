@@ -2667,7 +2667,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         gameState.consecutiveEmptySearches = 0;
         console.log(`✅ ¡Descubrimiento exitoso! Reseteando contadores`);
       
-        // PASO 1: Extraer items disponibles de la narrativa (solo para discovered items)
+        // PASO 1: Usar items disponibles ya extraídos de la narrativa
       const availableItems = narrativeExtraction.availableItems || [];
       if (availableItems.length > 0) {
         // CASO A: Hay items disponibles en la narrativa → Preguntar al jugador
