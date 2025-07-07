@@ -657,6 +657,12 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 
+// Middleware de debugging para todas las rutas
+app.use((req, res, next) => {
+  console.log(`🌐 ${req.method} ${req.path} - Origin: ${req.headers.origin || 'no-origin'}`);
+  next();
+});
+
 // MongoDB setup
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/';
 const client = new MongoClient(MONGO_URL);
