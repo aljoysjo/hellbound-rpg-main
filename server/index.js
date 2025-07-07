@@ -2376,14 +2376,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         /se encuentra (una?|el|la) ([^,.!?]+)/gi
       ];
       
-      // 🎁 PATRONES REFINADOS PARA ITEMS YA RECOGIDOS (CHATGPT SOLUTION - MÁS ESPECÍFICOS)
+      // 🎁 PATRONES REFINADOS Y FLEXIBLES PARA AUTO-PICK (CHATGPT SOLUTION V2)
       const alreadyPickedPatterns = [
-        // Solo cuando el jugador usa un verbo de acción + pronombre de 1ª persona
-        /\b(?:yo\s+)?(?:tomo?|agarro|cojo|recojo|guardo|meto)\s+(?:el|la|los|las|un|una|unos|unas)\s+([^,.!?]+)/gi,
-        // Expresiones de decisión directa
-        /\b(?:decido|decides|decidimos)\s+(?:que\s+)?(?:me|nos)?\s*(?:quedo|quedamos|quedare|quedaremos)\s+con\s+([^,.!?]+)/gi,
-        // Patrones muy específicos de posesión
-        /\b(?:llevo|cargo|porto|tengo)\s+(?:el|la|los|las|un|una|unos|unas)\s+([^,.!?]+)/gi
+        // Admite infinitivo, primera persona o imperativo; artículo opcional; plural/singular
+        /\b(?:agarra(?:r|s|mos)?|toma(?:r|s|mos)?|coge(?:r|s|mos)?|recoge(?:r|s|mos)?|guarda(?:r|s|mos)?|meta(?:r|s|mos)?)\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi,
+        // Expresiones de decisión directa más flexibles
+        /\b(?:decido|decides|decidimos)\s+(?:que\s+)?(?:me|nos)?\s*(?:quedo|quedamos|quedare|quedaremos)\s+con\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi,
+        // Patrones de posesión actuales
+        /\b(?:llevo|cargo|porto|tengo)\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi
       ];
       
       let foundItems = [];
