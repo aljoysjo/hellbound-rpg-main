@@ -71,7 +71,96 @@ const ITEM_DATABASE = [
   { type: 'metal', icon: '🔩', keywords: ['hierro', 'acero', 'metal', 'barra de hierro', 'lingote', 'varilla', 'barra de acero', 'chatarra'] },
 ];
 
-// 🎲 SISTEMA DE LOOT DINÁMICO CORREGIDO - OPCIONES 2+4+5
+// 🎲 SISTEMA DE EVENTOS ALEATORIOS D20
+const RANDOM_EVENTS_DATABASE = {
+  // 🎨 EVENTOS SANDBOX POR TEMÁTICA
+  sandbox: {
+    detective: [
+      {
+        id: 'clue_discovery',
+        title: 'Pista Inesperada',
+        description: 'Notas algo que otros investigadores pasaron por alto',
+        triggers: ['investigar', 'examinar', 'buscar', 'observar'],
+        difficulty: 12,
+        success: { items: ['lupa', 'documento'], narrative: 'Tu ojo entrenado detecta una pista crucial que cambia el rumbo de la investigación.' },
+        failure: { health: -5, narrative: 'Tu búsqueda exhaustiva te deja agotado y sin resultados claros.' }
+      },
+      {
+        id: 'witness_encounter',
+        title: 'Testigo Inesperado',
+        description: 'Alguien se acerca con información valiosa',
+        triggers: ['preguntar', 'hablar', 'interrogar'],
+        difficulty: 10,
+        success: { knowledge: { 'caso_actual': 25 }, narrative: 'El testigo revela información que encaja perfectamente con tus sospechas.' },
+        failure: { narrative: 'El testigo se muestra reticente y se marcha sin compartir detalles importantes.' }
+      }
+    ],
+    adventure: [
+      {
+        id: 'hidden_treasure',
+        title: 'Tesoro Oculto',
+        description: 'Descubres algo valioso en un lugar inesperado',
+        triggers: ['explorar', 'buscar', 'examinar'],
+        difficulty: 14,
+        success: { items: ['gema', 'moneda'], gold: 50, narrative: 'Tu exploración meticulosa revela un tesoro escondido por aventureros anteriores.' },
+        failure: { stamina: -10, narrative: 'Tras una búsqueda exhaustiva, solo encuentras polvo y desilusión.' }
+      }
+    ],
+    horror: [
+      {
+        id: 'supernatural_encounter',
+        title: 'Presencia Sobrenatural',
+        description: 'Sientes que algo te observa desde las sombras',
+        triggers: ['caminar', 'explorar', 'observar'],
+        difficulty: 15,
+        success: { skills: ['resistencia_mental'], narrative: 'Mantienes la calma ante la presencia perturbadora y aprendes a controlar tu miedo.' },
+        failure: { health: -8, emotions: { miedo: 30 }, narrative: 'El encuentro te deja marcado, con cicatrices mentales que tardarán en sanar.' }
+      }
+    ]
+  },
+  
+  // 📜 EVENTOS ESPECÍFICOS CAMPAÑA "CAMINOS DEL ABISMO"
+  campaign: {
+    alicante_supernatural: [
+      {
+        id: 'errante_sighting',
+        title: 'Avistamiento de Errante',
+        description: 'Una figura misteriosa aparece entre la niebla',
+        triggers: ['caminar', 'patrullar', 'observar'],
+        difficulty: 13,
+        success: { 
+          items: ['reliquia'], 
+          knowledge: { 'errantes': 20 }, 
+          narrative: 'El Errante te observa con curiosidad antes de desvanecerse, dejando atrás un objeto de poder.' 
+        },
+        failure: { 
+          health: -6, 
+          emotions: { miedo: 25, alerta: 40 }, 
+          narrative: 'El encuentro con el Errante te desorienta, dejándote con más preguntas que respuestas.' 
+        }
+      },
+      {
+        id: 'demonic_influence',
+        title: 'Influencia Demoníaca',
+        description: 'Las fuerzas del infierno hacen sentir su presencia',
+        triggers: ['invocar', 'ritual', 'orar'],
+        difficulty: 16,
+        success: { 
+          skills: ['exorcismo'], 
+          narrative: 'Tu fe y entrenamiento te permiten resistir la influencia demoníaca y purificar el área.' 
+        },
+        failure: { 
+          health: -12, 
+          mana: -15, 
+          emotions: { miedo: 40 }, 
+          narrative: 'Las fuerzas demoníacas te abruman, drenando tu energía espiritual y física.' 
+        }
+      }
+    ]
+  }
+};
+
+// 🧠 SISTEMA DE ANÁLISIS CONTEXTUAL DUAL
 
 // 🧠 OPCIÓN 4: ANÁLISIS INICIAL DE SANDBOX CONCEPT
 function analyzeSandboxConcept(concept) {
