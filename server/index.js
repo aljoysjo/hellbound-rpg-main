@@ -224,6 +224,59 @@ function analyzeGameContextForEvents(gameState, action, narrative) {
   return context;
 }
 
+// 🎯 SISTEMA DE TRIGGERS INTELIGENTES PARA EVENTOS
+function shouldTriggerRandomEvent(gameState, action) {
+  // Incrementar contador de acciones si no existe
+  if (!gameState.actionsSinceLastEvent) {
+    gameState.actionsSinceLastEvent = 0;
+  }
+  gameState.actionsSinceLastEvent++;
+  
+  // 🎯 TRIGGER TEMPORAL: Cada 4-6 acciones (probabilístico)
+  const minActions = 4;
+  const maxActions = 6;
+  if (gameState.actionsSinceLastEvent < minActions) {
+    console.log(`🎲 Trigger temporal: ${gameState.actionsSinceLastEvent}/${minActions} acciones mínimas`);
+    return false;
+  }
+  
+  // Probabilidad creciente después del mínimo
+  const actionsSinceMin = gameState.actionsSinceLastEvent - minActions;
+  const maxWait = maxActions - minActions;
+  const probability = Math.min(0.3 + (actionsSinceMin / maxWait) * 0.4, 0.8); // 30% base, hasta 80%
+  
+  // 🎯 TRIGGER CONTEXTUAL: Ciertas acciones aumentan probabilidad
+  const contextualTriggers = ['explorar', 'investigar', 'caminar', 'buscar', 'examinar', 'preguntar', 'observar'];
+  const hasContextualTrigger = contextualTriggers.some(trigger => action.toLowerCase().includes(trigger));
+  
+  let finalProbability = probability;
+  if (hasContextualTrigger) {
+    finalProbability += 0.2; // +20% por acción contextual
+  }
+  
+  // 🎯 TRIGGER DE UBICACIÓN: Ciertos lugares aumentan probabilidad
+  const location = gameState.location?.toLowerCase() || '';
+  const dangerousLocations = ['bosque', 'cueva', 'ruinas', 'cementerio', 'callejón', 'sótano'];
+  const isDangerousLocation = dangerousLocations.some(loc => location.includes(loc));
+  
+  if (isDangerousLocation) {
+    finalProbability += 0.15; // +15% en ubicaciones peligrosas
+  }
+  
+  finalProbability = Math.min(finalProbability, 0.9); // Máximo 90%
+  
+  const roll = Math.random();
+  const shouldTrigger = roll < finalProbability;
+  
+  console.log(`🎲 Trigger check: ${gameState.actionsSinceLastEvent} acciones | Contextual: ${hasContextualTrigger} | Ubicación: ${isDangerousLocation} | Probabilidad: ${(finalProbability*100).toFixed(1)}% | Roll: ${(roll*100).toFixed(1)}% | Resultado: ${shouldTrigger ? 'TRIGGER' : 'NO'}`);
+  
+  if (shouldTrigger) {
+    gameState.actionsSinceLastEvent = 0; // Reset contador
+  }
+  
+  return shouldTrigger;
+}
+
 // 🎯 SISTEMA DE FILTRADO DE EVENTOS CONTEXTUALES
 function filterEventsForContext(context) {
   if (!context.availableEvents || context.availableEvents.length === 0) {
