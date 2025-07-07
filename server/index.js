@@ -2428,7 +2428,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           let itemName = '';
           
           // Según el patrón, extraer el nombre del item (CHATGPT SOLUTION - SIMPLIFIED)
-          let itemName = '';
           if (match[1]) {
             itemName = match[1].trim();
           } else if (match[2]) {
