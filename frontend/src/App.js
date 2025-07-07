@@ -47,6 +47,14 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
+  // 🎯 USEEFFECT PARA FORZAR APERTURA MODAL DISCOVERED ITEMS (CHATGPT SOLUTION)
+  useEffect(() => {
+    if (discoveredItems && discoveredItems.length > 0) {
+      console.log(`🎁 FORZANDO APERTURA MODAL: ${discoveredItems.length} items descubiertos`);
+      setShowDiscoveredItems(true);
+    }
+  }, [discoveredItems.length]);
+
   // Persistencia de elementos "NEW"
   const [newElements, setNewElements] = useState({
     inventory: new Set(),
