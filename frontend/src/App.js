@@ -1584,6 +1584,15 @@ function App() {
           </button>
         </div>
       </div>
+      {/* 🎲 MODAL EVENTOS ALEATORIOS */}
+      <RandomEventModal 
+        event={randomEvent}
+        isVisible={showRandomEventModal}
+        onComplete={() => {
+          setShowRandomEventModal(false);
+          setRandomEvent(null);
+        }}
+      />
     </div>
   );
 }
