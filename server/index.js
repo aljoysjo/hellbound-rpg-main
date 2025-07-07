@@ -2535,6 +2535,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         return `Podría contener información valiosa o conocimientos importantes.`;
       }
       
+      if (itemType === 'diario') {
+        return `Un registro personal que podría revelar secretos o información crucial.`;
+      }
+      
+      if (itemType === 'frasco_cristal') {
+        return `Un recipiente de cristal que podría contener algo valioso o misterioso.`;
+      }
+      
       if (itemType === 'llave') {
         return `Probablemente abre algo importante en esta área.`;
       }
