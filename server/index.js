@@ -46,6 +46,7 @@ const ITEM_DATABASE = [
   
   // 🧪 CONSUMIBLES MÁGICOS
   { type: 'poción', icon: '🧪', keywords: ['poción', 'elixir', 'frasco', 'botella', 'tónico', 'brebaje'] },
+  { type: 'frasco_cristal', icon: '🧪', keywords: ['frasco de cristal', 'frasco cristalino', 'recipiente de cristal'] },
   { type: 'varita', icon: '🪄', keywords: ['varita', 'vara', 'bastón', 'cetro', 'wand', 'staff'] },
   
   // 💎 TESOROS
