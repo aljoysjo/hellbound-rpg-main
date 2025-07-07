@@ -5,6 +5,7 @@ import './App.css';
 import WelcomeScreen from './components/WelcomeScreen';
 import SandboxForm from './components/SandboxForm';
 import ResponsiveHeader from './components/ResponsiveHeader';
+import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
 
 // 🎮 MAIN APP COMPONENT - LAYOUT CORREGIDO + PANTALLA INICIO RESTAURADA
