@@ -2427,11 +2427,15 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         while ((match = pattern.exec(narrative)) !== null) {
           let itemName = '';
           
-          // Según el patrón, extraer el nombre del item (CHATGPT SOLUTION - SIMPLIFIED)
-          if (match[1]) {
-            itemName = match[1].trim();
-          } else if (match[2]) {
-            itemName = match[2].trim();
+          // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
+          let itemName = '';
+          
+          // Los nuevos patrones todos capturan en el primer grupo disponible
+          for (let i = 1; i < match.length; i++) {
+            if (match[i] && match[i].trim()) {
+              itemName = match[i].trim();
+              break;
+            }
           }
           
           // Limpiar y validar el item
