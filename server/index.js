@@ -2427,14 +2427,11 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         while ((match = pattern.exec(narrative)) !== null) {
           let itemName = '';
           
-          // Según el patrón, extraer el nombre del item
-          if (index === 0) { // "decidiste que X será"
-            itemName = match[2].trim();
-          } else if (index < 7) { // "tomas X", "recoges X", etc.
-            itemName = match[2].trim();
-          } else if (index === 7) { // "X será tu aliado"
-            itemName = match[2].trim();
-          } else { // "tienes X", "portas X"
+          // Según el patrón, extraer el nombre del item (CHATGPT SOLUTION - SIMPLIFIED)
+          let itemName = '';
+          if (match[1]) {
+            itemName = match[1].trim();
+          } else if (match[2]) {
             itemName = match[2].trim();
           }
           
