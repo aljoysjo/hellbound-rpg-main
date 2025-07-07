@@ -2376,18 +2376,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         /se encuentra (una?|el|la) ([^,.!?]+)/gi
       ];
       
-      // 🎁 NUEVOS PATRONES PARA ITEMS YA RECOGIDOS AUTOMÁTICAMENTE (van directo a inventario)
+      // 🎁 PATRONES REFINADOS PARA ITEMS YA RECOGIDOS (CHATGPT SOLUTION - MÁS ESPECÍFICOS)
       const alreadyPickedPatterns = [
-        /decidiste? que (el|la|una?|un) ([^,.!?]+) (será|serán)/gi,
-        /tomas? (el|la|una?|un) ([^,.!?]+)/gi,
-        /recoges? (el|la|una?|un) ([^,.!?]+)/gi,
-        /llevas? (el|la|una?|un) ([^,.!?]+)/gi,
-        /agarras? (el|la|una?|un) ([^,.!?]+)/gi,
-        /coges? (el|la|una?|un) ([^,.!?]+)/gi,
-        /equipas? (el|la|una?|un) ([^,.!?]+)/gi,
-        /(el|la|una?|un) ([^,.!?]+) (será|serán) (tu|tus) (aliado|aliados|herramienta)/gi,
-        /tienes? (el|la|una?|un) ([^,.!?]+)/gi,
-        /portas? (el|la|una?|un) ([^,.!?]+)/gi
+        // Solo cuando el jugador usa un verbo de acción + pronombre de 1ª persona
+        /\b(?:yo\s+)?(?:tomo?|agarro|cojo|recojo|guardo|meto)\s+(?:el|la|los|las|un|una|unos|unas)\s+([^,.!?]+)/gi,
+        // Expresiones de decisión directa
+        /\b(?:decido|decides|decidimos)\s+(?:que\s+)?(?:me|nos)?\s*(?:quedo|quedamos|quedare|quedaremos)\s+con\s+([^,.!?]+)/gi,
+        // Patrones muy específicos de posesión
+        /\b(?:llevo|cargo|porto|tengo)\s+(?:el|la|los|las|un|una|unos|unas)\s+([^,.!?]+)/gi
       ];
       
       let foundItems = [];
