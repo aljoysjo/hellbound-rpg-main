@@ -838,6 +838,13 @@ function App() {
         setGameState(data.game_state);
         setNarrativeVisible(true);
         
+        // 🎲 MANEJAR EVENTOS ALEATORIOS
+        if (response.data.random_event) {
+          console.log('🎲 Evento aleatorio recibido:', response.data.random_event);
+          setRandomEvent(response.data.random_event);
+          setShowRandomEventModal(true);
+        }
+        
         // 🖼️ ACTUALIZAR IMAGEN CONTEXTUAL
         const newImage = getContextualImage(data.game_state.location, data.game_state.narrativeLog?.[data.game_state.narrativeLog.length - 1]?.narrative);
         if (newImage !== sceneImage) {
