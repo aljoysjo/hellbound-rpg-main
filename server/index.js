@@ -162,7 +162,166 @@ const RANDOM_EVENTS_DATABASE = {
 
 // 🧠 SISTEMA DE ANÁLISIS CONTEXTUAL DUAL
 
-// 🧠 OPCIÓN 4: ANÁLISIS INICIAL DE SANDBOX CONCEPT
+// 🧠 SISTEMA DE ANÁLISIS CONTEXTUAL DUAL
+function analyzeGameContextForEvents(gameState, action, narrative) {
+  const context = {
+    mode: gameState.mode,
+    location: gameState.location || '',
+    action: action.toLowerCase(),
+    narrative: narrative.toLowerCase(),
+    themes: [],
+    restrictions: [],
+    availableEvents: []
+  };
+
+  if (gameState.mode === 'sandbox') {
+    // 🎨 ANÁLISIS CONTEXTO SANDBOX
+    const sandboxConcept = gameState.sandboxConcept || '';
+    const conceptLower = sandboxConcept.toLowerCase();
+    
+    // Detectar temática principal
+    if (conceptLower.includes('detective') || conceptLower.includes('investigar') || conceptLower.includes('misterio')) {
+      context.themes.push('detective');
+      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.detective || [];
+    } else if (conceptLower.includes('aventura') || conceptLower.includes('explorar') || conceptLower.includes('tesoro')) {
+      context.themes.push('adventure');  
+      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.adventure || [];
+    } else if (conceptLower.includes('horror') || conceptLower.includes('terror') || conceptLower.includes('miedo')) {
+      context.themes.push('horror');
+      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.horror || [];
+    } else {
+      // Temática general - mezclar eventos apropiados
+      context.themes.push('general');
+      context.availableEvents = [
+        ...(RANDOM_EVENTS_DATABASE.sandbox.adventure || []),
+        ...(RANDOM_EVENTS_DATABASE.sandbox.detective || [])
+      ];
+    }
+    
+    // Extraer restricciones del concepto
+    if (conceptLower.includes('realista') || conceptLower.includes('sin magia')) {
+      context.restrictions.push('no_supernatural');
+    }
+    if (conceptLower.includes('moderno') || conceptLower.includes('contemporáneo')) {
+      context.restrictions.push('modern_setting');
+    }
+    
+  } else if (gameState.mode === 'campaign') {
+    // 📜 ANÁLISIS CONTEXTO CAMPAÑA
+    context.themes.push('alicante_supernatural');
+    context.availableEvents = RANDOM_EVENTS_DATABASE.campaign.alicante_supernatural || [];
+    
+    // Considerar progreso de la campaña
+    if (gameState.storyAct) {
+      context.currentAct = gameState.storyAct;
+    }
+    if (gameState.location?.toLowerCase().includes('alicante')) {
+      context.themes.push('urban_supernatural');
+    }
+  }
+  
+  console.log(`🧠 Contexto analizado: Modo=${context.mode}, Temas=[${context.themes.join(', ')}], Eventos disponibles=${context.availableEvents.length}`);
+  return context;
+}
+
+// 🎯 SISTEMA DE FILTRADO DE EVENTOS CONTEXTUALES
+function filterEventsForContext(context) {
+  if (!context.availableEvents || context.availableEvents.length === 0) {
+    return [];
+  }
+  
+  let filteredEvents = context.availableEvents.filter(event => {
+    // Verificar si algún trigger coincide con la acción actual
+    const actionMatch = event.triggers.some(trigger => 
+      context.action.includes(trigger) || context.narrative.includes(trigger)
+    );
+    
+    if (!actionMatch) return false;
+    
+    // Aplicar restricciones de sandbox si existen
+    if (context.restrictions.includes('no_supernatural') && 
+        (event.id.includes('supernatural') || event.id.includes('demonic'))) {
+      return false;
+    }
+    
+    return true;
+  });
+  
+  console.log(`🎯 Eventos filtrados: ${filteredEvents.length} de ${context.availableEvents.length} disponibles`);
+  return filteredEvents;
+}
+
+// 🎲 SISTEMA D20 + APLICACIÓN DE CONSECUENCIAS
+function rollD20AndApplyConsequences(event, gameState) {
+  const roll = Math.floor(Math.random() * 20) + 1;
+  const success = roll >= event.difficulty;
+  
+  console.log(`🎲 Evento: ${event.title} | Dificultad: ${event.difficulty} | Dado: ${roll} | Resultado: ${success ? 'ÉXITO' : 'FRACASO'}`);
+  
+  const consequence = success ? event.success : event.failure;
+  let eventNarrative = consequence.narrative;
+  
+  // Aplicar consecuencias al gameState
+  if (consequence.health) {
+    gameState.updateVitals({ health: consequence.health });
+  }
+  if (consequence.mana) {
+    gameState.updateVitals({ mana: consequence.mana });
+  }
+  if (consequence.stamina) {
+    gameState.updateVitals({ stamina: consequence.stamina });
+  }
+  if (consequence.gold) {
+    gameState.updateResources({ gold: consequence.gold });
+  }
+  if (consequence.emotions) {
+    Object.entries(consequence.emotions).forEach(([emotion, value]) => {
+      gameState.updateEmotionalState(emotion, value);
+    });
+  }
+  if (consequence.items) {
+    consequence.items.forEach(itemType => {
+      const item = ITEM_DATABASE.find(dbItem => dbItem.type === itemType);
+      if (item) {
+        const newItem = {
+          name: item.type,
+          icon: item.icon,
+          type: item.type,
+          description: generateContextualDescription(item.type, item.type),
+          rarity: success ? 'rare' : 'common',
+          source: 'random_event',
+          instanceId: crypto.randomUUID()
+        };
+        gameState.inventory.push(newItem);
+        console.log(`🎁 Item de evento añadido: ${newItem.name} ${newItem.icon}`);
+      }
+    });
+  }
+  if (consequence.skills) {
+    consequence.skills.forEach(skillId => {
+      const existingSkill = gameState.skills.find(s => s.id === skillId);
+      if (existingSkill) {
+        existingSkill.level += 1;
+      } else {
+        gameState.skills.push({
+          id: skillId,
+          level: 1,
+          tags: ['evento'],
+          description: `Habilidad adquirida durante evento: ${event.title}`
+        });
+      }
+      console.log(`⭐ Habilidad de evento: ${skillId}`);
+    });
+  }
+  
+  return {
+    success,
+    roll,
+    event,
+    narrative: eventNarrative,
+    appliedConsequences: consequence
+  };
+}
 function analyzeSandboxConcept(concept) {
   console.log(`🧠 Analizando sandbox concept: "${concept}"`);
   
