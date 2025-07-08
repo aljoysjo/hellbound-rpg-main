@@ -1,7 +1,7 @@
 🚨 PROBLEMAS CRÍTICOS ACTUALES:
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
-🔄 Modal discovered items - Necesita testing
-🔄 Auto-pick regex - Necesita testing con casos reales
+✅ Modal discovered items - RESUELTO - Verificado que funciona correctamente
+✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 🔄 Flujo completo - No verificado end-to-end
 
   - task: "Eliminación de duplicación de newInventoryItem"
