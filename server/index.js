@@ -2430,8 +2430,12 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
             }
           }
           
-          // Limpiar y validar el item
-          itemName = itemName.replace(/[,\.!?;]$/, '').trim();
+          // Limpiar y validar el item - REFINADO SEGÚN CHATGPT
+          const raw = itemName.trim()
+                              .split(/[,;.]/)[0]          // corta en coma/punto
+                              .replace(/\s+(de|con|en|que|durante|mientras|porque|para)\s+.*/i,'') // corta en preposiciones
+                              .trim();
+          itemName = raw;
           
           // 🎯 NUEVA FUNCIÓN: SEPARAR ITEMS COMPUESTOS
           const individualItems = splitCompoundItems(itemName);
