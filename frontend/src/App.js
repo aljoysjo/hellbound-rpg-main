@@ -7,6 +7,7 @@ import SandboxForm from './components/SandboxForm';
 import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
+import DiscoveredItemsModal from './components/DiscoveredItemsModal'; // NUEVO MODAL PORTAL (CHATGPT)
 
 // this is test comment
 
