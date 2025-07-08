@@ -476,7 +476,7 @@ agent_communication:
     implemented: true
     working: false
     file: "/app/frontend/src/components/RandomEventModal.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -486,6 +486,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "Prueba realizada el 08/07/2025. No se pudo verificar la funcionalidad de los eventos aleatorios con animación D20 debido a los problemas de conexión con el backend. Se detectaron errores CORS en la consola que impiden la comunicación correcta entre el frontend y el backend. La aplicación está intentando conectarse a un backend diferente al configurado en el archivo .env, lo que causa errores CORS y bloquea la funcionalidad de los eventos aleatorios."
+      - working: false
+        agent: "testing"
+        comment: "Se intentó corregir la configuración CORS en el servidor para permitir todos los orígenes ('*'), pero el problema persiste. La aplicación frontend sigue sin poder conectarse correctamente al backend, lo que impide que los eventos aleatorios con animación D20 funcionen correctamente. Se recomienda revisar la configuración de las URLs en los archivos .env tanto del frontend como del backend para asegurar que estén correctamente configuradas."
   version: "1.0"
   test_sequence: 7
 
