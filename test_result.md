@@ -458,7 +458,7 @@ agent_communication:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -468,6 +468,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "Prueba realizada el 08/07/2025. El modal de discovered items no funciona correctamente. Al realizar acciones de búsqueda como 'buscar objetos valiosos', no aparece ningún modal con los items descubiertos. Se detectaron errores CORS en la consola que impiden la comunicación correcta entre el frontend y el backend. La aplicación está intentando conectarse a un backend diferente al configurado en el archivo .env, lo que causa errores CORS y bloquea la funcionalidad del modal discovered items."
+      - working: false
+        agent: "testing"
+        comment: "Se intentó corregir la configuración CORS en el servidor para permitir todos los orígenes ('*'), pero el problema persiste. La aplicación frontend sigue sin poder conectarse correctamente al backend, lo que impide que el modal de discovered items funcione correctamente. Se recomienda revisar la configuración de las URLs en los archivos .env tanto del frontend como del backend para asegurar que estén correctamente configuradas."
 
   - task: "Eventos aleatorios con animación D20"
     implemented: true
