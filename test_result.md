@@ -153,6 +153,9 @@
       - working: true
         agent: "testing"
         comment: "Se ha verificado que el sistema de eventos aleatorios D20 funciona correctamente. Las pruebas muestran que: 1) La base de datos de eventos incluye eventos para sandbox (detective/aventura/horror) y campaña (alicante_supernatural). 2) La función analyzeGameContextForEvents() funciona correctamente con ambos modos, detectando el contexto y seleccionando eventos apropiados. 3) La función shouldTriggerRandomEvent() implementa correctamente las probabilidades contextuales, aumentando la probabilidad según el tipo de acción y ubicación. 4) La función rollD20AndApplyConsequences() aplica correctamente las consecuencias al estado del juego según el resultado del dado. 5) La respuesta de la API incluye el campo random_event con la estructura correcta (success, roll, event, narrative, appliedConsequences). 6) Se ha verificado que los componentes D20Dice.js y RandomEventModal.js existen y son válidos para mostrar la animación del dado y el modal de eventos."
+      - working: true
+        agent: "testing"
+        comment: "PRUEBA ADICIONAL (08/07/2025): Se ha verificado nuevamente el sistema de eventos aleatorios D20 y funciona correctamente. Las pruebas muestran que: 1) Al realizar múltiples acciones, el sistema eventualmente dispara un evento aleatorio. 2) El campo random_event se incluye en la respuesta API con la estructura correcta (success, roll, event, narrative, appliedConsequences). 3) Las consecuencias se aplican correctamente al game_state (en este caso, health -5). 4) El sistema funciona tanto en modo sandbox como campaña."
 
 frontend:
   - task: "Modo campaña"
