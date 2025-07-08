@@ -588,7 +588,10 @@ function App() {
               setNarrativeVisible(true);
               
               if (data.game_state.discoveredItems) {
-                setDiscoveredItems(data.game_state.discoveredItems);
+                setDiscoveredItems(prev => {
+                  console.log('📝 setDiscoveredItems - prev', prev, 'next', data.game_state.discoveredItems); // PUNTO 2 CHATGPT
+                  return data.game_state.discoveredItems;
+                });
               }
               
               const inventoryChanges = detectInventoryChanges(prevState.inventory, data.game_state.inventory);
