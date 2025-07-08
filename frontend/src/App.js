@@ -1094,19 +1094,16 @@ function App() {
           </article>
 
           {/* 🎁 DISCOVERED ITEMS - CON BOTONES RECOGER/DEJAR */}
-          {/* 🔍 DEBUG: FORZAR RENDER PARA TESTING CHATGPT */}
-          {(discoveredItems.length > 0 || true) && (
+          {discoveredItems.length > 0 && (
             <div 
               className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl"
               style={{
                 position: "relative",
-                zIndex: 99999,
-                backgroundColor: "yellow",
-                border: "5px solid red"
+                zIndex: 10000
               }}
             >
               <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
-                🎁 Items Descubiertos DEBUG (Count: {discoveredItems.length})
+                🎁 Items Descubiertos
               </h3>
               <div className="space-y-3">
                 {discoveredItems.map((item, index) => (
