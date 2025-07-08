@@ -41,11 +41,12 @@ function App() {
   const [discoveredItems, setDiscoveredItems] = useState([]);
   const [pickupLoading, setPickupLoading] = useState(null);
 
-  // 🔧 FUNCIÓN CLOSE MODAL (OPCIÓN A CHATGPT + MODAL LOCK)
+  // 🔧 FUNCIÓN CLOSE MODAL (CHATGPT - LIMPIAR CACHE + LOCK)
   const closeDiscoveredModal = () => {
     console.log('🎁 CLOSING MODAL: User closed discovered items modal');
     setShowDiscoveredItems(false);
     setModalLocked(false);           // 🔓 se puede volver a abrir
+    setCachedItems([]);              // 🗑️ limpiar cache
   };
 
   // SISTEMA BADGES "VIVOS" MEJORADO
