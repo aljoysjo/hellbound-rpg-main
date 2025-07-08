@@ -1094,7 +1094,8 @@ function App() {
           </article>
 
           {/* 🎁 DISCOVERED ITEMS - CON BOTONES RECOGER/DEJAR */}
-          {discoveredItems.length > 0 && (
+          {/* 🔍 PASO 2.2 CHATGPT: Condición JSX simplificada usando solo showDiscoveredItems */}
+          {showDiscoveredItems && (
             <div 
               className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl"
               style={{
