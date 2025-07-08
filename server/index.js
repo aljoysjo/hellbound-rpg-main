@@ -2356,18 +2356,18 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log('📖 Analizando narrativa para detectar items...');
       
       const patterns = [
-        // 🔍 PATRONES PARA ITEMS DISPONIBLES (van a discovered)
-        /encuentras? (una?|el|la) ([^,.!?]+)/gi,
-        /descubres? (una?|el|la) ([^,.!?]+)/gi,
-        /hallas? (una?|el|la) ([^,.!?]+)/gi,
-        /ves? (una?|el|la) ([^,.!?]+)/gi,
-        /hay (una?|el|la) ([^,.!?]+)/gi,
-        /aparece (una?|el|la) ([^,.!?]+)/gi,
-        /observas? (una?|el|la) ([^,.!?]+)/gi,
-        /localizas? (una?|el|la) ([^,.!?]+)/gi,
-        /notas? (una?|el|la) ([^,.!?]+)/gi,
-        /(una?|el|la) ([^,.!?]+) (sobre|en|bajo|dentro de|junto a)/gi,
-        /se encuentra (una?|el|la) ([^,.!?]+)/gi
+        // 🔍 PATRONES PARA ITEMS DISPONIBLES (van a discovered) - MEJORADOS
+        /encuentras? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /descubres? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /hallas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /ves? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /hay (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /aparece (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /observas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /localizas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /notas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
+        /(?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))? (?:sobre|en|bajo|dentro de|junto a)/gi,
+        /se encuentra (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi
       ];
       
       // 🎁 PATRONES REFINADOS Y FLEXIBLES PARA AUTO-PICK (CHATGPT SOLUTION V2)
