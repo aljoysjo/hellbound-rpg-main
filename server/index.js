@@ -2355,6 +2355,9 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     function extractItemsFromNarrative(narrative) {
       console.log('📖 Analizando narrativa para detectar items...');
       
+      // 🔧 TRY/CATCH CHATGPT: Evitar crashes por regex errors
+      try {
+      
       const patterns = [
         // 🔍 PATRONES PARA ITEMS DISPONIBLES (van a discovered) - MEJORADOS
         /encuentras? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
