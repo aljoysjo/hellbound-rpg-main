@@ -51,11 +51,16 @@ function App() {
 
   // 🎯 USEEFFECT PARA FORZAR APERTURA MODAL DISCOVERED ITEMS (CHATGPT SOLUTION)
   useEffect(() => {
+    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, items=`, discoveredItems); // PUNTO 3 CHATGPT
     if (discoveredItems && discoveredItems.length > 0) {
       console.log(`🎁 FORZANDO APERTURA MODAL: ${discoveredItems.length} items descubiertos`);
+      console.log(`🎁 ANTES: showDiscoveredItems=${showDiscoveredItems}`); // ANTES CHATGPT
       setShowDiscoveredItems(true);
+      console.log(`🎁 DESPUÉS: setShowDiscoveredItems(true) ejecutado`); // DESPUÉS CHATGPT
+    } else {
+      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length}`); // CHATGPT
     }
-  }, [discoveredItems.length]);
+  }, [discoveredItems]); // CAMBIO DEPENDENCIA: discoveredItems completo vs .length (CHATGPT)
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
   useEffect(() => {
