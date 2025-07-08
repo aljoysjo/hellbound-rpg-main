@@ -887,7 +887,10 @@ function App() {
           console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
           console.log('🎁 FRONTEND: discoveredItems.length:', data.game_state.discoveredItems.length);
           console.log('🎁 FRONTEND: Setting discoveredItems state...');
-          setDiscoveredItems(data.game_state.discoveredItems);
+          setDiscoveredItems(prev => {
+            console.log('📝 setDiscoveredItems - prev', prev, 'next', data.game_state.discoveredItems); // PUNTO 2 CHATGPT
+            return data.game_state.discoveredItems;
+          });
           console.log('🎁 FRONTEND: discoveredItems state updated');
         } else {
           console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
