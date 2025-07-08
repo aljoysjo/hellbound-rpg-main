@@ -41,6 +41,12 @@ function App() {
   const [discoveredItems, setDiscoveredItems] = useState([]);
   const [pickupLoading, setPickupLoading] = useState(null);
 
+  // 🔧 FUNCIÓN CLOSE MODAL (OPCIÓN A CHATGPT)
+  const closeDiscoveredModal = () => {
+    console.log('🎁 CLOSING MODAL: User closed discovered items modal');
+    setShowDiscoveredItems(false);
+  };
+
   // SISTEMA BADGES "VIVOS" MEJORADO
   const [badges, setBadges] = useState({
     inventory: { count: 0, newItems: [], removedItems: [] },
