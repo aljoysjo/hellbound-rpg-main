@@ -864,9 +864,13 @@ function App() {
         
         if (data.game_state.discoveredItems) {
           console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
+          console.log('🎁 FRONTEND: discoveredItems.length:', data.game_state.discoveredItems.length);
+          console.log('🎁 FRONTEND: Setting discoveredItems state...');
           setDiscoveredItems(data.game_state.discoveredItems);
+          console.log('🎁 FRONTEND: discoveredItems state updated');
         } else {
           console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
+          console.log('🎁 FRONTEND: data.game_state keys:', Object.keys(data.game_state || {}));
         }
         
         if (data.suggested_actions) {
