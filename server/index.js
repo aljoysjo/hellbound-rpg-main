@@ -2387,14 +2387,23 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       patterns.forEach((pattern, index) => {
         let match;
         while ((match = pattern.exec(narrative)) !== null) {
+          // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
           let itemName = '';
           
           // Para la mayoría de patrones, el item está en la posición 2
           if (index < 10) {
-            itemName = match[2].trim();
+            // 🔧 ARREGLO CHATGPT: Validar que match[2] existe antes de trim()
+            itemName = match[2] ? match[2].trim() : '';
           } else {
             // Para el último patrón es diferente
-            itemName = match[2].trim();
+            // 🔧 ARREGLO CHATGPT: Validar que match[2] existe antes de trim()
+            itemName = match[2] ? match[2].trim() : '';
+          }
+          
+          // 🔧 FILTRO CHATGPT: Evitar items vacíos
+          if (!itemName || itemName.length === 0) {
+            console.log(`⚠️ Item vacío detectado, saltando...`);
+            continue;
           }
           
           // Limpiar y validar el item
