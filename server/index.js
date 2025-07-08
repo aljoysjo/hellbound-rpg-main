@@ -2118,7 +2118,11 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log(`🔍 KEYWORDS DINÁMICAS DISPONIBLES: ${allKeywords.length} total`);
       
       const lowerText = text.toLowerCase();
-      return allKeywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
+      // 🔧 USAR WORD BOUNDARIES PARA EVITAR FALSOS POSITIVOS (ej: "daga" dentro de "desgastada")
+      return allKeywords.some(keyword => {
+        const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'i');
+        return regex.test(lowerText);
+      });
     };
     
     // 📊 CALCULAR OVERLAP DE PALABRAS PARA DETECTAR DUPLICADOS
