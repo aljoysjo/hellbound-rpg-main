@@ -333,12 +333,12 @@ body {
   }
 }
 
-/* 🎁 DISCOVERED ITEMS MODAL - PORTAL GLOBAL (CHATGPT SOLUTION) */
+/* 🎁 DISCOVERED ITEMS MODAL - PORTAL GLOBAL (CHATGPT SOLUCIÓN 100% SEGURA) */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 10000;              /* > overlay "Procesando…" */
+  background: rgba(0, 255, 0, 0.5);  /* 🔧 Verde para debug - CHATGPT */
+  z-index: 15000;                    /* 🔧 MUY alto - por encima del overlay "Procesando…" */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,7 +346,7 @@ body {
 
 .modal-content-portal {
   background: var(--creamy-old);
-  border: 2px solid var(--imperial-gold);
+  border: 5px solid red;             /* 🔧 Borde rojo para debug - CHATGPT */
   border-radius: 12px;
   padding: 24px;
   max-width: 500px;
