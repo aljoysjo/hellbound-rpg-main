@@ -61,7 +61,12 @@ const DiscoveredItemsModal = ({
                 </div>
               </div>
             </div>
-          ))}
+          ))
+          ) : (
+            <div className="text-center text-[var(--cedar-brown)]/70 py-4">
+              No hay items para mostrar
+            </div>
+          )}
         </div>
       </div>
     </div>
