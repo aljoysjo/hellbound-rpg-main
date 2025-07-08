@@ -1,6 +1,9 @@
 🚨 PROBLEMAS CRÍTICOS ACTUALES:
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
-✅ Modal discovered items - RESUELTO - Verificado que funciona correctamente
+❌ Modal discovered items - NO FUNCIONA - Error CORS impide la comunicación con el backend
+❌ Eventos aleatorios con animación D20 - NO FUNCIONA - Error CORS impide la comunicación con el backend
+❌ Modo sandbox - NO FUNCIONA - Error CORS impide la comunicación con el backend
+❌ Modo campaña - NO FUNCIONA - Error CORS impide la comunicación con el backend
 ✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 🔄 Flujo completo - No verificado end-to-end
 
