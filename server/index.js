@@ -617,19 +617,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Accept', 'Origin']
 }));
 
-// Headers adicionales para asegurar CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Accept,Origin');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
+// ❌ ELIMINADOS: Headers manuales conflictivos (ChatGPT solution)
+// Ya no necesitamos esto porque cors() maneja todo automáticamente
 app.use(express.json());
 
 // Middleware de debugging para todas las rutas
