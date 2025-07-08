@@ -56,18 +56,22 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
+  // 🔧 MODAL LOCK FLAG (CHATGPT OPCIÓN A)
+  const [modalLocked, setModalLocked] = useState(false);
+
   // 🎯 USEEFFECT PARA FORZAR APERTURA MODAL DISCOVERED ITEMS (CHATGPT SOLUTION)
   useEffect(() => {
     console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, items=`, discoveredItems); // PUNTO 3 CHATGPT
-    if (discoveredItems && discoveredItems.length > 0) {
+    if (!modalLocked && discoveredItems && discoveredItems.length > 0) {
       console.log(`🎁 FORZANDO APERTURA MODAL: ${discoveredItems.length} items descubiertos`);
       console.log(`🎁 ANTES: showDiscoveredItems=${showDiscoveredItems}`); // ANTES CHATGPT
       setShowDiscoveredItems(true);
+      setModalLocked(true);          // 🔒 bloquea el cierre automático
       console.log(`🎁 DESPUÉS: setShowDiscoveredItems(true) ejecutado`); // DESPUÉS CHATGPT
     } else {
-      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length}`); // CHATGPT
+      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length} modalLocked=${modalLocked}`); // CHATGPT
     }
-  }, [discoveredItems]); // CAMBIO DEPENDENCIA: discoveredItems completo vs .length (CHATGPT)
+  }, [discoveredItems, modalLocked]); // CAMBIO DEPENDENCIA: discoveredItems completo vs .length (CHATGPT)
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
   useEffect(() => {
