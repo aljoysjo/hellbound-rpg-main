@@ -40,8 +40,8 @@
     implemented: true
     working: false
     file: "/app/server/index.js"
-    stuck_count: 1
-    priority: "medium"
+    stuck_count: 2
+    priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
@@ -53,6 +53,9 @@
       - working: false
         agent: "testing"
         comment: "Se intentó corregir la configuración CORS agregando métodos, headers permitidos y headers expuestos, pero el problema persiste. El header 'Access-Control-Allow-Origin' sigue sin estar presente en las respuestas OPTIONS."
+      - working: false
+        agent: "testing"
+        comment: "Se intentó modificar la configuración CORS para permitir todos los orígenes ('*') en lugar de un origen específico, pero el problema persiste. La aplicación frontend sigue sin poder conectarse correctamente al backend. Se recomienda revisar la configuración de las URLs en los archivos .env tanto del frontend como del backend para asegurar que estén correctamente configuradas."
 
   - task: "Nueva API key OpenAI"
     implemented: true
