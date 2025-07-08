@@ -591,6 +591,18 @@ function App() {
                 objectives: `${prevState.questObjectives?.length || 0} → ${data.game_state.questObjectives?.length || 0}`
               });
               
+              // 🎯 BADGE POLLING - DUAL APPROACH (CHATGPT SOLUTION)
+              if ((data.game_state.inventory?.length || 0) !== (prevState.inventory?.length || 0)) {
+                console.log(`📦 BADGE UPDATE: inventory ${prevState.inventory?.length || 0} → ${data.game_state.inventory?.length || 0}`);
+                setBadges(prev => ({
+                  ...prev,
+                  inventory: {
+                    ...prev.inventory,
+                    count: data.game_state.inventory?.length || 0
+                  }
+                }));
+              }
+              
               setNarrativeVisible(true);
               
               if (data.game_state.discoveredItems) {
