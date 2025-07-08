@@ -1150,67 +1150,15 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🚨 MODAL SÚPER SIMPLE INLINE - NO COMPONENTE */}
-          {showDiscoveredItems && discoveredItems && discoveredItems.length > 0 && (
-            <div 
-              style={{
-                position: "fixed",
-                top: "0",
-                left: "0",
-                width: "100vw",
-                height: "100vh",
-                backgroundColor: "rgba(255, 0, 0, 0.9)",
-                zIndex: 999999,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "white",
-                fontSize: "18px"
-              }}
-              onClick={closeDiscoveredModal}
-            >
-              <div 
-                style={{
-                  backgroundColor: "white",
-                  color: "black",
-                  padding: "30px",
-                  borderRadius: "10px",
-                  maxWidth: "500px",
-                  border: "5px solid red"
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h2>🎁 ITEMS DESCUBIERTOS ({discoveredItems.length})</h2>
-                {discoveredItems.map((item, index) => (
-                  <div key={index} style={{ border: "1px solid #ccc", margin: "10px 0", padding: "15px" }}>
-                    <div style={{ fontSize: "20px", marginBottom: "10px" }}>
-                      {item.icon} <strong>{item.name}</strong>
-                    </div>
-                    <div style={{ fontSize: "14px", color: "#666", marginBottom: "10px" }}>
-                      {item.description}
-                    </div>
-                    <button 
-                      onClick={() => pickupItem(item.instanceId)}
-                      style={{ marginRight: "10px", padding: "10px", backgroundColor: "green", color: "white", border: "none", borderRadius: "5px" }}
-                    >
-                      PICK UP
-                    </button>
-                    <button 
-                      onClick={() => ignoreItem(item.instanceId)}
-                      style={{ padding: "10px", backgroundColor: "gray", color: "white", border: "none", borderRadius: "5px" }}
-                    >
-                      IGNORE
-                    </button>
-                  </div>
-                ))}
-                <button 
-                  onClick={closeDiscoveredModal}
-                  style={{ marginTop: "20px", padding: "15px", backgroundColor: "red", color: "white", border: "none", borderRadius: "5px", fontSize: "16px" }}
-                >
-                  CERRAR MODAL
-                </button>
-              </div>
-            </div>
+          {/* 🎁 MODAL DISCOVERED ITEMS - PORTAL DEFINITIVO (CHATGPT SOLUCIÓN 100% SEGURA) */}
+          {showDiscoveredItems && (
+            <DiscoveredItemsModal
+              discoveredItems={cachedItems}
+              showDiscoveredItems={showDiscoveredItems}
+              onPickupItem={pickupItem}
+              onIgnoreItem={ignoreItem}
+              onCloseModal={closeDiscoveredModal}
+            />
           )}
 
         </main>
