@@ -96,7 +96,7 @@ backend:
         comment: "Se detectó un problema en las pruebas de múltiples acciones. El actionCount no siempre se incrementa correctamente después de cada acción. En algunas ocasiones, el contador permanece igual después de una acción, lo que podría afectar el sistema de badges."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El sistema de polling funciona correctamente. Se observan logs de polling cada 2 segundos ('🔄 Haciendo polling request...', '🔄 POLLING RESPONSE', '🔄 Sin cambios significativos'). No se detectaron errores CORS ni 502 en las respuestas. El polling está funcionando como se espera."
+        comment: "Prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El sistema de polling funciona correctamente. Se observan logs de polling cada 2 segundos ('🔄 Haciendo polling request...', '🔄 POLLING RESPONSE', '🔄 Sin cambios significativos'). No se detectaron errores CORS ni 502 en las respuestas. El polling está funcionando como se espera."
       
   - task: "Sistema de loot dinámico"
     implemented: true
@@ -175,7 +175,7 @@ frontend:
         comment: "Iniciando prueba de modo campaña"
       - working: true
         agent: "testing"
-        comment: "Prueba específica realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
+        comment: "Prueba específica realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
 
   - task: "Input fluido"
     implemented: true
@@ -202,16 +202,16 @@ frontend:
         comment: "Prueba realizada en la URL especificada (dark-chronicles-1.preview.emergentagent.com). A pesar de los cambios implementados (textarea, eliminación de stopPropagation, useRef y useEffect para mantener foco), el input sigue sin funcionar correctamente. En desktop no se registra ningún texto y en móvil solo se registra la primera letra 'E'. El cursor pierde el foco durante la escritura y Enter no envía la acción correctamente."
       - working: false
         agent: "testing"
-        comment: "Prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El input sigue sin funcionar correctamente. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
+        comment: "Prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El input sigue sin funcionar correctamente. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
       - working: false
         agent: "testing"
-        comment: "Nueva prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Se detectó un error crítico en la consola: 'EnhancedHeader is not defined'. Este error impide que la aplicación cargue correctamente después de iniciar una aventura, lo que bloquea la funcionalidad de input y otras características de la interfaz."
+        comment: "Nueva prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Se detectó un error crítico en la consola: 'EnhancedHeader is not defined'. Este error impide que la aplicación cargue correctamente después de iniciar una aventura, lo que bloquea la funcionalidad de input y otras características de la interfaz."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El input ahora funciona correctamente. Se puede iniciar una campaña y el textarea está presente y visible en la interfaz. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El input ahora funciona correctamente. Se puede iniciar una campaña y el textarea está presente y visible en la interfaz. No se detectó el error 'EnhancedHeader is not defined' en la consola."
       - working: false
         agent: "testing"
-        comment: "Nueva prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El textarea está presente en el DOM pero no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
+        comment: "Nueva prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El textarea está presente en el DOM pero no es posible interactuar con él. Playwright detecta el elemento pero no puede escribir en él, lo que sugiere problemas con eventos o foco."
 
   - task: "Inicio de sesión"
     implemented: true
@@ -229,10 +229,10 @@ frontend:
         comment: "Se pueden crear sesiones de campaña correctamente. Hay un error de WebSocket pero no impide la funcionalidad principal."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y comenzar la aventura sin errores 'Failed to fetch'. La aplicación carga correctamente y muestra la interfaz del juego."
+        comment: "Prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y comenzar la aventura sin errores 'Failed to fetch'. La aplicación carga correctamente y muestra la interfaz del juego."
       - working: true
         agent: "testing"
-        comment: "Nueva prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Se confirmó que el inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y hacer clic en 'Iniciar Aventura'. La aplicación intenta cargar la aventura, pero luego muestra un error de JavaScript: 'EnhancedHeader is not defined'."
+        comment: "Nueva prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Se confirmó que el inicio de sesión funciona correctamente. Se puede seleccionar el modo Sandbox, ingresar un concepto y hacer clic en 'Iniciar Aventura'. La aplicación intenta cargar la aventura, pero luego muestra un error de JavaScript: 'EnhancedHeader is not defined'."
 
   - task: "Layout móvil"
     implemented: true
@@ -280,13 +280,13 @@ frontend:
         comment: "Header ultra-compacto verificado en móvil: 'HELLBOUND | ❤️100 🔮100 ● On'"
       - working: false
         agent: "testing"
-        comment: "Nueva prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Se detectó un error crítico: 'EnhancedHeader is not defined'. Este componente parece ser parte del nuevo header mejorado con barras de stats, pero no está definido correctamente en el código, lo que impide que se muestre."
+        comment: "Nueva prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Se detectó un error crítico: 'EnhancedHeader is not defined'. Este componente parece ser parte del nuevo header mejorado con barras de stats, pero no está definido correctamente en el código, lo que impide que se muestre."
       - working: false
         agent: "testing"
         comment: "Se identificó el problema: hay una definición recursiva del componente EnhancedHeader en App.js línea 1176-1178. El componente se llama a sí mismo, lo que causa un error de recursión infinita. Se intentó corregir reemplazando la referencia a EnhancedHeader por GameHeader, pero persisten errores de sintaxis en App.js."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El header ahora se muestra correctamente con las barras de stats (salud, maná, stamina). No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El header ahora se muestra correctamente con las barras de stats (salud, maná, stamina). No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Modal estados emocionales"
     implemented: true
@@ -307,7 +307,7 @@ frontend:
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El modal de estados emocionales está presente en la interfaz y se puede acceder a él. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El modal de estados emocionales está presente en la interfaz y se puede acceder a él. No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Modal objetivos e inventario"
     implemented: true
@@ -328,7 +328,7 @@ frontend:
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Los modales de objetivos e inventario están presentes en la interfaz y se puede acceder a ellos. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Los modales de objetivos e inventario están presentes en la interfaz y se puede acceder a ellos. No se detectó el error 'EnhancedHeader is not defined' en la consola."
 
   - task: "Narrativa expandible"
     implemented: true
@@ -349,7 +349,7 @@ frontend:
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). La narrativa expandible funciona correctamente. Se muestra la narrativa inicial y se puede hacer clic en el botón de narrativa para ver la historia completa. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). La narrativa expandible funciona correctamente. Se muestra la narrativa inicial y se puede hacer clic en el botón de narrativa para ver la historia completa. No se detectó el error 'EnhancedHeader is not defined' en la consola."
         
   - task: "Sistema de badges"
     implemented: true
@@ -364,16 +364,16 @@ frontend:
         comment: "Iniciando prueba del sistema de badges"
       - working: false
         agent: "testing"
-        comment: "Se realizaron pruebas en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
+        comment: "Se realizaron pruebas en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
       - working: false
         agent: "testing"
-        comment: "Prueba realizada en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). No se pudo verificar la funcionalidad de los badges. Aunque el sistema de polling funciona correctamente (se observan logs de polling cada 2 segundos), no se pudo encontrar el botón de inventario ('Inv.') en la interfaz y no se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. Esto podría deberse a que no se pudo interactuar con el input para realizar acciones que generen cambios en el inventario."
+        comment: "Prueba realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). No se pudo verificar la funcionalidad de los badges. Aunque el sistema de polling funciona correctamente (se observan logs de polling cada 2 segundos), no se pudo encontrar el botón de inventario ('Inv.') en la interfaz y no se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. Esto podría deberse a que no se pudo interactuar con el input para realizar acciones que generen cambios en el inventario."
       - working: "NA"
         agent: "testing"
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El sistema de badges está presente en la interfaz y funciona correctamente. Se observan los botones de inventario, objetivos, skills y estados con sus respectivos badges. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos. No se detectó el error 'EnhancedHeader is not defined' en la consola."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El sistema de badges está presente en la interfaz y funciona correctamente. Se observan los botones de inventario, objetivos, skills y estados con sus respectivos badges. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos. No se detectó el error 'EnhancedHeader is not defined' en la consola."
         
   - task: "Sistema de loot dinámico"
     implemented: true
@@ -391,7 +391,7 @@ frontend:
         comment: "No se pudo probar debido al error 'EnhancedHeader is not defined' que impide que la aplicación cargue correctamente después de iniciar una aventura. Este error bloquea la funcionalidad principal del juego, incluyendo el sistema de loot dinámico que es una característica crítica a verificar."
       - working: true
         agent: "testing"
-        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). El sistema de loot dinámico está presente en la interfaz y funciona correctamente. Se puede iniciar una campaña y se muestran los elementos de la interfaz correctamente. No se detectó el error 'EnhancedHeader is not defined' en la consola. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos."
+        comment: "Prueba realizada después de la limpieza de caché en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El sistema de loot dinámico está presente en la interfaz y funciona correctamente. Se puede iniciar una campaña y se muestran los elementos de la interfaz correctamente. No se detectó el error 'EnhancedHeader is not defined' en la consola. El sistema de polling funciona correctamente, mostrando mensajes de '🔄 Sin cambios significativos' cada 2 segundos."
 
 agent_communication:
   - agent: "testing"
@@ -415,9 +415,9 @@ agent_communication:
   - agent: "testing"
     message: "PRUEBAS DE BACKEND COMPLETADAS: Se ha verificado que el sistema de badges funciona parcialmente. ActionCount se incrementa correctamente en acciones individuales, no hay duplicación de items en el inventario, y el endpoint /api/get_session/:sessionId funciona correctamente para polling. Sin embargo, se detectaron dos problemas: 1) La configuración CORS no incluye el header 'Access-Control-Allow-Origin' en las respuestas OPTIONS, lo que podría afectar las solicitudes desde el frontend. 2) El actionCount no siempre se incrementa correctamente después de múltiples acciones consecutivas, lo que podría afectar el sistema de badges."
   - agent: "testing"
-    message: "PRUEBA DEL SISTEMA DE BADGES: Se realizaron pruebas en la URL especificada (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
+    message: "PRUEBA DEL SISTEMA DE BADGES: Se realizaron pruebas en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). Se pudo verificar que el botón de inventario ('Inv.') está presente en la interfaz, pero no se pudo comprobar si los badges aparecen correctamente cuando se obtienen items debido a problemas con el input de texto. No se observaron badges con animación 'pulse' ni se detectaron logs de 'ACTUALIZANDO BADGES' en la consola. El sistema de polling muestra mensajes de '🔄 Sin cambios significativos' pero no se detectaron cambios en el inventario."
   - agent: "testing"
-    message: "PRUEBAS FINALES EN URL ESPECIFICADA (https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com): 1) INICIO DE SESIÓN: ✅ Funciona correctamente. Se puede seleccionar modo Sandbox, ingresar concepto y comenzar aventura sin errores 'Failed to fetch'. 2) INPUT FLUIDO: ❌ No funciona. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. 3) BADGES APARECEN: ❌ No se pudo verificar. No se encontró el botón de inventario ('Inv.') en la interfaz. 4) POLLING FUNCIONA: ✅ Funciona correctamente. Se observan logs de polling cada 2 segundos sin errores CORS ni 502."
+    message: "PRUEBAS FINALES EN URL ESPECIFICADA (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com): 1) INICIO DE SESIÓN: ✅ Funciona correctamente. Se puede seleccionar modo Sandbox, ingresar concepto y comenzar aventura sin errores 'Failed to fetch'. 2) INPUT FLUIDO: ❌ No funciona. Aunque el elemento textarea está presente en el DOM, no es posible interactuar con él. 3) BADGES APARECEN: ❌ No se pudo verificar. No se encontró el botón de inventario ('Inv.') en la interfaz. 4) POLLING FUNCIONA: ✅ Funciona correctamente. Se observan logs de polling cada 2 segundos sin errores CORS ni 502."
   - agent: "testing"
     message: "PRUEBA DEL SISTEMA DE LOOT DINÁMICO: Se ha detectado un problema crítico con el sistema de loot dinámico. Aunque el código para generar items dinámicos está implementado en las líneas 1878-1897 y el sistema detecta correctamente las acciones de búsqueda (como 'busco algo valioso'), los items no aparecen en el campo 'discoveredItems' del game_state. La narrativa menciona el descubrimiento de items (ej: 'Descubres amuleto protector 🧿 en el lugar'), pero estos no se añaden al estado del juego. El endpoint /api/pickup_item no puede funcionar correctamente sin items en discoveredItems."
   - agent: "testing"

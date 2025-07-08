@@ -6,7 +6,7 @@ from datetime import datetime
 
 def test_narrative_with_items():
     """Test a narrative that mentions items being picked up"""
-    base_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
+    base_url = "https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com"
     
     print(f"🔥 Testing Items in Narrative at {base_url}")
     

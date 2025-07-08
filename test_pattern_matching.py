@@ -6,7 +6,7 @@ import re
 from datetime import datetime
 
 class ItemsInNarrativeTester:
-    def __init__(self, base_url="https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"):
+    def __init__(self, base_url="https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
@@ -293,7 +293,7 @@ class ItemsInNarrativeTester:
 
 def main():
     # Use the provided URL from the test request
-    backend_url = "https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com"
+    backend_url = "https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com"
     
     print(f"🔥 Testing Items in Narrative at {backend_url}")
     
