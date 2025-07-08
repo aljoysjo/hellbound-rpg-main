@@ -2540,12 +2540,17 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         return null;
       }
       
-      // Buscar en ITEM_DATABASE por keywords
+      // Buscar en ITEM_DATABASE por keywords - ANCLAS PALABRA COMPLETA (CHATGPT FIX)
       for (const dbItem of ITEM_DATABASE) {
         for (const keyword of dbItem.keywords) {
           const normalizedKeyword = keyword.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          if (textLower.includes(normalizedKeyword)) {
-            console.log(`✅ Match encontrado: "${itemText}" → ${dbItem.type} (keyword: "${keyword}")`);
+          
+          // 🔧 CHATGPT FIX: Anclas de palabra completa \b + requiere artículo
+          const wordBoundaryPattern = new RegExp(`\\b(?:un(?:a|o)?|el|la|los|las)\\s+${normalizedKeyword}\\b`, 'i');
+          const simpleWordPattern = new RegExp(`\\b${normalizedKeyword}\\b`, 'i');
+          
+          if (wordBoundaryPattern.test(textLower) || simpleWordPattern.test(textLower)) {
+            console.log(`✅ Match encontrado: "${itemText}" → ${dbItem.type} (keyword: "${keyword}") - WORD BOUNDARY`);
             
             const foundItem = {
               name: itemText, // Usar nombre original de la narrativa
