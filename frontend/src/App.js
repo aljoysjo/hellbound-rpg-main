@@ -562,7 +562,10 @@ function App() {
             if (!prevState) {
               console.log('🔄 No prevState, returning new state');
               if (data.game_state.discoveredItems) {
-                setDiscoveredItems(data.game_state.discoveredItems);
+                setDiscoveredItems(prev => {
+                  console.log('📝 setDiscoveredItems - prev', prev, 'next', data.game_state.discoveredItems); // PUNTO 2 CHATGPT
+                  return data.game_state.discoveredItems;
+                });
               }
               return data.game_state;
             }
