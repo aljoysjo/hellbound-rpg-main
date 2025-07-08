@@ -19,11 +19,20 @@ const DiscoveredItemsModal = ({
   const modalContent = (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
-          🎁 Items Descubiertos
-        </h3>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-[var(--cedar-brown)] font-bold text-center flex-1">
+            🎁 Items Descubiertos
+          </h3>
+          <button 
+            onClick={onCloseModal}
+            className="text-[var(--cedar-brown)] hover:text-[var(--cedar-brown)]/70 font-bold text-lg"
+          >
+            ×
+          </button>
+        </div>
         <div className="space-y-3">
-          {discoveredItems.map((item, index) => (
+          {itemsToShow.length > 0 ? (
+            itemsToShow.map((item, index) => (
             <div
               key={item.instanceId || index}
               className="p-4 bg-[var(--creamy-old)] border border-[var(--imperial-gold)] rounded-lg"
