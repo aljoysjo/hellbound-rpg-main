@@ -487,8 +487,13 @@ agent_communication:
 test_plan:
   current_focus:
     - "Configuración CORS"
-    - "Sistema de eventos aleatorios D20"
+    - "Modal discovered items"
+    - "Eventos aleatorios con animación D20"
+    - "Modo sandbox"
+    - "Modo campaña"
   stuck_tasks:
     - "Configuración CORS"
+    - "Modal discovered items"
+    - "Eventos aleatorios con animación D20"
   test_all: false
   test_priority: "high_first"
