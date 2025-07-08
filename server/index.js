@@ -864,7 +864,6 @@ class GameState {
     this.location = "Punto de Inicio";
     this.inventory = [];
     this.discoveredItems = []; // 🎁 SISTEMA DISCOVERED ITEMS
-    this.discoveredItems = []; // 🎁 SISTEMA DISCOVERED ITEMS
     this.narrativeLog = [];
     this.mode = 'sandbox';
     this.campaignMeta = null;
