@@ -6,6 +6,12 @@
 🔄 Frontend integration - TESTING - Backend funciona, necesita verificar integración frontend
 ✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 🔄 Flujo completo - No verificado end-to-end
+🔧 ARREGLO ESPECÍFICO EN PROGRESO - Línea "asesina" del modal discovered items identificada y corregida
+
+ARREGLO ESPECÍFICO APLICADO:
+1. ✅ Removida dependency showDiscoveredItems del useEffect (línea 68) - ESTO CAUSABA BUCLES INFINITOS
+2. ✅ Mejorado containsPhysicalKeyword() con word boundaries (\b) para evitar falsos positivos como "daga" dentro de "desgastada"
+3. ✅ Modal ahora solo se cierra con user interaction (no polling)
 
   - task: "Eliminación de duplicación de newInventoryItem"
     implemented: true
