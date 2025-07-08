@@ -17,8 +17,14 @@ const DiscoveredItemsModal = ({
   const itemsToShow = discoveredItems || [];
 
   const modalContent = (
-    <div className="modal-backdrop">
-      <div className="modal-content">
+    <div 
+      className="modal-backdrop"
+      onClick={onCloseModal}
+    >
+      <div 
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-[var(--cedar-brown)] font-bold text-center flex-1">
             🎁 Items Descubiertos
