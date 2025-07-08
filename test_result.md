@@ -452,8 +452,35 @@ agent_communication:
   - agent: "testing"
     message: "PRUEBA ADICIONAL DEL SISTEMA DE EVENTOS ALEATORIOS D20 (08/07/2025): Se ha verificado nuevamente el sistema de eventos aleatorios D20 y funciona correctamente. Las pruebas muestran que: 1) Al realizar múltiples acciones, el sistema eventualmente dispara un evento aleatorio. 2) El campo random_event se incluye en la respuesta API con la estructura correcta (success, roll, event, narrative, appliedConsequences). 3) Las consecuencias se aplican correctamente al game_state (en este caso, health -5). 4) El sistema funciona tanto en modo sandbox como campaña."
 
-metadata:
-  created_by: "testing_agent"
+  - task: "Modal discovered items"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba de modal discovered items"
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada el 08/07/2025. El modal de discovered items no funciona correctamente. Al realizar acciones de búsqueda como 'buscar objetos valiosos', no aparece ningún modal con los items descubiertos. Se detectaron errores CORS en la consola que impiden la comunicación correcta entre el frontend y el backend. La aplicación está intentando conectarse a un backend diferente al configurado en el archivo .env, lo que causa errores CORS y bloquea la funcionalidad del modal discovered items."
+
+  - task: "Eventos aleatorios con animación D20"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/RandomEventModal.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba de eventos aleatorios con animación D20"
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada el 08/07/2025. No se pudo verificar la funcionalidad de los eventos aleatorios con animación D20 debido a los problemas de conexión con el backend. Se detectaron errores CORS en la consola que impiden la comunicación correcta entre el frontend y el backend. La aplicación está intentando conectarse a un backend diferente al configurado en el archivo .env, lo que causa errores CORS y bloquea la funcionalidad de los eventos aleatorios."
   version: "1.0"
   test_sequence: 7
 
