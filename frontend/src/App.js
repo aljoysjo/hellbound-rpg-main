@@ -1145,6 +1145,7 @@ function App() {
             showDiscoveredItems={showDiscoveredItems}
             onPickupItem={pickupItem}
             onIgnoreItem={ignoreItem}
+            onCloseModal={closeDiscoveredModal}
           />
 
         </main>
