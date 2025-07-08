@@ -594,7 +594,7 @@ const server = createServer(app);
 
 // Middleware - CORS SIMPLIFICADO Y DIRECTO
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
-                     || 'https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com';
+                     || 'https://hellbound-game.preview.emergentagent.com';
 
 console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
 
