@@ -236,8 +236,8 @@ const io = new Server(server, {
 
 // Middleware - CORS PERMANENTE Y ROBUSTO
 const allowedOrigins = [
-  'https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com',
-  'https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com',
+  'https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com',
+  'https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com',
   'http://localhost:3000', // Para desarrollo local
   'http://localhost:3001', // Puerto alternativo
   process.env.FRONTEND_URL // URL dinámica desde .env si existe

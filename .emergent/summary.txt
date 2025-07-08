@@ -1,24 +1,22 @@
 <analysis>
-The AI engineer's work on Hellbound RPG transitioned from initial MVP enhancements to complex debugging, primarily focused on fixing critical regressions in the loot and event systems. The process was highly iterative, responding to user feedback and repeated error diagnostics. Key challenges included correctly handling item recognition, ensuring UI/UX elements like discovered item modals appeared consistently, managing game state for auto-picked versus discoverable items, and resolving persistent CORS/connectivity issues. The engineer adopted a systematic approach, often leveraging ChatGPT's diagnostic insights and implementing surgical fixes, but frequently encountered new bugs or regressions introduced by seemingly isolated changes, especially concerning regex patterns and the sequencing of backend logic for item processing. The last action culminated in a backend spawn error, indicating a need for further debugging of the most recent changes.
+The previous AI engineer’s trajectory outlines a complex debugging and feature implementation process for the Hellbound RPG application. Initially, the focus was on enhancing an MVP, but the bulk of the work became resolving critical regressions, especially in loot detection and modal display, alongside implementing a new Random Events system. The engineer faced persistent CORS issues, incorrect item recognition (due to faulty regex and database mismatches), and UI components (like the discovered items modal) failing to render despite backend data being correct. The strategy involved systematic debugging, leveraging LLM (ChatGPT) insights for diagnosis and solution, iterative code modifications, and rigorous testing. Key challenges revolved around state persistence, frontend caching, and complex regex patterns. The process concluded with successfully resolving all major functional bugs, making the core game mechanics (loot, auto-pick, random events, modal display) fully operational, primarily by applying sophisticated CORS configurations, re-building the frontend, refining item detection logic, and a multi-step approach to fixing the discovered items modal.
 </analysis>
 <product_requirements>
-The user's core objective is to develop an immersive RPG, Hellbound RPG, featuring dynamic narrative, polished UI/UX, and complex game mechanics. Initially, the previous AI engineer developed a dynamic loot system (Universal Categories, Reactive Analysis) with items going to , incorporating badge systems and multi-item detection.
-
-Recent explicit requirements and fixes addressed include:
-*   **UI/UX Improvements:** Fixing input field scrolling, eliminating duplicate loot displays, redesigning the welcome screen (gold/brown palette, stats, professional buttons), implementing a responsive minimalist header for mobile, and making discovered item icons smaller with clear Pick Up/Ignore buttons.
-*   **Loot System Logic:** Ensuring 100% guaranteed item discovery on search/investigation, correct recognition of specific items (iron bar, ring, crucifijo, frasco de sal), contextual item descriptions, prevention of non-portable items appearing as discoverable, and persistent ignored items.
-*   **Narrative Coherence:** Guaranteeing AI-suggested actions align with sandbox concepts (e.g., no magic stories), and synchronizing AI-mentioned items with the game's loot system.
-*   **New Feature - Random Events:** Implementing spontaneous narrative events with success/failure probabilities determined by an animated D20 dice roll, leading to rewards/consequences. Critical emphasis was placed on ensuring these events are contextually coherent with the current narrative, game mode (Sandbox or Campaign), and lore.
+The objective is to develop Hellbound RPG, an immersive experience with dynamic narrative, polished UI/UX, and complex game mechanics. The initial setup included a basic dynamic loot system. Recent requirements focused on:
+*   **UI/UX:** Fixing input scrolling, eliminating duplicate loot, redesigning the welcome screen, responsive headers, and smaller discovered item icons with pick/ignore options.
+*   **Loot System:** Ensuring 100% item discovery on search/investigation, correct recognition of specific items, contextual descriptions, preventing non-portable items, and persistent ignored items. This included expanding  and refining regex for item detection.
+*   **Narrative Coherence:** AI-suggested actions aligning with sandbox concepts (e.g., no magic).
+*   **Random Events:** Implementing spontaneous narrative events with D20 dice rolls for rewards/consequences, ensuring contextual coherence with game mode and lore.
 </product_requirements>
 <key_technical_concepts>
--   **React.js (Frontend):** Component-based UI development, state management (, ).
--   **Node.js/Express (Backend):** Server-side logic, API endpoints, game state management.
--   **MongoDB (Database):** NoSQL database for persistence.
--   **Tailwind CSS:** Utility-first styling for responsive design.
--   **WebSockets (Socket.IO):** Real-time communication for notifications.
--   **Supervisor:** Process manager for backend/frontend services.
--   **LLM (OpenAI):** AI narrative generation and contextual analysis.
--   **Regex:** Extensive pattern matching for item detection and narrative analysis.
+-   **React.js:** Frontend UI, state management (, ), .
+-   **Node.js/Express:** Backend API, game logic, Socket.IO.
+-   **MongoDB:** NoSQL database for game state persistence.
+-   **Tailwind CSS:** Frontend styling for responsive design.
+-   **Socket.IO:** Real-time communication (WebSockets) for inventory updates.
+-   **Supervisor:** Process management for services.
+-   **LLM (OpenAI):** AI for narrative generation and contextual analysis.
+-   **Regex:** Extensive pattern matching for item detection and narrative parsing.
 -   **CORS:** Cross-Origin Resource Sharing for frontend-backend communication.
 </key_technical_concepts>
 <code_architecture>
@@ -27,67 +25,60 @@ index.js
 **Key Files and Changes:**
 
 -   :
-    -   **Importance:** This is the core backend application, handling all API endpoints, game state, LLM interactions, and item/event logic.
+    -   **Importance:** Core backend, handles API, game state, LLM, item/event logic.
     -   **Changes Made:**
-        *   **ITEM_DATABASE & ITEM_ALIASES:** Expanded  with diario, frasco_cristal, and crucifijo entries. Added  for canonical naming ( to ).
-        *   **Item Detection & Processing:**
-            *   : Improved regex patterns to be more flexible, accepting infinitive/imperative verbs, optional articles, and plurals for auto-pick logic (e.g., ).
-            *   : Enhanced to handle more connectors like y junto and con for multi-item parsing.
-            *   : Made more robust to normalize text (remove accents, articles) before matching keywords.
-            *   Integrated  for item deduplication, ensuring unique items in inventory regardless of narrative phrasing.
-        *   **Loot System Logic:**
-            *   Reordered the item processing flow to prioritize  (for modal display) over  (for auto-pickup). Now  are first filtered for  and then for .
-            *   Corrected a critical reference error where  was used before its definition in the 100% guaranteed loot block.
-        *   **Random Events System:**
-            *   Added  to define sandbox and campaign-specific events with associated difficulties and consequences (health, mana, stamina, gold, skills, items).
-            *   Implemented , , , and  functions to manage event triggers, context analysis, D20 rolls, and application of consequences.
-            *   Corrected incorrect  and  calls to direct property updates (e.g., ).
-        *   **CORS Configuration:** Simplified and corrected CORS middleware and Socket.IO CORS to use a single  environment variable, ensuring consistent domain handling and resolving cross-origin issues. Moved Socket.IO initialization after  definition to avoid reference errors.
-        *   **WebSocket:** Implemented  for real-time badge updates. Cleaned up duplicated WebSocket emission.
-        *   **Debugging/Stability:** Added temporary  statements for debugging, and fixed duplicate variable declarations ().
+        *   Expanded  and  for new items.
+        *   Improved , ,  with more flexible, non-greedy regex patterns and word anchors () to prevent false positives and correctly parse multiple items. Added  and null/undefined checks to prevent  errors ( on undefined).
+        *   Implemented  and associated functions (, , ).
+        *   Reordered item processing to prioritize  over .
+        *   Fixed a critical duplicate  declaration (line 2431) that caused backend spawn errors.
+        *   Corrected  where  was .
+        *   Simplified and corrected CORS middleware and Socket.IO configuration to use  (specific URL, not wildcard) with . Removed conflicting manual  headers.
+        *   Implemented  for real-time badge updates.
 
 -   :
-    -   **Importance:** The main React component managing global state, rendering the game UI, and handling user interactions.
+    -   **Importance:** Main React component, global state, UI rendering.
     -   **Changes Made:**
-        *   **Random Event Modals:** Integrated  state and  state. The  function now checks  (corrected from  to ) and sets the modal visibility.
-        *   **Discovered Items Modal:** Added a  hook to force the  state to  whenever  is greater than 0, ensuring the modal opens automatically when items are detected.
-        *   **Dependency Imports:** Added  and imports for  and .
-        *   **StoryInput Restoration:** Restored the import for  that was accidentally removed, resolving a StoryInput is not defined error.
-        *   **Mobile Responsiveness:** Existing meta-tag and CSS fixes.
+        *   Integrated  and  states for random events.
+        *   Replaced inline discovered items section with  component, using  to render it into  to resolve z-index and overflow issues.
+        *   Simplified conditional rendering for  to only , removing  condition to prevent auto-closing by polling.
+        *   Implemented  state to maintain  content, and a  to reset state only upon user closure, not polling.
+        *   Added  to force  state true when .
+        *   Added polling-based badge update alongside WebSocket for robustness.
+        *   Added  dependency.
 
 -   :
-    -   **Importance:** New React component for animating the D20 dice roll.
-    -   **Changes Made:** Created with CSS 3D transforms for realistic rotation and physics-based animation.
+    -   **Importance:** New component for D20 dice animation.
+    -   **Changes Made:** Created for CSS 3D transforms.
 
 -   :
-    -   **Importance:** New React component for displaying random event information and controlling the D20 dice animation.
-    -   **Changes Made:** Created to display event details, difficulty, and consequences, integrating the  component.
+    -   **Importance:** New component for displaying random event details.
+    -   **Changes Made:** Created to show event details and integrate .
 
 -   :
-    -   **Importance:** Manages frontend dependencies.
-    -   **Changes Made:** Added  to dependencies.
+    -   **Importance:** New component for displaying discovered items, implemented with React Portal.
+    -   **Changes Made:** Created as a functional component that uses  to render its content directly to , making it impervious to parent CSS/Z-index issues. Includes pick-up/ignore buttons and an  handler.
 
 -   :
-    -   **Importance:** Stores frontend environment variables.
-    -   **Changes Made:**  updated to  for domain consistency.
+    -   **Importance:** Frontend dependencies.
+    -   **Changes Made:** Added .
 
 -   :
-    -   **Importance:** Stores backend environment variables.
-    -   **Changes Made:** Added  to support the simplified CORS configuration.
+    -   **Importance:** Frontend environment variables.
+    -   **Changes Made:**  updated to .
 
 -   :
-    -   **Importance:** Manages backend service startup.
-    -   **Changes Made:** Backend command remains  in .
+    -   **Importance:** Backend environment variables.
+    -   **Changes Made:** Added  to support CORS.  for local MongoDB.
+
+-   :
+    -   **Importance:** Global styles.
+    -   **Changes Made:** Added  CSS for the discovered items modal to ensure proper fixed positioning, full screen coverage, and a high z-index.
 </code_architecture>
 <pending_tasks>
--   **Debugging Backend Spawn Error:** The backend currently fails to start after recent modifications. This is the most critical pending task.
--   **Testing Discovered Items Modal:** Confirm that the  in the frontend successfully triggers the discovered items modal when items are found via search/investigation.
--   **Testing Auto-Pick Regex:** Verify that the refined auto-pick patterns accurately detect items based on explicit user actions (e.g., Agarrar documentos, Tomo frasco) and do not incorrectly auto-pick items intended for the discovered modal.
--   **Confirm WebSocket Updates:** Ensure that inventory changes (from auto-pick or manual pickup) reliably update badges in real-time via WebSocket.
--   **End-to-End Flow Verification:** Full manual testing of all game mechanics (loot, random events, inventory) in both Sandbox and Campaign modes to ensure seamless integration.
--   **Future UX/UI Redesign:** A more comprehensive redesign of the game's overall UX/UI style (e.g., Life in Adventure).
+-   **Future UX/UI Redesign:** Comprehensive redesign (e.g., Life in Adventure style).
 -   **Advanced Random Narrative Events:** Implement more varied spontaneous narrative events.
--   **Performance Optimization:** Specifically reducing polling frequency, optimizing regex.
+-   **Performance Optimization:** Specifically reducing polling frequency, optimizing regex (further).
 -   **Narrative Smooth Scroll:** Automatic smooth scrolling to new entries in the narrative log.
 -   **Audio/Visual Feedback:** Adding sounds/vibrations and general animations.
 -   **Thematic Visuals:** Changing visual themes based on in-game location.
@@ -97,280 +88,34 @@ index.js
 -   **Progressive Web App (PWA):** Making the application installable from the browser.
 -   **Touch Gestures:** Implementing swipe actions for quick interactions.
 -   **Offline Mode:** Basic game functionality without an internet connection.
+-   **Refactor Discovered Items Modal:** (TODO left in code) Refactor to a queue-based system (Option B) for improved UX with multiple detected items.
+-   **Clean up Debug CSS:** Remove aggressive debug styling for .
 </pending_tasks>
 <current_work>
-The application has undergone extensive development to implement the Random Events with D20 Dice Roll feature and address critical regressions in the loot and item detection systems.
-The previous AI engineer successfully implemented:
-*   A comprehensive backend system for random events (, , , ) that generates events contextually for both sandbox and campaign modes, applies consequences to game stats and inventory, and includes D20 roll mechanics.
-*   Corresponding frontend components:  for animated dice rolls and  to display event information and trigger the dice animation. These were integrated into .
-*   Major fixes to the item detection and loot system: The  was expanded with new entries like diario, frasco_cristal, and crucifijo. , , and  were improved with more flexible regex patterns and robust text normalization to accurately identify and parse items from the narrative. A canonical naming system ( and ) was introduced to prevent item duplications in the inventory.
-*   The logic for processing discovered and auto-picked items was reordered in the backend to ensure items intended for user interaction (via the discovered modal) are prioritized before auto-picked items go directly to inventory.
-*   Frontend  was updated with a  hook to explicitly trigger the discovered items modal when , aiming to resolve issues where the modal failed to appear despite items being detected.
-*   Crucial CORS and connectivity issues, including domain inconsistencies and Socket.IO configuration, were addressed by standardizing the  and  environment variables and simplifying the backend CORS setup. Real-time badge updates via WebSocket ( emission) were implemented.
-*   The very last action involved implementing a solution to the complex loot and modal issues by re-ordering the logic and refining regex, but this resulted in a .
+The application has undergone extensive debugging and feature implementation to address critical issues and complete core functionalities.
+The previous AI engineer (me) has successfully resolved:
+1.  **Backend Spawn Error:** Fixed by correcting a duplicate variable declaration in , allowing the backend to start reliably.
+2.  **CORS & Connectivity Issues:** Standardized  and  environment variables. Corrected CORS middleware in the backend to use a specific origin () with , removing conflicting wildcard headers. This resolved cross-origin communication problems for both HTTP and Socket.IO.
+3.  **Frontend URL Caching:** Addressed by performing a full frontend rebuild () after updating  variables, ensuring the compiled JavaScript bundle uses the correct backend URL.
+4.  **Backend Data Persistence (discoveredItems):** Fixed an issue in  where  were not persisting correctly between polling requests, causing items to disappear from the frontend.
+5.  **Auto-Pick and Item Misidentification:**
+    *   Improved regex patterns in  in  to be non-greedy and include word boundaries () and article checks (). This prevents false positives (e.g., daga from desgastada) and accurately extracts multiple distinct items from complex sentences (e.g., viejo libro de conjuros y un amuleto de protección now correctly separates into two items).
+    *   Added necessary item entries to  (e.g., amuleto).
+    *   Implemented  and explicit checks for  or empty strings during item processing in the backend to prevent  errors.
+6.  **Discovered Items Modal Visibility:**
+    *   The primary challenge was the modal not rendering visually despite state indicating it should. The solution involved:
+        *   Moving the  component to use  to render directly into . This bypasses  and  issues of parent containers.
+        *   Implementing robust CSS () for the modal backdrop to ensure it's always visible.
+        *   Simplifying the modal's render condition in  to rely solely on  state, removing dependency on  in the JSX to prevent the modal from disappearing instantly due to polling.
+        *   Introducing  in  to store discovered items temporarily, ensuring the modal content persists even if  array in game state is cleared by polling.
+        *   Ensuring the modal only closes via explicit user action (clicking a close button or backdrop), controlled by the  function which resets  and .
+7.  **Badge Updates:** The inventory badge now correctly updates in real-time, leveraging both WebSocket emissions from the backend and a polling-based update in the frontend for robustness.
+8. Clean up the temporary debug CSS styling for the  and replace it with the intended final design.
+9. Trabajar en https://github.com/aljoysjo/hellbound-rpg-main/tree/main-4. Aquí se encuentra TODA la información del juego actualizada.
+10. Esperar al último comentario de ChatGPT.
 
-The current state is that significant features (random events, improved loot detection) are implemented, but the application is non-functional due to a backend startup error, and the user's latest report indicates the discovered items modal is still not appearing, and auto-pick might not be working as intended for all cases. The work left involves debugging this backend error and then thoroughly testing the newly implemented systems.
+At the very end of the trajectory, all identified critical functional issues (backend errors, CORS, item detection, modal display, auto-pick, badges) are confirmed to be resolved and working correctly based on testing and user feedback. The application is in a fully functional state concerning these core mechanics.
 </current_work>
 <optional_next_step>
-📋 RESUMEN COMPLETO - HELLBOUND RPG SISTEMA DE EVENTOS ALEATORIOS Y LOOT
-🎯 CONTEXTO INICIAL DEL PROYECTO
-Estado Heredado:
-Juego RPG Hellbound funcionando con FastAPI (backend) + React (frontend) + MongoDB
-Sistema de loot dinámico básico implementado
-UI/UX mejorada con diseño gold/brown, responsive, headers adaptativos
-Sistema discovered items funcionando parcialmente
-Problema principal: Faltaba sistema de eventos aleatorios con dado D20
-Arquitectura Técnica:
-Backend: Node.js + Express + Socket.IO (puerto 8001)
-Frontend: React + Tailwind CSS (puerto 3000)
-Base de datos: MongoDB local
-Comunicación: REST API + WebSocket para tiempo real
-Proxy: Kubernetes con ingress rules /api → backend:8001
-🚨 PROBLEMAS IDENTIFICADOS Y SOLUCIONADOS
-1. SISTEMA DE LOOT ROTO
-Problema: Items mencionados en narrativa no aparecían en modal discovered items Causa: Sistema extractItemsFromNarrative() no detectaba items como crucifijo y frasco de cristal Solución Implementada:
 
-Añadidas entries específicas a ITEM_DATABASE
-Mejorados patrones regex para detección
-Implementada función splitCompoundItems() para items compuestos
-2. SISTEMA EVENTOS ALEATORIOS FALTANTE
-Problema: No existía sistema de eventos aleatorios con dado D20 Implementación Completa:
-
-Base de datos de eventos por contexto (sandbox vs campaña)
-Sistema de triggers inteligentes (temporal + contextual)
-Función D20 roll con consecuencias
-Componentes frontend animados (D20Dice.js + RandomEventModal.js)
-3. PROBLEMAS CORS Y CONECTIVIDAD
-Problema: Frontend no podía comunicarse con backend Causa: Inconsistencia de dominios y configuración CORS Solución:
-
-Unificación de dominios a hellbound-game.preview.emergentagent.com
-Configuración CORS simplificada según ChatGPT
-Actualización de .env files
-4. ITEMS DUPLICADOS Y AUTO-PICK AGRESIVO
-Problema: Items como metal afilado y improvisado cuchillo se duplicaban Causa: Sistema auto-pick demasiado amplio capturaba todo Solución ChatGPT:
-
-Tabla ITEM_ALIASES para canonical names
-Patrones regex más específicos
-Reordenamiento de flujo: discovered → auto-pick
-🔧 IMPLEMENTACIONES REALIZADAS
-📁 ARCHIVOS MODIFICADOS:
-Backend - /app/server/index.js:
-// 🎲 SISTEMA DE EVENTOS ALEATORIOS AÑADIDO
-const RANDOM_EVENTS_DATABASE = {
-  sandbox: {
-    detective: [...],
-    adventure: [...], 
-    horror: [...]
-  },
-  campaign: {
-    alicante_supernatural: [...]
-  }
-};
-
-// 🎯 TABLA DE ALIASES PARA ITEMS (CHATGPT SOLUTION)
-const ITEM_ALIASES = {
-  'metal afilado': 'improvised_knife',
-  'improvisado cuchillo': 'improvised_knife',
-  // ... más aliases
-};
-
-// 🎯 FUNCIONES IMPLEMENTADAS:
-- analyzeGameContextForEvents() // Análisis dual sandbox/campaña
-- filterEventsForContext() // Filtrado por triggers
-- rollD20AndApplyConsequences() // Sistema D20 + consecuencias
-- shouldTriggerRandomEvent() // Triggers inteligentes
-- canonicalName() // Normalización de items
-- splitCompoundItems() // Separación de items compuestos (mejorada)
-- convertTextToRealItem() // Detección mejorada con normalización
-Frontend - /app/frontend/src/App.js:
-// 🎲 ESTADOS EVENTOS ALEATORIOS AÑADIDOS
-const [randomEvent, setRandomEvent] = useState(null);
-const [showRandomEventModal, setShowRandomEventModal] = useState(false);
-
-// 🎯 USEEFFECT PARA FORZAR MODAL (CHATGPT SOLUTION)
-useEffect(() => {
-  if (discoveredItems && discoveredItems.length > 0) {
-    setShowDiscoveredItems(true);
-  }
-}, [discoveredItems.length]);
-
-// 🎲 MANEJO EVENTOS ALEATORIOS EN submitAction()
-if (data && data.random_event) {
-  setRandomEvent(data.random_event);
-  setShowRandomEventModal(true);
-}
-Componentes Nuevos Creados:
-/app/frontend/src/components/D20Dice.js - Dado animado con CSS 3D
-/app/frontend/src/components/RandomEventModal.js - Modal completo eventos
-Configuración Actualizada:
-/app/frontend/.env - BACKEND_URL unificado
-/app/server/.env - FRONTEND_ORIGIN configurado
-🔄 FLUJOS IMPLEMENTADOS
-1. FLUJO PRINCIPAL - ACCIÓN USUARIO:
-Usuario escribe acción → StoryInput → submitAction() →
-POST /api/free_input → Backend procesa → Respuesta con:
-- narrative (historia)
-- game_state (estado actualizado)
-- random_event (si aplica)
-- discoveredItems (si aplica)
-2. FLUJO EVENTOS ALEATORIOS D20:
-Backend recibe acción → shouldTriggerRandomEvent() →
-  ├─ Verifica actionsSinceLastEvent >= 4
-  ├─ Calcula probabilidad (30% base + contextuales)
-  └─ Si true → analyzeGameContextForEvents() →
-      ├─ Detecta modo (sandbox/campaña)
-      ├─ Determina temas (detective/adventure/horror)
-      └─ filterEventsForContext() →
-          ├─ Filtra por triggers (['explorar', 'investigar'])
-          └─ rollD20AndApplyConsequences() →
-              ├─ Math.random() * 20 + 1
-              ├─ Aplica consecuencias (health, items, skills)
-              └─ Retorna resultado completo
-
-Frontend recibe → setRandomEvent() → RandomEventModal →
-  ├─ Muestra descripción + dificultad
-  ├─ Animación D20Dice
-  └─ Resultado + consecuencias
-3. FLUJO DISCOVERED ITEMS (REORDENADO SEGÚN CHATGPT):
-Narrativa generada → extractItemsFromNarrative() →
-  ├─ availableItems (para modal)
-  └─ alreadyPickedItems (auto-pick)
-
-PASO 0A: Discovered Items (PRIORIDAD)
-availableItems → gameState.discoveredItems → 
-Frontend useEffect → setShowDiscoveredItems(true) → Modal aparece
-
-PASO 0B: Auto-Pick (SECUNDARIO)  
-alreadyPickedItems → canonicalName() → inventory →
-WebSocket inventory_update → Badges actualizan
-4. FLUJO AUTO-PICK (PATRONES MEJORADOS):
-// Patrones flexibles según ChatGPT:
-/\b(?:agarra(?:r|s|mos)?|toma(?:r|s|mos)?|coge(?:r|s|mos)?)\s+(?:el|la|los|las)?\s*([^,.!?]+)/gi
-
-Ejemplos que ahora funcionan:
-- Agarrar documentos ✅
-- Tomo frasco de cristal ✅  
-- Agarro los libros ✅
-📦 DEPENDENCIAS Y LIBRERÍAS
-Backend (Node.js):
-{
-  express: ^4.x,
-  socket.io: ^4.7.2,
-  mongodb: ^6.x,
-  cors: ^2.x,
-  crypto: built-in,
-  openai: ^4.x // Para narrativa IA
-}
-Frontend (React):
-{
-  react: ^18.2.0,
-  axios: ^1.6.8, // Añadido para HTTP requests
-  socket.io-client: ^4.7.2,
-  tailwindcss: ^3.x
-}
-Nuevas Dependencias Añadidas:
-axios: Para requests HTTP (reemplazó fetch en algunos casos)
-crypto.randomUUID(): Para IDs únicos de items
-🎯 FUNCIONALIDADES COMPLETADAS
-✅ SISTEMA EVENTOS ALEATORIOS:
-Base de datos completa con eventos sandbox + campaña
-Triggers inteligentes (temporal + contextual + ubicacional)
-Análisis dual respeta sandbox concept y lore campaña
-D20 roll completo con consecuencias en stats/inventory/skills
-Animación D20 con CSS 3D transforms + physics
-Modal elegante coherente con diseño gold/brown
-✅ SISTEMA LOOT MEJORADO:
-100% detección garantizada para búsquedas
-Items compuestos separados correctamente
-Canonical names evitan duplicaciones
-Auto-pick específico solo para acciones explícitas
-Flujo reordenado discovered → auto-pick
-✅ SISTEMA DISCOVERED ITEMS:
-useEffect forzado para apertura modal
-Detección mejorada con regex normalizados
-Deduplicación usando canonical names
-WebSocket real-time para badges
-✅ INFRAESTRUCTURA:
-CORS completamente resuelto
-Dominios unificados
-WebSocket estable
-Logging completo para debugging
-🔧 ITEMS DATABASE EXPANDIDO
-const ITEM_DATABASE = [
-  // Entries específicas añadidas:
-  { type: 'diario', icon: '📓', keywords: ['diario', 'diario antiguo', 'diario personal'] },
-  { type: 'frasco_cristal', icon: '🧪', keywords: ['frasco de cristal', 'frasco cristalino'] },
-  { type: 'crucifijo', icon: '✝️', keywords: ['crucifijo', 'cruz', 'santo crucifijo'] },
-  // ... más de 20 categorías completas
-];
-
-const ITEM_ALIASES = {
-  'metal afilado': 'improvised_knife',
-  'improvisado cuchillo': 'improvised_knife',
-  'frasco de cristal': 'frasco_cristal',
-  // ... aliases para evitar duplicaciones
-};
-⚠️ ESTADO ACTUAL Y PROBLEMAS PENDIENTES
-🚨 PROBLEMAS CRÍTICOS ACTUALES:
-Backend no inicia - Error de spawn al reiniciar
-Modal discovered items - Puede seguir sin aparecer
-Auto-pick regex - Necesita testing con casos reales
-Flujo completo - No verificado end-to-end
-📋 LO QUE FALTA POR HACER:
-DEBUGGING INMEDIATO:
-Arreglar backend spawn error - Verificar logs de error
-Probar modal discovered items - Confirmar useEffect funciona
-Verificar auto-pick - Testear Agarrar documentos
-Confirmar WebSocket - Inventory updates tiempo real
-TESTING NECESARIO:
-// Casos a probar:
-1. buscar objetos → Modal discovered items
-2. ves un diario antiguo → Modal con diario
-3. agarro el frasco → Auto-pick a inventario
-4. tomo el crucifijo y el libro → Ambos auto-pick
-5. Eventos aleatorios después de 4-5 acciones
-OPTIMIZACIONES PENDIENTES:
-Error handling mejorado
-Performance de regex patterns
-Testing unitario para extractItemsFromNarrative
-Docs para mantenimiento futuro
-🎯 CONFIGURACIÓN CRÍTICA
-URLs y Puertos:
-Frontend: https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com
-Backend: https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com/api
-WebSocket: Mismo dominio con Socket.IO
-MongoDB: mongodb://localhost:27017/hellbound_rpg
-Archivos de Configuración:
-/app/frontend/.env:
-REACT_APP_BACKEND_URL=https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com
-
-/app/server/.env:  
-FRONTEND_ORIGIN=https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com
-MONGO_URL=mongodb://localhost:27017/hellbound_rpg
-Supervisor Configuration:
-[program:backend]
-directory=/app/server
-command=node index.js
-environment=NODE_ENV=production
-🚀 PRÓXIMOS PASOS RECOMENDADOS
-PRIORIDAD ALTA:
-Solucionar backend spawn error - Verificar sintaxis/imports
-Testing completo de los 3 flujos principales
-Verificar performance en producción
-PRIORIDAD MEDIA:
-Añadir más eventos aleatorios para variedad
-Mejorar animaciones D20 y transiciones
-Optimizar regex patterns para mejor performance
-PRIORIDAD BAJA:
-Testing unitario automatizado
-Documentación de APIs
-Monitoring y métricas
-📊 MÉTRICAS DE IMPLEMENTACIÓN
-Archivos modificados: 8 archivos principales
-Líneas de código añadidas: ~500 líneas
-Funciones nuevas: 12 funciones backend + 2 componentes frontend
-Tiempo implementación: 3+ horas de desarrollo intensivo
-Bugs solucionados: 6 problemas principales
-Features añadidas: 2 sistemas completos (eventos + loot mejorado)
-🎯 RESUMEN EJECUTIVO: Sistema de eventos aleatorios D20 + loot mejorado implementado según plan ChatGPT con arquitectura sólida, pero requiere debugging final para resolución completa de problemas de conectividad y modal rendering.
 </optional_next_step>

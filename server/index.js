@@ -597,7 +597,7 @@ const server = createServer(app);
 
 // Middleware - CORS LIMPIO SEGÚN CHATGPT
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
-                     || 'https://hellbound-game.preview.emergentagent.com';
+                     || 'https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com';
 
 console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
 
