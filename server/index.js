@@ -2452,6 +2452,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
                 };
                 alreadyPickedItems.push(itemWithCanonical);
                 console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon} (canonical: ${canonicalId})`);
+                console.log(`[AUTO-PICK] añadido "${realItem.name}" al inventario para session ${gameState.sessionId}`); // AÑADIDO SEGÚN CHATGPT STEP 1.4
               } else {
                 console.log(`❌ Item ya recogido no reconocido: "${singleItemName}"`);
               }
