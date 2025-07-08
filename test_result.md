@@ -1,8 +1,9 @@
 🚨 PROBLEMAS CRÍTICOS ACTUALES:
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
-✅ CORS Configuration - RESUELTO - URLs corregidas frontend/backend
-🔄 Modal discovered items - MEJORA - Game interface carga correctamente, testing modal en progreso
-🔄 Eventos aleatorios con animación D20 - MEJORA - Game interface carga correctamente, testing eventos en progreso
+✅ CORS Configuration - RESUELTO - URLs corregidas y wildcard CORS configurado
+✅ Modal discovered items - RESUELTO - Backend genera items correctamente en discoveredItems array
+✅ Eventos aleatorios con animación D20 - RESUELTO - Backend genera eventos con estructura correcta
+🔄 Frontend integration - TESTING - Backend funciona, necesita verificar integración frontend
 ✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 🔄 Flujo completo - No verificado end-to-end
 
