@@ -1148,6 +1148,46 @@ function App() {
             onCloseModal={closeDiscoveredModal}
           />
 
+          {/* 🚨 FALLBACK MODAL INLINE PARA DEBUG */}
+          {showDiscoveredItems && (
+            <div 
+              style={{
+                position: "fixed",
+                top: "0",
+                left: "0",
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255, 0, 0, 0.8)",
+                zIndex: 99999,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onClick={closeDiscoveredModal}
+            >
+              <div 
+                style={{
+                  backgroundColor: "white",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  maxWidth: "400px"
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3>🎁 DEBUG MODAL - Items Descubiertos</h3>
+                <p>Items encontrados: {discoveredItems?.length || 0}</p>
+                {discoveredItems?.map((item, index) => (
+                  <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "10px" }}>
+                    <div>{item.icon} {item.name}</div>
+                    <button onClick={() => pickupItem(item.instanceId)}>Pick Up</button>
+                    <button onClick={() => ignoreItem(item.instanceId)}>Ignore</button>
+                  </div>
+                ))}
+                <button onClick={closeDiscoveredModal} style={{ marginTop: "10px" }}>CLOSE</button>
+              </div>
+            </div>
+          )}
+
         </main>
       </div>
     );
