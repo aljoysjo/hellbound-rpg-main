@@ -2359,18 +2359,18 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       try {
       
       const patterns = [
-        // 🔍 PATRONES PARA ITEMS DISPONIBLES (van a discovered) - MEJORADOS
-        /encuentras? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /descubres? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /hallas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /ves? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /hay (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /aparece (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /observas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /localizas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /notas? (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi,
-        /(?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))? (?:sobre|en|bajo|dentro de|junto a)/gi,
-        /se encuentra (?:una?|el|la) ([^,.!?y]+)(?:\s+y\s+(?:una?|el|la) ([^,.!?]+))?/gi
+        // 🔍 PATRONES NON-GREEDY CON LOOK-AHEAD (CHATGPT SOLUTION)
+        /encuentras?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /descubres?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /hallas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /ves?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /hay\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /aparece\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /observas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /localizas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /notas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
+        /(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])\s+(?:sobre|en|bajo|dentro de|junto a)/gi,
+        /se encuentra\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi
       ];
       
       // 🎁 PATRONES REFINADOS Y FLEXIBLES PARA AUTO-PICK (CHATGPT SOLUTION V2)
