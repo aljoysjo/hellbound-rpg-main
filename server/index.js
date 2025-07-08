@@ -2425,8 +2425,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       alreadyPickedPatterns.forEach((pattern, index) => {
         let match;
         while ((match = pattern.exec(narrative)) !== null) {
-          let itemName = '';
-          
           // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
           let itemName = '';
           
