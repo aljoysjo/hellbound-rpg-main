@@ -5,11 +5,16 @@ const DiscoveredItemsModal = ({
   discoveredItems, 
   showDiscoveredItems, 
   onPickupItem, 
-  onIgnoreItem 
+  onIgnoreItem,
+  onCloseModal 
 }) => {
-  if (!showDiscoveredItems || !discoveredItems || discoveredItems.length === 0) {
+  // OPCIÓN A CHATGPT: Solo usar showDiscoveredItems, NO discoveredItems.length
+  if (!showDiscoveredItems) {
     return null;
   }
+
+  // Si no hay items, mostrar mensaje pero mantener modal abierto
+  const itemsToShow = discoveredItems || [];
 
   const modalContent = (
     <div className="modal-backdrop">
