@@ -411,7 +411,9 @@ function App() {
               console.log('🎁 FRONTEND: No hay discovered items en la respuesta');
             }
             
-            // SISTEMA DE BADGES AVANZADO
+            // 🔍 DETAILED INVENTORY DEBUG  
+          console.log('📦 FRONTEND: Current gameState.inventory:', gameState?.inventory);
+          console.log('📦 FRONTEND: Inventory length:', gameState?.inventory?.length || 0);
             if (prevState) {
               console.log('🔍 DETECTING CHANGES...');
               const inventoryChanges = detectInventoryChanges(
