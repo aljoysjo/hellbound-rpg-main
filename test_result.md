@@ -108,6 +108,9 @@
       - working: true
         agent: "testing"
         comment: "Se ha verificado que el sistema de loot dinámico ahora funciona correctamente después de los arreglos. Las pruebas muestran que: 1) Al crear una nueva sesión Sandbox, el game_state incluye el campo 'discoveredItems: []'. 2) Al enviar una acción de búsqueda ('busco algo valioso'), el sistema detecta correctamente la acción y añade un item al array discoveredItems. 3) El endpoint /api/pickup_item funciona correctamente, moviendo el item de discoveredItems a inventory. 4) Se pueden generar diferentes tipos de items según el contexto de la acción. Los logs muestran los mensajes esperados: '🎲 ACTIVANDO SISTEMA DINÁMICO para acción', '🎁 ITEM DESCUBIERTO (clickeable)', '🎁 ITEM RECOGIDO'. El sistema anti-duplicados también funciona correctamente."
+      - working: true
+        agent: "testing"
+        comment: "PRUEBA ADICIONAL (08/07/2025): Se ha verificado nuevamente el sistema de loot dinámico y funciona correctamente. Las pruebas muestran que: 1) Al enviar una acción de búsqueda ('buscar objetos valiosos en la biblioteca'), el sistema detecta correctamente la acción y añade un item al array discoveredItems. 2) El endpoint /api/pickup_item funciona correctamente, moviendo el item de discoveredItems a inventory. 3) Se pueden detectar items específicos como 'crucifijo', 'frasco de cristal' y 'diario' en la narrativa. 4) El campo discoveredItems se incluye correctamente en la respuesta API."
 
   - task: "Sistema de detección de items en narrativa"
     implemented: true
