@@ -58,27 +58,16 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
-  // 🔧 MODAL LOCK FLAG + CACHED ITEMS (CHATGPT SOLUCIÓN DEFINITIVA)
-  const [modalLocked, setModalLocked] = useState(false);
-  const [cachedItems, setCachedItems] = useState([]);
-
-  // 🎯 USEEFFECT PARA FORZAR APERTURA MODAL DISCOVERED ITEMS (CHATGPT SOLUTION)
+  // 🎯 USEEFFECT SIMPLIFICADO (CHATGPT SOLUTION) 
   useEffect(() => {
-    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, items=`, discoveredItems);
-    if (!modalLocked && discoveredItems && discoveredItems.length > 0) {
-      console.log(`🎁 FORZANDO APERTURA MODAL: ${discoveredItems.length} items descubiertos`);
-      console.log(`🎁 ANTES: showDiscoveredItems=${showDiscoveredItems}`);
-      
-      // 🔧 CACHE ITEMS PARA QUE NO SE PIERDAN CON POLLING
-      setCachedItems([...discoveredItems]);
+    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, showModal=${showDiscoveredItems}`);
+    // 👇 se dispara SOLO cuando llega un lote nuevo y showDiscoveredItems está en false
+    if (discoveredItems.length > 0 && !showDiscoveredItems) {
+      console.log(`🎁 ABRIENDO MODAL: ${discoveredItems.length} items descubiertos`);
       setShowDiscoveredItems(true);
-      setModalLocked(true);          // 🔒 bloquea el cierre automático
-      
-      console.log(`🎁 DESPUÉS: setShowDiscoveredItems(true) ejecutado`);
-    } else {
-      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length} modalLocked=${modalLocked}`);
+      console.log(`🎁 Modal abierto - sin modalLocked`);
     }
-  }, [discoveredItems, modalLocked]);
+  }, [discoveredItems, showDiscoveredItems]);
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
   useEffect(() => {
