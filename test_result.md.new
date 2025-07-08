@@ -1,0 +1,5 @@
+🚨 PROBLEMAS CRÍTICOS ACTUALES:
+✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
+🔄 Modal discovered items - Necesita testing
+🔄 Auto-pick regex - Necesita testing con casos reales
+🔄 Flujo completo - No verificado end-to-end
