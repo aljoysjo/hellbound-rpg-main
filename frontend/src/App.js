@@ -57,6 +57,15 @@ function App() {
     }
   }, [discoveredItems.length]);
 
+  // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
+  useEffect(() => {
+    if (showDiscoveredItems) {
+      console.log('💥 Render modal ahora - showDiscoveredItems is TRUE');
+    } else {
+      console.log('❌ Modal NOT rendering - showDiscoveredItems is FALSE');
+    }
+  }, [showDiscoveredItems]);
+
   // Persistencia de elementos "NEW"
   const [newElements, setNewElements] = useState({
     inventory: new Set(),
