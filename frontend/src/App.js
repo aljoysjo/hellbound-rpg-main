@@ -1139,51 +1139,65 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🎁 DISCOVERED ITEMS MODAL - PORTAL GLOBAL (CHATGPT SOLUTION) */}
-          <DiscoveredItemsModal
-            discoveredItems={discoveredItems}
-            showDiscoveredItems={showDiscoveredItems}
-            onPickupItem={pickupItem}
-            onIgnoreItem={ignoreItem}
-            onCloseModal={closeDiscoveredModal}
-          />
-
-          {/* 🚨 FALLBACK MODAL INLINE PARA DEBUG */}
-          {showDiscoveredItems && (
+          {/* 🚨 MODAL SÚPER SIMPLE INLINE - NO COMPONENTE */}
+          {showDiscoveredItems && discoveredItems && discoveredItems.length > 0 && (
             <div 
               style={{
                 position: "fixed",
                 top: "0",
                 left: "0",
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(255, 0, 0, 0.8)",
-                zIndex: 99999,
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "rgba(255, 0, 0, 0.9)",
+                zIndex: 999999,
                 display: "flex",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                color: "white",
+                fontSize: "18px"
               }}
               onClick={closeDiscoveredModal}
             >
               <div 
                 style={{
                   backgroundColor: "white",
-                  padding: "20px",
+                  color: "black",
+                  padding: "30px",
                   borderRadius: "10px",
-                  maxWidth: "400px"
+                  maxWidth: "500px",
+                  border: "5px solid red"
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3>🎁 DEBUG MODAL - Items Descubiertos</h3>
-                <p>Items encontrados: {discoveredItems?.length || 0}</p>
-                {discoveredItems?.map((item, index) => (
-                  <div key={index} style={{ border: "1px solid #ccc", margin: "5px", padding: "10px" }}>
-                    <div>{item.icon} {item.name}</div>
-                    <button onClick={() => pickupItem(item.instanceId)}>Pick Up</button>
-                    <button onClick={() => ignoreItem(item.instanceId)}>Ignore</button>
+                <h2>🎁 ITEMS DESCUBIERTOS ({discoveredItems.length})</h2>
+                {discoveredItems.map((item, index) => (
+                  <div key={index} style={{ border: "1px solid #ccc", margin: "10px 0", padding: "15px" }}>
+                    <div style={{ fontSize: "20px", marginBottom: "10px" }}>
+                      {item.icon} <strong>{item.name}</strong>
+                    </div>
+                    <div style={{ fontSize: "14px", color: "#666", marginBottom: "10px" }}>
+                      {item.description}
+                    </div>
+                    <button 
+                      onClick={() => pickupItem(item.instanceId)}
+                      style={{ marginRight: "10px", padding: "10px", backgroundColor: "green", color: "white", border: "none", borderRadius: "5px" }}
+                    >
+                      PICK UP
+                    </button>
+                    <button 
+                      onClick={() => ignoreItem(item.instanceId)}
+                      style={{ padding: "10px", backgroundColor: "gray", color: "white", border: "none", borderRadius: "5px" }}
+                    >
+                      IGNORE
+                    </button>
                   </div>
                 ))}
-                <button onClick={closeDiscoveredModal} style={{ marginTop: "10px" }}>CLOSE</button>
+                <button 
+                  onClick={closeDiscoveredModal}
+                  style={{ marginTop: "20px", padding: "15px", backgroundColor: "red", color: "white", border: "none", borderRadius: "5px", fontSize: "16px" }}
+                >
+                  CERRAR MODAL
+                </button>
               </div>
             </div>
           )}
