@@ -1,18 +1,8 @@
-backend:
-  - task: "ActionCount incremento correcto"
-    implemented: true
-    working: true
-    file: "/app/server/index.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Iniciando prueba de incremento de ActionCount"
-      - working: true
-        agent: "testing"
-        comment: "Verificado que actionCount se incrementa correctamente en la línea 1125 de index.js. Las pruebas muestran que el contador aumenta en 1 con cada acción del usuario."
+🚨 PROBLEMAS CRÍTICOS ACTUALES:
+✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
+🔄 Modal discovered items - Necesita testing
+🔄 Auto-pick regex - Necesita testing con casos reales
+🔄 Flujo completo - No verificado end-to-end
 
   - task: "Eliminación de duplicación de newInventoryItem"
     implemented: true
