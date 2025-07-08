@@ -1099,8 +1099,17 @@ function App() {
             <div 
               className="mt-4 p-4 bg-[var(--imperial-gold)]/10 border-2 border-[var(--imperial-gold)] rounded-xl"
               style={{
-                position: "relative",
-                zIndex: 10000
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 99999,
+                backgroundColor: "rgba(255, 215, 0, 0.9)",
+                border: "5px solid red",
+                width: "80%",
+                maxWidth: "500px",
+                opacity: 1,
+                display: "block"
               }}
             >
               <h3 className="text-[var(--cedar-brown)] font-bold mb-3 text-center">
