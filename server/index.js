@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// 🎯 BASE DE DATOS DE ITEMS PARA EMPAREJAMIENTO INTELIGENTE
+  // 🎯 BASE DE DATOS DE ITEMS PARA EMPAREJAMIENTO INTELIGENTE
 const ITEM_DATABASE = [
   // 🗡️ ARMAS Y COMBATE
   { type: 'espada', icon: '⚔️', keywords: ['espada', 'sable', 'hoja', 'blade', 'cuchilla', 'gladius', 'katana', 'espadón'] },
@@ -23,6 +23,9 @@ const ITEM_DATABASE = [
   // 🛡️ DEFENSAS
   { type: 'escudo', icon: '🛡️', keywords: ['escudo', 'shield', 'broquel', 'rodela', 'buckler'] },
   { type: 'armadura', icon: '🦺', keywords: ['armadura', 'armor', 'coraza', 'cota', 'peto', 'mail'] },
+  
+  // 🧿 AMULETOS Y PROTECCIÓN (AÑADIDO SEGÚN CHATGPT STEP 1.2)
+  { type: 'amuleto', icon: '🧿', keywords: ['amuleto', 'amuleto protector', 'amuleto de protección', 'amuleto sagrado', 'talismán', 'protección'] },
   
   // 👕 ROPA Y VESTIMENTA
   { type: 'capa', icon: '🧥', keywords: ['capa', 'manto', 'cape', 'cloak', 'túnica', 'robe'] },
