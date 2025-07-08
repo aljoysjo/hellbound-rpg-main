@@ -874,6 +874,7 @@ function App() {
         }
         
         if (data.game_state.discoveredItems) {
+          console.log('🛬 API payload.discoveredItems =', data.game_state.discoveredItems); // PUNTO 1 CHATGPT
           console.log('🎁 FRONTEND: Recibidos discovered items:', data.game_state.discoveredItems);
           console.log('🎁 FRONTEND: discoveredItems.length:', data.game_state.discoveredItems.length);
           console.log('🎁 FRONTEND: Setting discoveredItems state...');
