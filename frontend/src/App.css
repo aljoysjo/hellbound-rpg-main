@@ -334,17 +334,17 @@ body {
 }
 
 /* 🎁 DISCOVERED ITEMS MODAL - PORTAL GLOBAL (CHATGPT SOLUTION) */
-.modal-backdrop {
+.modal-overlay {
   position: fixed;
   inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;              /* > overlay "Procesando…" */
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+  justify-content: center;
 }
 
-.modal-content {
+.modal-content-portal {
   background: var(--creamy-old);
   border: 2px solid var(--imperial-gold);
   border-radius: 12px;
