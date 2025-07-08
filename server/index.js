@@ -2393,14 +2393,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
           let itemName = '';
           
-          // Para la mayoría de patrones, el item está en la posición 2
+          // Para los nuevos patrones non-greedy, el item está en la posición 1
           if (index < 10) {
-            // 🔧 ARREGLO CHATGPT: Validar que match[2] existe antes de trim()
-            itemName = match[2] ? match[2].trim() : '';
+            // 🔧 ARREGLO CHATGPT: Validar que match[1] existe antes de trim() (NUEVO REGEX)
+            itemName = match[1] ? match[1].trim() : '';
           } else {
             // Para el último patrón es diferente
-            // 🔧 ARREGLO CHATGPT: Validar que match[2] existe antes de trim()
-            itemName = match[2] ? match[2].trim() : '';
+            // 🔧 ARREGLO CHATGPT: Validar que match[1] existe antes de trim()
+            itemName = match[1] ? match[1].trim() : '';
           }
           
           // 🔧 FILTRO CHATGPT: Evitar items vacíos
