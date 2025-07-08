@@ -65,7 +65,7 @@ function App() {
       setShowDiscoveredItems(true);
       console.log(`🎁 Modal abierto - sin modalLocked`);
     }
-  }, [discoveredItems, showDiscoveredItems]);
+  }, [discoveredItems]);
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
   useEffect(() => {
