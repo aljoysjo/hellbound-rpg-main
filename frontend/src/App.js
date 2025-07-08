@@ -57,22 +57,27 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
-  // 🔧 MODAL LOCK FLAG (CHATGPT OPCIÓN A)
+  // 🔧 MODAL LOCK FLAG + CACHED ITEMS (CHATGPT SOLUCIÓN DEFINITIVA)
   const [modalLocked, setModalLocked] = useState(false);
+  const [cachedItems, setCachedItems] = useState([]);
 
   // 🎯 USEEFFECT PARA FORZAR APERTURA MODAL DISCOVERED ITEMS (CHATGPT SOLUTION)
   useEffect(() => {
-    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, items=`, discoveredItems); // PUNTO 3 CHATGPT
+    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, items=`, discoveredItems);
     if (!modalLocked && discoveredItems && discoveredItems.length > 0) {
       console.log(`🎁 FORZANDO APERTURA MODAL: ${discoveredItems.length} items descubiertos`);
-      console.log(`🎁 ANTES: showDiscoveredItems=${showDiscoveredItems}`); // ANTES CHATGPT
+      console.log(`🎁 ANTES: showDiscoveredItems=${showDiscoveredItems}`);
+      
+      // 🔧 CACHE ITEMS PARA QUE NO SE PIERDAN CON POLLING
+      setCachedItems([...discoveredItems]);
       setShowDiscoveredItems(true);
       setModalLocked(true);          // 🔒 bloquea el cierre automático
-      console.log(`🎁 DESPUÉS: setShowDiscoveredItems(true) ejecutado`); // DESPUÉS CHATGPT
+      
+      console.log(`🎁 DESPUÉS: setShowDiscoveredItems(true) ejecutado`);
     } else {
-      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length} modalLocked=${modalLocked}`); // CHATGPT
+      console.log(`❌ NO se ejecuta setShowDiscoveredItems - discoveredItems.length=${discoveredItems.length} modalLocked=${modalLocked}`);
     }
-  }, [discoveredItems, modalLocked]); // CAMBIO DEPENDENCIA: discoveredItems completo vs .length (CHATGPT)
+  }, [discoveredItems, modalLocked]);
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
   useEffect(() => {
