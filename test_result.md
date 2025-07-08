@@ -160,11 +160,11 @@
 frontend:
   - task: "Modo campaña"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -172,6 +172,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Prueba específica realizada en la URL especificada (https://66030ad9-fc7a-4800-8ed3-4290f8b1e31c.preview.emergentagent.com). El modo campaña funciona correctamente. Se puede seleccionar 'Campaña', hacer clic en 'Iniciar Campaña' y la aplicación carga correctamente. No se queda en 'Iniciando...'. La ubicación muestra 'Alicante' y se pueden ver acciones sugeridas relacionadas con la figura misteriosa. La narrativa menciona 'Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas...' lo que confirma que la narrativa de 'Caminos del Abismo' se carga correctamente. Los botones de acción son contextuales a la campaña, incluyendo 'Observar la figura a través de la ventana'."
+      - working: false
+        agent: "testing"
+        comment: "Prueba realizada el 08/07/2025. El modo campaña no funciona correctamente. Al hacer clic en 'Iniciar Campaña', la aplicación no carga la interfaz del juego. Se detectaron errores CORS en la consola: 'Access to fetch at 'https://e00f81cd-98f9-4055-a02d-c63e39f48833.preview.emergentagent.com/api/start_session' from origin 'https://hellbound-game.preview.emergentagent.com' has been blocked by CORS policy'. Parece que la aplicación está intentando conectarse a un backend diferente al configurado en el archivo .env."
 
   - task: "Input fluido"
     implemented: true
