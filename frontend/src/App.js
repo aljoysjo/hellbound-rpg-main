@@ -1140,7 +1140,7 @@ function App() {
           {/* 🎁 MODAL DISCOVERED ITEMS - PORTAL DEFINITIVO (CHATGPT SOLUCIÓN 100% SEGURA) */}
           {showDiscoveredItems && (
             <DiscoveredItemsModal
-              discoveredItems={cachedItems}
+              discoveredItems={discoveredItems}
               showDiscoveredItems={showDiscoveredItems}
               onPickupItem={pickupItem}
               onIgnoreItem={ignoreItem}
