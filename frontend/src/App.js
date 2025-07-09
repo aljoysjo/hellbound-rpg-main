@@ -208,6 +208,25 @@ function App() {
     }
   };
 
+  // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS (NUEVO)
+  const collectAllItems = async () => {
+    if (!discoveredItems.length || pickupLoading) return;
+    
+    console.log('🎁 Recogiendo todos los items:', discoveredItems);
+    
+    for (const item of discoveredItems) {
+      await pickupItem(item);
+    }
+  };
+
+  const ignoreAllItems = () => {
+    if (!discoveredItems.length) return;
+    
+    console.log('🚫 Ignorando todos los items:', discoveredItems);
+    
+    discoveredItems.forEach(item => ignoreItem(item));
+  };
+
   // 🔧 ARREGLO: Funciones de manejo para componentes nuevos
   const handleModeSelect = (selectedMode) => {
     setMode(selectedMode);
