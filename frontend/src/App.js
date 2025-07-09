@@ -8,6 +8,7 @@ import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
 import DiscoveredItemsModal from './components/DiscoveredItemsModal'; // NUEVO MODAL PORTAL (CHATGPT)
+import InlineLootBlock from './components/InlineLootBlock'; // NUEVO BLOQUE LOOT INTEGRADO
 
 // this is test comment
 
