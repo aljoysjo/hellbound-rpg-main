@@ -1068,6 +1068,36 @@ function App() {
   // Helper functions
   const getActionIcon = (action) => {
     if (!action) return '⚡';
+    
+  // 🎁 Helper para iconos de items (NUEVO)
+  const getItemIcon = (itemType) => {
+    const iconMap = {
+      'espada': 'sports_martial_arts',
+      'daga': 'sports_martial_arts', 
+      'hacha': 'sports_martial_arts',
+      'arco': 'sports_martial_arts',
+      'revolver': 'sports_martial_arts',
+      'escudo': 'security',
+      'armadura': 'security',
+      'casco': 'security',
+      'amuleto': 'auto_awesome',
+      'anillo': 'auto_awesome',
+      'pergamino': 'auto_stories',
+      'libro': 'auto_stories',
+      'pocion': 'science',
+      'frasco': 'science',
+      'gema': 'diamond',
+      'moneda': 'paid',
+      'reliquia': 'museum',
+      'cristal': 'diamond',
+      'medallion': 'auto_awesome',
+      'default': 'inventory_2'
+    };
+    return iconMap[itemType?.toLowerCase()] || iconMap.default;
+  };
+
+  const getActionIcon = (action) => {
+    if (!action) return '⚡';
     const actionLower = action.toLowerCase();
     if (actionLower.includes('atacar') || actionLower.includes('luchar')) return '⚔️';
     if (actionLower.includes('magia') || actionLower.includes('hechizo')) return '🔮';
