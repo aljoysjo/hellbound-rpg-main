@@ -62,14 +62,15 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
-  // 🎯 USEEFFECT SIMPLIFICADO (CHATGPT SOLUTION) 
+  // 🎯 USEEFFECT CON CANDADO (CHATGPT SOLUTION) 
   useEffect(() => {
-    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, showModal=${showDiscoveredItems}`);
+    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, showModal=${showDiscoveredItems}, locked=${modalLocked}`);
     // 👇 se dispara SOLO cuando llega un lote nuevo y showDiscoveredItems está en false
     if (discoveredItems.length > 0 && !showDiscoveredItems) {
       console.log(`🎁 ABRIENDO MODAL: ${discoveredItems.length} items descubiertos`);
       setShowDiscoveredItems(true);
-      console.log(`🎁 Modal abierto - sin modalLocked`);
+      setModalLocked(true);        // ✅ CANDADO
+      console.log(`🎁 Modal abierto - CON CANDADO activado`);
     }
   }, [discoveredItems]);
 
