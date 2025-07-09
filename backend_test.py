@@ -409,24 +409,58 @@ class HellboundRPGTester:
 
     def test_pickup_item(self):
         """Test picking up a discovered item"""
-        if not self.session_id or not hasattr(self, 'discovered_item_id'):
-            print("❌ Cannot test pickup_item without a valid session and discovered item")
+        if not self.session_id:
+            print("❌ Cannot test pickup_item without a valid session")
             return False
         
-        # Get initial state
-        _, initial_response = self.run_test(
-            "Get Initial State Before Pickup",
+        # Get current state to find a valid item to pick up
+        _, current_response = self.run_test(
+            "Get Current State Before Pickup",
             "GET",
             f"api/get_session/{self.session_id}",
             200
         )
         
-        initial_game_state = initial_response.get('game_state', {})
-        initial_discovered_items = initial_game_state.get('discoveredItems', [])
-        initial_inventory = initial_game_state.get('inventory', [])
+        current_game_state = current_response.get('game_state', {})
+        discovered_items = current_game_state.get('discoveredItems', [])
+        initial_inventory = current_game_state.get('inventory', [])
         
-        print(f"Initial Discovered Items Count: {len(initial_discovered_items)}")
+        print(f"Initial Discovered Items Count: {len(discovered_items)}")
         print(f"Initial Inventory Count: {len(initial_inventory)}")
+        
+        if not discovered_items:
+            print("❌ No discovered items to pick up")
+            
+            # Try to search for items first
+            search_success, search_response = self.run_test(
+                "Search for Items Before Pickup",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": self.session_id,
+                    "action": "buscar objetos valiosos"
+                }
+            )
+            
+            if not search_success:
+                print("❌ Failed to search for items")
+                return False
+            
+            # Get updated discovered items
+            game_state = search_response.get('game_state', {})
+            discovered_items = game_state.get('discoveredItems', [])
+            
+            if not discovered_items:
+                print("❌ Still no discovered items after search")
+                return False
+        
+        # Use the first discovered item
+        item_to_pickup = discovered_items[0]
+        item_id = item_to_pickup.get('instanceId')
+        item_name = item_to_pickup.get('name')
+        
+        print(f"Picking up item: {item_name} (ID: {item_id})")
         
         # Pick up the discovered item
         success, response = self.run_test(
@@ -436,7 +470,7 @@ class HellboundRPGTester:
             200,
             data={
                 "session_id": self.session_id,
-                "item_id": self.discovered_item_id
+                "item_id": item_id
             }
         )
         
@@ -451,20 +485,20 @@ class HellboundRPGTester:
             
             # Check updated game state
             game_state = response.get('game_state', {})
-            discovered_items = game_state.get('discoveredItems', [])
-            inventory = game_state.get('inventory', [])
+            discovered_items_after = game_state.get('discoveredItems', [])
+            inventory_after = game_state.get('inventory', [])
             
-            print(f"Discovered Items After Pickup: {len(discovered_items)}")
-            print(f"Inventory After Pickup: {len(inventory)}")
+            print(f"Discovered Items After Pickup: {len(discovered_items_after)}")
+            print(f"Inventory After Pickup: {len(inventory_after)}")
             
             # Verify item was moved from discoveredItems to inventory
-            if len(discovered_items) < len(initial_discovered_items) and len(inventory) > len(initial_inventory):
+            if len(discovered_items_after) < len(discovered_items) and len(inventory_after) > len(initial_inventory):
                 print("✅ Item successfully moved from discoveredItems to inventory")
                 
                 # Verify the specific item is now in inventory
                 item_in_inventory = False
-                for item in inventory:
-                    if item.get('instanceId') == self.discovered_item_id:
+                for item in inventory_after:
+                    if item.get('instanceId') == item_id:
                         item_in_inventory = True
                         print(f"✅ Item '{item['name']}' found in inventory")
                         break
@@ -473,16 +507,19 @@ class HellboundRPGTester:
                     print("❌ Picked up item not found in inventory")
                     return False
                 
+                # Save the item ID for future tests
+                self.discovered_item_id = item_id
+                
                 # Test edge case: Try to pick up the same item again
                 print("\n🔍 Testing edge case: Picking up the same item again...")
                 _, edge_response = self.run_test(
                     "Pickup Same Item Again",
                     "POST",
                     "api/pickup_item",
-                    400,  # Expecting error status
+                    404,  # Expecting error status
                     data={
                         "session_id": self.session_id,
-                        "item_id": self.discovered_item_id
+                        "item_id": item_id
                     }
                 )
                 
