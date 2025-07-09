@@ -7,8 +7,7 @@ import SandboxForm from './components/SandboxForm';
 import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
-// import DiscoveredItemsModal from './components/DiscoveredItemsModal'; // DESHABILITADO - AHORA USAMOS INLINE
-// import InlineLootBlock from './components/InlineLootBlock'; // NO NECESARIO - INLINE DIRECTO
+import InlineLootBlock from './components/InlineLootBlock';
 
 // this is test comment
 
