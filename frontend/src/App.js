@@ -44,14 +44,14 @@ function App() {
   const [discoveredItems, setDiscoveredItems] = useState([]);
   const [pickupLoading, setPickupLoading] = useState(null);
 
-  // 🔧 FUNCIÓN CLOSE MODAL SIMPLIFICADA (CHATGPT - SOLO MANUAL)
-  const closeDiscoveredModal = () => {
-    console.log('🎁 CLOSING MODAL: User manually closed modal');
-    console.trace('🏷️ setShowDiscoveredItems(false) disparado desde closeDiscoveredModal');
-    setShowDiscoveredItems(false);
-    setDiscoveredItems([]);        // vacía array
-    setModalLocked(false);         // ✅ SUELTA CANDADO
-  };
+  // 🔧 FUNCIÓN CLOSE MODAL SIMPLIFICADA (DESHABILITADA - YA NO SE USA)
+  // const closeDiscoveredModal = () => {
+  //   console.log('🎁 CLOSING MODAL: User manually closed modal');
+  //   console.trace('🏷️ setShowDiscoveredItems(false) disparado desde closeDiscoveredModal');
+  //   setShowDiscoveredItems(false);
+  //   setDiscoveredItems([]);        // vacía array
+  //   setModalLocked(false);         // ✅ SUELTA CANDADO
+  // };
 
   // SISTEMA BADGES "VIVOS" MEJORADO
   const [badges, setBadges] = useState({
