@@ -2449,7 +2449,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           
           // Los nuevos patrones todos capturan en el primer grupo disponible
           for (let i = 1; i < match.length; i++) {
-            if (match[i] && match[i].trim()) {
+            if (match[i] && typeof match[i] === 'string' && match[i].trim()) {
               itemName2 = match[i].trim();
               break;
             }
