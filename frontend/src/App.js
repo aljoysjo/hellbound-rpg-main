@@ -1086,9 +1086,7 @@ function App() {
   };
 
   // Helper functions
-  const getActionIcon = (action) => {
-    if (!action) return '⚡';
-    
+  
   // 🎁 Helper para iconos de items (NUEVO)
   const getItemIcon = (itemType) => {
     const iconMap = {
