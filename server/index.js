@@ -2440,26 +2440,26 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         let match;
         while ((match = pattern.exec(lastSentence)) !== null) {
           // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
-          let itemName = '';
+          let itemName2 = '';
           
           // Los nuevos patrones todos capturan en el primer grupo disponible
           for (let i = 1; i < match.length; i++) {
             if (match[i] && match[i].trim()) {
-              itemName = match[i].trim();
+              itemName2 = match[i].trim();
               break;
             }
           }
           
           // Limpiar y validar el item - REFINADO SEGÚN CHATGPT
-          const raw = itemName.trim()
+          const raw = itemName2.trim()
                               .split(/[,;.]/)[0]          // corta en coma/punto
                               .replace(/\s+(de|con|en|que|durante|mientras|porque|para)\s+.*/i,'') // corta en preposiciones
                               .trim();
-          itemName = raw;
+          itemName2 = raw;
           
           // 🎯 NUEVA FUNCIÓN: SEPARAR ITEMS COMPUESTOS
-          const individualItems = splitCompoundItems(itemName);
-          console.log(`🔍 Items compuestos separados: "${itemName}" → [${individualItems.join(', ')}]`);
+          const individualItems = splitCompoundItems(itemName2);
+          console.log(`🔍 Items compuestos separados: "${itemName2}" → [${individualItems.join(', ')}]`);
           
           individualItems.forEach(singleItemName => {
             // Filtrar palabras demasiado cortas o genéricas
