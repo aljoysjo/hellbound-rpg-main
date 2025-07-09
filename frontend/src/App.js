@@ -1202,8 +1202,8 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🎁 MODAL DISCOVERED ITEMS - PORTAL DEFINITIVO (CHATGPT SOLUCIÓN 100% SEGURA) */}
-          {showDiscoveredItems && (
+          {/* 🎁 MODAL DISCOVERED ITEMS - DESHABILITADO - AHORA USAMOS INLINE LOOT BLOCK */}
+          {/* {showDiscoveredItems && (
             <DiscoveredItemsModal
               discoveredItems={discoveredItems}
               showDiscoveredItems={showDiscoveredItems}
@@ -1211,7 +1211,7 @@ function App() {
               onIgnoreItem={ignoreItem}
               onCloseModal={closeDiscoveredModal}
             />
-          )}
+          )} */}
 
         </main>
       </div>
