@@ -210,13 +210,17 @@ function App() {
 
   // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS (NUEVO)
   const collectAllItems = async () => {
-    if (!discoveredItems.length || pickupLoading) return;
+    if (!discoveredItems.length) return;
     
     console.log('🎁 Recogiendo todos los items:', discoveredItems);
     
-    for (const item of discoveredItems) {
-      await pickupItem(item);
-    }
+    // Usar Promise.all para recoger todos los items
+    await Promise.all(
+      discoveredItems.map((itm) => pickupItem(itm))
+    );
+    
+    // Vaciar la lista para que el bloque desaparezca
+    setDiscoveredItems([]);
   };
 
   const ignoreAllItems = () => {
@@ -224,7 +228,8 @@ function App() {
     
     console.log('🚫 Ignorando todos los items:', discoveredItems);
     
-    discoveredItems.forEach(item => ignoreItem(item));
+    // Simplemente limpiar sin tocar inventario
+    setDiscoveredItems([]);
   };
 
   // 🔧 ARREGLO: Funciones de manejo para componentes nuevos
