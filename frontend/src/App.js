@@ -7,8 +7,8 @@ import SandboxForm from './components/SandboxForm';
 import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
-import DiscoveredItemsModal from './components/DiscoveredItemsModal'; // NUEVO MODAL PORTAL (CHATGPT)
-import InlineLootBlock from './components/InlineLootBlock'; // NUEVO BLOQUE LOOT INTEGRADO
+// import DiscoveredItemsModal from './components/DiscoveredItemsModal'; // DESHABILITADO - AHORA USAMOS INLINE
+// import InlineLootBlock from './components/InlineLootBlock'; // NO NECESARIO - INLINE DIRECTO
 
 // this is test comment
 
