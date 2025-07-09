@@ -1140,32 +1140,32 @@ function App() {
   // 🎮 LAYOUT PRINCIPAL COMPLETO CON TODO FUNCIONANDO
   const EnhancedNarrativeSection = () => {
     return (
-      <div className="flex flex-col h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
+      <div className="flex h-screen flex-col bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
         
         {/* HEADER RESPONSIVO: MINIMALISTA MÓVIL + COMPLETO DESKTOP */}
         <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
         {/* MAIN CON SCROLL CONTENIDO - SIN INPUT DENTRO */}
-        <main className="flex-1 overflow-y-auto px-4 space-y-4">
+        <main className="flex-1 space-y-4 overflow-y-auto px-4">
           
           {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
           <div
-            className="w-full aspect-[16/9] rounded-xl bg-center bg-cover shadow-lg"
+            className="aspect-[16/9] w-full rounded-xl bg-cover bg-center shadow-lg"
             style={{ backgroundImage: `url(${sceneImage})` }}
           />
 
           {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
-          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
+          <article className="prose mb-4 max-w-none space-y-4 text-[var(--text-primary-custom)]">
             {gameState?.narrativeLog?.length === 0 ? (
-              <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
+              <div className="text-[var(--cedar-brown)]/70 py-8 text-center italic">
                 Tu aventura está a punto de comenzar...
               </div>
             ) : (
               gameState?.narrativeLog?.map((entry, index) => (
-                <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                <div key={index} className="narrative-text-enter animate-fadeIn opacity-0" style={{animationDelay: `${index * 0.1}s`}}>
                   {/* ACCIÓN DEL JUGADOR */}
                   <div className="mb-2">
-                    <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-base font-semibold text-[var(--text-accent-custom)]">
                       <span className="text-lg">▶️</span>
                       "{safeStringify(entry.player_action, 'Acción del jugador')}"
                     </p>
@@ -1173,7 +1173,7 @@ function App() {
                   
                   {/* NARRATIVA DEL JUEGO */}
                   <div className="mb-3">
-                    <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                    <p className="text-sm leading-relaxed text-[var(--text-primary-custom)]">
                       {safeStringify(entry.narrative, 'Narrativa del juego')}
                     </p>
                   </div>
@@ -1186,7 +1186,7 @@ function App() {
                           key={actionIndex}
                           onClick={() => handleInlineAction(action)}
                           disabled={loading || gameOver}
-                          className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[var(--imperial-gold)]/10 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] font-medium transition-all duration-200 hover:scale-105 active:scale-95 border border-[var(--imperial-gold)]/30"
+                          className="bg-[var(--imperial-gold)]/10 border-[var(--imperial-gold)]/30 inline-flex items-center gap-2 self-start rounded-full border px-4 py-2 font-medium text-[var(--cedar-brown)] transition-all duration-200 hover:scale-105 hover:bg-[var(--imperial-gold)] active:scale-95"
                         >
                           <span>{getActionIcon(action)}</span>
                           <span>{action}</span>
@@ -1219,7 +1219,7 @@ function App() {
   // Game Over screen
   if (gameOver) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-900 to-black flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-900 to-black">
         <div className="game-over-container">
           <h1 className="game-over-title">GAME OVER</h1>
           <p className="game-over-text">
@@ -1239,7 +1239,7 @@ function App() {
   // Loading states
   if (loading && !gameState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)]">
         <div className="loading-indicator">
           Cargando tu aventura...
         </div>
@@ -1266,31 +1266,31 @@ function App() {
   // Main game screen - LAYOUT COMPLETO CON TODO FUNCIONAL
   if (gameState) {
     return (
-      <div className="flex flex-col h-screen">
+      <div className="flex h-screen flex-col">
         {/* HEADER RESPONSIVO */}
         <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
         {/* MAIN CON SCROLL CONTENIDO */}
-        <main className="flex-1 overflow-y-auto px-4 space-y-4">
+        <main className="flex-1 space-y-4 overflow-y-auto px-4">
           
           {/* 🖼️ IMAGEN/PLACEHOLDER CONTEXTUAL */}
           <div
-            className="w-full aspect-[16/9] rounded-xl bg-center bg-cover shadow-lg"
+            className="aspect-[16/9] w-full rounded-xl bg-cover bg-center shadow-lg"
             style={{ backgroundImage: `url(${sceneImage})` }}
           />
 
           {/* NARRATIVA PERSISTENTE + CHIPS INLINE */}
-          <article className="prose max-w-none text-[var(--text-primary-custom)] space-y-4 mb-4">
+          <article className="prose mb-4 max-w-none space-y-4 text-[var(--text-primary-custom)]">
             {gameState?.narrativeLog?.length === 0 ? (
-              <div className="text-center text-[var(--cedar-brown)]/70 italic py-8">
+              <div className="text-[var(--cedar-brown)]/70 py-8 text-center italic">
                 Tu aventura está a punto de comenzar...
               </div>
             ) : (
               gameState?.narrativeLog?.map((entry, index) => (
-                <div key={index} className="narrative-text-enter opacity-0 animate-fadeIn" style={{animationDelay: `${index * 0.1}s`}}>
+                <div key={index} className="narrative-text-enter animate-fadeIn opacity-0" style={{animationDelay: `${index * 0.1}s`}}>
                   {/* ACCIÓN DEL JUGADOR */}
                   <div className="mb-2">
-                    <p className="text-[var(--text-accent-custom)] text-base font-semibold flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-base font-semibold text-[var(--text-accent-custom)]">
                       <span className="text-lg">▶️</span>
                       "{safeStringify(entry.player_action, 'Acción del jugador')}"
                     </p>
@@ -1298,7 +1298,7 @@ function App() {
                   
                   {/* NARRATIVA DEL JUEGO */}
                   <div className="mb-3">
-                    <p className="text-[var(--text-primary-custom)] text-sm leading-relaxed">
+                    <p className="text-sm leading-relaxed text-[var(--text-primary-custom)]">
                       {safeStringify(entry.narrative, 'Narrativa del juego')}
                     </p>
                   </div>
@@ -1311,7 +1311,7 @@ function App() {
                           key={actionIndex}
                           onClick={() => handleInlineAction(action)}
                           disabled={loading || gameOver}
-                          className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[var(--imperial-gold)]/10 hover:bg-[var(--imperial-gold)] text-[var(--cedar-brown)] font-medium transition-all duration-200 hover:scale-105 active:scale-95 border border-[var(--imperial-gold)]/30"
+                          className="bg-[var(--imperial-gold)]/10 border-[var(--imperial-gold)]/30 inline-flex items-center gap-2 self-start rounded-full border px-4 py-2 font-medium text-[var(--cedar-brown)] transition-all duration-200 hover:scale-105 hover:bg-[var(--imperial-gold)] active:scale-95"
                         >
                           <span>{getActionIcon(action)}</span>
                           <span>{action}</span>
@@ -1329,7 +1329,7 @@ function App() {
         </main>
 
         {/* INPUT FIELD FIJO FUERA DEL SCROLL - CRÍTICO */}
-        <div className="flex-shrink-0 p-4 bg-[var(--creamy-old)]/90 border-t border-[var(--imperial-gold)]/50">
+        <div className="bg-[var(--creamy-old)]/90 border-[var(--imperial-gold)]/50 flex-shrink-0 border-t p-4">
           <StoryInput
             onSubmit={submitAction}
             loading={loading}
@@ -1339,14 +1339,14 @@ function App() {
         </div>
 
         {/* FOOTER FIJO CON NAVIGATION - CRÍTICO */}
-        <footer className="flex-shrink-0 border-t border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 backdrop-blur-md">
-          <nav className="flex gap-1 px-2 pt-2 pb-safe-bottom">
+        <footer className="border-[var(--imperial-gold)]/50 bg-[var(--creamy-old)]/80 flex-shrink-0 border-t backdrop-blur-md">
+          <nav className="flex gap-1 px-2 pb-safe-bottom pt-2">
             <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] hover:bg-black/5 transition-colors relative"
+              className="relative flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--imperial-gold)] transition-colors hover:bg-black/5"
               onClick={toggleInventory}
             >
               {badges.inventory.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                <span className="absolute -right-1 -top-1 flex size-5 animate-pulse items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                   {badges.inventory.count}
                 </span>
               )}
@@ -1354,11 +1354,11 @@ function App() {
               <span className="text-xs font-medium text-[var(--cedar-brown)]">Inventario</span>
             </button>
             <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              className="relative flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 transition-colors hover:bg-black/5 hover:opacity-100"
               onClick={toggleSkills}
             >
               {badges.skills.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                <span className="absolute -right-1 -top-1 flex size-5 animate-pulse items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
                   {badges.skills.count}
                 </span>
               )}
@@ -1366,11 +1366,11 @@ function App() {
               <span className="text-xs font-medium">Habilidades</span>
             </button>
             <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              className="relative flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 transition-colors hover:bg-black/5 hover:opacity-100"
               onClick={toggleObjectives}
             >
               {badges.objectives.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                <span className="absolute -right-1 -top-1 flex size-5 animate-pulse items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
                   {badges.objectives.count}
                 </span>
               )}
@@ -1378,11 +1378,11 @@ function App() {
               <span className="text-xs font-medium">Objetivos</span>
             </button>
             <button 
-              className="flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 hover:opacity-100 hover:bg-black/5 transition-colors relative"
+              className="relative flex flex-1 flex-col items-center justify-end gap-0.5 rounded-lg py-1 text-[var(--cedar-brown)] opacity-70 transition-colors hover:bg-black/5 hover:opacity-100"
               onClick={toggleEmotionsModal}
             >
               {badges.emotions.count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                <span className="absolute -right-1 -top-1 flex size-5 animate-pulse items-center justify-center rounded-full bg-purple-500 text-xs font-bold text-white">
                   {badges.emotions.count}
                 </span>
               )}
@@ -1390,7 +1390,7 @@ function App() {
               <span className="text-xs font-medium">Estados</span>
             </button>
           </nav>
-          <div className="h-safe-bottom bg-[var(--creamy-old)]/80"></div>
+          <div className="bg-[var(--creamy-old)]/80 h-safe-bottom"></div>
         </footer>
 
         {/* Error display */}
@@ -1433,7 +1433,7 @@ function App() {
                       className={`inventory-slot ${isNew ? 'animate-pulse bg-green-100' : ''}`}
                       onClick={() => isNew && markElementSeen('inventory', itemId)}
                     >
-                      {isNew && <span className="absolute top-1 right-1 text-xs bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">!</span>}
+                      {isNew && <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-green-500 text-xs text-white">!</span>}
                       <div className="slot-icon">{item?.icon || '📦'}</div>
                       <div className="slot-name">{safeStringify(item?.name, 'Item')}</div>
                     </div>
@@ -1475,12 +1475,12 @@ function App() {
                         if (isLevelUp) markElementSeen('skills', `${skillId}-levelup`);
                       }}
                     >
-                      {(isNew || isLevelUp) && <span className="absolute top-2 right-2 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center">{isLevelUp ? '↗' : '!'}</span>}
+                      {(isNew || isLevelUp) && <span className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white">{isLevelUp ? '↗' : '!'}</span>}
                       <div className="skill-icon-large">{getSkillIcon(skill?.id || skill?.name)}</div>
                       <div className="skill-detailed-info">
                         <div className="skill-detailed-name">
                           {safeStringify(skill?.id || skill?.name, 'Habilidad')}
-                          {isLevelUp && <span className="text-yellow-500 text-sm ml-1">LEVEL UP!</span>}
+                          {isLevelUp && <span className="ml-1 text-sm text-yellow-500">LEVEL UP!</span>}
                         </div>
                         <div className="skill-detailed-level">Nivel {skill?.level || 1}</div>
                         <div className="skill-detailed-desc">{safeStringify(skill?.description, 'Habilidad misteriosa')}</div>
@@ -1516,14 +1516,14 @@ function App() {
                       className={`objective-item ${isNew ? 'animate-pulse bg-green-100' : ''} ${isCompleted ? 'objective-completed' : ''}`}
                       onClick={() => isNew && markElementSeen('objectives', objId)}
                     >
-                      {isNew && <span className="absolute top-2 right-2 text-xs bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center">!</span>}
+                      {isNew && <span className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-green-500 text-xs text-white">!</span>}
                       <div className="objective-checkbox">
                         {isCompleted ? '✅' : '🎯'}
                       </div>
                       <div className="objective-text">
                         <span>{safeStringify(objective?.description, 'Objetivo misterioso')}</span>
                         {objective?.progress !== undefined && (
-                          <span className="text-sm text-gray-600 ml-2">({objective.progress}%)</span>
+                          <span className="ml-2 text-sm text-gray-600">({objective.progress}%)</span>
                         )}
                       </div>
                     </div>
@@ -1554,7 +1554,7 @@ function App() {
                       className={`emotion-row ${isSignificant ? 'animate-pulse bg-purple-100' : ''}`}
                       onClick={() => isSignificant && markElementSeen('emotions', emotion)}
                     >
-                      {isSignificant && <span className="absolute top-2 right-2 text-xs bg-purple-500 text-white rounded-full w-5 h-5 flex items-center justify-center">!</span>}
+                      {isSignificant && <span className="absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-purple-500 text-xs text-white">!</span>}
                       <div className="emotion-icon">
                         {emotion === 'miedo' && '😱'}
                         {emotion === 'alerta' && '👁️'}
@@ -1615,7 +1615,7 @@ function App() {
   // Campaign selection - Solo para modo campaign
   if (mode === 'campaign') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] p-4">
         <div className="mode-selection-container">
           <p className="mode-selected-text">
             Has seleccionado: <span className="mode-name">{mode}</span>
