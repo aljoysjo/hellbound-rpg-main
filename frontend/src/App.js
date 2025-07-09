@@ -1031,6 +1031,7 @@ function App() {
     e.preventDefault();
     e.stopPropagation();
     forceBlurAll();
+    console.trace('🏷️ setShowDiscoveredItems TOGGLE disparado desde toggleDiscoveredItems');
     setShowDiscoveredItems(!showDiscoveredItems);
     if (!showDiscoveredItems) {
       setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
