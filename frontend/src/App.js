@@ -1038,9 +1038,16 @@ function App() {
     e.stopPropagation();
     forceBlurAll();
     console.trace('🏷️ setShowDiscoveredItems TOGGLE disparado desde toggleDiscoveredItems');
-    setShowDiscoveredItems(!showDiscoveredItems);
-    if (!showDiscoveredItems) {
-      setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
+    console.log(`🔒 TOGGLE: modalLocked=${modalLocked}, showDiscoveredItems=${showDiscoveredItems}`);
+    
+    // ✅ PROTECCIÓN: Solo permitir toggle si no está bloqueado O si el usuario quiere cerrar manualmente
+    if (!modalLocked || showDiscoveredItems) {
+      setShowDiscoveredItems(!showDiscoveredItems);
+      if (!showDiscoveredItems) {
+        setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
+      }
+    } else {
+      console.log('🔒 TOGGLE BLOQUEADO: Modal está locked, ignorando toggle');
     }
   };
 
