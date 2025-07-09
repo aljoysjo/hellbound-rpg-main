@@ -10,7 +10,7 @@ import random
 from datetime import datetime
 
 class HellboundRPGTester:
-    def __init__(self, base_url="https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
