@@ -44,6 +44,7 @@ function App() {
   // 🔧 FUNCIÓN CLOSE MODAL SIMPLIFICADA (CHATGPT - SOLO MANUAL)
   const closeDiscoveredModal = () => {
     console.log('🎁 CLOSING MODAL: User manually closed modal');
+    console.trace('🏷️ setShowDiscoveredItems(false) disparado desde closeDiscoveredModal');
     setShowDiscoveredItems(false);
   };
 
