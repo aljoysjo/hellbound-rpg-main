@@ -468,11 +468,11 @@ agent_communication:
 
   - task: "Modal discovered items"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/App.js"
-    stuck_count: 2
+    stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -483,6 +483,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "Se intentó corregir la configuración CORS en el servidor para permitir todos los orígenes ('*'), pero el problema persiste. La aplicación frontend sigue sin poder conectarse correctamente al backend, lo que impide que el modal de discovered items funcione correctamente. Se recomienda revisar la configuración de las URLs en los archivos .env tanto del frontend como del backend para asegurar que estén correctamente configuradas."
+      - working: true
+        agent: "testing"
+        comment: "Prueba realizada el 09/07/2025. Se ha verificado que el modal de discovered items ahora funciona correctamente después de los arreglos. Las pruebas muestran que: 1) Se eliminó showDiscoveredItems de las dependencias del useEffect, lo que evita bucles infinitos. 2) La función containsPhysicalKeyword ahora usa word boundaries (\\b) para evitar falsos positivos como 'daga' dentro de 'desgastada'. 3) El modal permanece abierto hasta que el usuario interactúa con él, no se cierra automáticamente debido al polling. 4) Los items descubiertos se mantienen estables en el estado del juego hasta que el usuario los recoge o los ignora. Las pruebas de backend confirman que el sistema funciona correctamente."
 
   - task: "Eventos aleatorios con animación D20"
     implemented: true
