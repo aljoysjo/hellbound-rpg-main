@@ -2397,7 +2397,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       // 🔍 PROCESAR PATRONES DE ITEMS DISPONIBLES (para discovered items)
       patterns.forEach((pattern, index) => {
         let match;
-        while ((match = pattern.exec(narrative)) !== null) {
+        while ((match = pattern.exec(lastSentence)) !== null) {
           // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
           let itemName = '';
           
