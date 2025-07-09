@@ -35,10 +35,8 @@ function App() {
   const [showSkills, setShowSkills] = useState(false);
   const [showEmotionsModal, setShowEmotionsModal] = useState(false);
   const [showNarrativeModal, setShowNarrativeModal] = useState(false);
-  const [showDiscoveredItems, setShowDiscoveredItems] = useState(false);
-  
-  // 🔒 SISTEMA DE CANDADO PARA MODAL (CHATGPT SOLUTION)
-  const [modalLocked, setModalLocked] = useState(false);
+  // const [showDiscoveredItems, setShowDiscoveredItems] = useState(false);
+  // const [modalLocked, setModalLocked] = useState(false); // YA NO SE USA
 
   // 🎁 SISTEMA DISCOVERED ITEMS
   const [discoveredItems, setDiscoveredItems] = useState([]);
