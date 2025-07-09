@@ -6,12 +6,30 @@
 🔄 Frontend integration - TESTING - Backend funciona, necesita verificar integración frontend
 ✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 🔄 Flujo completo - No verificado end-to-end
-🔧 ARREGLO ESPECÍFICO EN PROGRESO - Línea "asesina" del modal discovered items identificada y corregida
+✅ ARREGLO ESPECÍFICO COMPLETADO - Línea "asesina" del modal discovered items corregida y verificada
 
-ARREGLO ESPECÍFICO APLICADO:
+ARREGLO ESPECÍFICO APLICADO Y VERIFICADO:
 1. ✅ Removida dependency showDiscoveredItems del useEffect (línea 68) - ESTO CAUSABA BUCLES INFINITOS
 2. ✅ Mejorado containsPhysicalKeyword() con word boundaries (\b) para evitar falsos positivos como "daga" dentro de "desgastada"
 3. ✅ Modal ahora solo se cierra con user interaction (no polling)
+4. ✅ extractItemsFromNarrative procesa solo la última frase para evitar items fantasma
+5. ✅ Añadida validación de tipo para match[i] para prevenir errores
+
+backend:
+  - task: "Modal discovered items - Killer Line Fix"
+    implemented: true
+    working: true
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando prueba de la corrección del modal discovered items (killer line)"
+      - working: true
+        agent: "testing"
+        comment: "Verificado que todas las correcciones para el modal discovered items funcionan correctamente. Las pruebas muestran que: 1) El sistema procesa correctamente solo la última frase de la narrativa para evitar items fantasma. 2) La función containsPhysicalKeyword usa word boundaries (\\b) para evitar falsos positivos como 'daga' dentro de 'desgastada'. 3) El sistema maneja correctamente valores nulos en el procesamiento de regex. 4) Los items descubiertos permanecen estables en el estado del juego hasta que el usuario los recoge o los ignora."
 
   - task: "Eliminación de duplicación de newInventoryItem"
     implemented: true
