@@ -134,6 +134,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Prueba realizada en la URL especificada (https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com). El sistema de polling funciona correctamente. Se observan logs de polling cada 2 segundos ('🔄 Haciendo polling request...', '🔄 POLLING RESPONSE', '🔄 Sin cambios significativos'). No se detectaron errores CORS ni 502 en las respuestas. El polling está funcionando como se espera."
+      - working: true
+        agent: "testing"
+        comment: "PRUEBA FINAL (10/07/2025): Se ha verificado exhaustivamente el sistema de polling para detección de cambios en badges con pruebas automatizadas. Las pruebas confirman que: 1) El endpoint /api/get_session/:sessionId devuelve el estado actualizado después de cada acción, incluyendo cambios en el inventario y actionCount. 2) El actionCount se incrementa correctamente después de cada acción. 3) Los cambios en el inventario se reflejan correctamente en el estado del juego. 4) El sistema de badges puede detectar estos cambios y actualizar la interfaz de usuario. El sistema de polling funciona según lo esperado y cumple con todos los requisitos para la actualización de badges."
       
   - task: "Sistema de loot dinámico"
     implemented: true
