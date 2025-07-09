@@ -1061,75 +1061,82 @@ function generateSandboxRestrictions(sandboxConcept) {
         
         return False
 
-def main():
-    # Use the provided URL from the frontend .env file
-    backend_url = "https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"
+def test_inline_loot_system():
+    """Test the inline loot system and badge updates"""
+    # Use localhost:8001 as specified in the review request
+    backend_url = "http://localhost:8001"
     
-    print(f"🔥 Testing Random Event System at {backend_url}")
-    print(f"🎲 FASE 2A - BACKEND FOUNDATION & FASE 2B - FRONTEND INTEGRATION")
+    print(f"🔥 Testing Inline Loot System and Badge Updates at {backend_url}")
     
     # Setup tester
     tester = HellboundRPGTester(backend_url)
     
     try:
-        # Run tests based on the requested test plan
+        # Run tests
         print("\n==== 1. BACKEND HEALTHCHECK ====")
         if not tester.test_healthcheck():
             print("❌ Healthcheck failed, stopping tests")
             return 1
         
-        # Test 1: Sandbox Detective Mode
-        print("\n==== 2. TEST SANDBOX DETECTIVE MODE ====")
-        if not tester.test_start_session_sandbox("detective realista Londres 1920"):
+        print("\n==== 2. START SANDBOX SESSION ====")
+        if not tester.test_start_session_sandbox("Detective paranormal investigando misterios"):
             print("❌ Sandbox session creation failed, stopping tests")
             return 1
         
-        print("\n==== 3. TEST MULTIPLE INVESTIGATIVE ACTIONS ====")
-        investigative_success = tester.test_multiple_investigative_actions()
-        
-        # Test 2: Campaign Supernatural Mode
-        print("\n==== 4. TEST CAMPAIGN MODE ====")
-        if not tester.test_start_session_campaign():
-            print("❌ Campaign session creation failed, stopping tests")
+        print("\n==== 3. SEARCH FOR VALUABLE ITEMS ====")
+        if not tester.test_dynamic_loot_system():
+            print("❌ Search for items failed, stopping tests")
             return 1
         
-        print("\n==== 5. TEST EXPLORATION ACTIONS IN CAMPAIGN ====")
-        campaign_success = tester.test_exploration_actions_campaign()
+        print("\n==== 4. PICKUP DISCOVERED ITEM ====")
+        if not tester.test_pickup_item():
+            print("❌ Pickup item failed, stopping tests")
+            return 1
         
-        # Test 3: Get Session API
-        print("\n==== 6. TEST GET SESSION API ====")
-        get_session_success = tester.test_get_session_endpoint()
+        print("\n==== 5. VERIFY SESSION STATE AFTER PICKUP ====")
+        if not tester.test_get_session_endpoint():
+            print("❌ Get session after pickup failed, stopping tests")
+            return 1
+        
+        print("\n==== 6. TEST MULTIPLE SEARCHES AND PICKUPS ====")
+        multiple_searches_success = tester.test_multiple_searches()
+        
+        print("\n==== 7. TEST ACTION COUNT INCREMENT ====")
+        action_count_success = tester.test_action_count_increment()
         
         # Print results
         print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
         
-        # Summary of tests based on the requested test plan
+        # Summary of tests
         print("\n==== TEST SUMMARY ====")
         print(f"1. Healthcheck: {'✅ PASSED' if tester.test_healthcheck() else '❌ FAILED'}")
-        print(f"2. Sandbox Detective Mode: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"3. Multiple Investigative Actions: {'✅ PASSED' if investigative_success else '⚠️ NO EVENT TRIGGERED (probabilistic)'}")
-        print(f"4. Campaign Mode: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
-        print(f"5. Exploration Actions in Campaign: {'✅ PASSED' if campaign_success else '⚠️ NO EVENT TRIGGERED (probabilistic)'}")
-        print(f"6. Get Session API: {'✅ PASSED' if get_session_success else '❌ FAILED'}")
+        print(f"2. Start Sandbox Session: {'✅ PASSED' if tester.session_id else '❌ FAILED'}")
+        print(f"3. Search for Valuable Items: {'✅ PASSED' if hasattr(tester, 'discovered_item_id') and tester.discovered_item_id else '❌ FAILED'}")
+        print(f"4. Pickup Discovered Item: {'✅ PASSED' if tester.test_pickup_item() else '❌ FAILED'}")
+        print(f"5. Verify Session State After Pickup: {'✅ PASSED' if tester.test_get_session_endpoint() else '❌ FAILED'}")
+        print(f"6. Multiple Searches and Pickups: {'✅ PASSED' if multiple_searches_success else '❌ FAILED'}")
+        print(f"7. Action Count Increment: {'✅ PASSED' if action_count_success else '❌ FAILED'}")
         
         # Overall success
         overall_success = (
             tester.test_healthcheck() and
             tester.session_id and
-            get_session_success
+            hasattr(tester, 'discovered_item_id') and tester.discovered_item_id and
+            tester.test_pickup_item() and
+            tester.test_get_session_endpoint() and
+            multiple_searches_success and
+            action_count_success
         )
         
-        print(f"\n{'✅' if overall_success else '❌'} Backend Tests: {'PASSED' if overall_success else 'FAILED'}")
+        print(f"\n{'✅' if overall_success else '❌'} Inline Loot System and Badge Updates Tests: {'PASSED' if overall_success else 'FAILED'}")
         
         if overall_success:
-            print("\n✅ VERIFICACIÓN COMPLETA DEL SISTEMA DE EVENTOS ALEATORIOS:")
-            print("1. ✅ Base de Datos Eventos: Verificados eventos sandbox (detective/aventura/horror) y campaña (alicante_supernatural)")
-            print("2. ✅ Análisis Contextual: Confirmada función analyzeGameContextForEvents() funciona con ambos modos")
-            print("3. ✅ Triggers Inteligentes: Verificada función shouldTriggerRandomEvent() con probabilidades contextuales")
-            print("4. ✅ Sistema D20: Confirmada función rollD20AndApplyConsequences() aplica correctamente consecuencias")
-            print("5. ✅ Estructura Componentes: Verificados D20Dice.js y RandomEventModal.js existen y son válidos")
-            print("6. ✅ Integración App.js: Confirmados imports correctos y manejo de random_event")
-            print("7. ✅ Respuesta API: Verificado campo random_event en respuesta con estructura correcta")
+            print("\n✅ VERIFICACIÓN COMPLETA DEL SISTEMA DE LOOT INLINE Y ACTUALIZACIÓN DE BADGES:")
+            print("1. ✅ Búsqueda de Items: Verificado que 'buscar objetos valiosos' genera discoveredItems")
+            print("2. ✅ Pickup de Items: Confirmado que los items se mueven correctamente de discoveredItems a inventory")
+            print("3. ✅ Estado de Sesión: Verificado que el estado de la sesión se actualiza correctamente después de recoger items")
+            print("4. ✅ Múltiples Búsquedas: Confirmado que se pueden realizar múltiples búsquedas y recoger múltiples items")
+            print("5. ✅ Actualización de Badges: Confirmado que el contador de acciones y el inventario se actualizan correctamente")
         
         return 0 if overall_success else 1
     
@@ -1140,6 +1147,10 @@ def main():
     finally:
         # Clean up resources
         tester.cleanup()
+
+def main():
+    # Run the inline loot system test
+    return test_inline_loot_system()
 
 if __name__ == "__main__":
     sys.exit(main())
