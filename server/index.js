@@ -2359,6 +2359,10 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     function extractItemsFromNarrative(narrative) {
       console.log('📖 Analizando narrativa para detectar items...');
       
+      // 🔧 ARREGLO GPT-4: Procesar solo la última frase para evitar ítems fantasma
+      const lastSentence = narrative.trim().split(/[.!?]/).pop().trim();
+      console.log(`📝 Procesando solo la última frase: "${lastSentence}"`);
+      
       // 🔧 TRY/CATCH CHATGPT: Evitar crashes por regex errors
       try {
       
