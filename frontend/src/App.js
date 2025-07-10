@@ -66,14 +66,10 @@ function App() {
     // Solo logging, el InlineLootBlock se renderiza automáticamente en JSX
   }, [discoveredItems]);
 
-  // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
+  // 🎯 LOGGING DE ESTADO (SIMPLIFICADO)
   useEffect(() => {
-    if (showDiscoveredItems) {
-      console.log('💥 Render modal ahora - showDiscoveredItems is TRUE');
-    } else {
-      console.log('❌ Modal NOT rendering - showDiscoveredItems is FALSE');
-    }
-  }, [showDiscoveredItems]);
+    console.log(`📊 discoveredItems: ${discoveredItems.length} items`);
+  }, [discoveredItems]);
 
   // Persistencia de elementos "NEW"
   const [newElements, setNewElements] = useState({
