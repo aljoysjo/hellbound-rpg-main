@@ -60,16 +60,10 @@ function App() {
     discovered: { count: 0, newItems: [] }
   });
 
-  // 🎯 USEEFFECT CON CANDADO (CHATGPT SOLUTION) 
+  // 🎯 USEEFFECT PARA LOGGING (SIMPLIFICADO - SIN MODAL)
   useEffect(() => {
-    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}, showModal=${showDiscoveredItems}, locked=${modalLocked}`);
-    // 👇 se dispara SOLO cuando llega un lote nuevo y showDiscoveredItems está en false
-    if (discoveredItems.length > 0 && !showDiscoveredItems) {
-      console.log(`🎁 ABRIENDO MODAL: ${discoveredItems.length} items descubiertos`);
-      setShowDiscoveredItems(true);
-      setModalLocked(true);        // ✅ CANDADO
-      console.log(`🎁 Modal abierto - CON CANDADO activado`);
-    }
+    console.log(`🔍 DISCOVEREDTEMS CHANGE: length=${discoveredItems.length}`);
+    // Solo logging, el InlineLootBlock se renderiza automáticamente en JSX
   }, [discoveredItems]);
 
   // 🔍 PASO 2.4 CHATGPT: Instrumentación para debugging modal rendering
