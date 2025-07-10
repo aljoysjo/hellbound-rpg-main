@@ -1185,16 +1185,7 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
-          {/* 🎁 MODAL DISCOVERED ITEMS - DESHABILITADO - AHORA USAMOS INLINE LOOT BLOCK */}
-          {/* {showDiscoveredItems && (
-            <DiscoveredItemsModal
-              discoveredItems={discoveredItems}
-              showDiscoveredItems={showDiscoveredItems}
-              onPickupItem={pickupItem}
-              onIgnoreItem={ignoreItem}
-              onCloseModal={closeDiscoveredModal}
-            />
-          )} */}
+          {/* MODAL COMPLETAMENTE ELIMINADO - USANDO SISTEMA INLINE */}
 
         </main>
       </div>
