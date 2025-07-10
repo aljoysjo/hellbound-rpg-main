@@ -1187,7 +1187,9 @@ function App() {
                       onCollectAll={collectAllItems}
                       onIgnoreAll={ignoreAllItems}
                     />
-                  )}                  {/* CHIPS DE ACCIÓN INLINE (Solo en última entrada) */}
+                  )}
+                  
+                  {/* CHIPS DE ACCIÓN INLINE (Solo en última entrada) */}
                   {index === gameState.narrativeLog.length - 1 && suggestedActions.length > 0 && (
                     <div className="mt-4 flex flex-col gap-3">
                       {suggestedActions.map((action, actionIndex) => (
