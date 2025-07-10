@@ -1045,23 +1045,7 @@ function App() {
     }
   };
 
-  const toggleDiscoveredItems = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    forceBlurAll();
-    console.trace('🏷️ setShowDiscoveredItems TOGGLE disparado desde toggleDiscoveredItems');
-    console.log(`🔒 TOGGLE: modalLocked=${modalLocked}, showDiscoveredItems=${showDiscoveredItems}`);
-    
-    // ✅ PROTECCIÓN: Solo permitir toggle si no está bloqueado O si el usuario quiere cerrar manualmente
-    if (!modalLocked || showDiscoveredItems) {
-      setShowDiscoveredItems(!showDiscoveredItems);
-      if (!showDiscoveredItems) {
-        setBadges(prev => ({ ...prev, discovered: { count: 0, newItems: [] } }));
-      }
-    } else {
-      console.log('🔒 TOGGLE BLOQUEADO: Modal está locked, ignorando toggle');
-    }
-  };
+  // toggleDiscoveredItems ELIMINADO - Ya no se usa con sistema inline
 
   // Helper para verificar si elemento es nuevo
   const isElementNew = (category, elementId) => {
