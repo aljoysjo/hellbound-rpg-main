@@ -742,7 +742,7 @@ function App() {
       discovered: new Set()
     });
     
-    setDiscoveredItems([]);
+    // setDiscoveredItems([]); // ELIMINADO - Línea asesina que impedía render del InlineLootBlock
     
     try {
       const requestBody = { mode: selectedMode || 'sandbox' };
