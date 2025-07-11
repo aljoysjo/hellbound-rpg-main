@@ -2504,10 +2504,16 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log(`📦 Items disponibles extraídos: ${uniqueItems.length > 0 ? uniqueItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
       console.log(`🎁 Items ya recogidos extraídos: ${uniquePickedItems.length > 0 ? uniquePickedItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
       
-      return {
-        availableItems: uniqueItems,
-        alreadyPickedItems: uniquePickedItems
-      };
+      // 🧠 AGREGAR PARSING CONTEXTUAL (APPROACH SEGURO)
+      const contextualItems = parseContextualItems(lastTwoSentences);
+      
+      // 🔄 MERGE INTELIGENTE DE RESULTADOS
+      const finalResults = mergeResults(
+        { availableItems: uniqueItems, alreadyPickedItems: uniquePickedItems },
+        contextualItems
+      );
+      
+      return finalResults;
     }
 
     // 🧠 NUEVA FUNCIÓN: PARSING CONTEXTUAL INTELIGENTE (APPROACH SEGURO)
