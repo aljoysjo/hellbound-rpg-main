@@ -1,40 +1,22 @@
 import React from "react";
 
-// Helper para iconos de items
+// Helper para iconos de items - CHATGPT APPROACH
 const getItemIcon = (itemType) => {
   const iconMap = {
-    // ARMAS Y COMBATE
-    'espada': 'sports_martial_arts',
-    'daga': 'sports_martial_arts', 
-    'hacha': 'sports_martial_arts',
-    'arco': 'sports_martial_arts',
-    'revolver': 'sports_martial_arts',
-    // DEFENSAS
-    'escudo': 'security',
-    'armadura': 'security',
-    // AMULETOS Y PROTECCIÓN
-    'amuleto': 'auto_awesome',
-    'talismán': 'auto_awesome',
-    // VESTIMENTA
-    'capa': 'checkroom',
-    'ropa': 'checkroom',
-    'zapatos': 'checkroom',
-    'guantes': 'checkroom',
-    // CONSUMIBLES Y OBJETOS
-    'pergamino': 'auto_stories',
+    // Tipos principales (alineados con backend)
     'libro': 'menu_book',
-    'pocion': 'science',
-    'frasco': 'science',
-    'cristal': 'diamond',
-    'gema': 'diamond',
-    'moneda': 'paid',
-    'reliquia': 'museum',
-    // TIPOS BACKEND ESPECÍFICOS
+    'arma': 'sports_martial_arts',
+    'armadura': 'security', 
+    'amuleto': 'auto_awesome',
+    'misceláneo': 'inventory',
+    // Tipos específicos del backend
+    'espada': 'sports_martial_arts',
+    'daga': 'sports_martial_arts',
     'mystical': 'auto_awesome',
     'knowledge': 'menu_book',
-    'default': 'inventory'
+    'cristal': 'diamond'
   };
-  return iconMap[itemType?.toLowerCase()] || iconMap.default;
+  return iconMap[itemType?.toLowerCase()] || 'inventory';
 };
 
 export default function InlineLootBlock({
