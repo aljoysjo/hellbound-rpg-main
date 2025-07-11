@@ -196,27 +196,39 @@ function App() {
     }
   };
 
-  // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS (NUEVO)
+  // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS - APPROACH HÍBRIDO SEGURO
   const collectAllItems = async () => {
     if (!discoveredItems.length) return;
     
     console.log('🎁 Recogiendo todos los items:', discoveredItems);
     
-    // Usar Promise.all para recoger todos los items
+    // 1. Pickup directo (mantiene funcionalidad actual)
     await Promise.all(
       discoveredItems.map((itm) => pickupItem(itm))
     );
     
-    // Vaciar la lista para que el bloque desaparezca
+    // 2. Generar narrativa de confirmación SIN esperar (approach híbrido)
+    const names = discoveredItems.map(i => i.name).join(', ');
+    setTimeout(() => {
+      submitAction(`[Recogiste: ${names}]`);
+    }, 500); // Delay para mejor UX
+    
+    // 3. Vaciar la lista para que el bloque desaparezca
     setDiscoveredItems([]);
   };
 
-  const ignoreAllItems = () => {
+  const ignoreAllItems = async () => {
     if (!discoveredItems.length) return;
     
     console.log('🚫 Ignorando todos los items:', discoveredItems);
     
-    // Simplemente limpiar sin tocar inventario
+    // 1. Generar narrativa opcional
+    const names = discoveredItems.map(i => i.name).join(', ');
+    setTimeout(() => {
+      submitAction(`[Ignoraste: ${names}]`);
+    }, 500);
+    
+    // 2. Simplemente limpiar sin tocar inventario
     setDiscoveredItems([]);
   };
 
