@@ -2508,6 +2508,121 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         availableItems: uniqueItems,
         alreadyPickedItems: uniquePickedItems
       };
+    }
+
+    // 🧠 NUEVA FUNCIÓN: PARSING CONTEXTUAL INTELIGENTE (APPROACH SEGURO)
+    function parseContextualItems(narrative) {
+      console.log('🧠 PARSING CONTEXTUAL: Analizando objetos principales...');
+      
+      const contextualItems = [];
+      
+      // 🔍 PATRONES CONTEXTUALES PARA OBJETOS PRINCIPALES
+      const contextualPatterns = [
+        // Patrón: [artículo] + [objeto] + [modificadores]
+        /(?:un|una|el|la)\s+(túnica|vestimenta|ropa)\s+(?:con|de)\s+([^,.!?]+)/gi,
+        /(?:un|una|el|la)\s+(libro|grimorio|manual|texto)\s+(?:con|de)\s+([^,.!?]+)/gi,
+        /(?:un|una|el|la)\s+(frasco|botella|recipiente)\s+(?:con|de)\s+([^,.!?]+)/gi,
+        /(?:un|una|el|la)\s+(hacha|espada|daga|arma)\s+(?:con|de)\s+([^,.!?]+)/gi,
+        /(?:un|una|el|la)\s+(amuleto|talismán|reliquia)\s+(?:con|de)\s+([^,.!?]+)/gi,
+        /(?:un|una|el|la)\s+(capa|manto)\s+(?:con|de)\s+([^,.!?]+)/gi
+      ];
+      
+      contextualPatterns.forEach((pattern, index) => {
+        let match;
+        while ((match = pattern.exec(narrative)) !== null) {
+          const mainObject = match[1].toLowerCase();
+          const descriptors = match[2].trim();
+          
+          console.log(`🎯 OBJETO CONTEXTUAL DETECTADO: "${mainObject}" con descriptores: "${descriptors}"`);
+          
+          // Construir item contextual
+          const contextualItem = buildContextualItem(mainObject, descriptors, match[0]);
+          if (contextualItem) {
+            contextualItems.push(contextualItem);
+          }
+        }
+      });
+      
+      return contextualItems;
+    }
+
+    // 🏗️ FUNCIÓN: CONSTRUIR ITEM CONTEXTUAL
+    function buildContextualItem(mainObject, descriptors, fullMatch) {
+      // Mapear objeto principal a type del ITEM_DATABASE
+      const objectTypeMap = {
+        'túnica': 'ropa',
+        'vestimenta': 'ropa', 
+        'ropa': 'ropa',
+        'libro': 'libro',
+        'grimorio': 'libro',
+        'manual': 'libro',
+        'texto': 'libro',
+        'frasco': 'frasco',
+        'botella': 'frasco',
+        'recipiente': 'frasco',
+        'hacha': 'hacha',
+        'espada': 'espada',
+        'daga': 'daga',
+        'arma': 'espada',
+        'amuleto': 'amuleto',
+        'talismán': 'amuleto',
+        'reliquia': 'reliquia',
+        'capa': 'capa',
+        'manto': 'capa'
+      };
+      
+      const type = objectTypeMap[mainObject];
+      if (!type) return null;
+      
+      // Encontrar en ITEM_DATABASE
+      const dbItem = ITEM_DATABASE.find(item => item.type === type);
+      if (!dbItem) return null;
+      
+      // Construir nombre descriptivo completo
+      const contextualName = `${mainObject} ${descriptors}`.trim();
+      
+      console.log(`✅ ITEM CONTEXTUAL CREADO: "${contextualName}" (type: ${type})`);
+      
+      return {
+        name: contextualName,
+        type: type,
+        icon: dbItem.icon,
+        rarity: 'común',
+        instanceId: generateUniqueId(),
+        source: 'contextual_parsing'
+      };
+    }
+
+    // 🔄 FUNCIÓN: MERGE INTELIGENTE DE RESULTADOS
+    function mergeResults(currentResults, contextualItems) {
+      if (contextualItems.length === 0) {
+        return currentResults; // Sin cambios si no hay items contextuales
+      }
+      
+      console.log(`🔄 MERGE: ${currentResults.availableItems.length} items actuales + ${contextualItems.length} contextuales`);
+      
+      // PRIORIZAR items contextuales sobre keyword matching para evitar duplicados
+      const mergedItems = [...contextualItems];
+      
+      // Agregar items actuales que NO sean duplicados
+      currentResults.availableItems.forEach(currentItem => {
+        const isDuplicate = contextualItems.some(contextItem => 
+          contextItem.name.toLowerCase().includes(currentItem.name.toLowerCase()) ||
+          currentItem.name.toLowerCase().includes(contextItem.name.toLowerCase())
+        );
+        
+        if (!isDuplicate) {
+          mergedItems.push(currentItem);
+        }
+      });
+      
+      console.log(`🎯 RESULTADO MERGE: ${mergedItems.length} items finales`);
+      
+      return {
+        availableItems: mergedItems,
+        alreadyPickedItems: currentResults.alreadyPickedItems
+      };
+    }
       
       // 🔧 CATCH CHATGPT: Manejar errores de regex sin crashear
       } catch (error) {
