@@ -2514,6 +2514,11 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       );
       
       return finalResults;
+      
+      } catch (error) {
+        console.error(`❌ Error en extractItemsFromNarrative: ${error.message}`);
+        return { foundItems: [], alreadyPickedItems: [] };
+      }
     }
 
     // 🧠 NUEVA FUNCIÓN: PARSING CONTEXTUAL INTELIGENTE (APPROACH SEGURO)
