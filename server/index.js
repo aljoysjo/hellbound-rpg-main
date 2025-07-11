@@ -2667,11 +2667,10 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     // 🎁 PASO 0: EXTRAER TODOS LOS CANDIDATOS Y REORDENAR FLUJO (CHATGPT SOLUTION)
     console.log(`🔍 PASO 0: Extrayendo candidatos de narrativa y acción para procesamiento ordenado...`);
     
-    // Analizar tanto la narrativa generada como la acción del usuario
-    const fullText = `${action} ${narrative}`;
-    console.log(`🔍 Texto completo para análisis: "${fullText}"`);
+    // Analizar SOLO la narrativa final (no la acción del usuario) para evitar desincronización
+    console.log(`🔍 Analizando solo narrativa final: "${narrative}"`);
     
-    const narrativeExtraction = extractItemsFromNarrative(fullText);
+    const narrativeExtraction = extractItemsFromNarrative(narrative);
     const allCandidates = [
       ...(narrativeExtraction.availableItems || []),
       ...(narrativeExtraction.alreadyPickedItems || [])
