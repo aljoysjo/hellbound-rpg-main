@@ -2444,7 +2444,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       // 🔍 PROCESAR PATRONES DE ITEMS YA RECOGIDOS (para autopick)
       alreadyPickedPatterns.forEach((pattern, index) => {
         let match;
-        while ((match = pattern.exec(lastSentence)) !== null) {
+        while ((match = pattern.exec(lastTwoSentences)) !== null) {
           // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
           let itemName2 = '';
           
