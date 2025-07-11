@@ -1301,6 +1301,15 @@ function App() {
             <div ref={narrativeRef} />
           </article>
 
+          {/* 🎁 BLOQUE DE LOOT INLINE - FUERA DEL MAP (CHATGPT SOLUTION) */}
+          {discoveredItems.length > 0 && (
+            <InlineLootBlock
+              items={discoveredItems}
+              onCollectAll={collectAllItems}
+              onIgnoreAll={ignoreAllItems}
+            />
+          )}
+
 
         </main>
 
