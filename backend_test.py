@@ -1098,6 +1098,152 @@ function generateSandboxRestrictions(sandboxConcept) {
         
         return False
 
+def test_discovered_items_specific():
+    """DIAGNÓSTICO ESPECÍFICO - Verificar discoveredItems en respuesta de "buscar objetos" """
+    # Use the backend URL from frontend/.env as specified in the review request
+    backend_url = "https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"
+    
+    print(f"🔥 DIAGNÓSTICO ESPECÍFICO - Verificar discoveredItems en respuesta de 'buscar objetos'")
+    print(f"🌐 Backend URL: {backend_url}")
+    
+    # Setup tester
+    tester = HellboundRPGTester(backend_url)
+    
+    try:
+        # Step 1: Healthcheck
+        print("\n==== 1. BACKEND HEALTHCHECK ====")
+        if not tester.test_healthcheck():
+            print("❌ Healthcheck failed, stopping tests")
+            return False
+        
+        # Step 2: Create session with concept containing "diario": "Detective que investiga misterios antiguos"
+        print("\n==== 2. CREAR SESIÓN CON CONCEPTO ESPECÍFICO ====")
+        concept = "Detective que investiga misterios antiguos"
+        print(f"📝 Concepto: {concept}")
+        
+        if not tester.test_start_session_sandbox(concept):
+            print("❌ Session creation failed, stopping tests")
+            return False
+        
+        # Step 3: Execute action: "buscar objetos valiosos" or "examinar la habitación cuidadosamente"
+        print("\n==== 3. EJECUTAR ACCIÓN DE BÚSQUEDA ====")
+        search_actions = [
+            "buscar objetos valiosos",
+            "examinar la habitación cuidadosamente"
+        ]
+        
+        discovered_items_found = False
+        
+        for action in search_actions:
+            print(f"\n🔍 Ejecutando acción: '{action}'")
+            
+            success, response = tester.run_test(
+                f"Búsqueda de objetos - {action}",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": tester.session_id,
+                    "action": action
+                }
+            )
+            
+            if success:
+                print(f"✅ Acción ejecutada exitosamente")
+                
+                # Step 4: Verify if the JSON response contains discoveredItems array with at least 1 item
+                print("\n==== 4. VERIFICAR RESPUESTA JSON ====")
+                
+                # Check if discoveredItems exists in game_state
+                game_state = response.get('game_state', {})
+                discovered_items = game_state.get('discoveredItems', [])
+                
+                print(f"🔍 discoveredItems en game_state: {discovered_items}")
+                
+                if discovered_items and len(discovered_items) > 0:
+                    discovered_items_found = True
+                    print(f"✅ discoveredItems array contiene {len(discovered_items)} item(s)")
+                    
+                    # Step 5: Verify the item has correct structure (name, type, rarity, instanceId)
+                    print("\n==== 5. VERIFICAR ESTRUCTURA DE ITEMS ====")
+                    
+                    for i, item in enumerate(discovered_items):
+                        print(f"\n📦 Item {i+1}:")
+                        print(f"  - Estructura completa: {item}")
+                        
+                        # Check required fields
+                        required_fields = ['name', 'type', 'instanceId']
+                        optional_fields = ['rarity', 'icon', 'description', 'contexts']
+                        
+                        structure_valid = True
+                        for field in required_fields:
+                            if field in item:
+                                print(f"  ✅ {field}: {item[field]}")
+                            else:
+                                print(f"  ❌ {field}: MISSING")
+                                structure_valid = False
+                        
+                        for field in optional_fields:
+                            if field in item:
+                                print(f"  ✅ {field}: {item[field]}")
+                            else:
+                                print(f"  ⚠️ {field}: Not present (optional)")
+                        
+                        if structure_valid:
+                            print(f"  ✅ Item {i+1} tiene estructura correcta")
+                        else:
+                            print(f"  ❌ Item {i+1} tiene estructura incorrecta")
+                    
+                    # Step 6: Check narrative to confirm backend is using last sentence
+                    print("\n==== 6. VERIFICAR USO DE ÚLTIMA FRASE DE NARRATIVA ====")
+                    narrative = response.get('new_narrative', '') or response.get('narrative', '')
+                    print(f"📖 Narrativa completa: {narrative}")
+                    
+                    # Split narrative into sentences
+                    sentences = [s.strip() for s in narrative.split('.') if s.strip()]
+                    if sentences:
+                        last_sentence = sentences[-1]
+                        print(f"📝 Última frase: '{last_sentence}'")
+                        
+                        # Check if last sentence mentions items
+                        item_keywords = ['encuentra', 'descubre', 'halla', 've', 'observa', 'nota']
+                        mentions_items = any(keyword in last_sentence.lower() for keyword in item_keywords)
+                        
+                        if mentions_items:
+                            print("✅ La última frase menciona descubrimiento de items")
+                        else:
+                            print("⚠️ La última frase no menciona explícitamente descubrimiento de items")
+                    
+                    print(f"\n✅ DIAGNÓSTICO COMPLETADO EXITOSAMENTE")
+                    print(f"✅ discoveredItems array contiene {len(discovered_items)} item(s) con estructura correcta")
+                    return True
+                    
+                else:
+                    print(f"❌ discoveredItems array está vacío: {discovered_items}")
+                    print(f"🔍 Respuesta completa del game_state:")
+                    for key, value in game_state.items():
+                        print(f"  - {key}: {value}")
+            else:
+                print(f"❌ Acción '{action}' falló")
+        
+        if not discovered_items_found:
+            print(f"\n❌ DIAGNÓSTICO FALLIDO")
+            print(f"❌ Ninguna de las acciones de búsqueda generó discoveredItems")
+            print(f"🔍 POSIBLE PROBLEMA: El backend no está devolviendo discoveredItems correctamente")
+            print(f"🔍 RECOMENDACIÓN: Verificar extractItemsFromNarrative() en el backend")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error inesperado: {str(e)}")
+        return False
+    
+    finally:
+        # Clean up resources
+        try:
+            tester.cleanup()
+        except:
+            pass
+
 def test_inline_loot_system():
     """Test the inline loot system and badge updates"""
     # Use localhost:8001 as specified in the review request
