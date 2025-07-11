@@ -47,44 +47,17 @@ backend:
       - working: true
         agent: "testing"
         comment: "Verificado que todas las correcciones para el modal discovered items funcionan correctamente. Las pruebas muestran que: 1) El sistema procesa correctamente solo la última frase de la narrativa para evitar items fantasma. 2) La función containsPhysicalKeyword usa word boundaries (\\b) para evitar falsos positivos como 'daga' dentro de 'desgastada'. 3) El sistema maneja correctamente valores nulos en el procesamiento de regex. 4) Los items descubiertos permanecen estables en el estado del juego hasta que el usuario los recoge o los ignora."
-
-  - task: "Eliminación de duplicación de newInventoryItem"
-    implemented: true
-    working: true
-    file: "/app/server/index.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Iniciando prueba de duplicación de newInventoryItem"
       - working: true
         agent: "testing"
-        comment: "Verificado que no hay duplicación de items en el inventario. Las pruebas muestran que cada item se agrega una sola vez al inventario."
-
-  - task: "Endpoint /api/get_session/:sessionId para polling"
-    implemented: true
-    working: true
-    file: "/app/server/index.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Iniciando prueba del endpoint /api/get_session/:sessionId"
-      - working: true
-        agent: "testing"
-        comment: "El endpoint /api/get_session/:sessionId funciona correctamente. Devuelve el estado completo de la sesión, incluyendo actionCount, inventory y otros campos necesarios para el sistema de badges."
+        comment: "DIAGNÓSTICO ESPECÍFICO COMPLETADO (11/07/2025): Se ha verificado exhaustivamente la funcionalidad de discoveredItems con el concepto 'Detective que investiga misterios antiguos'. Las pruebas confirman que: 1) La acción 'buscar objetos valiosos' genera correctamente un item en discoveredItems array con estructura completa (name: 'Superior amuleto protector', type: 'mystical', instanceId, rarity: 'rare', icon: '🧿'). 2) El backend está usando correctamente la última frase de la narrativa para detectar items ('Mientras rebuscas con más atención, descubres Superior amuleto protector 🧿'). 3) La estructura del item es correcta con todos los campos requeridos (name, type, instanceId) y opcionales (rarity, icon, description, contexts). 4) El sistema extractItemsFromNarrative() funciona correctamente. El problema NO está en el backend - discoveredItems se devuelve correctamente."
 
   - task: "Configuración CORS"
     implemented: true
-    working: false
+    working: true
     file: "/app/server/index.js"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -98,6 +71,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Se intentó modificar la configuración CORS para permitir todos los orígenes ('*') en lugar de un origen específico, pero el problema persiste. La aplicación frontend sigue sin poder conectarse correctamente al backend. Se recomienda revisar la configuración de las URLs en los archivos .env tanto del frontend como del backend para asegurar que estén correctamente configuradas."
+      - working: true
+        agent: "testing"
+        comment: "CORS RESUELTO (11/07/2025): Las pruebas exhaustivas confirman que la configuración CORS funciona correctamente. Se pudo conectar exitosamente al backend desde https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com, crear sesiones, ejecutar acciones y recibir respuestas JSON válidas. El healthcheck, creación de sesiones sandbox, acciones de búsqueda y pickup de items funcionan sin errores CORS. El problema anterior se ha resuelto."
 
   - task: "Nueva API key OpenAI"
     implemented: true
