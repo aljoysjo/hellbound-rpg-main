@@ -537,10 +537,8 @@ agent_communication:
 
 test_plan:
   current_focus:
-    - "Configuración CORS"
     - "Modo sandbox"
     - "Modo campaña"
-  stuck_tasks:
-    - "Configuración CORS"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
