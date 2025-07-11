@@ -196,18 +196,24 @@ function App() {
     }
   };
 
-  // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS (REVERTIDO A VERSIÓN ORIGINAL)
+  // 🎁 FUNCIONES PARA COLLECT/IGNORE ALL ITEMS - CHATGPT APPROACH SEGURO
   const collectAllItems = async () => {
     if (!discoveredItems.length) return;
     
     console.log('🎁 Recogiendo todos los items:', discoveredItems);
     
-    // Usar Promise.all para recoger todos los items (VERSIÓN ORIGINAL)
+    // 1. Pickup directo (API interna, sin narrativa) - MANTIENE FUNCIONALIDAD
     await Promise.all(
       discoveredItems.map((itm) => pickupItem(itm))
     );
     
-    // Vaciar la lista para que el bloque desaparezca
+    // 2. Opcional: disparar narrativa ligera SIN bloquear (CHATGPT APPROACH)
+    const names = discoveredItems.map(i => i.name).join(', ');
+    setTimeout(() => {
+      submitAction(`Guardas en tu inventario: ${names}`);
+    }, 1000); // Delay para mejor UX
+    
+    // 3. Vaciar la lista para que el bloque desaparezca
     setDiscoveredItems([]);
   };
 
@@ -216,7 +222,13 @@ function App() {
     
     console.log('🚫 Ignorando todos los items:', discoveredItems);
     
-    // Simplemente limpiar sin tocar inventario (VERSIÓN ORIGINAL)
+    // 1. Narrativa opcional para ignora (CHATGPT APPROACH)
+    const names = discoveredItems.map(i => i.name).join(', ');
+    setTimeout(() => {
+      submitAction(`Decides no tomar: ${names}`);
+    }, 1000);
+    
+    // 2. Simplemente limpiar sin tocar inventario
     setDiscoveredItems([]);
   };
 
