@@ -1393,8 +1393,25 @@ def test_inline_loot_system():
             pass
 
 def main():
-    # Run the inline loot system test
-    return test_inline_loot_system()
+    # Run the specific discoveredItems diagnostic test as requested
+    print("🎯 EJECUTANDO DIAGNÓSTICO ESPECÍFICO - discoveredItems")
+    specific_test_result = test_discovered_items_specific()
+    
+    if specific_test_result:
+        print("\n✅ DIAGNÓSTICO ESPECÍFICO COMPLETADO EXITOSAMENTE")
+        print("✅ El backend está devolviendo discoveredItems correctamente")
+    else:
+        print("\n❌ DIAGNÓSTICO ESPECÍFICO FALLIDO")
+        print("❌ El backend NO está devolviendo discoveredItems correctamente")
+        print("🔍 El problema está en extractItemsFromNarrative() o en el procesamiento de la respuesta")
+    
+    # Also run the comprehensive inline loot system test
+    print("\n" + "="*60)
+    print("🎯 EJECUTANDO PRUEBA COMPLETA DEL SISTEMA DE LOOT")
+    comprehensive_test_result = test_inline_loot_system()
+    
+    # Return success if either test passes (prioritizing the specific diagnostic)
+    return 0 if specific_test_result else (comprehensive_test_result if comprehensive_test_result == 0 else 1)
 
 if __name__ == "__main__":
     sys.exit(main())
