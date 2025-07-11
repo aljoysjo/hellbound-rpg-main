@@ -3,26 +3,36 @@ import React from "react";
 // Helper para iconos de items
 const getItemIcon = (itemType) => {
   const iconMap = {
+    // ARMAS Y COMBATE
     'espada': 'sports_martial_arts',
     'daga': 'sports_martial_arts', 
     'hacha': 'sports_martial_arts',
     'arco': 'sports_martial_arts',
     'revolver': 'sports_martial_arts',
+    // DEFENSAS
     'escudo': 'security',
     'armadura': 'security',
-    'casco': 'security',
+    // AMULETOS Y PROTECCIÓN
     'amuleto': 'auto_awesome',
-    'anillo': 'auto_awesome',
+    'talismán': 'auto_awesome',
+    // VESTIMENTA
+    'capa': 'checkroom',
+    'ropa': 'checkroom',
+    'zapatos': 'checkroom',
+    'guantes': 'checkroom',
+    // CONSUMIBLES Y OBJETOS
     'pergamino': 'auto_stories',
-    'libro': 'auto_stories',
+    'libro': 'menu_book',
     'pocion': 'science',
     'frasco': 'science',
+    'cristal': 'diamond',
     'gema': 'diamond',
     'moneda': 'paid',
     'reliquia': 'museum',
-    'cristal': 'diamond',
-    'medallion': 'auto_awesome',
-    'default': 'inventory_2'
+    // TIPOS BACKEND ESPECÍFICOS
+    'mystical': 'auto_awesome',
+    'knowledge': 'menu_book',
+    'default': 'inventory'
   };
   return iconMap[itemType?.toLowerCase()] || iconMap.default;
 };
