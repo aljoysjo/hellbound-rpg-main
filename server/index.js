@@ -2514,17 +2514,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         return { foundItems: [], alreadyPickedItems: [] };
       }
     }
-      
-      // 🔧 CATCH CHATGPT: Manejar errores de regex sin crashear
-      } catch (error) {
-        console.error(`❌ Error en extractItemsFromNarrative: ${error.message}`);
-        console.error(`❌ Narrativa problemática: ${narrative.substring(0, 100)}...`);
-        return {
-          availableItems: [],
-          alreadyPickedItems: []
-        };
-      }
-    }
     
     // 🎯 NUEVA FUNCIÓN: CONVERTIR TEXTO DE NARRATIVA A ITEM REAL
     function convertTextToRealItem(itemText) {
