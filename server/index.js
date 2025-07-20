@@ -2664,9 +2664,10 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     console.log(`🔍 PASO 0: Extrayendo candidatos de narrativa y acción para procesamiento ordenado...`);
     
     // CHATGPT FIX: Analizar SOLO la narrativa final para sincronización
-    console.log(`🔍 CHATGPT FIX - Analizando solo narrativa: "${narrative}"`);
+    console.log(`🔍 SISTEMA DETECTIVO DESACTIVADO - Solo usando rollIntelligentLoot()`);
     
-    const narrativeExtraction = extractItemsFromNarrative(narrative);
+    // const narrativeExtraction = extractItemsFromNarrative(narrative);
+    const narrativeExtraction = { availableItems: [], alreadyPickedItems: [] }; // DESACTIVADO
     const allCandidates = [
       ...(narrativeExtraction.availableItems || []),
       ...(narrativeExtraction.alreadyPickedItems || [])
