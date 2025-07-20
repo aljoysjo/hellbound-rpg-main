@@ -1544,17 +1544,17 @@ def test_inline_loot_system():
             pass
 
 def main():
-    # Run the specific discoveredItems diagnostic test as requested
-    print("🎯 EJECUTANDO DIAGNÓSTICO ESPECÍFICO - discoveredItems")
-    specific_test_result = test_discovered_items_specific()
+    # Run the specific generative system test as requested in the review
+    print("🎯 EJECUTANDO TEST RÁPIDO - Sistema generativo puro (rollIntelligentLoot) sin detectivo")
+    specific_test_result = test_generative_system_only()
     
     if specific_test_result:
-        print("\n✅ DIAGNÓSTICO ESPECÍFICO COMPLETADO EXITOSAMENTE")
-        print("✅ El backend está devolviendo discoveredItems correctamente")
+        print("\n✅ TEST RÁPIDO COMPLETADO EXITOSAMENTE")
+        print("✅ El sistema generativo funciona solo y genera items coherentes con contexto")
     else:
-        print("\n❌ DIAGNÓSTICO ESPECÍFICO FALLIDO")
-        print("❌ El backend NO está devolviendo discoveredItems correctamente")
-        print("🔍 El problema está en extractItemsFromNarrative() o en el procesamiento de la respuesta")
+        print("\n❌ TEST RÁPIDO FALLIDO")
+        print("❌ El sistema generativo NO está funcionando correctamente")
+        print("🔍 El problema está en rollIntelligentLoot() o en el procesamiento de la respuesta")
     
     # Also run the comprehensive inline loot system test
     print("\n" + "="*60)
