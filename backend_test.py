@@ -1806,25 +1806,25 @@ def test_inline_loot_system():
             pass
 
 def main():
-    # Run the specific generative system test as requested in the review
-    print("🎯 EJECUTANDO TEST RÁPIDO - Sistema generativo puro (rollIntelligentLoot) sin detectivo")
-    specific_test_result = test_generative_system_only()
+    # Run the specific drop functionality test as requested in the review
+    print("🎯 EJECUTANDO DIAGNÓSTICO ESPECÍFICO - Funcionalidad 'suelto' no remueve del inventario")
+    drop_test_result = test_drop_functionality_specific()
     
-    if specific_test_result:
-        print("\n✅ TEST RÁPIDO COMPLETADO EXITOSAMENTE")
-        print("✅ El sistema generativo funciona solo y genera items coherentes con contexto")
+    if drop_test_result:
+        print("\n✅ DIAGNÓSTICO ESPECÍFICO COMPLETADO EXITOSAMENTE")
+        print("✅ La funcionalidad 'suelto' funciona correctamente")
     else:
-        print("\n❌ TEST RÁPIDO FALLIDO")
-        print("❌ El sistema generativo NO está funcionando correctamente")
-        print("🔍 El problema está en rollIntelligentLoot() o en el procesamiento de la respuesta")
+        print("\n❌ DIAGNÓSTICO ESPECÍFICO FALLIDO")
+        print("❌ La funcionalidad 'suelto' NO está funcionando correctamente")
+        print("🔍 Se identificó exactamente dónde falla la lógica de drop")
     
-    # Also run the comprehensive inline loot system test
+    # Also run the generative system test for completeness
     print("\n" + "="*60)
-    print("🎯 EJECUTANDO PRUEBA COMPLETA DEL SISTEMA DE LOOT")
-    comprehensive_test_result = test_inline_loot_system()
+    print("🎯 EJECUTANDO TEST ADICIONAL - Sistema generativo puro")
+    generative_test_result = test_generative_system_only()
     
-    # Return success if either test passes (prioritizing the specific diagnostic)
-    return 0 if specific_test_result else (comprehensive_test_result if comprehensive_test_result == 0 else 1)
+    # Return success based on the drop test result (main focus of the review)
+    return 0 if drop_test_result else 1
 
 if __name__ == "__main__":
     sys.exit(main())
