@@ -59,6 +59,21 @@
 - El problema NO está en el backend - discoveredItems funciona al 100%
 
 backend:
+  - task: "Sistema generativo puro (rollIntelligentLoot) sin detectivo"
+    implemented: true
+    working: true
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando test rápido del sistema generativo puro según review request"
+      - working: true
+        agent: "testing"
+        comment: "TEST RÁPIDO COMPLETADO EXITOSAMENTE (15/01/2025): Se ha verificado que el sistema generativo puro funciona correctamente después de desactivar extractItemsFromNarrative(). Las pruebas confirman que: 1) SESIÓN CREADA: 'Detective paranormal investigando misterios' funciona correctamente. 2) ACCIÓN EJECUTADA: 'buscar objetos valiosos en la habitación' genera items apropiados. 3) rollIntelligentLoot() genera items contextuales apropiados: 'documento oficial 📜' con type 'urban' y contexts ['investigation', 'urban', 'exploration']. 4) NARRATIVA E ITEMS COINCIDEN: La narrativa menciona explícitamente 'documento oficial 📜' al final. 5) SISTEMA DETECTIVO DESACTIVADO: extractItemsFromNarrative() retorna arrays vacíos como se esperaba. 6) ESTRUCTURA CORRECTA: Items tienen todos los campos requeridos (name, type, instanceId) y opcionales (rarity, icon, description, contexts, source). El sistema generativo puro funciona solo y genera items coherentes con el contexto del detective paranormal."
+
   - task: "Modal discovered items - Killer Line Fix"
     implemented: true
     working: true
