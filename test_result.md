@@ -467,6 +467,8 @@ frontend:
 
 agent_communication:
   - agent: "testing"
+    message: "TEST RÁPIDO COMPLETADO EXITOSAMENTE (15/01/2025): Se ha verificado que el sistema generativo puro (rollIntelligentLoot) funciona correctamente sin el sistema detectivo. Las pruebas confirman que: 1) extractItemsFromNarrative() está DESACTIVADO y retorna arrays vacíos como se esperaba. 2) rollIntelligentLoot() está ACTIVO y genera items contextuales apropiados para el concepto 'Detective paranormal investigando misterios'. 3) La acción 'buscar objetos valiosos en la habitación' genera correctamente un 'documento oficial 📜' con estructura completa. 4) La narrativa e items coinciden perfectamente - la narrativa menciona explícitamente el item encontrado. 5) El sistema generativo funciona solo y genera items coherentes con el contexto. OBJETIVO CUMPLIDO: El sistema generativo puro funciona correctamente y el cambio crítico ha sido verificado exitosamente."
+  - agent: "testing"
     message: "Iniciando pruebas completas de HELLBOUND RPG v2.0 según las especificaciones proporcionadas."
   - agent: "testing"
     message: "Se han encontrado problemas con el input fluido. Al escribir en el campo de texto, solo se registra la primera letra. Posible problema con preventDefault en handleInputChange."
