@@ -230,6 +230,21 @@ backend:
         agent: "testing"
         comment: "PRUEBA ADICIONAL (08/07/2025): Se ha verificado nuevamente el sistema de eventos aleatorios D20 y funciona correctamente. Las pruebas muestran que: 1) Al realizar múltiples acciones, el sistema eventualmente dispara un evento aleatorio. 2) El campo random_event se incluye en la respuesta API con la estructura correcta (success, roll, event, narrative, appliedConsequences). 3) Las consecuencias se aplican correctamente al game_state (en este caso, health -5). 4) El sistema funciona tanto en modo sandbox como campaña."
 
+  - task: "Funcionalidad drop/suelto items"
+    implemented: true
+    working: true
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Iniciando diagnóstico específico de la funcionalidad 'suelto' que no remueve del inventario"
+      - working: true
+        agent: "testing"
+        comment: "DIAGNÓSTICO ESPECÍFICO COMPLETADO EXITOSAMENTE (15/01/2025): Se ha verificado exhaustivamente la funcionalidad 'suelto' con el escenario específico solicitado. Las pruebas confirman que: 1) SESIÓN CREADA: 'Detective paranormal investigando misterios' funciona correctamente. 2) BÚSQUEDA DE AMULETO: Se obtuvo exitosamente un 'amuleto protector 🧿' en el inventario. 3) ACCIÓN DROP: 'suelto el amuleto' se ejecuta correctamente. 4) VERIFICACIÓN DE LOGS: dropRegex detecta correctamente 'amuleto' (línea 2178-2183 en server/index.js). 5) ITEM ELIMINADO: findIndex encuentra el item y splice() lo remueve exitosamente del inventario (líneas 2196-2202). 6) INVENTARIO ACTUALIZADO: Inventario pasa de 1 item a 0 items correctamente. 7) NARRATIVA CONFIRMA: 'Dejas caer el amuleto al suelo...' + 'Sueltas amuleto protector.' confirma la acción. 8) LOGS ESPERADOS: Se confirma que los logs '❌ TEXTO DETECTADO PARA DROP: amuleto', '❌ ITEM ELIMINADO EXITOSAMENTE' y '🔍 CURRENT INVENTORY' funcionan correctamente. CONCLUSIÓN: La funcionalidad 'suelto' funciona perfectamente - el item SÍ se remueve del inventario UI y la lógica de drop está funcionando correctamente en todas las líneas/pasos."
+
 frontend:
   - task: "Modo campaña"
     implemented: true
