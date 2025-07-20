@@ -611,7 +611,7 @@ function App() {
               return data.game_state;
             }
             
-            const hasInventoryChanges = (data.game_state.inventory?.length || 0) > (prevState.inventory?.length || 0);
+            const hasInventoryChanges = (data.game_state.inventory?.length || 0) !== (prevState.inventory?.length || 0);
             const hasDiscoveredChanges = (data.game_state.discoveredItems?.length || 0) !== (prevState.discoveredItems?.length || 0);
             const hasSkillsChanges = (data.game_state.skills?.length || 0) > (prevState.skills?.length || 0);
             const hasObjectivesChanges = (data.game_state.questObjectives?.length || 0) > (prevState.questObjectives?.length || 0);
