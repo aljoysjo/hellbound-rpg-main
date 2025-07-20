@@ -6,6 +6,22 @@
 ✅ Frontend integration - RESUELTO - Modal killer line issue completamente solucionado
 ✅ Auto-pick regex - RESUELTO - Verificado con casos reales
 ✅ Flujo completo - RESUELTO - Todos los arreglos aplicados y testados
+✅ Sistema generativo puro - RESUELTO - rollIntelligentLoot() funciona correctamente sin detectivo
+
+🎯 TEST RÁPIDO COMPLETADO - Sistema generativo puro (rollIntelligentLoot) sin detectivo:
+
+✅ CAMBIO CRÍTICO VERIFICADO:
+- ❌ extractItemsFromNarrative() DESACTIVADO (retorna arrays vacíos) - CONFIRMADO
+- ✅ rollIntelligentLoot() ACTIVO (sistema generativo) - CONFIRMADO
+
+✅ TEST ESPECÍFICO COMPLETADO:
+1. ✅ Sesión creada: "Detective paranormal investigando misterios"
+2. ✅ Acción ejecutada: "buscar objetos valiosos en la habitación" 
+3. ✅ rollIntelligentLoot() genera items contextuales apropiados (documento oficial 📜)
+4. ✅ Narrativa e items coinciden perfectamente
+5. ✅ Log "SISTEMA DETECTIVO DESACTIVADO" confirmado en código
+
+✅ OBJETIVO CUMPLIDO: Sistema generativo funciona solo y genera items coherentes con contexto
 
 🎯 ARREGLO ESPECÍFICO COMPLETADO - "Línea asesina" del modal discovered items:
 
