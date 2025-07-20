@@ -1395,6 +1395,268 @@ def test_discovered_items_specific():
         except:
             pass
 
+def test_drop_functionality_specific():
+    """DIAGNÓSTICO ESPECÍFICO - Funcionalidad "suelto" no remueve del inventario"""
+    # Use LOCAL backend as specified in the review request
+    backend_url = "http://localhost:8001"
+    
+    print(f"🔥 DIAGNÓSTICO ESPECÍFICO - Funcionalidad 'suelto' no remueve del inventario")
+    print(f"🌐 Backend URL: {backend_url}")
+    print(f"🎯 OBJETIVO: Identificar exactamente en qué línea/paso falla la lógica de drop")
+    
+    # Setup tester
+    tester = HellboundRPGTester(backend_url)
+    
+    try:
+        # Step 1: Healthcheck
+        print("\n==== 1. BACKEND HEALTHCHECK ====")
+        if not tester.test_healthcheck():
+            print("❌ Healthcheck failed, stopping tests")
+            return False
+        
+        # Step 2: Create session: "Detective paranormal investigando misterios"
+        print("\n==== 2. CREAR SESIÓN: 'Detective paranormal investigando misterios' ====")
+        concept = "Detective paranormal investigando misterios"
+        print(f"📝 Concepto: {concept}")
+        
+        if not tester.test_start_session_sandbox(concept):
+            print("❌ Session creation failed, stopping tests")
+            return False
+        
+        # Step 3: Search for objects to get an amulet in inventory
+        print("\n==== 3. BUSCAR OBJETOS PARA OBTENER UN AMULETO EN INVENTARIO ====")
+        search_actions = [
+            "buscar objetos valiosos",
+            "examinar la habitación en busca de amuletos",
+            "buscar un amuleto protector"
+        ]
+        
+        amulet_found = False
+        amulet_name = None
+        
+        for action in search_actions:
+            print(f"\n🔍 Ejecutando acción: '{action}'")
+            
+            success, response = tester.run_test(
+                f"Búsqueda de amuleto - {action}",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": tester.session_id,
+                    "action": action
+                }
+            )
+            
+            if success:
+                game_state = response.get('game_state', {})
+                discovered_items = game_state.get('discoveredItems', [])
+                
+                # Look for amulet in discovered items
+                for item in discovered_items:
+                    item_name = item.get('name', '').lower()
+                    if 'amuleto' in item_name or 'amulet' in item_name:
+                        print(f"✅ Amuleto encontrado en discoveredItems: {item['name']}")
+                        
+                        # Pick up the amulet
+                        pickup_success, pickup_response = tester.run_test(
+                            "Pickup Amulet",
+                            "POST",
+                            "api/pickup_item",
+                            200,
+                            data={
+                                "session_id": tester.session_id,
+                                "item_id": item['instanceId']
+                            }
+                        )
+                        
+                        if pickup_success:
+                            amulet_found = True
+                            amulet_name = item['name']
+                            print(f"✅ Amuleto recogido exitosamente: {amulet_name}")
+                            break
+                
+                if amulet_found:
+                    break
+        
+        if not amulet_found:
+            print("❌ No se pudo obtener un amuleto en el inventario")
+            print("🔍 Intentando generar un amuleto directamente...")
+            
+            # Try a more direct approach
+            success, response = tester.run_test(
+                "Generate Amulet Directly",
+                "POST",
+                "api/free_input",
+                200,
+                data={
+                    "session_id": tester.session_id,
+                    "action": "encuentro un amuleto protector en el suelo"
+                }
+            )
+            
+            if success:
+                game_state = response.get('game_state', {})
+                inventory = game_state.get('inventory', [])
+                
+                # Check if amulet is now in inventory
+                for item in inventory:
+                    item_name = item.get('name', '').lower()
+                    if 'amuleto' in item_name or 'amulet' in item_name:
+                        amulet_found = True
+                        amulet_name = item['name']
+                        print(f"✅ Amuleto encontrado en inventario: {amulet_name}")
+                        break
+        
+        if not amulet_found:
+            print("❌ No se pudo obtener un amuleto, usando item genérico para la prueba")
+            # Get current inventory to use any available item
+            _, state_response = tester.run_test(
+                "Get Current Inventory",
+                "GET",
+                f"api/get_session/{tester.session_id}",
+                200
+            )
+            
+            current_game_state = state_response.get('game_state', {})
+            current_inventory = current_game_state.get('inventory', [])
+            
+            if current_inventory:
+                amulet_name = current_inventory[0]['name']
+                amulet_found = True
+                print(f"✅ Usando item existente para prueba: {amulet_name}")
+            else:
+                print("❌ No hay items en el inventario para probar drop")
+                return False
+        
+        # Step 4: Get inventory before drop
+        print(f"\n==== 4. VERIFICAR INVENTARIO ANTES DE DROP ====")
+        _, before_response = tester.run_test(
+            "Get Inventory Before Drop",
+            "GET",
+            f"api/get_session/{tester.session_id}",
+            200
+        )
+        
+        before_game_state = before_response.get('game_state', {})
+        before_inventory = before_game_state.get('inventory', [])
+        
+        print(f"🔍 INVENTARIO ANTES DE DROP:")
+        for i, item in enumerate(before_inventory):
+            print(f"  {i+1}. {item.get('name')} {item.get('icon')} (ID: {item.get('instanceId')})")
+        
+        print(f"📊 Total items antes: {len(before_inventory)}")
+        
+        # Step 5: Execute drop action: "suelto el amuleto"
+        print(f"\n==== 5. EJECUTAR: 'suelto el {amulet_name.split()[0] if amulet_name else 'amuleto'}' ====")
+        
+        # Extract the first word of the amulet name for the drop command
+        drop_item_name = amulet_name.split()[0] if amulet_name else 'amuleto'
+        drop_action = f"suelto el {drop_item_name}"
+        
+        print(f"🔍 Ejecutando acción: '{drop_action}'")
+        
+        success, response = tester.run_test(
+            f"Drop Action - {drop_action}",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": tester.session_id,
+                "action": drop_action
+            }
+        )
+        
+        if not success:
+            print("❌ Drop action failed")
+            return False
+        
+        print(f"✅ Drop action executed successfully")
+        
+        # Step 6: Verify logs and inventory after drop
+        print(f"\n==== 6. VERIFICAR LOGS ESPECÍFICOS Y INVENTARIO DESPUÉS ====")
+        
+        # Get inventory after drop
+        after_game_state = response.get('game_state', {})
+        after_inventory = after_game_state.get('inventory', [])
+        
+        print(f"🔍 INVENTARIO DESPUÉS DE DROP:")
+        for i, item in enumerate(after_inventory):
+            print(f"  {i+1}. {item.get('name')} {item.get('icon')} (ID: {item.get('instanceId')})")
+        
+        print(f"📊 Total items después: {len(after_inventory)}")
+        
+        # Check if item was removed
+        item_removed = len(after_inventory) < len(before_inventory)
+        
+        if item_removed:
+            print(f"✅ ITEM ELIMINADO EXITOSAMENTE")
+            print(f"📊 Items removidos: {len(before_inventory) - len(after_inventory)}")
+            
+            # Find which item was removed
+            before_ids = set(item.get('instanceId') for item in before_inventory)
+            after_ids = set(item.get('instanceId') for item in after_inventory)
+            removed_ids = before_ids - after_ids
+            
+            for item in before_inventory:
+                if item.get('instanceId') in removed_ids:
+                    print(f"🗑️ Item removido: {item.get('name')} {item.get('icon')}")
+        else:
+            print(f"⚠️ ITEM NO ENCONTRADO PARA DROP o NO SE REMOVIÓ")
+            print(f"📊 Inventario no cambió de tamaño: {len(before_inventory)} → {len(after_inventory)}")
+        
+        # Step 7: Analyze the narrative for drop confirmation
+        print(f"\n==== 7. ANALIZAR NARRATIVA PARA CONFIRMACIÓN DE DROP ====")
+        narrative = response.get('new_narrative', '') or response.get('narrative', '')
+        print(f"📖 Narrativa: {narrative}")
+        
+        # Check if narrative mentions dropping
+        drop_keywords = ['sueltas', 'dejas caer', 'abandonas', 'tiras', 'desechas']
+        narrative_confirms_drop = any(keyword in narrative.lower() for keyword in drop_keywords)
+        
+        if narrative_confirms_drop:
+            print("✅ La narrativa confirma que el item fue soltado")
+        else:
+            print("⚠️ La narrativa no confirma explícitamente que el item fue soltado")
+        
+        # Step 8: Final analysis
+        print(f"\n==== 8. ANÁLISIS FINAL ====")
+        
+        print(f"🔍 VERIFICACIÓN DE LOGS ESPERADOS:")
+        print(f"  - ❌ TEXTO DETECTADO PARA DROP: {drop_item_name} - (Solo visible en logs del servidor)")
+        print(f"  - {'✅' if item_removed else '❌'} ITEM ELIMINADO EXITOSAMENTE - {'CONFIRMADO' if item_removed else 'NO CONFIRMADO'}")
+        print(f"  - 🔍 CURRENT INVENTORY: {len(before_inventory)} → {len(after_inventory)} items")
+        
+        print(f"\n🎯 DIAGNÓSTICO:")
+        if item_removed and narrative_confirms_drop:
+            print("✅ La funcionalidad 'suelto' funciona correctamente")
+            print("✅ El item se remueve del inventario UI")
+            print("✅ La narrativa confirma la acción")
+            return True
+        elif item_removed and not narrative_confirms_drop:
+            print("⚠️ El item se remueve del inventario pero la narrativa no lo confirma claramente")
+            print("🔍 POSIBLE PROBLEMA: Narrativa no refleja la acción de drop")
+            return True  # Still working, just narrative issue
+        elif not item_removed and narrative_confirms_drop:
+            print("❌ La narrativa menciona drop pero el item NO se remueve del inventario")
+            print("🔍 PROBLEMA CRÍTICO: dropRegex detecta pero splice() no funciona")
+            return False
+        else:
+            print("❌ La funcionalidad 'suelto' NO funciona")
+            print("🔍 PROBLEMA CRÍTICO: dropRegex no detecta o findIndex no encuentra el item")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error inesperado: {str(e)}")
+        return False
+    
+    finally:
+        # Clean up resources
+        try:
+            tester.cleanup()
+        except:
+            pass
+
 def test_inline_loot_system():
     """Test the inline loot system and badge updates"""
     # Use localhost:8001 as specified in the review request
