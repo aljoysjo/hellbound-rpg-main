@@ -1098,6 +1098,159 @@ function generateSandboxRestrictions(sandboxConcept) {
         
         return False
 
+def test_contextual_item_detection_regression():
+    """DIAGNÓSTICO ESPECÍFICO - Regresión en detección contextual de items"""
+    # Use the backend URL from frontend/.env as specified in the review request
+    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
+    
+    print(f"🔥 DIAGNÓSTICO ESPECÍFICO - Regresión en detección contextual de items")
+    print(f"🌐 Backend URL: {backend_url}")
+    print(f"🎯 OBJETIVO: Verificar si 'diario de exorcismo' se muestra incorrectamente como 'amuleto protector'")
+    
+    # Setup tester
+    tester = HellboundRPGTester(backend_url)
+    
+    try:
+        # Step 1: Healthcheck
+        print("\n==== 1. BACKEND HEALTHCHECK ====")
+        if not tester.test_healthcheck():
+            print("❌ Healthcheck failed, stopping tests")
+            return False
+        
+        # Step 2: Create session with specific concept that should generate "diario de exorcismo"
+        print("\n==== 2. CREAR SESIÓN CON CONCEPTO ESPECÍFICO ====")
+        concept = "Exorcista investigando posesiones demoníacas"
+        print(f"📝 Concepto: {concept}")
+        
+        if not tester.test_start_session_sandbox(concept):
+            print("❌ Session creation failed, stopping tests")
+            return False
+        
+        # Step 3: Execute action that should generate "diario de exorcismo"
+        print("\n==== 3. EJECUTAR ACCIÓN QUE DEBERÍA GENERAR 'DIARIO DE EXORCISMO' ====")
+        action = "buscar documentos sobre exorcismos en la biblioteca"
+        print(f"🔍 Ejecutando acción: '{action}'")
+        
+        success, response = tester.run_test(
+            f"Búsqueda de diario de exorcismo - {action}",
+            "POST",
+            "api/free_input",
+            200,
+            data={
+                "session_id": tester.session_id,
+                "action": action
+            }
+        )
+        
+        if not success:
+            print("❌ Acción falló")
+            return False
+            
+        print(f"✅ Acción ejecutada exitosamente")
+        
+        # Step 4: Verify contextual item detection
+        print("\n==== 4. VERIFICAR DETECCIÓN CONTEXTUAL DE ITEMS ====")
+        
+        # Check if discoveredItems exists in game_state
+        game_state = response.get('game_state', {})
+        discovered_items = game_state.get('discoveredItems', [])
+        
+        print(f"🔍 discoveredItems en game_state: {discovered_items}")
+        
+        if not discovered_items or len(discovered_items) == 0:
+            print(f"❌ discoveredItems array está vacío: {discovered_items}")
+            print(f"🔍 POSIBLE PROBLEMA: Sistema generativo no está funcionando")
+            return False
+            
+        print(f"✅ Sistema generativo generó {len(discovered_items)} item(s)")
+        
+        # Step 5: Analyze contextual appropriateness
+        print("\n==== 5. ANALIZAR APROPIACIÓN CONTEXTUAL ====")
+        
+        contextual_issues = []
+        appropriate_items = []
+        
+        for i, item in enumerate(discovered_items):
+            print(f"\n📦 Item {i+1}:")
+            print(f"  - Nombre: {item.get('name')}")
+            print(f"  - Tipo: {item.get('type')}")
+            print(f"  - Icono: {item.get('icon')}")
+            
+            item_name = item.get('name', '').lower()
+            item_type = item.get('type', '').lower()
+            
+            # Check if this is the specific regression case
+            if 'diario' in item_name and 'exorcismo' in item_name:
+                if 'amuleto' in item_name or item_type == 'amuleto':
+                    contextual_issues.append(f"REGRESIÓN DETECTADA: '{item['name']}' debería ser un diario, no un amuleto")
+                    print(f"  ❌ REGRESIÓN DETECTADA: Item debería ser 'diario de exorcismo', no '{item['name']}'")
+                else:
+                    appropriate_items.append(item['name'])
+                    print(f"  ✅ Item contextualmente apropiado: diario de exorcismo")
+            
+            # Check for general contextual appropriateness for exorcist theme
+            exorcist_contexts = ['knowledge', 'mystical', 'religious', 'tool']
+            exorcist_keywords = ['diario', 'libro', 'pergamino', 'crucifijo', 'agua bendita', 'biblia', 'rosario', 'exorcismo']
+            
+            contextually_appropriate = (
+                item_type in exorcist_contexts or
+                any(keyword in item_name for keyword in exorcist_keywords)
+            )
+            
+            if contextually_appropriate:
+                appropriate_items.append(item['name'])
+                print(f"  ✅ Item contextualmente apropiado para exorcista")
+            else:
+                # Check if it's the specific regression case
+                if 'amuleto' in item_name and 'diario' not in item_name:
+                    contextual_issues.append(f"POSIBLE REGRESIÓN: '{item['name']}' podría ser incorrecto para contexto de exorcismo")
+                    print(f"  ⚠️ Item podría no ser contextualmente apropiado: '{item['name']}'")
+                else:
+                    print(f"  ⚠️ Item podría no ser contextualmente apropiado")
+        
+        # Step 6: Check narrative for contextual consistency
+        print("\n==== 6. VERIFICAR CONSISTENCIA NARRATIVA ====")
+        narrative = response.get('new_narrative', '') or response.get('narrative', '')
+        print(f"📖 Narrativa: {narrative}")
+        
+        # Check if narrative mentions the correct items
+        narrative_mentions_correct_items = False
+        for item in discovered_items:
+            item_name = item.get('name', '')
+            if item_name.lower() in narrative.lower():
+                print(f"✅ Narrativa menciona correctamente el item: {item_name}")
+                narrative_mentions_correct_items = True
+            else:
+                print(f"⚠️ Narrativa no menciona explícitamente el item: {item_name}")
+        
+        # Step 7: Final assessment
+        print(f"\n==== 7. EVALUACIÓN FINAL ====")
+        
+        if contextual_issues:
+            print(f"❌ REGRESIÓN CONFIRMADA - Se detectaron {len(contextual_issues)} problemas contextuales:")
+            for issue in contextual_issues:
+                print(f"  - {issue}")
+            return False
+        elif appropriate_items:
+            print(f"✅ DETECCIÓN CONTEXTUAL FUNCIONA CORRECTAMENTE")
+            print(f"✅ Items apropiados generados: {appropriate_items}")
+            print(f"✅ No se detectó la regresión reportada ('diario de exorcismo' → 'amuleto protector')")
+            return True
+        else:
+            print(f"⚠️ NO SE PUDO DETERMINAR - Items generados pero contexto incierto")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error inesperado: {str(e)}")
+        return False
+    
+    finally:
+        # Clean up resources
+        try:
+            tester.cleanup()
+        except:
+            pass
+
 def test_generative_system_only():
     """TEST RÁPIDO - Sistema generativo puro (rollIntelligentLoot) sin detectivo"""
     # Use LOCAL backend as specified in the review request
