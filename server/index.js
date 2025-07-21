@@ -2950,14 +2950,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
             }
           }
         } // Cierre del else
-          );
-          
-          if (wasIgnored) {
-            console.log(`🚫 Item previamente ignorado, no se añadirá: ${intelligentLoot.name}`);
-            return; // No añadir item ignorado
-          }
-          
-          // Verificar anti-duplicados
+      } // Cierre del if availableItems.length === 0
           const existsInInventory = gameState.inventory.some(item => 
             item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
           );
