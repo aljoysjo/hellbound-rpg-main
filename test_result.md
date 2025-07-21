@@ -1,21 +1,18 @@
-🚨 INVESTIGACIÓN ESPECÍFICA COMPLETADA - 21/01/2025:
+🚨 INVESTIGACIÓN CRÍTICA - 21/01/2025:
+🔍 PROBLEMA CRÍTICO PERSISTENTE: InlineLootBlock NO aparece después de múltiples reverts
+🔍 NECESITA DIAGNÓSTICO URGENTE: Sistema de loot completamente roto
 
-✅ INVESTIGACIÓN COMPLETADA - Drop Item UI Update Issue: FUNCIONALIDAD FUNCIONA CORRECTAMENTE
-✅ INVESTIGACIÓN COMPLETADA - Contextual Item Detection Regression: NO SE DETECTÓ REGRESIÓN
+HISTORIAL DE REVERTSIONES:
+❌ PRIMER REVERT: /app/server_backup_loot_system_complete/index.js - JSON corrupto 
+❌ SEGUNDO REVERT: /app/server_backup_session1/index.js - Backend arranca pero NO funciona loot
+✅ Backend arranca sin errores pero discoveredItems no se generan
 
-🔍 RESULTADOS DETALLADOS:
-1. DROP FUNCTIONALITY: Se verificó exhaustivamente la funcionalidad "suelto el amuleto" y funciona perfectamente:
-   - Item se remueve correctamente del inventario (1 → 0 items)
-   - Narrativa confirma la acción ("Sueltas amuleto protector")
-   - Backend procesa correctamente el comando drop
-   - UI se actualiza automáticamente
-
-2. CONTEXTUAL DETECTION: Se probó con concepto "Exorcista investigando posesiones demoníacas":
-   - Sistema generativo genera items contextualmente apropiados ("Excelente reliquia antigua" tipo mystical)
-   - No se detectó la regresión reportada ("diario de exorcismo" → "amuleto protector")
-   - Items coinciden con la narrativa correctamente
-
-🎯 CONCLUSIÓN: Los problemas reportados por el usuario NO se reproducen en las pruebas automatizadas. Ambas funcionalidades trabajan correctamente.
+ESTADO ACTUAL REPORTADO POR USUARIO:
+- Usuario busca items en habitación
+- Narrativa menciona "libro de conjuros, medallón desgastado, frasco pequeño"
+- InlineLootBlock NO aparece
+- Inventario permanece vacío
+- Funcionalidad completamente rota
 
 HISTORIAL PREVIO (RESUELTOS ANTERIORMENTE):
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
