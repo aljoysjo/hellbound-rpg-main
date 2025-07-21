@@ -146,10 +146,14 @@ function loadFullCampaign(name) {
       console.log(`❌ Ink file not found: ${scenesFile}`);
     }
     
+    // 🆕 EXTENSIÓN: Intentar cargar chapter JSON (opcional, no afecta sistema existente)
+    const chapterData = loadChapterSystem('ch01');
+    
     return { 
       json, 
       map, 
-      firstText: firstText || json.titulo || 'Aventura épica te espera'
+      firstText: firstText || json.titulo || 'Aventura épica te espera',
+      chapterData  // 🆕 Solo agregar, no modificar campos existentes
     };
     
   } catch (error) {
