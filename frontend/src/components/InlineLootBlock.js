@@ -21,8 +21,8 @@ const getItemIcon = (itemType) => {
 
 export default function InlineLootBlock({
   items = [],
-  onCollectAll,
-  onIgnoreAll,
+  onCollectItem,
+  onIgnoreItem,
 }) {
   if (!items.length) return null;
 
@@ -33,7 +33,7 @@ export default function InlineLootBlock({
       </h2>
 
       {items.map((itm) => (
-        <div key={itm.instanceId} className="flex items-center gap-3">
+        <div key={itm.instanceId} className="flex items-center gap-3 p-2 bg-white/50 rounded">
           <span className="material-icons-outlined text-[var(--cedar-brown)] text-3xl">
             {getItemIcon(itm.type)}
           </span>
@@ -41,23 +41,24 @@ export default function InlineLootBlock({
           <span className="rarity-tag text-sm text-[var(--imperial-gold)] px-2 py-1 rounded-full bg-[var(--imperial-gold)]/20">
             ({itm.rarity || "común"})
           </span>
+          
+          {/* Botones individuales por item */}
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 bg-[var(--imperial-gold)] hover:bg-[var(--imperial-gold)]/80 text-[var(--cedar-brown)] font-semibold rounded transition-all duration-200 hover:scale-105 active:scale-95 text-sm"
+              onClick={() => onCollectItem(itm.instanceId)}
+            >
+              Recoger
+            </button>
+            <button
+              className="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-[var(--cedar-brown)] font-semibold rounded transition-all duration-200 hover:scale-105 active:scale-95 text-sm"
+              onClick={() => onIgnoreItem(itm.instanceId)}
+            >
+              Ignorar
+            </button>
+          </div>
         </div>
       ))}
-
-      <div className="flex gap-3 pt-3 justify-center sm:justify-start">
-        <button
-          className="px-4 py-2 bg-[var(--imperial-gold)] hover:bg-[var(--imperial-gold)]/80 text-[var(--cedar-brown)] font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-          onClick={onCollectAll}
-        >
-          Recoger
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-[var(--cedar-brown)] font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-          onClick={onIgnoreAll}
-        >
-          Ignorar
-        </button>
-      </div>
     </div>
   );
 }
