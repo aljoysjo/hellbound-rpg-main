@@ -1951,8 +1951,19 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir/.test(action.toLowerCase())) {
       console.log(`🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "${action}"`);
       
-      // Generar loot inteligente
-      const intelligentLoot = rollIntelligentLoot(gameState, action, narrative);
+      // 🆕 PASO 1: Intentar extraer items específicos del LLM primero
+      const llmExtractedItems = extractSpecificItemsFromLLMNarrative(narrative);
+      
+      let itemToAdd = null;
+      
+      if (llmExtractedItems.length > 0) {
+        console.log(`✅ LLM ITEMS ENCONTRADOS: ${llmExtractedItems.length} items extraídos de narrativa`);
+        itemToAdd = llmExtractedItems[0]; // Tomar el primer item extraído
+      } else {
+        console.log(`🎯 No se encontraron items específicos en LLM, usando rollIntelligentLoot como fallback...`);
+        // Generar loot inteligente como fallback
+        itemToAdd = rollIntelligentLoot(gameState, action, narrative);
+      }
       
       if (intelligentLoot) {
         // Verificar que no existe ya en inventario
