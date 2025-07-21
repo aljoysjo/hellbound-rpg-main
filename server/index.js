@@ -1564,7 +1564,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     }
     
     // Detectar soltar items CON SOPORTE PARA MÚLTIPLES ITEMS
-    const dropRegex = /\b(?:suelto|dejo|tiro|abandono|desecho|boto)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
+    const dropRegex = /\b(?:suelto|soltar|dejo|tiro|abandono|desecho|boto)\b\s+(?:un[ae]?|la?|el)?\s*(.+?)(?:\s+(?:del?|de la?)\s.+|$)/i;
     const dropMatch = actionLowerForFlags.match(dropRegex);
     
     if (dropMatch) {
