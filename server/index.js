@@ -347,6 +347,10 @@ class GameState {
     this.campaignMeta = null;
     this.map = null;
     
+    // 🆕 CHAPTER SYSTEM (solo se usa cuando hay chapter JSON disponible)
+    this.chapterData = null;
+    this.currentScene = null;
+    
     // 📖 SISTEMA NARRATIVO MEJORADO
     this.toneBias = 0; // -5 (luminoso) a +5 (oscuro)
     this.usedPhrases = []; // Historial de frases para evitar repetición
