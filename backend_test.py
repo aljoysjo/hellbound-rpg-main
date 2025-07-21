@@ -1252,7 +1252,7 @@ def test_generative_system_only():
 def test_discovered_items_specific():
     """DIAGNÓSTICO ESPECÍFICO - Verificar discoveredItems en respuesta de "buscar objetos" """
     # Use the backend URL from frontend/.env as specified in the review request
-    backend_url = "https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"
+    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
     
     print(f"🔥 DIAGNÓSTICO ESPECÍFICO - Verificar discoveredItems en respuesta de 'buscar objetos'")
     print(f"🌐 Backend URL: {backend_url}")

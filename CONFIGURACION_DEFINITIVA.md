@@ -3,8 +3,8 @@
 ## ⚠️ INSTRUCCIONES CRÍTICAS:
 
 ### 1. NUNCA CAMBIAR ESTAS URLs:
-- Frontend .env: `REACT_APP_BACKEND_URL=https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com`
-- Backend .env: `FRONTEND_URL=https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com`
+- Frontend .env: `REACT_APP_BACKEND_URL=https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com`
+- Backend .env: `FRONTEND_URL=https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com`
 
 ### 2. HEADERS PERMITIDOS EN CORS (línea 270 server/index.js):
 ```javascript
@@ -49,7 +49,7 @@ curl -s http://localhost:8001/api/healthcheck
 - ❌ Usar URLs hardcodeadas en lugar de variables de entorno
 
 ## ✅ CONFIGURACIÓN ACTUAL FUNCIONANDO:
-- ✅ Frontend: https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com
+- ✅ Frontend: https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com
 - ✅ Backend: Mismo dominio, rutas /api/*
 - ✅ CORS: Configurado para ambos dominios
 - ✅ Headers: Mínimos y permitidos

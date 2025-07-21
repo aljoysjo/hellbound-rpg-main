@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 
 class DiscoveredItemsModalTester:
-    def __init__(self, base_url="https://rpg-fixer.preview.emergentagent.com"):
+    def __init__(self, base_url="https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
@@ -325,7 +325,7 @@ class DiscoveredItemsModalTester:
 
 def main():
     # Use the provided URL
-    backend_url = "https://rpg-fixer.preview.emergentagent.com"
+    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
     
     print(f"🔥 Testing Discovered Items Modal Fix at {backend_url}")
     

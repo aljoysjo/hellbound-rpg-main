@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 
 class HellboundRPGTester:
-    def __init__(self, base_url="https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"):
+    def __init__(self, base_url="https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
@@ -601,7 +601,7 @@ class HellboundRPGTester:
 
 def main():
     # Use the provided URL from the frontend .env file
-    backend_url = "https://82bcbb31-ba5d-4ac4-997b-559356b55852.preview.emergentagent.com"
+    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
     
     print(f"🔥 Testing Hellbound RPG Backend at {backend_url}")
     print(f"🎯 FOCUS: Modal discovered items and Random Events D20")
