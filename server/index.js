@@ -1965,24 +1965,32 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         itemToAdd = rollIntelligentLoot(gameState, action, narrative);
       }
       
-      if (intelligentLoot) {
+      if (itemToAdd) {
         // Verificar que no existe ya en inventario
         const existsInInventory = gameState.inventory.some(item => 
-          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+          item.name.toLowerCase() === itemToAdd.name.toLowerCase()
         );
         
         // Verificar que no existe ya en discoveredItems
         if (!gameState.discoveredItems) gameState.discoveredItems = [];
         const existsInDiscovered = gameState.discoveredItems.some(item => 
-          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+          item.name.toLowerCase() === itemToAdd.name.toLowerCase()
         );
         
         if (!existsInInventory && !existsInDiscovered) {
-          gameState.discoveredItems.push(intelligentLoot);
-          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${intelligentLoot.name} ${intelligentLoot.icon}`);
+          gameState.discoveredItems.push(itemToAdd);
+          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${itemToAdd.name} ${itemToAdd.icon}`);
           
-          // Añadir a la narrativa que se descubrió algo
-          narrative += ` Descubres ${intelligentLoot.name} ${intelligentLoot.icon} en el lugar.`;
+          // Solo añadir narrativa si es del sistema fallback (no del LLM)
+          if (itemToAdd.source !== 'llm_narrative') {
+            narrative += ` Descubres ${itemToAdd.name} ${itemToAdd.icon} en el lugar.`;
+          }
+        } else {
+          console.log(`🔄 Item ya existe: ${itemToAdd.name}`);
+        }
+      } else {
+        console.log(`🎲 No se generó ningún item para esta búsqueda`);
+      }
           
           console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
         } else {
