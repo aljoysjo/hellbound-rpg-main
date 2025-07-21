@@ -1187,6 +1187,13 @@ Responde SOLO con la narrativa, sin explicaciones.
       gameState.campaignMeta = camp.json;
       gameState.map = camp.map;
       
+      // 🆕 USAR CHAPTER SYSTEM si está disponible (tu JSON)
+      if (camp.chapterData) {
+        gameState.chapterData = camp.chapterData;
+        gameState.currentScene = camp.chapterData.scenes[0].id;
+        console.log(`🔖 Using chapter system: ${camp.chapterData.title}`);
+      }
+      
       // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO
       gameState.initializeCampaignObjectives();
       
