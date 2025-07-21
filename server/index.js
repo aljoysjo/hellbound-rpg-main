@@ -11,21 +11,17 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-  // 🎯 BASE DE DATOS DE ITEMS PARA EMPAREJAMIENTO INTELIGENTE
+// 🎯 BASE DE DATOS DE ITEMS PARA EMPAREJAMIENTO INTELIGENTE
 const ITEM_DATABASE = [
   // 🗡️ ARMAS Y COMBATE
   { type: 'espada', icon: '⚔️', keywords: ['espada', 'sable', 'hoja', 'blade', 'cuchilla', 'gladius', 'katana', 'espadón'] },
   { type: 'daga', icon: '🔪', keywords: ['daga', 'cuchillo', 'puñal', 'navaja', 'stiletto', 'dagger'] },
   { type: 'hacha', icon: '🪓', keywords: ['hacha', 'axe', 'machete', 'hachuela'] },
   { type: 'arco', icon: '🏹', keywords: ['arco', 'ballesta', 'bow', 'flecha', 'arrow'] },
-  { type: 'revolver', icon: '🔫', keywords: ['revolver', 'pistola', 'arma', 'gun', 'weapon', 'firearm'] },
   
   // 🛡️ DEFENSAS
   { type: 'escudo', icon: '🛡️', keywords: ['escudo', 'shield', 'broquel', 'rodela', 'buckler'] },
   { type: 'armadura', icon: '🦺', keywords: ['armadura', 'armor', 'coraza', 'cota', 'peto', 'mail'] },
-  
-  // 🧿 AMULETOS Y PROTECCIÓN (AÑADIDO SEGÚN CHATGPT STEP 1.2)
-  { type: 'amuleto', icon: '🧿', keywords: ['amuleto', 'amuleto protector', 'amuleto de protección', 'amuleto sagrado', 'talismán', 'protección'] },
   
   // 👕 ROPA Y VESTIMENTA
   { type: 'capa', icon: '🧥', keywords: ['capa', 'manto', 'cape', 'cloak', 'túnica', 'robe'] },
@@ -49,7 +45,6 @@ const ITEM_DATABASE = [
   
   // 🧪 CONSUMIBLES MÁGICOS
   { type: 'poción', icon: '🧪', keywords: ['poción', 'elixir', 'frasco', 'botella', 'tónico', 'brebaje'] },
-  { type: 'frasco_cristal', icon: '🧪', keywords: ['frasco de cristal', 'frasco cristalino', 'recipiente de cristal'] },
   { type: 'varita', icon: '🪄', keywords: ['varita', 'vara', 'bastón', 'cetro', 'wand', 'staff'] },
   
   // 💎 TESOROS
@@ -58,354 +53,17 @@ const ITEM_DATABASE = [
   
   // 📚 CONOCIMIENTO
   { type: 'libro', icon: '📖', keywords: ['libro', 'grimorio', 'tomo', 'manuscrito', 'volumen', 'text'] },
-  { type: 'diario', icon: '📓', keywords: ['diario', 'diario antiguo', 'diario personal', 'antiguo diario'] },
   { type: 'pergamino', icon: '📜', keywords: ['pergamino', 'scroll', 'mapa', 'carta', 'plano', 'documento'] },
   
   // 🏆 OBJETOS ESPECIALES
   { type: 'trofeo', icon: '🏆', keywords: ['trofeo', 'trophy', 'premio', 'medalla', 'copa', 'galardón'] },
   { type: 'reliquia', icon: '⚗️', keywords: ['reliquia', 'relic', 'artefacto', 'artifact', 'objeto sagrado', 'antigüedad'] },
   { type: 'cuerpo', icon: '💀', keywords: ['cabeza', 'cráneo', 'hueso', 'esqueleto', 'calavera', 'skull', 'bone', 'head'] },
-  { type: 'crucifijo', icon: '✝️', keywords: ['crucifijo', 'el crucifijo', 'cruz', 'santo crucifijo', 'cross', 'símbolo religioso', 'cruz de plata', 'cruz adornada'] },
-  
-  // 💍 JOYERÍA Y ACCESORIOS
-  { type: 'anillo', icon: '💍', keywords: ['anillo', 'ring', 'sortija', 'aro', 'alianza'] },
-  { type: 'collar', icon: '📿', keywords: ['collar', 'necklace', 'cadena', 'pendiente'] },
-  { type: 'brazalete', icon: '🔗', keywords: ['brazalete', 'pulsera', 'bracelet'] },
-  
-  // 🔧 MATERIALES Y METALES  
-  { type: 'metal', icon: '🔩', keywords: ['hierro', 'acero', 'metal', 'barra de hierro', 'lingote', 'varilla', 'barra de acero', 'chatarra'] },
 ];
 
-// 🎯 TABLA DE ALIASES PARA ITEMS SIMILARES (CHATGPT SOLUTION)
-const ITEM_ALIASES = {
-  'metal afilado': 'improvised_knife',
-  'improvisado cuchillo': 'improvised_knife', 
-  'cuchillo improvisado': 'improvised_knife',
-  'trozo de metal': 'improvised_knife',
-  'fragmento de metal': 'improvised_knife',
-  'hoja afilada': 'improvised_knife',
-  'frasco de cristal': 'frasco_cristal',
-  'frasco cristalino': 'frasco_cristal',
-  'recipiente de cristal': 'frasco_cristal',
-  'diario antiguo': 'diario',
-  'diario personal': 'diario',
-  'viejo diario': 'diario'
-};
+// 🎲 SISTEMA DE LOOT DINÁMICO CORREGIDO - OPCIONES 2+4+5
 
-// 🎯 FUNCIÓN: NORMALIZAR NOMBRES DE ITEMS (CHATGPT SOLUTION)
-function canonicalName(raw) {
-  const key = raw.toLowerCase().trim();
-  return ITEM_ALIASES[key] || key;
-}
-
-// 🎲 SISTEMA DE EVENTOS ALEATORIOS D20
-const RANDOM_EVENTS_DATABASE = {
-  // 🎨 EVENTOS SANDBOX POR TEMÁTICA
-  sandbox: {
-    detective: [
-      {
-        id: 'clue_discovery',
-        title: 'Pista Inesperada',
-        description: 'Notas algo que otros investigadores pasaron por alto',
-        triggers: ['investigar', 'examinar', 'buscar', 'observar'],
-        difficulty: 12,
-        success: { items: ['lupa', 'documento'], narrative: 'Tu ojo entrenado detecta una pista crucial que cambia el rumbo de la investigación.' },
-        failure: { health: -5, narrative: 'Tu búsqueda exhaustiva te deja agotado y sin resultados claros.' }
-      },
-      {
-        id: 'witness_encounter',
-        title: 'Testigo Inesperado',
-        description: 'Alguien se acerca con información valiosa',
-        triggers: ['preguntar', 'hablar', 'interrogar'],
-        difficulty: 10,
-        success: { knowledge: { 'caso_actual': 25 }, narrative: 'El testigo revela información que encaja perfectamente con tus sospechas.' },
-        failure: { narrative: 'El testigo se muestra reticente y se marcha sin compartir detalles importantes.' }
-      }
-    ],
-    adventure: [
-      {
-        id: 'hidden_treasure',
-        title: 'Tesoro Oculto',
-        description: 'Descubres algo valioso en un lugar inesperado',
-        triggers: ['explorar', 'buscar', 'examinar'],
-        difficulty: 14,
-        success: { items: ['gema', 'moneda'], gold: 50, narrative: 'Tu exploración meticulosa revela un tesoro escondido por aventureros anteriores.' },
-        failure: { stamina: -10, narrative: 'Tras una búsqueda exhaustiva, solo encuentras polvo y desilusión.' }
-      }
-    ],
-    horror: [
-      {
-        id: 'supernatural_encounter',
-        title: 'Presencia Sobrenatural',
-        description: 'Sientes que algo te observa desde las sombras',
-        triggers: ['caminar', 'explorar', 'observar'],
-        difficulty: 15,
-        success: { skills: ['resistencia_mental'], narrative: 'Mantienes la calma ante la presencia perturbadora y aprendes a controlar tu miedo.' },
-        failure: { health: -8, emotions: { miedo: 30 }, narrative: 'El encuentro te deja marcado, con cicatrices mentales que tardarán en sanar.' }
-      }
-    ]
-  },
-  
-  // 📜 EVENTOS ESPECÍFICOS CAMPAÑA "CAMINOS DEL ABISMO"
-  campaign: {
-    alicante_supernatural: [
-      {
-        id: 'errante_sighting',
-        title: 'Avistamiento de Errante',
-        description: 'Una figura misteriosa aparece entre la niebla',
-        triggers: ['caminar', 'patrullar', 'observar'],
-        difficulty: 13,
-        success: { 
-          items: ['reliquia'], 
-          knowledge: { 'errantes': 20 }, 
-          narrative: 'El Errante te observa con curiosidad antes de desvanecerse, dejando atrás un objeto de poder.' 
-        },
-        failure: { 
-          health: -6, 
-          emotions: { miedo: 25, alerta: 40 }, 
-          narrative: 'El encuentro con el Errante te desorienta, dejándote con más preguntas que respuestas.' 
-        }
-      },
-      {
-        id: 'demonic_influence',
-        title: 'Influencia Demoníaca',
-        description: 'Las fuerzas del infierno hacen sentir su presencia',
-        triggers: ['invocar', 'ritual', 'orar'],
-        difficulty: 16,
-        success: { 
-          skills: ['exorcismo'], 
-          narrative: 'Tu fe y entrenamiento te permiten resistir la influencia demoníaca y purificar el área.' 
-        },
-        failure: { 
-          health: -12, 
-          mana: -15, 
-          emotions: { miedo: 40 }, 
-          narrative: 'Las fuerzas demoníacas te abruman, drenando tu energía espiritual y física.' 
-        }
-      }
-    ]
-  }
-};
-
-// 🧠 SISTEMA DE ANÁLISIS CONTEXTUAL DUAL
-
-// 🧠 SISTEMA DE ANÁLISIS CONTEXTUAL DUAL
-function analyzeGameContextForEvents(gameState, action, narrative) {
-  const context = {
-    mode: gameState.mode,
-    location: gameState.location || '',
-    action: action.toLowerCase(),
-    narrative: narrative.toLowerCase(),
-    themes: [],
-    restrictions: [],
-    availableEvents: []
-  };
-
-  if (gameState.mode === 'sandbox') {
-    // 🎨 ANÁLISIS CONTEXTO SANDBOX
-    const sandboxConcept = gameState.sandboxConcept || '';
-    const conceptLower = sandboxConcept.toLowerCase();
-    
-    // Detectar temática principal
-    if (conceptLower.includes('detective') || conceptLower.includes('investigar') || conceptLower.includes('misterio')) {
-      context.themes.push('detective');
-      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.detective || [];
-    } else if (conceptLower.includes('aventura') || conceptLower.includes('explorar') || conceptLower.includes('tesoro')) {
-      context.themes.push('adventure');  
-      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.adventure || [];
-    } else if (conceptLower.includes('horror') || conceptLower.includes('terror') || conceptLower.includes('miedo')) {
-      context.themes.push('horror');
-      context.availableEvents = RANDOM_EVENTS_DATABASE.sandbox.horror || [];
-    } else {
-      // Temática general - mezclar eventos apropiados
-      context.themes.push('general');
-      context.availableEvents = [
-        ...(RANDOM_EVENTS_DATABASE.sandbox.adventure || []),
-        ...(RANDOM_EVENTS_DATABASE.sandbox.detective || [])
-      ];
-    }
-    
-    // Extraer restricciones del concepto
-    if (conceptLower.includes('realista') || conceptLower.includes('sin magia')) {
-      context.restrictions.push('no_supernatural');
-    }
-    if (conceptLower.includes('moderno') || conceptLower.includes('contemporáneo')) {
-      context.restrictions.push('modern_setting');
-    }
-    
-  } else if (gameState.mode === 'campaign') {
-    // 📜 ANÁLISIS CONTEXTO CAMPAÑA
-    context.themes.push('alicante_supernatural');
-    context.availableEvents = RANDOM_EVENTS_DATABASE.campaign.alicante_supernatural || [];
-    
-    // Considerar progreso de la campaña
-    if (gameState.storyAct) {
-      context.currentAct = gameState.storyAct;
-    }
-    if (gameState.location?.toLowerCase().includes('alicante')) {
-      context.themes.push('urban_supernatural');
-    }
-  }
-  
-  console.log(`🧠 Contexto analizado: Modo=${context.mode}, Temas=[${context.themes.join(', ')}], Eventos disponibles=${context.availableEvents.length}`);
-  return context;
-}
-
-// 🎯 SISTEMA DE TRIGGERS INTELIGENTES PARA EVENTOS
-function shouldTriggerRandomEvent(gameState, action) {
-  // Incrementar contador de acciones si no existe
-  if (!gameState.actionsSinceLastEvent) {
-    gameState.actionsSinceLastEvent = 0;
-  }
-  gameState.actionsSinceLastEvent++;
-  
-  // 🎯 TRIGGER TEMPORAL: Cada 4-6 acciones (probabilístico)
-  const minActions = 4;
-  const maxActions = 6;
-  if (gameState.actionsSinceLastEvent < minActions) {
-    console.log(`🎲 Trigger temporal: ${gameState.actionsSinceLastEvent}/${minActions} acciones mínimas`);
-    return false;
-  }
-  
-  // Probabilidad creciente después del mínimo
-  const actionsSinceMin = gameState.actionsSinceLastEvent - minActions;
-  const maxWait = maxActions - minActions;
-  const probability = Math.min(0.3 + (actionsSinceMin / maxWait) * 0.4, 0.8); // 30% base, hasta 80%
-  
-  // 🎯 TRIGGER CONTEXTUAL: Ciertas acciones aumentan probabilidad
-  const contextualTriggers = ['explorar', 'investigar', 'caminar', 'buscar', 'examinar', 'preguntar', 'observar'];
-  const hasContextualTrigger = contextualTriggers.some(trigger => action.toLowerCase().includes(trigger));
-  
-  let finalProbability = probability;
-  if (hasContextualTrigger) {
-    finalProbability += 0.2; // +20% por acción contextual
-  }
-  
-  // 🎯 TRIGGER DE UBICACIÓN: Ciertos lugares aumentan probabilidad
-  const location = gameState.location?.toLowerCase() || '';
-  const dangerousLocations = ['bosque', 'cueva', 'ruinas', 'cementerio', 'callejón', 'sótano'];
-  const isDangerousLocation = dangerousLocations.some(loc => location.includes(loc));
-  
-  if (isDangerousLocation) {
-    finalProbability += 0.15; // +15% en ubicaciones peligrosas
-  }
-  
-  finalProbability = Math.min(finalProbability, 0.9); // Máximo 90%
-  
-  const roll = Math.random();
-  const shouldTrigger = roll < finalProbability;
-  
-  console.log(`🎲 Trigger check: ${gameState.actionsSinceLastEvent} acciones | Contextual: ${hasContextualTrigger} | Ubicación: ${isDangerousLocation} | Probabilidad: ${(finalProbability*100).toFixed(1)}% | Roll: ${(roll*100).toFixed(1)}% | Resultado: ${shouldTrigger ? 'TRIGGER' : 'NO'}`);
-  
-  if (shouldTrigger) {
-    gameState.actionsSinceLastEvent = 0; // Reset contador
-  }
-  
-  return shouldTrigger;
-}
-
-// 🎯 SISTEMA DE FILTRADO DE EVENTOS CONTEXTUALES
-function filterEventsForContext(context) {
-  if (!context.availableEvents || context.availableEvents.length === 0) {
-    return [];
-  }
-  
-  let filteredEvents = context.availableEvents.filter(event => {
-    // Verificar si algún trigger coincide con la acción actual
-    const actionMatch = event.triggers.some(trigger => 
-      context.action.includes(trigger) || context.narrative.includes(trigger)
-    );
-    
-    if (!actionMatch) return false;
-    
-    // Aplicar restricciones de sandbox si existen
-    if (context.restrictions.includes('no_supernatural') && 
-        (event.id.includes('supernatural') || event.id.includes('demonic'))) {
-      return false;
-    }
-    
-    return true;
-  });
-  
-  console.log(`🎯 Eventos filtrados: ${filteredEvents.length} de ${context.availableEvents.length} disponibles`);
-  return filteredEvents;
-}
-
-// 🎲 SISTEMA D20 + APLICACIÓN DE CONSECUENCIAS
-function rollD20AndApplyConsequences(event, gameState) {
-  const roll = Math.floor(Math.random() * 20) + 1;
-  const success = roll >= event.difficulty;
-  
-  console.log(`🎲 Evento: ${event.title} | Dificultad: ${event.difficulty} | Dado: ${roll} | Resultado: ${success ? 'ÉXITO' : 'FRACASO'}`);
-  
-  const consequence = success ? event.success : event.failure;
-  let eventNarrative = consequence.narrative;
-  
-  // Aplicar consecuencias al gameState
-  if (consequence.health) {
-    gameState.vitals.health = Math.max(0, Math.min(100, gameState.vitals.health + consequence.health));
-    console.log(`💗 Salud actualizada: ${gameState.vitals.health}`);
-  }
-  if (consequence.mana) {
-    gameState.vitals.mana = Math.max(0, Math.min(100, gameState.vitals.mana + consequence.mana));
-    console.log(`💙 Maná actualizado: ${gameState.vitals.mana}`);
-  }
-  if (consequence.stamina) {
-    gameState.vitals.stamina = Math.max(0, Math.min(100, gameState.vitals.stamina + consequence.stamina));
-    console.log(`💚 Stamina actualizada: ${gameState.vitals.stamina}`);
-  }
-  if (consequence.gold) {
-    gameState.resources.gold = Math.max(0, gameState.resources.gold + consequence.gold);
-    console.log(`💰 Oro actualizado: ${gameState.resources.gold}`);
-  }
-  if (consequence.emotions) {
-    Object.entries(consequence.emotions).forEach(([emotion, value]) => {
-      gameState.updateEmotionalState(emotion, value);
-    });
-  }
-  if (consequence.items) {
-    consequence.items.forEach(itemType => {
-      const item = ITEM_DATABASE.find(dbItem => dbItem.type === itemType);
-      if (item) {
-        const newItem = {
-          name: item.type,
-          icon: item.icon,
-          type: item.type,
-          description: generateContextualDescription(item.type, item.type),
-          rarity: success ? 'rare' : 'common',
-          source: 'random_event',
-          instanceId: crypto.randomUUID()
-        };
-        gameState.inventory.push(newItem);
-        console.log(`🎁 Item de evento añadido: ${newItem.name} ${newItem.icon}`);
-      }
-    });
-  }
-  if (consequence.skills) {
-    consequence.skills.forEach(skillId => {
-      const existingSkill = gameState.skills.find(s => s.id === skillId);
-      if (existingSkill) {
-        existingSkill.level += 1;
-      } else {
-        gameState.skills.push({
-          id: skillId,
-          level: 1,
-          tags: ['evento'],
-          description: `Habilidad adquirida durante evento: ${event.title}`
-        });
-      }
-      console.log(`⭐ Habilidad de evento: ${skillId}`);
-    });
-  }
-  
-  return {
-    success,
-    roll,
-    event,
-    narrative: eventNarrative,
-    appliedConsequences: consequence
-  };
-}
+// 🧠 OPCIÓN 4: ANÁLISIS INICIAL DE SANDBOX CONCEPT
 function analyzeSandboxConcept(concept) {
   console.log(`🧠 Analizando sandbox concept: "${concept}"`);
   
@@ -508,8 +166,8 @@ const INTELLIGENT_LOOT = {
   ]
 };
 
-function rollIntelligentLoot(gameState, action, narrative, quality = 'common') {
-  console.log(`🎯 Generando loot inteligente con calidad: ${quality}...`);
+function rollIntelligentLoot(gameState, action, narrative) {
+  console.log(`🎯 Generando loot inteligente...`);
   
   // Detectar contextos
   const narrativeContexts = detectNarrativeContext(narrative, action);
@@ -535,27 +193,13 @@ function rollIntelligentLoot(gameState, action, narrative, quality = 'common') {
   
   console.log(`🎯 Categoría seleccionada: ${selectedCategory}`);
   
-  // Generar item - MEJORADO CON SISTEMA DE CALIDAD
+  // Generar item
   const lootTable = INTELLIGENT_LOOT[selectedCategory] || INTELLIGENT_LOOT.exploration;
-  
-  // 🎯 FILTRAR POR CALIDAD
-  let filteredLoot = lootTable;
-  if (quality === 'rare') {
-    // Para items raros, preferir items con mayor peso (más valiosos)
-    filteredLoot = lootTable.filter(item => item.weight >= 15);
-    if (filteredLoot.length === 0) filteredLoot = lootTable; // Fallback
-  } else if (quality === 'epic') {
-    // Para items épicos, preferir los más pesados y añadir prefijos especiales
-    filteredLoot = lootTable.filter(item => item.weight >= 20);
-    if (filteredLoot.length === 0) filteredLoot = lootTable.filter(item => item.weight >= 15);
-    if (filteredLoot.length === 0) filteredLoot = lootTable; // Fallback
-  }
-  
-  const totalWeight = filteredLoot.reduce((sum, item) => sum + item.weight, 0);
+  const totalWeight = lootTable.reduce((sum, item) => sum + item.weight, 0);
   let randomWeight = Math.random() * totalWeight;
   
   let selectedItem = null;
-  for (const item of filteredLoot) {
+  for (const item of lootTable) {
     if (randomWeight < item.weight) {
       selectedItem = item;
       break;
@@ -563,152 +207,41 @@ function rollIntelligentLoot(gameState, action, narrative, quality = 'common') {
     randomWeight -= item.weight;
   }
   
-  if (!selectedItem) selectedItem = filteredLoot[0];
-  
-  // 🌟 APLICAR MODIFICADORES DE CALIDAD AL NOMBRE
-  let finalName = selectedItem.name;
-  if (quality === 'rare') {
-    const rarePrefixes = ['Refinado', 'Resistente', 'Mejorado', 'Superior', 'Excelente'];
-    const randomPrefix = rarePrefixes[Math.floor(Math.random() * rarePrefixes.length)];
-    finalName = `${randomPrefix} ${selectedItem.name}`;
-  } else if (quality === 'epic') {
-    const epicPrefixes = ['Legendario', 'Encantado', 'Mágico', 'Perfecto', 'Ancestral'];
-    const randomPrefix = epicPrefixes[Math.floor(Math.random() * epicPrefixes.length)];
-    finalName = `${randomPrefix} ${selectedItem.name}`;
-  }
+  if (!selectedItem) selectedItem = lootTable[0];
   
   const finalItem = {
-    name: finalName,
+    name: selectedItem.name,
     icon: selectedItem.icon,
     type: selectedCategory,
-    description: `${finalName} encontrado durante la exploración`,
-    rarity: quality,
+    description: `${selectedItem.name} encontrado durante la exploración`,
+    rarity: 'common',
     source: 'dynamic_intelligent',
     contexts: allContexts,
     instanceId: crypto.randomUUID()
   };
   
-  console.log(`🎁 LOOT GENERADO: ${finalItem.name} ${finalItem.icon} (${selectedCategory}, ${quality})`);
+  console.log(`🎁 LOOT GENERADO: ${finalItem.name} ${finalItem.icon} (${selectedCategory})`);
   return finalItem;
-}
-
-// 🎯 NUEVA FUNCIÓN - EXTRACCIÓN DE ITEMS ESPECÍFICOS DEL LLM (OPCIÓN E)
-function extractSpecificItemsFromLLMNarrative(narrativeText) {
-  console.log('🔍 EXTRAYENDO ITEMS ESPECÍFICOS DE NARRATIVA LLM...');
-  
-  if (!narrativeText) return [];
-  
-  const extractedItems = [];
-  const text = narrativeText.toLowerCase();
-  
-  // Patrones para detectar items mencionados específicamente
-  const itemPatterns = [
-    /(?:encuentra[s]?|descubr[ie]s?|h[ae]llas?|observas?|ves?)\s+(?:un[ao]?|el|la)?\s*([^.!?,]+?)(?:\s+(?:en|sobre|bajo|dentro))/gi,
-    /(?:hay|existe|aparece)\s+(?:un[ao]?|el|la)?\s*([^.!?,:]+?)(?:\s+(?:que|en|sobre))/gi,
-    /(?:un[ao]?|el|la)\s+([^.!?,\s]+(?:\s+[^.!?,\s]+)*?)\s+(?:se encuentra|está|yace)/gi,
-    /,\s*(?:un[ao]?|el|la)\s+([^.!?,]+?)(?:,|\s+y\s+|\.|$)/gi
-  ];
-  
-  for (const pattern of itemPatterns) {
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      const potentialItem = match[1].trim();
-      
-      // Filtrar items válidos
-      if (potentialItem.length > 2 && potentialItem.length < 50) {
-        // Verificar si es un item físico usando keywords existentes
-        const physicalKeywords = ITEM_DATABASE.flatMap(item => item.keywords);
-        const hasPhysicalKeyword = physicalKeywords.some(keyword => 
-          potentialItem.includes(keyword.toLowerCase())
-        );
-        
-        if (hasPhysicalKeyword || 
-            /\b(libro|diario|pistola|hacha|espada|daga|amuleto|anillo|pergamino|frasco|cristal|gema|llave|documento)\b/.test(potentialItem)) {
-          
-          // Determinar tipo de item
-          let itemType = 'exploration';
-          let itemIcon = '📦';
-          
-          if (/(libro|diario|pergamino|documento|tomo|grimorio)/.test(potentialItem)) {
-            itemType = 'knowledge';
-            itemIcon = '📖';
-          } else if (/(pistola|hacha|espada|daga|arma)/.test(potentialItem)) {
-            itemType = 'combat';
-            itemIcon = '⚔️';
-          } else if (/(amuleto|anillo|cristal|gema|reliquia)/.test(potentialItem)) {
-            itemType = 'mystical';
-            itemIcon = '🔮';
-          } else if (/(frasco|poción|elixir)/.test(potentialItem)) {
-            itemType = 'mystical';
-            itemIcon = '🧪';
-          }
-          
-          // Capitalizar nombre
-          const itemName = potentialItem.charAt(0).toUpperCase() + potentialItem.slice(1);
-          
-          extractedItems.push({
-            name: itemName,
-            icon: itemIcon,
-            type: itemType,
-            description: `${itemName} encontrado durante la exploración`,
-            rarity: 'common',
-            source: 'llm_narrative',
-            contexts: [itemType],
-            instanceId: crypto.randomUUID()
-          });
-          
-          console.log(`✅ ITEM EXTRAÍDO DE LLM: ${itemName} (${itemType})`);
-        }
-      }
-    }
-  }
-  
-  // Eliminar duplicados
-  const uniqueItems = extractedItems.filter((item, index, arr) => 
-    arr.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase()) === index
-  );
-  
-  console.log(`🎯 ITEMS EXTRAÍDOS DEL LLM: ${uniqueItems.length} items únicos`);
-  return uniqueItems;
 }
 
 const app = express();
 const server = createServer(app);
-
-// Middleware - CORS LIMPIO SEGÚN CHATGPT
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN  
-                     || 'https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com';
-
-console.log('🌐 FRONTEND_ORIGIN configurado:', FRONTEND_ORIGIN);
-
-// Socket.IO CORS con origen específico
 const io = new Server(server, {
   cors: {
-    origin: FRONTEND_ORIGIN,     // ← SIN wildcard, origen específico
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true
-  },
-  transports: ['websocket', 'polling'],
-  allowEIO3: true
+  }
 });
 
-// REST API CORS con origen específico
+// Middleware - CORS LIBERAL PARA DEBUGGING
 app.use(cors({
-  origin: FRONTEND_ORIGIN,       // ← SIN wildcard, origen específico
+  origin: true,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Accept', 'Origin']
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// ❌ ELIMINADOS: Headers manuales conflictivos (ChatGPT solution)
-// Ya no necesitamos esto porque cors() maneja todo automáticamente
 app.use(express.json());
-
-// Middleware de debugging para todas las rutas
-app.use((req, res, next) => {
-  console.log(`🌐 ${req.method} ${req.path} - Origin: ${req.headers.origin || 'no-origin'}`);
-  next();
-});
 
 // MongoDB setup
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/';
@@ -946,7 +479,6 @@ class GameState {
     
     this.location = "Punto de Inicio";
     this.inventory = [];
-    this.discoveredItems = []; // 🎁 SISTEMA DISCOVERED ITEMS
     this.narrativeLog = [];
     this.mode = 'sandbox';
     this.campaignMeta = null;
@@ -1005,7 +537,6 @@ class GameState {
       
       location: this.location,
       inventory: this.inventory,
-      discoveredItems: this.discoveredItems || [], // 🎁 SISTEMA DISCOVERED ITEMS
       narrativeLog: this.narrativeLog,
       mode: this.mode,
       campaignMeta: this.campaignMeta,
@@ -1762,24 +1293,15 @@ Crea una narrativa inicial inmersiva (máximo 4 oraciones) en segunda persona qu
 Responde SOLO con la narrativa, sin explicaciones.
 `;
 
-    try {
-      const conceptResponse = await Promise.race([
-        openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [{ role: "user", content: conceptPrompt }],
-          temperature: 0.8,
-          max_tokens: 200
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('OpenAI timeout')), 15000)
-        )
-      ]);
-      initialNarrative = conceptResponse.choices[0].message.content || fallbackNarrative;
-    } catch (error) {
-      console.log("⚠️ OpenAI timeout o error, usando narrativa rápida:", error.message);
-      initialNarrative = `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
-    }
+      const conceptResponse = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: conceptPrompt }],
+        temperature: 0.8,
+        max_tokens: 200
+      });
 
+      initialNarrative = conceptResponse.choices[0].message.content || 
+        `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
         
     } else if (mode === 'campaign') {
       // Handle campaign mode with full loading
@@ -1877,54 +1399,6 @@ app.post('/api/free_input', async (req, res) => {
       });
     }
     
-    function generateSandboxRestrictions(sandboxConcept) {
-      if (!sandboxConcept) return '- Sin restricciones específicas';
-      
-      const concept = sandboxConcept.toLowerCase();
-      let restrictions = [];
-      
-      // Detectar temas y aplicar restricciones correspondientes
-      if (concept.includes('real') || concept.includes('realista') || concept.includes('sin magia') || 
-          concept.includes('sin sobrenatural') || concept.includes('normal') || concept.includes('mundano')) {
-        restrictions.push('- NO incluir magia, hechizos, poderes sobrenaturales o elementos fantásticos');
-        restrictions.push('- Mantener todo realista y creíble en el mundo real');
-        restrictions.push('- Las acciones sugeridas deben ser realistas y posibles para un humano normal');
-      }
-      
-      if (concept.includes('moderno') || concept.includes('contemporáneo') || concept.includes('actual')) {
-        restrictions.push('- Ambientación moderna/contemporánea (tecnología actual)');
-        restrictions.push('- No incluir elementos medievales o anacronismos');
-      }
-      
-      if (concept.includes('pacífico') || concept.includes('sin violencia') || concept.includes('tranquilo')) {
-        restrictions.push('- Evitar violencia, combates o situaciones agresivas');
-        restrictions.push('- Enfocarse en resolución pacífica de conflictos');
-      }
-      
-      if (concept.includes('serio') || concept.includes('profesional') || concept.includes('formal')) {
-        restrictions.push('- Mantener tono serio y profesional');
-        restrictions.push('- Evitar humor o situaciones cómicas');
-      }
-      
-      if (concept.includes('investigación') || concept.includes('detective') || concept.includes('misterio')) {
-        restrictions.push('- Enfocarse en pistas, deducciones y metodología investigativa');
-        restrictions.push('- Las acciones deben ser propias de un investigador o detective');
-      }
-      
-      if (concept.includes('urbano') || concept.includes('ciudad') || concept.includes('metropolitano')) {
-        restrictions.push('- Mantener ambientación urbana/citadina');
-        restrictions.push('- No incluir elementos rurales o salvajes sin justificación');
-      }
-      
-      // Si no se detectan restricciones específicas, dar flexibilidad
-      if (restrictions.length === 0) {
-        restrictions.push('- Respetar el tono y tema general del concepto proporcionado');
-        restrictions.push('- Mantener coherencia con la visión original del usuario');
-      }
-      
-      return restrictions.join('\n');
-    }
-    
     // Create enhanced system prompt following Sombra Arcana DM v2.0
     let campaignContext = '';
     
@@ -1963,9 +1437,6 @@ SESGO DE TONO ACTUAL: ${gameState.toneBias} (-5=luminoso, +5=oscuro)
 - Los stats y habilidades emergen orgánicamente
 - Tono natural y adaptativo
 - LAS ACCIONES PELIGROSAS PUEDEN SER MORTALES
-
-RESTRICCIONES IMPORTANTES DEL CONCEPTO SANDBOX:
-${generateSandboxRestrictions(gameState.sandboxConcept)}
 `;
     }
     
@@ -2123,8 +1594,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     const detectMultipleItems = (action) => {
       const items = [];
       
-      // 🎯 REGEX CONTEXTUAL SIMPLE Y EFECTIVO - INCLUYE GUARDAR
-      const contextualPattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger|guardo|guardaba|guardar|me quedo)\s+(?:un[ae]?|el|la|los|las)?\s*(.+)/gi;
+      // 🎯 REGEX CONTEXTUAL SIMPLE Y EFECTIVO
+      const contextualPattern = /\b(?:agarro|agarré|recojo|recogí|tomo|tomé|encuentro|encontré|consigo|conseguí|robo|robé|robaba|cogí|coger)\s+(?:un[ae]?|el|la|los|las)?\s*(.+)/gi;
       
       let match;
       while ((match = contextualPattern.exec(action)) !== null) {
@@ -2198,11 +1669,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       console.log(`🔍 KEYWORDS DINÁMICAS DISPONIBLES: ${allKeywords.length} total`);
       
       const lowerText = text.toLowerCase();
-      // 🔧 USAR WORD BOUNDARIES PARA EVITAR FALSOS POSITIVOS (ej: "daga" dentro de "desgastada")
-      return allKeywords.some(keyword => {
-        const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'i');
-        return regex.test(lowerText);
-      });
+      return allKeywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
     };
     
     // 📊 CALCULAR OVERLAP DE PALABRAS PARA DETECTAR DUPLICADOS
@@ -2404,578 +1871,41 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       state_changes: stateChanges
     });
     
-    
-    // 🎯 FUNCIÓN: SEPARAR ITEMS COMPUESTOS CONECTADOS POR CONJUNCIONES
-    function splitCompoundItems(itemText) {
-      if (!itemText || typeof itemText !== 'string') return [itemText];
-      
-      // Separar por conjunciones comunes según ChatGPT
-      const separators = [' y ', ' e ', ' y el ', ' y la ', ' e el ', ' e la ', ' y junto ', ' con ', ', y ', ',', ';'];
-      let items = [itemText];
-      
-      separators.forEach(separator => {
-        let newItems = [];
-        items.forEach(item => {
-          if (item.includes(separator)) {
-            const parts = item.split(separator);
-            newItems.push(...parts.map(part => part.trim()));
-          } else {
-            newItems.push(item);
-          }
-        });
-        items = newItems;
-      });
-      
-      // Limpiar items vacíos o demasiado cortos
-      const cleanedItems = items
-        .map(item => item.trim())
-        .filter(item => item.length > 2 && !['el', 'la', 'un', 'una', 'de', 'del', 'y', 'e', 'con', 'junto'].includes(item.toLowerCase()));
-      
-      console.log(`🔧 splitCompoundItems: "${itemText}" → [${cleanedItems.join(', ')}]`);
-      return cleanedItems;
-    }
-    
-    // 🔧 FUNCIÓN: DETECCIÓN INTELIGENTE DE ITEMS EN NARRATIVA
-    function extractItemsFromNarrative(narrative) {
-      console.log('📖 Analizando narrativa para detectar items...');
-      
-      // 🔧 ARREGLO CHATGPT: Procesar solo las últimas 2 frases para evitar ítems fantasma
-      const sentences = narrative?.trim()?.split(/[.!?]+/) || [];
-      const lastTwoSentences = sentences.slice(-2).join('. ').trim();
-      console.log(`📝 CHATGPT FIX - Procesando últimas 2 frases: "${lastTwoSentences}"`);
-      
-      // 🔧 VALIDACIÓN: Si no hay frases, no procesar
-      if (!lastTwoSentences || lastTwoSentences.length < 5) {
-        console.log('❌ No hay frases válidas para procesar');
-        return { foundItems: [], alreadyPickedItems: [] };
-      }
-      // 🔧 TRY/CATCH CHATGPT: Evitar crashes por regex errors
-      try {
-      
-      const patterns = [
-        // 🔍 PATRONES NON-GREEDY CON LOOK-AHEAD (CHATGPT SOLUTION)
-        /encuentras?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /descubres?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /hallas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /ves?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /hay\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /aparece\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /observas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /localizas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /notas?\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi,
-        /(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])\s+(?:sobre|en|bajo|dentro de|junto a)/gi,
-        /se encuentra\s+(?:un(?:a)?s?|el|la|los|las)\s+(.+?)(?=\s+(?:y|e|o)\s+(?:un(?:a)?s?|el|la|los|las)\s+|[,.!?])/gi
-      ];
-      
-      // 🎁 PATRONES REFINADOS Y FLEXIBLES PARA AUTO-PICK (CHATGPT SOLUTION V2)
-      const alreadyPickedPatterns = [
-        // Admite infinitivo, primera persona o imperativo; artículo opcional; plural/singular
-        /\b(?:agarra(?:r|s|mos)?|toma(?:r|s|mos)?|coge(?:r|s|mos)?|recoge(?:r|s|mos)?|guarda(?:r|s|mos)?|meta(?:r|s|mos)?)\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi,
-        // Expresiones de decisión directa más flexibles
-        /\b(?:decido|decides|decidimos)\s+(?:que\s+)?(?:me|nos)?\s*(?:quedo|quedamos|quedare|quedaremos)\s+con\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi,
-        // Patrones de posesión actuales
-        /\b(?:llevo|cargo|porto|tengo)\s+(?:el|la|los|las|un|una|unos|unas)?\s*([^,.!?]+)/gi
-      ];
-      
-      let foundItems = [];
-      let alreadyPickedItems = [];
-      
-      // 🔍 PROCESAR PATRONES DE ITEMS DISPONIBLES (para discovered items)
-      patterns.forEach((pattern, index) => {
-        let match;
-        while ((match = pattern.exec(lastTwoSentences)) !== null) {
-          // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
-          let itemName = '';
-          
-          // Para los nuevos patrones non-greedy, el item está en la posición 1
-          if (index < 10) {
-            // 🔧 ARREGLO CHATGPT: Validar que match[1] existe antes de trim() (NUEVO REGEX)
-            itemName = match[1] ? match[1].trim() : '';
-          } else {
-            // Para el último patrón es diferente
-            // 🔧 ARREGLO CHATGPT: Validar que match[1] existe antes de trim()
-            itemName = match[1] ? match[1].trim() : '';
-          }
-          
-          // 🔧 FILTRO CHATGPT: Evitar items vacíos
-          if (!itemName || itemName.length === 0) {
-            console.log(`⚠️ Item vacío detectado, saltando...`);
-            continue;
-          }
-          
-          // Limpiar y validar el item
-          itemName = itemName.replace(/[,\.!?;]$/, '').trim();
-          
-          // Filtrar palabras demasiado cortas o genéricas
-          if (itemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(itemName.toLowerCase()) && itemName.length < 30 && !itemName.includes("mientras") && !itemName.includes("que se") && !itemName.includes("de la")) {
-            
-            // 🎯 NUEVO: CONVERTIR TEXTO A ITEM REAL DE DATABASE
-            const realItem = convertTextToRealItem(itemName);
-            if (realItem) {
-              foundItems.push(realItem);
-              console.log(`🔍 Item disponible detectado: ${realItem.name} ${realItem.icon}`);
-            } else {
-              console.log(`❌ Item no reconocido: "${itemName}"`);
-            }
-          }
-        }
-      });
-      
-      // 🔍 PROCESAR PATRONES DE ITEMS YA RECOGIDOS (para autopick)
-      alreadyPickedPatterns.forEach((pattern, index) => {
-        let match;
-        while ((match = pattern.exec(lastTwoSentences)) !== null) {
-          // Extraer el nombre del item - SIMPLIFICADO (CHATGPT SOLUTION)
-          let itemName2 = '';
-          
-          // Los nuevos patrones todos capturan en el primer grupo disponible
-          for (let i = 1; i < match.length; i++) {
-            if (match[i] && typeof match[i] === 'string' && match[i].trim()) {
-              itemName2 = match[i].trim();
-              break;
-            }
-          }
-          
-          // Limpiar y validar el item - REFINADO SEGÚN CHATGPT
-          const raw = itemName2.trim()
-                              .split(/[,;.]/)[0]          // corta en coma/punto
-                              .replace(/\s+(de|con|en|que|durante|mientras|porque|para)\s+.*/i,'') // corta en preposiciones
-                              .trim();
-          itemName2 = raw;
-          
-          // 🎯 NUEVA FUNCIÓN: SEPARAR ITEMS COMPUESTOS
-          const individualItems = splitCompoundItems(itemName2);
-          console.log(`🔍 Items compuestos separados: "${itemName2}" → [${individualItems.join(', ')}]`);
-          
-          individualItems.forEach(singleItemName => {
-            // Filtrar palabras demasiado cortas o genéricas
-            if (singleItemName.length > 3 && !["lugar", "sitio", "cosa", "algo", "esto", "habitación", "sala", "lugar", "ambiente", "aire", "sonido", "ruido", "sensación", "momento", "instante"].includes(singleItemName.toLowerCase()) && singleItemName.length < 30 && !singleItemName.includes("mientras") && !singleItemName.includes("que se") && !singleItemName.includes("de la")) {
-              
-              // 🎯 CONVERTIR TEXTO A ITEM REAL CON CANONICAL NAME (CHATGPT SOLUTION)
-              const realItem = convertTextToRealItem(singleItemName);
-              if (realItem) {
-                // Usar canonical name para evitar duplicaciones
-                const canonicalId = canonicalName(realItem.name);
-                const itemWithCanonical = {
-                  ...realItem,
-                  canonicalId: canonicalId
-                };
-                alreadyPickedItems.push(itemWithCanonical);
-                console.log(`🎁 Item ya recogido detectado: ${realItem.name} ${realItem.icon} (canonical: ${canonicalId})`);
-                console.log(`[AUTO-PICK] añadido "${realItem.name}" al inventario para session ${gameState.sessionId}`); // AÑADIDO SEGÚN CHATGPT STEP 1.4
-              } else {
-                console.log(`❌ Item ya recogido no reconocido: "${singleItemName}"`);
-              }
-            }
-          });
-        }
-      });
-      
-      // Eliminar duplicados para items disponibles
-      const uniqueItems = foundItems.filter((item, index, self) => 
-        index === self.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase())
-      );
-      
-      // Eliminar duplicados para items ya recogidos
-      const uniquePickedItems = alreadyPickedItems.filter((item, index, self) => 
-        index === self.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase())
-      );
-      
-      console.log(`📦 Items disponibles extraídos: ${uniqueItems.length > 0 ? uniqueItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
-      console.log(`🎁 Items ya recogidos extraídos: ${uniquePickedItems.length > 0 ? uniquePickedItems.map(i => `${i.name} ${i.icon}`).join(', ') : 'ninguno'}`);
-      
-      return {
-        availableItems: uniqueItems,
-        alreadyPickedItems: uniquePickedItems
-      };
-      
-      } catch (error) {
-        console.error(`❌ Error en extractItemsFromNarrative: ${error.message}`);
-        return { foundItems: [], alreadyPickedItems: [] };
-      }
-    }
-    
-    // 🎯 NUEVA FUNCIÓN: CONVERTIR TEXTO DE NARRATIVA A ITEM REAL
-    function convertTextToRealItem(itemText) {
-      const textLower = itemText.toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
-        .replace(/[^a-z0-9áéíóúüñ\s]/g, ' ') // quita símbolos pero mantiene espacios
-        .replace(/\b(el|la|los|las|un|una|unos|unas|del|de|y|junto|junto del|con)\b/g, ' ') // quita artículos y conectores
-        .replace(/\s+/g, ' ') // normaliza espacios múltiples
-        .trim();
-      
-      console.log(`🪄 Text→Item: "${itemText}" → normalizado: "${textLower}"`);
-      
-      // 🚫 FILTRO DE PORTABILIDAD: Items que NO se pueden llevar
-      const nonPortableKeywords = [
-        'mapa muy grande', 'mapa grande', 'mapa enorme', 'mapa gigante',
-        'edificio', 'casa', 'puerta', 'ventana', 'pared', 'suelo', 'techo',
-        'mesa grande', 'escritorio grande', 'armario', 'estantería',
-        'árbol', 'roca grande', 'piedra grande', 'estatua grande',
-        'fuente', 'pozo', 'columna', 'pilar', 'escalera', 'escalón'
-      ];
-      
-      for (const nonPortable of nonPortableKeywords) {
-        if (textLower.includes(nonPortable)) {
-          console.log(`🚫 Item NO portable detectado: "${itemText}" (keyword: "${nonPortable}")`);
-          return null; // No es portable
-        }
-      }
-      
-      // Evaluar tamaño por contexto
-      if (textLower.includes('muy grande') || textLower.includes('enorme') || 
-          textLower.includes('gigante') || textLower.includes('masivo')) {
-        console.log(`🚫 Item demasiado grande: "${itemText}"`);
-        return null;
-      }
-      
-      // Buscar en ITEM_DATABASE por keywords - ANCLAS PALABRA COMPLETA (CHATGPT FIX)
-      for (const dbItem of ITEM_DATABASE) {
-        for (const keyword of dbItem.keywords) {
-          const normalizedKeyword = keyword.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          
-          // 🔧 CHATGPT FIX: Anclas de palabra completa \b + requiere artículo
-          const wordBoundaryPattern = new RegExp(`\\b(?:un(?:a|o)?|el|la|los|las)\\s+${normalizedKeyword}\\b`, 'i');
-          const simpleWordPattern = new RegExp(`\\b${normalizedKeyword}\\b`, 'i');
-          
-          if (wordBoundaryPattern.test(textLower) || simpleWordPattern.test(textLower)) {
-            console.log(`✅ Match encontrado: "${itemText}" → ${dbItem.type} (keyword: "${keyword}") - WORD BOUNDARY`);
-            
-            const foundItem = {
-              name: itemText, // Usar nombre original de la narrativa
-              icon: dbItem.icon,
-              type: dbItem.type,
-              description: generateContextualDescription(itemText, dbItem.type),
-              rarity: 'common',
-              source: 'narrative_extraction',
-              instanceId: crypto.randomUUID()
-            };
-            
-            console.log(`🪄 Text→Item resultado: ${foundItem.name} → ${foundItem.type} ${foundItem.icon}`);
-            return foundItem;
-          }
-        }
-      }
-      
-      console.log(`🪄 Text→Item: "${itemText}" → NO ENCONTRADO`);
-      return null; // No se encontró match
-    }
-    
-    // 🎯 NUEVA FUNCIÓN: GENERAR DESCRIPCIONES CONTEXTUALES ÚTILES
-    function generateContextualDescription(itemName, itemType) {
-      const nameLower = itemName.toLowerCase();
-      
-      // Descripciones específicas por tipo de item
-      if (itemType === 'revolver' || itemType === 'daga' || itemType === 'arco') {
-        return `Un arma que podría ser útil para defenderte en situaciones peligrosas.`;
-      }
-      
-      if (itemType === 'libro' || itemType === 'pergamino') {
-        return `Podría contener información valiosa o conocimientos importantes.`;
-      }
-      
-      if (itemType === 'diario') {
-        return `Un registro personal que podría revelar secretos o información crucial.`;
-      }
-      
-      if (itemType === 'frasco_cristal') {
-        return `Un recipiente de cristal que podría contener algo valioso o misterioso.`;
-      }
-      
-      if (itemType === 'llave') {
-        return `Probablemente abre algo importante en esta área.`;
-      }
-      
-      if (itemType === 'poción' || itemType === 'bebida') {
-        return `Un líquido que podría tener efectos beneficiosos si lo consumes.`;
-      }
-      
-      if (itemType === 'moneda' || itemType === 'gema') {
-        return `Tiene valor monetario y podría ser útil para intercambios.`;
-      }
-      
-      if (itemType === 'anillo' || itemType === 'collar') {
-        return `Una pieza de joyería que podría tener valor o significado especial.`;
-      }
-      
-      if (itemType === 'metal') {
-        return `Material resistente que podría servir como herramienta o arma improvisada.`;
-      }
-      
-      // Descripción genérica pero útil
-      return `Un objeto que encontraste y que podría ser útil en tu aventura.`;
-    }
-    
-    // 🔧 FUNCIÓN: GENERAR PREGUNTA NARRATIVA PARA ITEMS REALES
-    function generateItemChoiceNarrative(items) {
-      if (items.length === 0) return '';
-      
-      // Añadir items a discoveredItems para que aparezcan en la UI
-      if (!gameState.discoveredItems) gameState.discoveredItems = [];
-      
-      items.forEach(item => {
-        // Verificar anti-duplicados
-        const existsInInventory = gameState.inventory.some(invItem => 
-          invItem.name.toLowerCase() === item.name.toLowerCase()
-        );
-        const existsInDiscovered = gameState.discoveredItems.some(discItem => 
-          discItem.name.toLowerCase() === item.name.toLowerCase()
-        );
-        
-        if (!existsInInventory && !existsInDiscovered) {
-          gameState.discoveredItems.push(item);
-          console.log(`🎁 Item de narrativa añadido a discovered: ${item.name} ${item.icon}`);
-        }
-      });
-      
-      const phrases = [
-        'Encuentras varios objetos interesantes.',
-        'Descubres algunos items que podrían ser útiles.',
-        'Hay varios objetos que llaman tu atención.',
-        'Observas algunos items que podrían interesarte.',
-        'Localizas varios objetos durante tu búsqueda.'
-      ];
-      
-      const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      return ` ${randomPhrase}`;
-    }
-    
-    // 🎁 PASO 0: EXTRAER TODOS LOS CANDIDATOS Y REORDENAR FLUJO (CHATGPT SOLUTION)
-    console.log(`🔍 PASO 0: Extrayendo candidatos de narrativa y acción para procesamiento ordenado...`);
-    
-    // CHATGPT FIX: Analizar SOLO la narrativa final para sincronización
-    console.log(`🔍 SISTEMA DETECTIVO DESACTIVADO - Solo usando rollIntelligentLoot()`);
-    
-    // const narrativeExtraction = extractItemsFromNarrative(narrative);
-    const narrativeExtraction = { availableItems: [], alreadyPickedItems: [] }; // DESACTIVADO
-    const allCandidates = [
-      ...(narrativeExtraction.availableItems || []),
-      ...(narrativeExtraction.alreadyPickedItems || [])
-    ];
-    
-    console.log(`📦 CANDIDATOS TOTALES EXTRAÍDOS: ${allCandidates.length} items`);
-    
-    // 🎯 PASO 0A: PROCESAR DISCOVERED ITEMS PRIMERO (CHATGPT SOLUTION - PRIORIDAD AL MODAL)
-    const candidatesForDiscovered = narrativeExtraction.availableItems || [];
-    if (candidatesForDiscovered.length > 0) {
-      console.log(`🎁 DISCOVERED ITEMS DETECTADOS: ${candidatesForDiscovered.length} items para modal`);
-      
-      // Añadir a discoveredItems para que aparezcan en modal
-      if (!gameState.discoveredItems) gameState.discoveredItems = [];
-      
-      candidatesForDiscovered.forEach(item => {
-        const existsInInventory = gameState.inventory.some(invItem => 
-          invItem.name.toLowerCase() === item.name.toLowerCase()
-        );
-        const existsInDiscovered = gameState.discoveredItems.some(discItem => 
-          discItem.name.toLowerCase() === item.name.toLowerCase()
-        );
-        
-        if (!existsInInventory && !existsInDiscovered) {
-          gameState.discoveredItems.push(item);
-          console.log(`🎁 Item añadido a discovered para modal: ${item.name} ${item.icon}`);
-        }
-      });
-    }
-    
-    // 🎯 PASO 0B: PROCESAR AUTO-PICK DESPUÉS (CHATGPT SOLUTION - SECUNDARIO)
-    const alreadyPickedItems = narrativeExtraction.alreadyPickedItems || [];
-    if (alreadyPickedItems.length > 0) {
-      console.log(`🤖 AUTO-PICK DETECTADO: ${alreadyPickedItems.length} items para inventario directo`);
-      
-      alreadyPickedItems.forEach(item => {
-        // Verificar que no existe ya en inventario usando canonical name (CHATGPT SOLUTION)
-        const canonicalId = item.canonicalId || canonicalName(item.name);
-        const existsInInventory = gameState.inventory.some(invItem => {
-          const invCanonicalId = invItem.canonicalId || canonicalName(invItem.name);
-          return invCanonicalId === canonicalId;
-        });
-        
-        if (!existsInInventory) {
-          gameState.inventory.push(item);
-          console.log(`🤖 AUTO-PICK: Item añadido al inventario: ${item.name} ${item.icon} (canonical: ${canonicalId})`);
-        } else {
-          console.log(`⚠️ AUTO-PICK: Item ya existe en inventario (canonical match): ${item.name} ≈ ${canonicalId}`);
-        }
-      });
-      
-      // 🎯 EMITIR INVENTORY UPDATE VIA WEBSOCKET (CHATGPT SOLUTION)
-      const socketSessionId = gameState.sessionId;
-      io.to(socketSessionId).emit('inventory_update', {
-        inventory: gameState.inventory,
-        discoveredItems: gameState.discoveredItems || []
-      });
-      console.log(`📡 AUTO-PICK: Inventory update emitted via WebSocket for ${alreadyPickedItems.length} items`);
-    }
-    
-    // 🎲 SISTEMA HÍBRIDO DE LOOT INTELIGENTE (SOLO PARA BÚSQUEDAS)
+    // 🎲 SISTEMA DINÁMICO DE LOOT INTELIGENTE - NUEVO FLUJO DISCOVEREDITEMS
     
     // Solo activar cuando el usuario busca/explora activamente
     if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir/.test(action.toLowerCase())) {
-      console.log(`🎲 ACTIVANDO SISTEMA HÍBRIDO para acción: "${action}"`);
+      console.log(`🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "${action}"`);
       
-      // 🎯 NUEVO SISTEMA 100% GARANTIZADO - SIEMPRE GENERA ITEMS CONTEXTUALES
-      console.log(`🎁 SISTEMA 100% GARANTIZADO: Siempre se generan items al buscar`);
+      // Generar loot inteligente
+      const intelligentLoot = rollIntelligentLoot(gameState, action, narrative);
       
-      const location = gameState.location || '';
-      const currentAction = action.toLowerCase();
-      
-      // 🔺 CALIDAD DE ITEMS BASADA EN CONTEXTO (no probabilidad)
-      let itemQuality = 'common'; // Base
-      
-      if (location.toLowerCase().includes('tesoro') || location.toLowerCase().includes('cofre') || 
-          location.toLowerCase().includes('biblioteca') || location.toLowerCase().includes('cueva') ||
-          location.toLowerCase().includes('ruinas') || location.toLowerCase().includes('templo')) {
-        itemQuality = 'rare'; // Items más valiosos en ubicaciones especiales
-        console.log(`🏛️ Ubicación especial detectada, generando items de mejor calidad`);
-      }
-      
-      if (currentAction.includes('minuciosamente') || currentAction.includes('cuidadosamente') || 
-          currentAction.includes('detalladamente') || currentAction.includes('exhaustivamente')) {
-        itemQuality = itemQuality === 'rare' ? 'epic' : 'rare'; // Mejorar calidad por búsqueda detallada
-        console.log(`🔍 Búsqueda detallada detectada, mejorando calidad de items`);
-      }
-      
-      // Reset contador de búsquedas vacías (ya no es necesario)
-      gameState.consecutiveEmptySearches = 0;
-      
-      // Actualizar último descubrimiento
-      gameState.lastDiscoveryAction = gameState.actionCount;
-      
-      console.log(`🎯 Calidad de items determinada: ${itemQuality}`);
-      
-      // 🎁 SIEMPRE GENERAR ITEMS (100% garantizado)
-      const shouldGenerateItem = true; // Cambiado de probabilidad a 100%
-      
-      console.log(`🎰 Sistema garantizado: SIEMPRE ÉXITO - Generando items contextuales`);
-      
-      if (shouldGenerateItem) {
-        // 🎁 GENERAR ITEM - LÓGICA ORIGINAL
-        gameState.lastDiscoveryAction = gameState.actionCount;
-        gameState.consecutiveEmptySearches = 0;
-        console.log(`✅ ¡Descubrimiento exitoso! Reseteando contadores`);
-      
-        // PASO 1: Usar items disponibles ya extraídos de la narrativa
-      const availableItems = narrativeExtraction.availableItems || [];
-      if (availableItems.length > 0) {
-        // CASO A: Hay items disponibles en la narrativa → Preguntar al jugador
-        console.log(`📖 NARRATIVA CON ITEMS DISPONIBLES: Encontrados ${availableItems.length} items, extendiendo narrativa con decisión`);
+      if (intelligentLoot) {
+        // Verificar que no existe ya en inventario
+        const existsInInventory = gameState.inventory.some(item => 
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+        );
         
-        const itemChoiceText = generateItemChoiceNarrative(availableItems);
-        narrative += itemChoiceText;
+        // Verificar que no existe ya en discoveredItems
+        if (!gameState.discoveredItems) gameState.discoveredItems = [];
+        const existsInDiscovered = gameState.discoveredItems.some(item => 
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+        );
         
-        console.log(`🎭 NARRATIVA EXTENDIDA: ${itemChoiceText}`);
-        
-      } else if (availableItems.length === 0) {
-        // CASO B: No hay items disponibles → Primero intentar extraer del LLM, luego generar loot dinámico
-        console.log(`🎁 NARRATIVA SIN ITEMS DISPONIBLES: Intentando extraer items específicos del LLM...`);
-        
-        // 🆕 PASO 1: Extraer items específicos mencionados por el LLM
-        const llmExtractedItems = extractSpecificItemsFromLLMNarrative(narrative);
-        
-        if (llmExtractedItems.length > 0) {
-          console.log(`✅ LLM ITEMS ENCONTRADOS: ${llmExtractedItems.length} items extraídos de narrativa`);
+        if (!existsInInventory && !existsInDiscovered) {
+          gameState.discoveredItems.push(intelligentLoot);
+          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${intelligentLoot.name} ${intelligentLoot.icon}`);
           
-          // Usar items extraídos del LLM
-          llmExtractedItems.forEach(item => {
-            // 🚫 VERIFICAR ITEMS IGNORADOS
-            if (!gameState.ignoredItems) gameState.ignoredItems = [];
-            const wasIgnored = gameState.ignoredItems.some(ignoredId => 
-              ignoredId === item.instanceId || 
-              gameState.ignoredItems.some(id => id.includes(item.name.toLowerCase()))
-            );
-            
-            if (wasIgnored) {
-              console.log(`🚫 Item del LLM previamente ignorado: ${item.name}`);
-              return;
-            }
-            
-            // Verificar anti-duplicados
-            const existsInInventory = gameState.inventory.some(invItem => 
-              invItem.name.toLowerCase() === item.name.toLowerCase()
-            );
-            
-            if (!gameState.discoveredItems) gameState.discoveredItems = [];
-            const existsInDiscovered = gameState.discoveredItems.some(discItem => 
-              discItem.name.toLowerCase() === item.name.toLowerCase()
-            );
-            
-            if (!existsInInventory && !existsInDiscovered) {
-              gameState.discoveredItems.push(item);
-              console.log(`🎁 LLM ITEM AÑADIDO A DISCOVERED: ${item.name} ${item.icon}`);
-            }
-          });
+          // Añadir a la narrativa que se descubrió algo
+          narrative += ` Descubres ${intelligentLoot.name} ${intelligentLoot.icon} en el lugar.`;
           
+          console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
         } else {
-          console.log(`🎯 No se encontraron items específicos en LLM, usando rollIntelligentLoot como fallback...`);
-          
-          // 🆕 PASO 2: Si no hay items del LLM, usar sistema existente como fallback
-          const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
-        
-          if (intelligentLoot) {
-            // 🚫 VERIFICAR ITEMS IGNORADOS PERMANENTEMENTE
-            if (!gameState.ignoredItems) gameState.ignoredItems = [];
-            const wasIgnored = gameState.ignoredItems.some(ignoredId => 
-              ignoredId === intelligentLoot.instanceId || 
-              gameState.ignoredItems.some(id => id.includes(intelligentLoot.name.toLowerCase()))
-            );
-            
-            if (wasIgnored) {
-              console.log(`🚫 Item previamente ignorado, no se añadirá: ${intelligentLoot.name}`);
-              return; // No añadir item ignorado
-            }
-            
-            // Verificar anti-duplicados
-            const existsInInventory = gameState.inventory.some(item => 
-              item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
-            );
-            
-            if (!gameState.discoveredItems) gameState.discoveredItems = [];
-            const existsInDiscovered = gameState.discoveredItems.some(item => 
-              item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
-            );
-            
-            if (!existsInInventory && !existsInDiscovered) {
-              // Añadir a discoveredItems (clickeable)
-              gameState.discoveredItems.push(intelligentLoot);
-              console.log(`🎁 ITEM DINÁMICO AÑADIDO: ${intelligentLoot.name} ${intelligentLoot.icon}`);
-              console.log(`🎁 SYSTEM: Item añadido a discoveredItems para pickup`);
-              
-              // LÓGICA NARRATIVA PARA EXPLICAR EL DESCUBRIMIENTO
-              const discoveryText = generateItemDiscoveryNarrative(intelligentLoot, action);
-              narrative += ` ${discoveryText}`;
-              console.log(`🎭 NARRATIVA EXTENDIDA CON DESCUBRIMIENTO: ${discoveryText}`);
-            } else {
-              console.log(`🔄 Item ya existe en inventario o discoveredItems: ${intelligentLoot.name}`);
-            }
-          }
-        } // Cierre del else
-      } // Cierre del if availableItems.length === 0
-      } // Cierre del shouldGenerateItem
-    } // ← CERRAR BLOQUE DEL SISTEMA DE PROBABILIDAD
-    } else {
-      console.log(`🎲 Sistema híbrido no activado para: "${action}"`);
-    }
-    
-    // 🎲 PASO FINAL: SISTEMA DE EVENTOS ALEATORIOS D20
-    let randomEventResult = null;
-    
-    // Verificar si debe activarse un evento aleatorio
-    if (shouldTriggerRandomEvent(gameState, action)) {
-      console.log(`🎲 ACTIVANDO SISTEMA DE EVENTOS ALEATORIOS`);
-      
-      const context = analyzeGameContextForEvents(gameState, action, narrative);
-      const availableEvents = filterEventsForContext(context);
-      
-      if (availableEvents.length > 0) {
-        const selectedEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
-        randomEventResult = rollD20AndApplyConsequences(selectedEvent, gameState);
-        
-        // Extender narrativa con el evento
-        narrative += `\n\n🎲 **${selectedEvent.title}**: ${selectedEvent.description}\n\n*[Lanzas un D20... Resultado: ${randomEventResult.roll}]*\n\n${randomEventResult.narrative}`;
-        
-        console.log(`🎲 EVENTO EJECUTADO: ${selectedEvent.title} (${randomEventResult.success ? 'ÉXITO' : 'FRACASO'})`);
+          console.log(`⚠️ LOOT YA EXISTE: ${intelligentLoot.name}`);
+        }
       }
+    } else {
+      console.log(`🎲 Sistema dinámico no activado para: "${action}"`);
     }
     
     res.json({
@@ -2983,8 +1913,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       narrative: narrative,
       suggested_actions: suggestedActions,
       game_state: gameState.toDict(),
-      state_changes: stateChanges,
-      random_event: randomEventResult // Para el frontend
+      state_changes: stateChanges
     });
     
   } catch (error) {
@@ -3015,112 +1944,6 @@ io.on('connection', (socket) => {
 });
 
 /* eslint-disable */
-// 🚫 ENDPOINT: IGNORAR ITEM PERSISTENTEMENTE
-app.post('/api/ignore_item', async (req, res) => {
-  try {
-    const { session_id, item_id } = req.body;
-    
-    if (!session_id || !gameSessions.has(session_id)) {
-      return res.status(400).json({ error: 'Invalid session' });
-    }
-    
-    if (!item_id) {
-      return res.status(400).json({ error: 'No item_id provided' });
-    }
-    
-    const gameState = gameSessions.get(session_id);
-    
-    // Inicializar array de items ignorados si no existe
-    if (!gameState.ignoredItems) {
-      gameState.ignoredItems = [];
-    }
-    
-    // Añadir item a lista de ignorados (si no está ya)
-    if (!gameState.ignoredItems.includes(item_id)) {
-      gameState.ignoredItems.push(item_id);
-      console.log(`🚫 Item ignorado permanentemente: ${item_id}`);
-    }
-    
-    // Remover de discoveredItems si está presente
-    if (gameState.discoveredItems) {
-      gameState.discoveredItems = gameState.discoveredItems.filter(
-        item => item.instanceId !== item_id
-      );
-    }
-    
-    // Save to MongoDB
-    if (db) {
-      await db.collection('sessions').replaceOne(
-        { sessionId: session_id },
-        gameState.toDict()
-      );
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Item ignored permanently',
-      game_state: gameState.toDict()
-    });
-    
-  } catch (error) {
-    console.error('Error ignoring item:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 🚫 ENDPOINT: IGNORAR ITEM PERSISTENTEMENTE
-app.post('/api/ignore_item', async (req, res) => {
-  try {
-    const { session_id, item_id } = req.body;
-    
-    if (!session_id || !gameSessions.has(session_id)) {
-      return res.status(400).json({ error: 'Invalid session' });
-    }
-    
-    if (!item_id) {
-      return res.status(400).json({ error: 'No item_id provided' });
-    }
-    
-    const gameState = gameSessions.get(session_id);
-    
-    // Inicializar array de items ignorados si no existe
-    if (!gameState.ignoredItems) {
-      gameState.ignoredItems = [];
-    }
-    
-    // Añadir item a lista de ignorados (si no está ya)
-    if (!gameState.ignoredItems.includes(item_id)) {
-      gameState.ignoredItems.push(item_id);
-      console.log(`🚫 Item ignorado permanentemente: ${item_id}`);
-    }
-    
-    // Remover de discoveredItems si está presente
-    if (gameState.discoveredItems) {
-      gameState.discoveredItems = gameState.discoveredItems.filter(
-        item => item.instanceId !== item_id
-      );
-    }
-    
-    // Save to MongoDB
-    if (db) {
-      await db.collection('sessions').replaceOne(
-        { sessionId: session_id },
-        gameState.toDict()
-      );
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Item ignored permanently',
-      game_state: gameState.toDict()
-    });
-    
-  } catch (error) {
-    console.error('Error ignoring item:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // 🎁 ENDPOINT: Recoger item descubierto
 app.post('/api/pickup_item', async (req, res) => {
   try {
