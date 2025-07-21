@@ -317,6 +317,8 @@ class GameState {
     
     this.location = "Punto de Inicio";
     this.inventory = [];
+    this.discoveredItems = []; // 🎁 SISTEMA DE LOOT DESCUBIERTO
+    this.ignoredItems = []; // 🚫 ITEMS IGNORADOS PERMANENTEMENTE
     this.narrativeLog = [];
     this.mode = 'sandbox';
     this.campaignMeta = null;
