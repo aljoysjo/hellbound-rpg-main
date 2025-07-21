@@ -2867,10 +2867,50 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         console.log(`🎭 NARRATIVA EXTENDIDA: ${itemChoiceText}`);
         
       } else if (availableItems.length === 0) {
-        // CASO B: No hay items disponibles → Generar loot dinámico + explicación
-        console.log(`🎁 NARRATIVA SIN ITEMS DISPONIBLES: Generando loot dinámico con explicación`);
+        // CASO B: No hay items disponibles → Primero intentar extraer del LLM, luego generar loot dinámico
+        console.log(`🎁 NARRATIVA SIN ITEMS DISPONIBLES: Intentando extraer items específicos del LLM...`);
         
-        const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
+        // 🆕 PASO 1: Extraer items específicos mencionados por el LLM
+        const llmExtractedItems = extractSpecificItemsFromLLMNarrative(narrative);
+        
+        if (llmExtractedItems.length > 0) {
+          console.log(`✅ LLM ITEMS ENCONTRADOS: ${llmExtractedItems.length} items extraídos de narrativa`);
+          
+          // Usar items extraídos del LLM
+          llmExtractedItems.forEach(item => {
+            // 🚫 VERIFICAR ITEMS IGNORADOS
+            if (!gameState.ignoredItems) gameState.ignoredItems = [];
+            const wasIgnored = gameState.ignoredItems.some(ignoredId => 
+              ignoredId === item.instanceId || 
+              gameState.ignoredItems.some(id => id.includes(item.name.toLowerCase()))
+            );
+            
+            if (wasIgnored) {
+              console.log(`🚫 Item del LLM previamente ignorado: ${item.name}`);
+              return;
+            }
+            
+            // Verificar anti-duplicados
+            const existsInInventory = gameState.inventory.some(invItem => 
+              invItem.name.toLowerCase() === item.name.toLowerCase()
+            );
+            
+            if (!gameState.discoveredItems) gameState.discoveredItems = [];
+            const existsInDiscovered = gameState.discoveredItems.some(discItem => 
+              discItem.name.toLowerCase() === item.name.toLowerCase()
+            );
+            
+            if (!existsInInventory && !existsInDiscovered) {
+              gameState.discoveredItems.push(item);
+              console.log(`🎁 LLM ITEM AÑADIDO A DISCOVERED: ${item.name} ${item.icon}`);
+            }
+          });
+          
+        } else {
+          console.log(`🎯 No se encontraron items específicos en LLM, usando rollIntelligentLoot como fallback...`);
+          
+          // 🆕 PASO 2: Si no hay items del LLM, usar sistema existente como fallback
+          const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
         
         if (intelligentLoot) {
           // 🚫 VERIFICAR ITEMS IGNORADOS PERMANENTEMENTE
