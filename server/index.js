@@ -1985,17 +1985,8 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           if (itemToAdd.source !== 'llm_narrative') {
             narrative += ` Descubres ${itemToAdd.name} ${itemToAdd.icon} en el lugar.`;
           }
-        } else {
-          console.log(`🔄 Item ya existe: ${itemToAdd.name}`);
-        }
       } else {
         console.log(`🎲 No se generó ningún item para esta búsqueda`);
-      }
-          
-          console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
-        } else {
-          console.log(`⚠️ LOOT YA EXISTE: ${intelligentLoot.name}`);
-        }
       }
     } else {
       console.log(`🎲 Sistema dinámico no activado para: "${action}"`);
