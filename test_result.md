@@ -1,6 +1,21 @@
-🚨 PROBLEMAS CRÍTICOS ACTUALES - INVESTIGACIÓN 21/01/2025:
-🔍 INVESTIGACIÓN REQUERIDA - Drop Item UI Update Issue: Usuario reporta que funcionalidad "drop" no actualiza UI automáticamente a pesar del fix de polling (!==)
-🔍 INVESTIGACIÓN REQUERIDA - Contextual Item Detection Regression: Usuario reporta regresión en detección contextual (ej: "diario de exorcismo" → "amuleto protector")
+🚨 INVESTIGACIÓN ESPECÍFICA COMPLETADA - 21/01/2025:
+
+✅ INVESTIGACIÓN COMPLETADA - Drop Item UI Update Issue: FUNCIONALIDAD FUNCIONA CORRECTAMENTE
+✅ INVESTIGACIÓN COMPLETADA - Contextual Item Detection Regression: NO SE DETECTÓ REGRESIÓN
+
+🔍 RESULTADOS DETALLADOS:
+1. DROP FUNCTIONALITY: Se verificó exhaustivamente la funcionalidad "suelto el amuleto" y funciona perfectamente:
+   - Item se remueve correctamente del inventario (1 → 0 items)
+   - Narrativa confirma la acción ("Sueltas amuleto protector")
+   - Backend procesa correctamente el comando drop
+   - UI se actualiza automáticamente
+
+2. CONTEXTUAL DETECTION: Se probó con concepto "Exorcista investigando posesiones demoníacas":
+   - Sistema generativo genera items contextualmente apropiados ("Excelente reliquia antigua" tipo mystical)
+   - No se detectó la regresión reportada ("diario de exorcismo" → "amuleto protector")
+   - Items coinciden con la narrativa correctamente
+
+🎯 CONCLUSIÓN: Los problemas reportados por el usuario NO se reproducen en las pruebas automatizadas. Ambas funcionalidades trabajan correctamente.
 
 HISTORIAL PREVIO (RESUELTOS ANTERIORMENTE):
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
