@@ -2912,12 +2912,44 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           // 🆕 PASO 2: Si no hay items del LLM, usar sistema existente como fallback
           const intelligentLoot = rollIntelligentLoot(gameState, action, narrative, itemQuality);
         
-        if (intelligentLoot) {
-          // 🚫 VERIFICAR ITEMS IGNORADOS PERMANENTEMENTE
-          if (!gameState.ignoredItems) gameState.ignoredItems = [];
-          const wasIgnored = gameState.ignoredItems.some(ignoredId => 
-            ignoredId === intelligentLoot.instanceId || 
-            gameState.ignoredItems.some(id => id.includes(intelligentLoot.name.toLowerCase()))
+          if (intelligentLoot) {
+            // 🚫 VERIFICAR ITEMS IGNORADOS PERMANENTEMENTE
+            if (!gameState.ignoredItems) gameState.ignoredItems = [];
+            const wasIgnored = gameState.ignoredItems.some(ignoredId => 
+              ignoredId === intelligentLoot.instanceId || 
+              gameState.ignoredItems.some(id => id.includes(intelligentLoot.name.toLowerCase()))
+            );
+            
+            if (wasIgnored) {
+              console.log(`🚫 Item previamente ignorado, no se añadirá: ${intelligentLoot.name}`);
+              return; // No añadir item ignorado
+            }
+            
+            // Verificar anti-duplicados
+            const existsInInventory = gameState.inventory.some(item => 
+              item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+            );
+            
+            if (!gameState.discoveredItems) gameState.discoveredItems = [];
+            const existsInDiscovered = gameState.discoveredItems.some(item => 
+              item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+            );
+            
+            if (!existsInInventory && !existsInDiscovered) {
+              // Añadir a discoveredItems (clickeable)
+              gameState.discoveredItems.push(intelligentLoot);
+              console.log(`🎁 ITEM DINÁMICO AÑADIDO: ${intelligentLoot.name} ${intelligentLoot.icon}`);
+              console.log(`🎁 SYSTEM: Item añadido a discoveredItems para pickup`);
+              
+              // LÓGICA NARRATIVA PARA EXPLICAR EL DESCUBRIMIENTO
+              const discoveryText = generateItemDiscoveryNarrative(intelligentLoot, action);
+              narrative += ` ${discoveryText}`;
+              console.log(`🎭 NARRATIVA EXTENDIDA CON DESCUBRIMIENTO: ${discoveryText}`);
+            } else {
+              console.log(`🔄 Item ya existe en inventario o discoveredItems: ${intelligentLoot.name}`);
+            }
+          }
+        } // Cierre del else
           );
           
           if (wasIgnored) {
