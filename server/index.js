@@ -1257,80 +1257,6 @@ app.get('/api/get_session/:sessionId', (req, res) => {
   }
 });
 
-// 🎯 NUEVA FUNCIÓN - EXTRACCIÓN DE ITEMS ESPECÍFICOS DEL LLM (OPCIÓN E)
-function extractSpecificItemsFromLLMNarrative(narrativeText) {
-  console.log('🔍 EXTRAYENDO ITEMS ESPECÍFICOS DE NARRATIVA LLM...');
-  
-  if (!narrativeText) return [];
-  
-  const extractedItems = [];
-  const text = narrativeText.toLowerCase();
-  
-  // Patrones para detectar items mencionados específicamente  
-  const itemPatterns = [
-    /(?:encuentras?|descubres?|hallas?|observas?|ves?)\s+(?:un[ao]?|el|la)?\s*([^.!?,]+?)(?:\s+(?:en|sobre|bajo|dentro))/gi,
-    /(?:hay|existe|aparece)\s+(?:un[ao]?|el|la)?\s*([^.!?,:]+?)(?:\s+(?:que|en|sobre))/gi,
-    /(?:un[ao]?|el|la)\s+([^.!?,\s]+(?:\s+[^.!?,\s]+)*?)\s+(?:se encuentra|está|yace)/gi,
-    /,\s*(?:un[ao]?|el|la)\s+([^.!?,]+?)(?:,|\s+y\s+|\.|$)/gi
-  ];
-  
-  for (const pattern of itemPatterns) {
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      const potentialItem = match[1].trim();
-      
-      // Filtrar items válidos
-      if (potentialItem.length > 2 && potentialItem.length < 50) {
-        // Verificar si contiene palabras de items físicos
-        if (/\b(libro|diario|pistola|hacha|espada|daga|amuleto|anillo|pergamino|frasco|cristal|gema|llave|documento|tomo|grimorio|reliquia|poción|elixir)\b/.test(potentialItem)) {
-          
-          // Determinar tipo de item
-          let itemType = 'exploration';
-          let itemIcon = '📦';
-          
-          if (/(libro|diario|pergamino|documento|tomo|grimorio)/.test(potentialItem)) {
-            itemType = 'knowledge';
-            itemIcon = '📖';
-          } else if (/(pistola|hacha|espada|daga|arma)/.test(potentialItem)) {
-            itemType = 'combat';  
-            itemIcon = '⚔️';
-          } else if (/(amuleto|anillo|cristal|gema|reliquia)/.test(potentialItem)) {
-            itemType = 'mystical';
-            itemIcon = '🔮';
-          } else if (/(frasco|poción|elixir)/.test(potentialItem)) {
-            itemType = 'mystical';
-            itemIcon = '🧪';
-          }
-          
-          // Capitalizar nombre
-          const itemName = potentialItem.charAt(0).toUpperCase() + potentialItem.slice(1);
-          
-          extractedItems.push({
-            name: itemName,
-            icon: itemIcon,
-            type: itemType,
-            description: `${itemName} encontrado durante la exploración`,
-            rarity: 'common',
-            source: 'llm_narrative',
-            contexts: [itemType],
-            instanceId: crypto.randomUUID()
-          });
-          
-          console.log(`✅ ITEM EXTRAÍDO DE LLM: ${itemName} (${itemType})`);
-        }
-      }
-    }
-  }
-  
-  // Eliminar duplicados
-  const uniqueItems = extractedItems.filter((item, index, arr) => 
-    arr.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase()) === index
-  );
-  
-  console.log(`🎯 ITEMS EXTRAÍDOS DEL LLM: ${uniqueItems.length} items únicos`);
-  return uniqueItems;
-}
-
 app.post('/api/start_session', async (req, res) => {
   try {
     const { mode = 'sandbox', campaign, sandboxConcept } = req.body;
@@ -1951,45 +1877,32 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir/.test(action.toLowerCase())) {
       console.log(`🎲 ACTIVANDO SISTEMA DINÁMICO para acción: "${action}"`);
       
-      // 🆕 PASO 1: Intentar extraer items específicos del LLM primero
-      const llmExtractedItems = extractSpecificItemsFromLLMNarrative(narrative);
+      // Generar loot inteligente
+      const intelligentLoot = rollIntelligentLoot(gameState, action, narrative);
       
-      let itemToAdd = null;
-      
-      if (llmExtractedItems.length > 0) {
-        console.log(`✅ LLM ITEMS ENCONTRADOS: ${llmExtractedItems.length} items extraídos de narrativa`);
-        itemToAdd = llmExtractedItems[0]; // Tomar el primer item extraído
-      } else {
-        console.log(`🎯 No se encontraron items específicos en LLM, usando rollIntelligentLoot como fallback...`);
-        // Generar loot inteligente como fallback
-        itemToAdd = rollIntelligentLoot(gameState, action, narrative);
-      }
-      
-      if (itemToAdd) {
+      if (intelligentLoot) {
         // Verificar que no existe ya en inventario
         const existsInInventory = gameState.inventory.some(item => 
-          item.name.toLowerCase() === itemToAdd.name.toLowerCase()
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
         );
         
         // Verificar que no existe ya en discoveredItems
         if (!gameState.discoveredItems) gameState.discoveredItems = [];
         const existsInDiscovered = gameState.discoveredItems.some(item => 
-          item.name.toLowerCase() === itemToAdd.name.toLowerCase()
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
         );
         
         if (!existsInInventory && !existsInDiscovered) {
-          gameState.discoveredItems.push(itemToAdd);
-          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${itemToAdd.name} ${itemToAdd.icon}`);
+          gameState.discoveredItems.push(intelligentLoot);
+          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${intelligentLoot.name} ${intelligentLoot.icon}`);
           
-          // Solo añadir narrativa si es del sistema fallback (no del LLM)
-          if (itemToAdd.source !== 'llm_narrative') {
-            narrative += ` Descubres ${itemToAdd.name} ${itemToAdd.icon} en el lugar.`;
-          }
+          // Añadir a la narrativa que se descubrió algo
+          narrative += ` Descubres ${intelligentLoot.name} ${intelligentLoot.icon} en el lugar.`;
+          
+          console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
         } else {
-          console.log(`🔄 Item ya existe: ${itemToAdd.name}`);
+          console.log(`⚠️ LOOT YA EXISTE: ${intelligentLoot.name}`);
         }
-      } else {
-        console.log(`🎲 No se generó ningún item para esta búsqueda`);
       }
     } else {
       console.log(`🎲 Sistema dinámico no activado para: "${action}"`);
