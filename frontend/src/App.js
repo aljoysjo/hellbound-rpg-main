@@ -664,7 +664,7 @@ function App() {
                     inventory: { 
                       count: prev.inventory.count + inventoryChanges.totalCount, 
                       newItems: [...prev.inventory.newItems, ...inventoryChanges.newItems],
-                      removedItems: [...prev.inventory.removedItems, ...(inventoryChanges.removedItems || [])]
+                      removedItems: [...(prev.inventory.removedItems || []), ...(inventoryChanges.removedItems || [])]
                     },
                     discovered: {
                       count: prev.discovered.count + discoveredChanges.totalCount,
