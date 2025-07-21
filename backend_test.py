@@ -1397,8 +1397,8 @@ def test_discovered_items_specific():
 
 def test_drop_functionality_specific():
     """DIAGNÓSTICO ESPECÍFICO - Funcionalidad "suelto" no remueve del inventario"""
-    # Use LOCAL backend as specified in the review request
-    backend_url = "http://localhost:8001"
+    # Use the backend URL from frontend/.env as specified in the review request
+    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
     
     print(f"🔥 DIAGNÓSTICO ESPECÍFICO - Funcionalidad 'suelto' no remueve del inventario")
     print(f"🌐 Backend URL: {backend_url}")
