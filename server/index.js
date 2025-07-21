@@ -1201,14 +1201,8 @@ Responde SOLO con la narrativa, sin explicaciones.
       const bookTitle = "Hellbound: El infierno en la tierra";
       const campaignTitle = camp.json.titulo || "Aventura Épica";
       
-      if (camp.firstText && camp.firstText.includes("La nieve cae sobre Alicante")) {
-        initialNarrative = `Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas, y una extraña quietud en el aire. Algo en el ambiente te pone en alerta, como si una presencia invisible observara cada uno de tus movimientos.
-
-A través de la ventana, entre la niebla matutina, vislumbras una figura que no debería estar ahí. Tus instintos de exorcista se despiertan inmediatamente.
-
-Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu entrenamiento te ha preparado para enfrentar lo sobrenatural, pero esta situación parece diferente.`;
-      } else if (camp.chapterData && camp.chapterData.scenes) {
-        // 🆕 USAR NARRATIVA DE TU CHAPTER JSON
+      if (camp.chapterData && camp.chapterData.scenes) {
+        // 🆕 PRIORIDAD: USAR NARRATIVA DE TU CHAPTER JSON
         const firstScene = camp.chapterData.scenes[0];
         initialNarrative = `📖 **${camp.chapterData.title}**
 
@@ -1220,6 +1214,12 @@ ${camp.chapterData.description}
 
 ${firstScene.narrative}`;
         console.log(`🎭 Using rich narrative from chapter: ${firstScene.title}`);
+      } else if (camp.firstText && camp.firstText.includes("La nieve cae sobre Alicante")) {
+        initialNarrative = `Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas, y una extraña quietud en el aire. Algo en el ambiente te pone en alerta, como si una presencia invisible observara cada uno de tus movimientos.
+
+A través de la ventana, entre la niebla matutina, vislumbras una figura que no debería estar ahí. Tus instintos de exorcista se despiertan inmediatamente.
+
+Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu entrenamiento te ha preparado para enfrentar lo sobrenatural, pero esta situación parece diferente.`;
       } else {
         initialNarrative = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
 
