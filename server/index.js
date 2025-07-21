@@ -1257,6 +1257,80 @@ app.get('/api/get_session/:sessionId', (req, res) => {
   }
 });
 
+// 🎯 NUEVA FUNCIÓN - EXTRACCIÓN DE ITEMS ESPECÍFICOS DEL LLM (OPCIÓN E)
+function extractSpecificItemsFromLLMNarrative(narrativeText) {
+  console.log('🔍 EXTRAYENDO ITEMS ESPECÍFICOS DE NARRATIVA LLM...');
+  
+  if (!narrativeText) return [];
+  
+  const extractedItems = [];
+  const text = narrativeText.toLowerCase();
+  
+  // Patrones para detectar items mencionados específicamente  
+  const itemPatterns = [
+    /(?:encuentras?|descubres?|hallas?|observas?|ves?)\s+(?:un[ao]?|el|la)?\s*([^.!?,]+?)(?:\s+(?:en|sobre|bajo|dentro))/gi,
+    /(?:hay|existe|aparece)\s+(?:un[ao]?|el|la)?\s*([^.!?,:]+?)(?:\s+(?:que|en|sobre))/gi,
+    /(?:un[ao]?|el|la)\s+([^.!?,\s]+(?:\s+[^.!?,\s]+)*?)\s+(?:se encuentra|está|yace)/gi,
+    /,\s*(?:un[ao]?|el|la)\s+([^.!?,]+?)(?:,|\s+y\s+|\.|$)/gi
+  ];
+  
+  for (const pattern of itemPatterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const potentialItem = match[1].trim();
+      
+      // Filtrar items válidos
+      if (potentialItem.length > 2 && potentialItem.length < 50) {
+        // Verificar si contiene palabras de items físicos
+        if (/\b(libro|diario|pistola|hacha|espada|daga|amuleto|anillo|pergamino|frasco|cristal|gema|llave|documento|tomo|grimorio|reliquia|poción|elixir)\b/.test(potentialItem)) {
+          
+          // Determinar tipo de item
+          let itemType = 'exploration';
+          let itemIcon = '📦';
+          
+          if (/(libro|diario|pergamino|documento|tomo|grimorio)/.test(potentialItem)) {
+            itemType = 'knowledge';
+            itemIcon = '📖';
+          } else if (/(pistola|hacha|espada|daga|arma)/.test(potentialItem)) {
+            itemType = 'combat';  
+            itemIcon = '⚔️';
+          } else if (/(amuleto|anillo|cristal|gema|reliquia)/.test(potentialItem)) {
+            itemType = 'mystical';
+            itemIcon = '🔮';
+          } else if (/(frasco|poción|elixir)/.test(potentialItem)) {
+            itemType = 'mystical';
+            itemIcon = '🧪';
+          }
+          
+          // Capitalizar nombre
+          const itemName = potentialItem.charAt(0).toUpperCase() + potentialItem.slice(1);
+          
+          extractedItems.push({
+            name: itemName,
+            icon: itemIcon,
+            type: itemType,
+            description: `${itemName} encontrado durante la exploración`,
+            rarity: 'common',
+            source: 'llm_narrative',
+            contexts: [itemType],
+            instanceId: crypto.randomUUID()
+          });
+          
+          console.log(`✅ ITEM EXTRAÍDO DE LLM: ${itemName} (${itemType})`);
+        }
+      }
+    }
+  }
+  
+  // Eliminar duplicados
+  const uniqueItems = extractedItems.filter((item, index, arr) => 
+    arr.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase()) === index
+  );
+  
+  console.log(`🎯 ITEMS EXTRAÍDOS DEL LLM: ${uniqueItems.length} items únicos`);
+  return uniqueItems;
+}
+
 app.post('/api/start_session', async (req, res) => {
   try {
     const { mode = 'sandbox', campaign, sandboxConcept } = req.body;
