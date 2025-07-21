@@ -1770,6 +1770,119 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
   }
 });
 
+// 🎁 ENDPOINT PARA RECOGER ITEMS DESCUBIERTOS
+app.post('/api/pickup_item', async (req, res) => {
+  try {
+    const { session_id, item_instance_id } = req.body;
+    
+    if (!session_id || !gameSessions.has(session_id)) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    if (!item_instance_id) {
+      return res.status(400).json({ error: 'item_instance_id required' });
+    }
+    
+    const gameState = gameSessions.get(session_id);
+    
+    // Buscar item en discoveredItems
+    if (!gameState.discoveredItems) gameState.discoveredItems = [];
+    const itemIndex = gameState.discoveredItems.findIndex(item => item.instanceId === item_instance_id);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: 'Item not found in discovered items' });
+    }
+    
+    // Remover de discoveredItems y añadir a inventory
+    const pickedItem = gameState.discoveredItems.splice(itemIndex, 1)[0];
+    gameState.inventory.push(pickedItem);
+    
+    console.log(`✅ ITEM RECOGIDO: ${pickedItem.name} ${pickedItem.icon}`);
+    
+    // Emit real-time update
+    io.to(session_id).emit('inventory_update', {
+      session_id: session_id,
+      game_state: gameState.toDict()
+    });
+    
+    // Update in MongoDB
+    if (db) {
+      await db.collection('sessions').updateOne(
+        { sessionId: session_id },
+        { $set: gameState.toDict() }
+      );
+    }
+    
+    res.json({
+      success: true,
+      message: `Has recogido ${pickedItem.name}`,
+      item: pickedItem,
+      game_state: gameState.toDict()
+    });
+    
+  } catch (error) {
+    console.error('Error picking up item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 🚫 ENDPOINT PARA IGNORAR ITEMS DESCUBIERTOS 
+app.post('/api/ignore_item', async (req, res) => {
+  try {
+    const { session_id, item_instance_id } = req.body;
+    
+    if (!session_id || !gameSessions.has(session_id)) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    if (!item_instance_id) {
+      return res.status(400).json({ error: 'item_instance_id required' });
+    }
+    
+    const gameState = gameSessions.get(session_id);
+    
+    // Buscar item en discoveredItems
+    if (!gameState.discoveredItems) gameState.discoveredItems = [];
+    const itemIndex = gameState.discoveredItems.findIndex(item => item.instanceId === item_instance_id);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: 'Item not found in discovered items' });
+    }
+    
+    // Remover de discoveredItems y añadir a ignoredItems
+    const ignoredItem = gameState.discoveredItems.splice(itemIndex, 1)[0];
+    if (!gameState.ignoredItems) gameState.ignoredItems = [];
+    gameState.ignoredItems.push(ignoredItem.instanceId);
+    
+    console.log(`🚫 ITEM IGNORADO: ${ignoredItem.name} ${ignoredItem.icon}`);
+    
+    // Emit real-time update
+    io.to(session_id).emit('inventory_update', {
+      session_id: session_id,
+      game_state: gameState.toDict()
+    });
+    
+    // Update in MongoDB
+    if (db) {
+      await db.collection('sessions').updateOne(
+        { sessionId: session_id },
+        { $set: gameState.toDict() }
+      );
+    }
+    
+    res.json({
+      success: true,
+      message: `Has ignorado ${ignoredItem.name}`,
+      item: ignoredItem,
+      game_state: gameState.toDict()
+    });
+    
+  } catch (error) {
+    console.error('Error ignoring item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 
 // WebSocket events
