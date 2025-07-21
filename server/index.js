@@ -1598,6 +1598,49 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     
     console.log('🔍 CURRENT INVENTORY:', gameState.inventory.map(item => `${item.name} ${item.icon}`));
     
+    // 🎁 SISTEMA DE LOOT DINÁMICO - Detectar acciones de búsqueda (MOVIDO DESPUÉS DE DROP)
+    const actionLowerForLoot = action.toLowerCase();
+    if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir|rebusco|reviso|miro|observo|inspecciono|registro/.test(actionLowerForLoot)) {
+      console.log(`🎁 ACTIVANDO SISTEMA DE LOOT para acción: "${action}"`);
+      
+      // Generar loot inteligente
+      const intelligentLoot = rollIntelligentLoot(gameState, action, narrative);
+      
+      if (intelligentLoot) {
+        // Verificar que no existe ya en inventario
+        const existsInInventory = gameState.inventory.some(item => 
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+        );
+        
+        // Verificar que no existe ya en discoveredItems
+        if (!gameState.discoveredItems) gameState.discoveredItems = [];
+        const existsInDiscovered = gameState.discoveredItems.some(item => 
+          item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
+        );
+        
+        // Verificar que no fue ignorado anteriormente
+        if (!gameState.ignoredItems) gameState.ignoredItems = [];
+        const wasIgnored = gameState.ignoredItems.some(ignoredId => 
+          ignoredId === intelligentLoot.instanceId || 
+          gameState.ignoredItems.some(id => id.includes(intelligentLoot.name.toLowerCase()))
+        );
+        
+        if (!existsInInventory && !existsInDiscovered && !wasIgnored) {
+          gameState.discoveredItems.push(intelligentLoot);
+          console.log(`🎁 ITEM DESCUBIERTO (clickeable): ${intelligentLoot.name} ${intelligentLoot.icon}`);
+          
+          // Añadir a la narrativa que se descubrió algo
+          narrative += ` Descubres ${intelligentLoot.name} ${intelligentLoot.icon} en el lugar.`;
+        } else {
+          console.log(`🔄 Item ya existe o fue ignorado: ${intelligentLoot.name}`);
+        }
+      } else {
+        console.log(`🎁 No se generó loot para esta búsqueda`);
+      }
+    } else {
+      console.log(`🎁 Sistema de loot no activado para: "${action}"`);
+    }
+    
     // 📊 ANALIZAR CAMBIOS DE ESTADO DINÁMICOS (MEJORADO)
     const stateChanges = await analyzeNarrativeForStateChanges(action, narrative, gameState, openai);
     
