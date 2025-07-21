@@ -1,18 +1,24 @@
-🚨 INVESTIGACIÓN CRÍTICA - 21/01/2025:
-🔍 PROBLEMA CRÍTICO PERSISTENTE: InlineLootBlock NO aparece después de múltiples reverts
-🔍 NECESITA DIAGNÓSTICO URGENTE: Sistema de loot completamente roto
+🚨 INVESTIGACIÓN CRÍTICA COMPLETADA - 21/01/2025:
+🔍 PROBLEMA CRÍTICO IDENTIFICADO: InlineLootBlock NO aparece después de múltiples reverts
+✅ DIAGNÓSTICO COMPLETADO: Sistema de loot completamente roto - CAUSA RAÍZ ENCONTRADA
 
 HISTORIAL DE REVERTSIONES:
 ❌ PRIMER REVERT: /app/server_backup_loot_system_complete/index.js - JSON corrupto 
 ❌ SEGUNDO REVERT: /app/server_backup_session1/index.js - Backend arranca pero NO funciona loot
-✅ Backend arranca sin errores pero discoveredItems no se generan
+❌ ESTADO ACTUAL: /app/server/index.js - Backend arranca sin errores pero discoveredItems no se generan
 
-ESTADO ACTUAL REPORTADO POR USUARIO:
-- Usuario busca items en habitación
-- Narrativa menciona "libro de conjuros, medallón desgastado, frasco pequeño"
-- InlineLootBlock NO aparece
-- Inventario permanece vacío
-- Funcionalidad completamente rota
+🔧 CAUSA RAÍZ IDENTIFICADA:
+1. ❌ rollIntelligentLoot() NO está implementado en servidor actual
+2. ❌ discoveredItems NO está inicializado en GameState constructor  
+3. ❌ discoveredItems NO está incluido en método toDict()
+4. ❌ Sistema de detección de acciones de búsqueda NO existe
+5. ❌ Endpoint /api/pickup_item NO está implementado
+
+ESTADO ACTUAL CONFIRMADO POR TESTING:
+- Usuario ejecuta "buscar en la habitación"
+- Backend responde correctamente pero discoveredItems field NO está presente
+- InlineLootBlock NO puede aparecer porque no recibe datos
+- Sistema completamente roto después de los reverts
 
 HISTORIAL PREVIO (RESUELTOS ANTERIORMENTE):
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
