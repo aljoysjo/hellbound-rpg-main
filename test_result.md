@@ -81,6 +81,18 @@ HISTORIAL PREVIO (RESUELTOS ANTERIORMENTE):
 - El problema NO está en el backend - discoveredItems funciona al 100%
 
 backend:
+  - task: "CRÍTICO: Restaurar sistema rollIntelligentLoot completo"
+    implemented: false
+    working: false
+    file: "/app/server/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "INVESTIGACIÓN CRÍTICA COMPLETADA (21/01/2025): Se ha identificado la causa raíz del problema reportado por el usuario. DIAGNÓSTICO DEFINITIVO: 1) rollIntelligentLoot() NO está implementado en el servidor actual (/app/server/index.js). 2) discoveredItems NO está inicializado en GameState constructor. 3) discoveredItems NO está incluido en método toDict(), por lo que nunca se devuelve al frontend. 4) Sistema de detección de acciones de búsqueda NO existe. 5) Endpoint /api/pickup_item NO está implementado. TESTING CONFIRMADO: Al ejecutar 'buscar en la habitación', el backend responde correctamente pero discoveredItems field NO está presente en game_state. El sistema está completamente roto después de los reverts. SOLUCIÓN REQUERIDA: Restaurar rollIntelligentLoot() desde /app/server_backup_loot_system_complete/index.js y corregir GameState para incluir discoveredItems."
+
   - task: "Sistema generativo puro (rollIntelligentLoot) sin detectivo"
     implemented: true
     working: true
