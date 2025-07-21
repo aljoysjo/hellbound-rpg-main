@@ -188,7 +188,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_id: sessionId,
-          item_id: item.instanceId
+          item_instance_id: item.instanceId
         })
       }).catch(error => {
         console.error('❌ Error comunicando item ignorado:', error);
