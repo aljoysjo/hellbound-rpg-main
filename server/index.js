@@ -158,6 +158,25 @@ function loadFullCampaign(name) {
   }
 }
 
+// 🆕 NUEVA FUNCIÓN - Chapter System Loader (sin tocar sistema existente)
+function loadChapterSystem(chapterId) {
+  const chapterFile = path.join('/app/campaigns/chapters', `${chapterId}.json`);
+  
+  if (existsSync(chapterFile)) {
+    try {
+      const chapterData = JSON.parse(readFileSync(chapterFile, 'utf8'));
+      console.log(`🔖 Loaded chapter system: ${chapterData.title} (${chapterId})`);
+      return chapterData;
+    } catch (error) {
+      console.log(`❌ Error loading chapter ${chapterId}:`, error.message);
+      return null;
+    }
+  }
+  
+  console.log(`🔍 No chapter JSON found for: ${chapterId}`);
+  return null;
+}
+
 // Generate suggested actions based on context using AI and emotional states
 async function generateSuggestedActions(gameState, narrative, openaiClient) {
   try {
