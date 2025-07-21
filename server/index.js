@@ -1207,6 +1207,19 @@ Responde SOLO con la narrativa, sin explicaciones.
 A través de la ventana, entre la niebla matutina, vislumbras una figura que no debería estar ahí. Tus instintos de exorcista se despiertan inmediatamente.
 
 Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu entrenamiento te ha preparado para enfrentar lo sobrenatural, pero esta situación parece diferente.`;
+      } else if (camp.chapterData && camp.chapterData.scenes) {
+        // 🆕 USAR NARRATIVA DE TU CHAPTER JSON
+        const firstScene = camp.chapterData.scenes[0];
+        initialNarrative = `📖 **${camp.chapterData.title}**
+
+${camp.chapterData.description}
+
+---
+
+**${firstScene.title}**
+
+${firstScene.narrative}`;
+        console.log(`🎭 Using rich narrative from chapter: ${firstScene.title}`);
       } else {
         initialNarrative = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
 
