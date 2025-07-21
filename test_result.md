@@ -1,4 +1,8 @@
-🚨 PROBLEMAS CRÍTICOS ACTUALES:
+🚨 PROBLEMAS CRÍTICOS ACTUALES - INVESTIGACIÓN 21/01/2025:
+🔍 INVESTIGACIÓN REQUERIDA - Drop Item UI Update Issue: Usuario reporta que funcionalidad "drop" no actualiza UI automáticamente a pesar del fix de polling (!==)
+🔍 INVESTIGACIÓN REQUERIDA - Contextual Item Detection Regression: Usuario reporta regresión en detección contextual (ej: "diario de exorcismo" → "amuleto protector")
+
+HISTORIAL PREVIO (RESUELTOS ANTERIORMENTE):
 ✅ Backend no inicia - RESUELTO - Error de spawn arreglado (declaración duplicada itemName)
 ✅ CORS Configuration - RESUELTO - URLs corregidas y wildcard CORS configurado
 ✅ Modal discovered items - RESUELTO - Backend genera items correctamente en discoveredItems array
