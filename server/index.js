@@ -1759,4 +1759,153 @@ async function startServer() {
   });
 }
 
+// 🎯 INTELLIGENT LOOT SYSTEM - Sistema de loot dinámico contextual
+const INTELLIGENT_LOOT = {
+  mystical: [
+    { name: 'amuleto protector', icon: '🧿', weight: 30 },
+    { name: 'cristal energético', icon: '🔮', weight: 25 },
+    { name: 'pergamino sagrado', icon: '📜', weight: 20 },
+    { name: 'reliquia antigua', icon: '⚗️', weight: 15 }
+  ],
+  knowledge: [
+    { name: 'libro antiguo', icon: '📖', weight: 35 },
+    { name: 'documento secreto', icon: '📋', weight: 30 },
+    { name: 'mapa detallado', icon: '🗺️', weight: 25 },
+    { name: 'diario personal', icon: '📓', weight: 20 }
+  ],
+  combat: [
+    { name: 'daga afilada', icon: '🗡️', weight: 35 },
+    { name: 'pistola antigua', icon: '🔫', weight: 30 },
+    { name: 'armadura ligera', icon: '🦺', weight: 25 },
+    { name: 'escudo pequeño', icon: '🛡️', weight: 20 }
+  ],
+  exploration: [
+    { name: 'linterna robusta', icon: '🔦', weight: 35 },
+    { name: 'cuerda resistente', icon: '🪢', weight: 30 },
+    { name: 'herramientas básicas', icon: '🔧', weight: 25 },
+    { name: 'brújula precisa', icon: '🧭', weight: 20 }
+  ],
+  urban: [
+    { name: 'llave maestra', icon: '🗝️', weight: 35 },
+    { name: 'moneda de oro', icon: '🪙', weight: 30 },
+    { name: 'documento oficial', icon: '📜', weight: 25 },
+    { name: 'gema preciosa', icon: '💎', weight: 20 }
+  ]
+};
+
+function detectNarrativeContext(narrative, action) {
+  console.log(`🔍 Detectando contexto narrativo...`);
+  
+  const text = (narrative + ' ' + action).toLowerCase();
+  const contexts = [];
+  
+  // Detección de contextos
+  if (/magia|místico|espiritual|sagrado|demonio|exorcismo|bruja|hechizo/.test(text)) {
+    contexts.push('mystical');
+  }
+  
+  if (/libro|leer|estudiar|investigar|documento|archivo|biblioteca/.test(text)) {
+    contexts.push('knowledge');
+  }
+  
+  if (/lucha|combate|pelea|atacar|defender|arma|enemigo/.test(text)) {
+    contexts.push('combat');
+  }
+  
+  if (/explorar|aventura|buscar|examinar|descubrir|hurgar/.test(text)) {
+    contexts.push('exploration');
+  }
+  
+  if (/ciudad|urbano|edificio|calle|oficina|tienda/.test(text)) {
+    contexts.push('urban');
+  }
+  
+  console.log(`🎯 Contextos detectados: ${contexts.join(', ')}`);
+  return contexts.length > 0 ? contexts : ['exploration'];
+}
+
+function analyzeSandboxConcept(concept) {
+  console.log(`🎯 Analizando concepto sandbox: "${concept}"`);
+  
+  const conceptLower = concept.toLowerCase();
+  const themes = [];
+  
+  if (/detective|investigar|misterio|caso|policial/.test(conceptLower)) {
+    themes.push('exploration', 'urban');
+  }
+  
+  if (/paranormal|sobrenatural|fantasma|demonio|exorcista/.test(conceptLower)) {
+    themes.push('mystical', 'knowledge');
+  }
+  
+  if (/guerra|soldado|militar|combate|batalla/.test(conceptLower)) {
+    themes.push('combat', 'exploration');
+  }
+  
+  if (/aventurero|explorador|tesoro|ruinas/.test(conceptLower)) {
+    themes.push('exploration', 'mystical');
+  }
+  
+  console.log(`🎯 Temas del sandbox: ${themes.join(', ')}`);
+  return themes.length > 0 ? themes : ['exploration'];
+}
+
+function rollIntelligentLoot(gameState, action, narrative) {
+  console.log(`🎯 Generando loot inteligente...`);
+  
+  // Detectar contextos
+  const narrativeContexts = detectNarrativeContext(narrative, action);
+  let sandboxThemes = [];
+  
+  if (gameState.mode === 'sandbox' && gameState.sandboxConcept) {
+    sandboxThemes = gameState.sandboxThemes || analyzeSandboxConcept(gameState.sandboxConcept);
+    gameState.sandboxThemes = sandboxThemes;
+  }
+  
+  // Combinar contextos
+  const allContexts = [...new Set([...sandboxThemes, ...narrativeContexts])];
+  console.log(`🎯 Contextos finales: ${allContexts.join(', ')}`);
+  
+  // Seleccionar categoría (priorizar narrativo)
+  let selectedCategory = 'exploration';
+  for (const context of narrativeContexts) {
+    if (INTELLIGENT_LOOT[context]) {
+      selectedCategory = context;
+      break;
+    }
+  }
+  
+  console.log(`🎯 Categoría seleccionada: ${selectedCategory}`);
+  
+  // Generar item
+  const lootTable = INTELLIGENT_LOOT[selectedCategory] || INTELLIGENT_LOOT.exploration;
+  const totalWeight = lootTable.reduce((sum, item) => sum + item.weight, 0);
+  let randomWeight = Math.random() * totalWeight;
+  
+  let selectedItem = null;
+  for (const item of lootTable) {
+    if (randomWeight < item.weight) {
+      selectedItem = item;
+      break;
+    }
+    randomWeight -= item.weight;
+  }
+  
+  if (!selectedItem) selectedItem = lootTable[0];
+  
+  const finalItem = {
+    name: selectedItem.name,
+    icon: selectedItem.icon,
+    type: selectedCategory,
+    description: `${selectedItem.name} encontrado durante la exploración`,
+    rarity: 'common',
+    source: 'dynamic_intelligent',
+    contexts: allContexts,
+    instanceId: crypto.randomUUID()
+  };
+  
+  console.log(`🎁 LOOT GENERADO: ${finalItem.name} ${finalItem.icon} (${selectedCategory})`);
+  return finalItem;
+}
+
 startServer().catch(console.error);
