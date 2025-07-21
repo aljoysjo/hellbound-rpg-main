@@ -377,6 +377,8 @@ class GameState {
       
       location: this.location,
       inventory: this.inventory,
+      discoveredItems: this.discoveredItems || [], // 🎁 LOOT DESCUBIERTO
+      ignoredItems: this.ignoredItems || [], // 🚫 ITEMS IGNORADOS
       narrativeLog: this.narrativeLog,
       mode: this.mode,
       campaignMeta: this.campaignMeta,
