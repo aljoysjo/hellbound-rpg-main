@@ -411,6 +411,10 @@ class GameState {
       campaignMeta: this.campaignMeta,
       map: this.map,
       
+      // 🆕 CHAPTER SYSTEM (solo incluir si existe)
+      chapterData: this.chapterData || null,
+      currentScene: this.currentScene || null,
+      
       // 📖 NARRATIVA MEJORADA
       toneBias: this.toneBias,
       usedPhrases: this.usedPhrases.slice(-20), // Solo últimas 20 frases
