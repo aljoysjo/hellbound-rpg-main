@@ -1680,7 +1680,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
     
     // 🎁 SISTEMA DE LOOT DINÁMICO - Detectar acciones de búsqueda
     const actionLowerForLoot = action.toLowerCase();
-    if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir|rebusco|reviso/.test(actionLowerForLoot)) {
+    if (/busco|buscar|examino|examinar|hurgo|hurgar|exploro|explorar|investigo|investigar|descubro|descubrir|rebusco|reviso|miro|observo|inspecciono|registro/.test(actionLowerForLoot)) {
       console.log(`🎁 ACTIVANDO SISTEMA DE LOOT para acción: "${action}"`);
       
       // Generar loot inteligente
