@@ -2952,12 +2952,6 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
         } // Cierre del else
       } // Cierre del if availableItems.length === 0
       } // Cierre del shouldGenerateItem
-            console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
-          } else {
-            console.log(`⚠️ LOOT YA EXISTE: ${intelligentLoot.name}`);
-          }
-        }
-      }
     } // ← CERRAR BLOQUE DEL SISTEMA DE PROBABILIDAD
     } else {
       console.log(`🎲 Sistema híbrido no activado para: "${action}"`);
