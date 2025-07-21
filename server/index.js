@@ -2951,33 +2951,7 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
           }
         } // Cierre del else
       } // Cierre del if availableItems.length === 0
-          const existsInInventory = gameState.inventory.some(item => 
-            item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
-          );
-          
-          if (!gameState.discoveredItems) gameState.discoveredItems = [];
-          const existsInDiscovered = gameState.discoveredItems.some(item => 
-            item.name.toLowerCase() === intelligentLoot.name.toLowerCase()
-          );
-          
-          if (!existsInInventory && !existsInDiscovered) {
-            // Añadir a discoveredItems (clickeable)
-            gameState.discoveredItems.push(intelligentLoot);
-            console.log(`🎁 LOOT DINÁMICO GENERADO (clickeable): ${intelligentLoot.name} ${intelligentLoot.icon}`);
-            
-            // Extender narrativa con explicación orgánica
-            const explanationPhrases = [
-              `Mientras rebuscas con más atención, descubres ${intelligentLoot.name} ${intelligentLoot.icon}`,
-              `Al examinar más detenidamente, encuentras ${intelligentLoot.name} ${intelligentLoot.icon}`,
-              `Durante tu búsqueda, das con ${intelligentLoot.name} ${intelligentLoot.icon}`,
-              `Tras una inspección minuciosa, localizas ${intelligentLoot.name} ${intelligentLoot.icon}`,
-              `En un rincón poco visible, descubres ${intelligentLoot.name} ${intelligentLoot.icon}`
-            ];
-            
-            const randomExplanation = explanationPhrases[Math.floor(Math.random() * explanationPhrases.length)];
-            narrative += ` ${randomExplanation}.`;
-            
-            console.log(`📝 NARRATIVA EXTENDIDA: ${randomExplanation}`);
+      } // Cierre del shouldGenerateItem
             console.log(`🎯 CONTEXTOS UTILIZADOS: ${intelligentLoot.contexts.join(', ')}`);
           } else {
             console.log(`⚠️ LOOT YA EXISTE: ${intelligentLoot.name}`);
