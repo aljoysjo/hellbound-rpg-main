@@ -3,7 +3,7 @@ import json
 import time
 
 # Base URL for the API
-BASE_URL = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
+BASE_URL = "https://9f2d59a6-1dc6-45c7-94c5-bb7bd8e5829c.preview.emergentagent.com"
 
 def test_healthcheck():
     """Test the healthcheck endpoint"""

@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 class ItemsInNarrativeFixer:
-    def __init__(self, base_url="https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"):
+    def __init__(self, base_url="https://9f2d59a6-1dc6-45c7-94c5-bb7bd8e5829c.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_id = None
         self.tests_run = 0
@@ -279,7 +279,7 @@ class ItemsInNarrativeFixer:
 
 def main():
     # Use the provided URL from the test request
-    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
+    backend_url = "https://9f2d59a6-1dc6-45c7-94c5-bb7bd8e5829c.preview.emergentagent.com"
     
     print(f"🔥 Testing Items in Narrative at {backend_url}")
     

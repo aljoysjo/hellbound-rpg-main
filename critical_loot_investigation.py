@@ -12,7 +12,7 @@ def investigate_loot_system():
     """
     
     # Use the backend URL from frontend/.env as specified in the review request
-    backend_url = "https://bdd8441f-bc0a-4b84-9d25-f35dd5944ec5.preview.emergentagent.com"
+    backend_url = "https://9f2d59a6-1dc6-45c7-94c5-bb7bd8e5829c.preview.emergentagent.com"
     
     print("🔥 INVESTIGACIÓN CRÍTICA - Completar diagnóstico de InlineLootBlock")
     print(f"🌐 Backend URL: {backend_url}")
