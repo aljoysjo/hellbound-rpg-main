@@ -1510,6 +1510,15 @@ function App() {
               <div className="no-skills-message">Tu inventario está vacío</div>
             )}
           </div>
+          
+          {/* 🆕 BOTÓN GUARDAR EN MODAL INVENTARIO */}
+          <div className="modal-footer border-t border-[var(--imperial-gold)]/30 pt-3 mt-3">
+            <SaveSessionButton 
+              sessionId={sessionId} 
+              BACKEND_URL={BACKEND_URL} 
+              compact={false}
+            />
+          </div>
         </div>
 
         {/* Skills Modal */}
