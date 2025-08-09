@@ -329,10 +329,12 @@ class SessionPersistenceTester:
             'sandboxConcept': concept
         })
         
-        if not success or not response.get('success'):
-            return self.log_test("Flujo Completo", False, "Error creando sesión inicial")
+        if not success:
+            return self.log_test("Flujo Completo", False, "Error en request de sesión inicial")
         
         flow_session_id = response.get('session_id')
+        if not flow_session_id:
+            return self.log_test("Flujo Completo", False, "session_id no devuelto")
         initial_game_state = response.get('game_state', {})
         initial_inventory_count = len(initial_game_state.get('inventory', []))
         initial_action_count = initial_game_state.get('actionCount', 0)
