@@ -8,6 +8,8 @@ import ResponsiveHeader from './components/ResponsiveHeader';
 import StoryInput from './components/StoryInput';
 import RandomEventModal from './components/RandomEventModal';
 import InlineLootBlock from './components/InlineLootBlock';
+import SavedSessionsManager from './components/SavedSessionsManager';
+import SaveSessionButton from './components/SaveSessionButton';
 
 // this is test comment
 
