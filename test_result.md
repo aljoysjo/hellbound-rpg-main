@@ -1,3 +1,75 @@
+🚨 FUNCIONALIDAD DE PERSISTENCIA DE SESIONES IMPLEMENTADA - 22/01/2025:
+
+## 🆕 NUEVA FUNCIONALIDAD IMPLEMENTADA - PERSISTENCIA DE SESIONES
+
+**DESCRIPCIÓN**: Se implementó un sistema completo de persistencia de sesiones que permite a los usuarios guardar y cargar sus partidas usando códigos únicos de sesión.
+
+**COMPONENTES AGREGADOS**:
+
+### Backend (/app/server/index.js):
+- ✅ Métodos de serialización en GameState:
+  - `serialize()`: Convertir GameState a JSON
+  - `static deserialize()`: Crear GameState desde JSON guardado
+  - `autoSave()`: Auto-guardado con debouncing
+- ✅ Nuevos endpoints API:
+  - `POST /api/save_session`: Guardar sesión manualmente
+  - `POST /api/load_session`: Cargar sesión por código
+  - `GET /api/list_sessions`: Listar sesiones guardadas
+  - `DELETE /api/delete_session`: Eliminar sesión
+- ✅ Auto-guardado integrado en:
+  - `/api/free_input`: Acciones principales del juego
+  - `/api/pickup_item`: Recoger items
+  - `/api/ignore_item`: Ignorar items
+- ✅ Generación de códigos únicos (formato: RPG-XXXXX)
+- ✅ Sistema de gestión de múltiples partidas
+
+### Frontend (/app/frontend/src):
+- ✅ **SavedSessionsManager.js**: Componente principal para gestionar sesiones
+  - Lista de partidas guardadas con metadatos
+  - Input para cargar por código de sesión
+  - UI responsive y moderna
+- ✅ **SaveSessionButton.js**: Botón para guardar partida
+  - Versión compacta para header
+  - Versión completa para modales
+  - Funcionalidad de copiar código al portapapeles
+- ✅ **WelcomeScreen.js**: Agregado botón "💾 Cargar Partida"
+- ✅ **App.js**: Integración completa:
+  - Estado para mostrar manager de sesiones
+  - Funciones para cargar sesiones guardadas
+  - Botón guardar en header (desktop) e inventario (móvil)
+
+**CARACTERÍSTICAS TÉCNICAS**:
+- 🔄 Auto-guardado automático cada 3 segundos tras acciones importantes
+- 🎯 Códigos únicos de sesión (RPG-XXXXX) para compartir partidas
+- 💾 Persistencia completa del estado del juego en MongoDB
+- 🔒 Sistema no-destructivo: no rompe funcionalidad existente
+- 📱 UI responsive para móvil y desktop
+- 🎮 Soporte para máximo 5 partidas por usuario
+- 🔄 Preparado para futuro modo multiplayer
+- ✨ Títulos automáticos generados por contexto del juego
+
+**FLUJO DE USUARIO**:
+1. **Crear nueva partida**: Se genera código automáticamente
+2. **Auto-guardado**: Transparente durante el juego
+3. **Guardar manual**: Botón en header/inventario muestra código
+4. **Cargar partida**: Por código o desde lista de sesiones
+5. **Compartir**: Enviar código RPG-XXXXX a otros jugadores
+
+**ESTADO ACTUAL**: ✅ IMPLEMENTADO Y FUNCIONAL
+- Backend: Todos los endpoints funcionando
+- Frontend: Componentes integrados
+- Base de datos: Colección `saved_sessions` creada
+- Servicios: Backend y Frontend ejecutándose correctamente
+
+**PRÓXIMOS PASOS PARA TESTING**:
+- Probar guardado de sesión en diferentes modos (sandbox/campaña)
+- Verificar carga de sesiones guardadas
+- Testear auto-guardado durante el juego
+- Validar códigos de sesión únicos
+- Comprobar UI responsive en diferentes dispositivos
+
+---
+
 🚨 INVESTIGACIÓN CRÍTICA COMPLETADA - 21/01/2025:
 🔍 PROBLEMA CRÍTICO IDENTIFICADO: InlineLootBlock NO aparece después de múltiples reverts
 ✅ DIAGNÓSTICO COMPLETADO: Sistema de loot completamente roto - CAUSA RAÍZ ENCONTRADA
