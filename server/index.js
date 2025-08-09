@@ -2210,6 +2210,13 @@ app.post('/api/pickup_item', async (req, res) => {
       );
     }
     
+    // 🆕 AUTO-GUARDADO NO INVASIVO (solo si hay sessionCode)
+    if (gameState.sessionCode) {
+      gameState.autoSave().catch(error => {
+        console.error('⚠️ Error en auto-guardado pickup:', error);
+      });
+    }
+    
     res.json({
       success: true,
       message: `Has recogido ${pickedItem.name}`,
