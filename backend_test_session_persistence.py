@@ -263,10 +263,12 @@ class SessionPersistenceTester:
                 'sandboxConcept': concept
             })
             
-            if not success or not response.get('success'):
-                return self.log_test("Códigos Únicos", False, f"Error creando sesión {i+1}")
+            if not success:
+                return self.log_test("Códigos Únicos", False, f"Error en request de sesión {i+1}")
             
             temp_session_id = response.get('session_id')
+            if not temp_session_id:
+                return self.log_test("Códigos Únicos", False, f"session_id no devuelto para sesión {i+1}")
             
             # Save the session
             success, save_response = self.run_request('POST', 'api/save_session', data={
