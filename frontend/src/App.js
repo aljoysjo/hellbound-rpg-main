@@ -1310,6 +1310,17 @@ function App() {
         {/* HEADER RESPONSIVO */}
         <ResponsiveHeader gameState={gameState} connectionStatus={connectionStatus} />
 
+        {/* 🆕 BOTÓN GUARDAR PARTIDA (COMPACTO) - SOLO DESKTOP */}
+        <div className="hidden md:block px-4 py-2 border-b border-[var(--imperial-gold)]/30">
+          <div className="flex justify-end">
+            <SaveSessionButton 
+              sessionId={sessionId} 
+              BACKEND_URL={BACKEND_URL} 
+              compact={true}
+            />
+          </div>
+        </div>
+
         {/* MAIN CON SCROLL CONTENIDO */}
         <main className="flex-1 space-y-4 overflow-y-auto px-4">
           
