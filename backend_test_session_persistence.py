@@ -90,7 +90,7 @@ class SessionPersistenceTester:
         
         success, response = self.run_request('POST', 'api/start_session', data={
             'mode': 'sandbox',
-            'concept': concept
+            'sandboxConcept': concept
         })
         
         if not success:
