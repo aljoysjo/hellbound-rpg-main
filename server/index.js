@@ -1215,6 +1215,228 @@ async function initDatabase() {
   }
 }
 
+// Generate session code
+function generateSessionCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = 'RPG-';
+  for (let i = 0; i < 5; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Check if session code exists
+async function sessionCodeExists(code) {
+  if (!db) return false;
+  const existing = await db.collection('saved_sessions').findOne({ sessionCode: code });
+  return !!existing;
+}
+
+// Generate unique session code
+async function generateUniqueSessionCode() {
+  let code;
+  let attempts = 0;
+  do {
+    code = generateSessionCode();
+    attempts++;
+  } while (await sessionCodeExists(code) && attempts < 10);
+  
+  if (attempts >= 10) {
+    throw new Error('No se pudo generar código único de sesión');
+  }
+  
+  return code;
+}
+
+// 🆕 NUEVOS ENDPOINTS PARA PERSISTENCIA (no afectan endpoints existentes)
+
+// Guardar sesión manualmente
+app.post('/api/save_session', async (req, res) => {
+  try {
+    const { session_id } = req.body;
+    
+    if (!session_id || !gameSessions.has(session_id)) {
+      return res.status(400).json({ error: 'Sesión no válida' });
+    }
+    
+    const gameState = gameSessions.get(session_id);
+    
+    // Generar código de sesión si no existe
+    if (!gameState.sessionCode) {
+      gameState.sessionCode = await generateUniqueSessionCode();
+    }
+    
+    const sessionData = {
+      sessionCode: gameState.sessionCode,
+      gameState: gameState.toDict(),
+      metadata: {
+        created: gameState.createdAt || new Date(),
+        lastPlayed: new Date(),
+        gameMode: gameState.mode,
+        title: gameState._generateSessionTitle(),
+        playerCount: 1
+      },
+      players: [{
+        playerID: gameState.playerId,
+        isHost: true
+      }]
+    };
+    
+    if (db) {
+      await db.collection('saved_sessions').updateOne(
+        { sessionCode: gameState.sessionCode },
+        { $set: sessionData },
+        { upsert: true }
+      );
+    }
+    
+    res.json({
+      success: true,
+      sessionCode: gameState.sessionCode,
+      title: sessionData.metadata.title,
+      message: 'Sesión guardada exitosamente'
+    });
+    
+  } catch (error) {
+    console.error('Error guardando sesión:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Cargar sesión por código
+app.post('/api/load_session', async (req, res) => {
+  try {
+    const { sessionCode } = req.body;
+    
+    if (!sessionCode || !sessionCode.trim()) {
+      return res.status(400).json({ error: 'Código de sesión requerido' });
+    }
+    
+    if (!db) {
+      return res.status(500).json({ error: 'Base de datos no disponible' });
+    }
+    
+    // Buscar sesión guardada
+    const savedSession = await db.collection('saved_sessions').findOne({ 
+      sessionCode: sessionCode.trim().toUpperCase() 
+    });
+    
+    if (!savedSession) {
+      return res.status(404).json({ error: 'Código de sesión no encontrado' });
+    }
+    
+    // Crear nuevo ID de sesión para esta carga
+    const newSessionId = crypto.randomUUID();
+    
+    // Restaurar GameState
+    const gameState = GameState.deserialize(savedSession.gameState, newSessionId);
+    gameState.sessionCode = savedSession.sessionCode; // Mantener código original
+    
+    // Registrar en memoria
+    gameSessions.set(newSessionId, gameState);
+    
+    // Actualizar última vez jugado
+    await db.collection('saved_sessions').updateOne(
+      { sessionCode: savedSession.sessionCode },
+      { $set: { 'metadata.lastPlayed': new Date() }}
+    );
+    
+    // Obtener narrativa más reciente
+    const lastNarrative = gameState.narrativeLog.length > 0 ? 
+      gameState.narrativeLog[gameState.narrativeLog.length - 1].narrative :
+      'Tu aventura continúa desde donde la dejaste...';
+    
+    // Generar acciones sugeridas para la situación actual
+    const suggestedActions = await generateSuggestedActions(gameState, lastNarrative, openai);
+    
+    res.json({
+      success: true,
+      session_id: newSessionId,
+      game_state: gameState.toDict(),
+      current_narrative: lastNarrative,
+      suggested_actions: suggestedActions,
+      sessionCode: savedSession.sessionCode,
+      title: savedSession.metadata.title,
+      lastPlayed: savedSession.metadata.lastPlayed
+    });
+    
+  } catch (error) {
+    console.error('Error cargando sesión:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Listar sesiones guardadas (máximo 5 por dispositivo)
+app.get('/api/list_sessions', async (req, res) => {
+  try {
+    const { deviceId } = req.query;
+    
+    if (!db) {
+      return res.status(500).json({ error: 'Base de datos no disponible' });
+    }
+    
+    // Por ahora listar todas las sesiones (futuro: filtrar por deviceId)
+    const sessions = await db.collection('saved_sessions')
+      .find({})
+      .sort({ 'metadata.lastPlayed': -1 })
+      .limit(20)
+      .toArray();
+    
+    const sessionsList = sessions.map(session => ({
+      sessionCode: session.sessionCode,
+      title: session.metadata.title,
+      gameMode: session.metadata.gameMode,
+      lastPlayed: session.metadata.lastPlayed,
+      created: session.metadata.created,
+      playerCount: session.metadata.playerCount,
+      location: session.gameState.location,
+      health: session.gameState.vitals?.health || session.gameState.health || 100
+    }));
+    
+    res.json({
+      success: true,
+      sessions: sessionsList,
+      total: sessionsList.length
+    });
+    
+  } catch (error) {
+    console.error('Error listando sesiones:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Eliminar sesión
+app.delete('/api/delete_session', async (req, res) => {
+  try {
+    const { sessionCode } = req.body;
+    
+    if (!sessionCode || !sessionCode.trim()) {
+      return res.status(400).json({ error: 'Código de sesión requerido' });
+    }
+    
+    if (!db) {
+      return res.status(500).json({ error: 'Base de datos no disponible' });
+    }
+    
+    const result = await db.collection('saved_sessions').deleteOne({ 
+      sessionCode: sessionCode.trim().toUpperCase() 
+    });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Sesión no encontrada' });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Sesión eliminada exitosamente'
+    });
+    
+  } catch (error) {
+    console.error('Error eliminando sesión:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Routes
 app.get('/api/healthcheck', (req, res) => {
   res.json({
