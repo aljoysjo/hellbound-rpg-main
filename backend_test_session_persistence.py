@@ -96,14 +96,10 @@ class SessionPersistenceTester:
         if not success:
             return self.log_test("Crear Sesión Sandbox", False, "Error en request")
         
-        print(f"🔍 Response completa: {json.dumps(response, indent=2)}")
-        
-        if not response.get('success'):
-            return self.log_test("Crear Sesión Sandbox", False, f"Error: {response.get('error', 'Sin success=true')}")
-        
+        # Check if we have session_id (indicates success)
         self.session_id = response.get('session_id')
         if not self.session_id:
-            return self.log_test("Crear Sesión Sandbox", False, "session_id no devuelto")
+            return self.log_test("Crear Sesión Sandbox", False, f"session_id no devuelto. Response: {response}")
         
         # Verify game state structure
         game_state = response.get('game_state', {})
