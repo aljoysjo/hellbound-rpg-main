@@ -42,7 +42,7 @@ const WelcomeScreen = ({ onSelect }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            Sandbox
+            🎨 Sandbox
           </button>
           
           <button
@@ -52,7 +52,18 @@ const WelcomeScreen = ({ onSelect }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            Campaña
+            📖 Campaña
+          </button>
+          
+          {/* 🆕 BOTÓN CARGAR PARTIDA */}
+          <button
+            onClick={() => onSelect('load_session')}
+            className="w-full py-4 px-8 bg-[#583A1D] text-[#F3E7C6] font-bold text-lg rounded-xl 
+                       shadow-lg hover:bg-[#4A3018] hover:shadow-xl hover:-translate-y-1 
+                       transition-all duration-300 ease-out transform active:scale-95 border-2 border-[#B98746]"
+            style={{ fontFamily: 'Cinzel, serif' }}
+          >
+            💾 Cargar Partida
           </button>
         </div>
       </div>
