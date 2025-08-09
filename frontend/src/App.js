@@ -250,7 +250,41 @@ function App() {
 
   const handleBackToModeSelection = () => {
     setShowSandboxForm(false);
+    setShowSavedSessions(false); // 🆕 También ocultar manager de sesiones
     setMode(null);
+  };
+
+  // 🆕 FUNCIONES PARA CARGAR SESIONES
+  const handleLoadSession = (sessionData) => {
+    console.log('🔄 Cargando sesión desde SavedSessionsManager:', sessionData);
+    
+    // Configurar el estado del juego con los datos cargados
+    setSessionId(sessionData.session_id);
+    setGameState(sessionData.game_state);
+    setShowSavedSessions(false);
+    setMode(sessionData.game_state.mode || 'sandbox');
+    setNarrativeVisible(true);
+    
+    // Configurar narrativa y acciones sugeridas
+    if (sessionData.suggested_actions) {
+      setSuggestedActions(sessionData.suggested_actions);
+    }
+    
+    // Configurar discovered items si existen
+    if (sessionData.game_state.discoveredItems) {
+      setDiscoveredItems(sessionData.game_state.discoveredItems);
+    }
+    
+    // Conectar socket si existe
+    if (socket) {
+      socket.emit('join_session', { session_id: sessionData.session_id });
+    }
+    
+    console.log('✅ Sesión cargada exitosamente');
+  };
+
+  const handleCancelLoadSession = () => {
+    setShowSavedSessions(false);
   };
 
   // Auto-scroll effect para narrativa persistente
