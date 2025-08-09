@@ -237,7 +237,11 @@ function App() {
 
   // 🔧 ARREGLO: Funciones de manejo para componentes nuevos
   const handleModeSelect = (selectedMode) => {
-    setMode(selectedMode);
+    if (selectedMode === 'load_session') {
+      setShowSavedSessions(true);
+    } else {
+      setMode(selectedMode);
+    }
   };
 
   const handleSandboxSubmit = (concept) => {
