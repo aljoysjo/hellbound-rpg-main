@@ -262,7 +262,7 @@ class SessionPersistenceTester:
             concept = f"Aventurero explorando ruinas antiguas #{i+1}"
             success, response = self.run_request('POST', 'api/start_session', data={
                 'mode': 'sandbox',
-                'concept': concept
+                'sandboxConcept': concept
             })
             
             if not success or not response.get('success'):
