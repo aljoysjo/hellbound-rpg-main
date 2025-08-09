@@ -2274,6 +2274,13 @@ app.post('/api/ignore_item', async (req, res) => {
       );
     }
     
+    // 🆕 AUTO-GUARDADO NO INVASIVO (solo si hay sessionCode)
+    if (gameState.sessionCode) {
+      gameState.autoSave().catch(error => {
+        console.error('⚠️ Error en auto-guardado ignore:', error);
+      });
+    }
+    
     res.json({
       success: true,
       message: `Has ignorado ${ignoredItem.name}`,
