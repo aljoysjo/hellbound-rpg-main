@@ -29,6 +29,7 @@ function App() {
   const [showSandboxForm, setShowSandboxForm] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [sandboxConcept, setSandboxConcept] = useState('');
+  const [showSavedSessions, setShowSavedSessions] = useState(false); // 🆕 Estado para mostrar sesiones guardadas
   
   // UI States
   const [narrativeVisible, setNarrativeVisible] = useState(true);
