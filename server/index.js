@@ -2145,6 +2145,14 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       state_changes: stateChanges
     });
     
+    // 🆕 AUTO-GUARDADO NO INVASIVO (solo si hay sessionCode)
+    if (gameState.sessionCode) {
+      gameState.autoSave().catch(error => {
+        console.error('⚠️ Error en auto-guardado:', error);
+        // No afecta la respuesta principal
+      });
+    }
+    
     res.json({
       success: true,
       narrative: narrative,
