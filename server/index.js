@@ -447,6 +447,123 @@ class GameState {
     };
   }
 
+  // 🆕 MÉTODOS DE PERSISTENCIA DE SESIONES (no afecta funcionamiento existente)
+  
+  // Serializar GameState completo a JSON para persistencia
+  serialize() {
+    return JSON.stringify(this.toDict());
+  }
+  
+  // Crear GameState desde datos serializados
+  static deserialize(jsonData, sessionId) {
+    try {
+      const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      const gameState = new GameState(sessionId || data.sessionId);
+      
+      // Restaurar todos los campos del estado
+      gameState.playerId = data.playerId || gameState.playerId;
+      gameState.vitals = data.vitals || gameState.vitals;
+      gameState.resources = data.resources || gameState.resources;
+      gameState.attributes = data.attributes || gameState.attributes;
+      gameState.emotionalStates = data.emotionalStates || gameState.emotionalStates;
+      gameState.skills = data.skills || gameState.skills;
+      gameState.location = data.location || gameState.location;
+      gameState.inventory = data.inventory || gameState.inventory;
+      gameState.discoveredItems = data.discoveredItems || [];
+      gameState.ignoredItems = data.ignoredItems || [];
+      gameState.narrativeLog = data.narrativeLog || [];
+      gameState.mode = data.mode || gameState.mode;
+      gameState.campaignMeta = data.campaignMeta || null;
+      gameState.map = data.map || null;
+      gameState.chapterData = data.chapterData || null;
+      gameState.currentScene = data.currentScene || null;
+      gameState.toneBias = data.toneBias || 0;
+      gameState.usedPhrases = data.usedPhrases || [];
+      gameState.questStage = data.questStage || 'I';
+      gameState.divergenceScore = data.divergenceScore || 0;
+      gameState.memoryRaw = data.memoryRaw || [];
+      gameState.memorySummary = data.memorySummary || '';
+      gameState.sessionSummaries = data.sessionSummaries || [];
+      gameState.actionCount = data.actionCount || 0;
+      gameState.storyAct = data.storyAct || 1;
+      gameState.actProgress = data.actProgress || 0;
+      gameState.majorDecisions = data.majorDecisions || [];
+      gameState.questObjectives = data.questObjectives || [];
+      gameState.sandboxConcept = data.sandboxConcept || null;
+      gameState.isAlive = data.isAlive !== undefined ? data.isAlive : true;
+      gameState.deathReason = data.deathReason || null;
+      gameState.createdAt = data.createdAt ? new Date(data.createdAt) : new Date();
+      
+      // Restaurar Maps desde objetos serializados
+      gameState.temporalEffects = new Map(Object.entries(data.temporalEffects || {}));
+      gameState.relationships = new Map(Object.entries(data.relationships || {}));
+      gameState.knowledge = new Map(Object.entries(data.knowledge || {}));
+      gameState.reputation = new Map(Object.entries(data.reputation || {}));
+      gameState.companionStatus = new Map(Object.entries(data.companionStatus || {}));
+      
+      // Restaurar Sets desde arrays
+      gameState.eventFlags = new Set(data.eventFlags || []);
+      gameState.storyFlags = new Set(data.storyFlags || []);
+      
+      console.log(`🔄 GameState deserializado exitosamente: ${gameState.sessionId}`);
+      return gameState;
+      
+    } catch (error) {
+      console.error('❌ Error deserializando GameState:', error);
+      throw new Error('No se pudo cargar la sesión guardada');
+    }
+  }
+  
+  // Auto-guardar sesión con debouncing
+  async autoSave(delay = 3000) {
+    if (this._saveTimeout) {
+      clearTimeout(this._saveTimeout);
+    }
+    
+    this._saveTimeout = setTimeout(async () => {
+      try {
+        if (db && this.sessionCode) {
+          const sessionData = {
+            sessionCode: this.sessionCode,
+            gameState: this.toDict(),
+            metadata: {
+              lastPlayed: new Date(),
+              gameMode: this.mode,
+              title: this._generateSessionTitle(),
+              playerCount: 1
+            },
+            players: [{
+              playerID: this.playerId,
+              isHost: true
+            }]
+          };
+          
+          await db.collection('saved_sessions').updateOne(
+            { sessionCode: this.sessionCode },
+            { $set: sessionData },
+            { upsert: true }
+          );
+          
+          console.log(`💾 Sesión auto-guardada: ${this.sessionCode}`);
+        }
+      } catch (error) {
+        console.error('❌ Error en auto-guardado:', error);
+      }
+    }, delay);
+  }
+  
+  // Generar título descriptivo para la sesión
+  _generateSessionTitle() {
+    const concept = this.sandboxConcept ? 
+      this.sandboxConcept.substring(0, 30) + '...' : 
+      this.campaignMeta?.titulo || 'Aventura';
+    
+    const location = this.location !== 'Punto de Inicio' ? 
+      ` en ${this.location}` : '';
+    
+    return `${concept}${location}`;
+  }
+
   // 🎯 CATEGORIZACIÓN AUTOMÁTICA DE HABILIDADES
   detectSkillCategory(skill) {
     const skillId = skill.id?.toLowerCase() || '';
