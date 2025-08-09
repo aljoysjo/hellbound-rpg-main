@@ -364,11 +364,11 @@ class SessionPersistenceTester:
             discovered_items = game_state.get('discoveredItems', [])
             
             for item in discovered_items:
-                item_id = item.get('instanceId')
+                item_id = item.get('instanceId')  # Use instanceId instead of instanceId
                 if item_id:
                     pickup_success, pickup_response = self.run_request('POST', 'api/pickup_item', data={
                         'session_id': flow_session_id,
-                        'item_id': item_id
+                        'item_instance_id': item_id  # Use item_instance_id parameter
                     })
                     if pickup_success:
                         print(f"📦 Recogido: {item.get('name')}")
