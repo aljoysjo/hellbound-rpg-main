@@ -96,8 +96,10 @@ class SessionPersistenceTester:
         if not success:
             return self.log_test("Crear Sesión Sandbox", False, "Error en request")
         
+        print(f"🔍 Response completa: {json.dumps(response, indent=2)}")
+        
         if not response.get('success'):
-            return self.log_test("Crear Sesión Sandbox", False, f"Error: {response.get('error')}")
+            return self.log_test("Crear Sesión Sandbox", False, f"Error: {response.get('error', 'Sin success=true')}")
         
         self.session_id = response.get('session_id')
         if not self.session_id:
