@@ -1277,8 +1277,19 @@ function App() {
   }
 
   // Mode selection screen - NUEVO DISEÑO PROFESIONAL EN ESPAÑOL
-  if (!mode) {
+  if (!mode && !showSavedSessions) {
     return <WelcomeScreen onSelect={handleModeSelect} />;
+  }
+
+  // 🆕 PANTALLA DE SESIONES GUARDADAS
+  if (showSavedSessions) {
+    return (
+      <SavedSessionsManager
+        BACKEND_URL={BACKEND_URL}
+        onLoadSession={handleLoadSession}
+        onCancel={handleCancelLoadSession}
+      />
+    );
   }
 
   // Sandbox form - NUEVO COMPONENTE EN ESPAÑOL
