@@ -264,9 +264,7 @@ class GameState {
     this.discoveredItems = []; // 🎁 SISTEMA DE LOOT DESCUBIERTO
     this.ignoredItems = []; // 🚫 ITEMS IGNORADOS PERMANENTEMENTE
     this.narrativeLog = [];
-    this.mode = 'sandbox';
-    this.campaignMeta = null;
-    this.map = null;
+    this.mode = 'sandbox'; // Solo sandbox mode disponible
     
     // 🆕 CHAPTER SYSTEM (solo se usa cuando hay chapter JSON disponible)
     this.chapterData = null;
