@@ -105,8 +105,8 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] overflow-y-auto">
-      <div className="px-4 py-8">
+    <div className="fixed inset-0 bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] overflow-y-auto">
+      <div className="px-4 py-8 min-h-full">
         <div className="mx-auto max-w-4xl">
         {/* HEADER CON FLECHA VOLVER INTEGRADA */}
         <div className="mb-8 text-center relative">
