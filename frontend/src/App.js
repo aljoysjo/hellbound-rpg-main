@@ -31,6 +31,7 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [sandboxConcept, setSandboxConcept] = useState('');
   const [showSavedSessions, setShowSavedSessions] = useState(false); // 🆕 Estado para mostrar sesiones guardadas
+  const [showNewOnboarding, setShowNewOnboarding] = useState(false); // 🆕 Estado para mostrar nuevo onboarding
   
   // UI States
   const [narrativeVisible, setNarrativeVisible] = useState(true);
