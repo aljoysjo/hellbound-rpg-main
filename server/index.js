@@ -297,6 +297,7 @@ class GameState {
     
     // 🎨 SANDBOX CONCEPT-FIRST
     this.sandboxConcept = null; // Para modo sandbox: idea inicial del usuario
+    this.character = null; // 🆕 Datos del personaje creado
     
     // 💀 SISTEMA DE MUERTE
     this.isAlive = true;
