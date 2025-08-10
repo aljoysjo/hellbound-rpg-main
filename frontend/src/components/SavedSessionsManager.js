@@ -105,20 +105,19 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] px-4 py-8 overflow-y-auto">
       <div className="mx-auto max-w-4xl">
-        {/* 🔧 BOTÓN VOLVER - POSICIÓN UX CORRECTA (ARRIBA IZQUIERDA) */}
-        <div className="mb-6">
+        {/* HEADER CON FLECHA VOLVER INTEGRADA */}
+        <div className="mb-8 text-center relative">
+          {/* 🔧 FLECHA VOLVER - DISCRETA Y CORRECTA POSICIÓN */}
           <button
             onClick={onCancel}
-            className="rounded-lg bg-[var(--cedar-brown)] px-6 py-2 text-white font-semibold transition-all hover:bg-[var(--cedar-brown)]/90 shadow-lg flex items-center gap-2"
+            className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-[var(--cedar-brown)]/10 transition-all text-[var(--cedar-brown)] text-2xl"
+            title="Volver al Menú Principal"
           >
-            ← Volver al Menú Principal
+            ←
           </button>
-        </div>
-
-        {/* HEADER */}
-        <div className="mb-8 text-center">
+          
           <h1 className="mb-2 text-4xl font-bold text-[var(--cedar-brown)]">
             💾 Sesiones Guardadas
           </h1>
