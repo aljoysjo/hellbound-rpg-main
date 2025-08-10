@@ -267,6 +267,7 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
             </div>
           )}
         </div>
+        </div>
       </div>
     </div>
   );
