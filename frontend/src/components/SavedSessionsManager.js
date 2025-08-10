@@ -267,16 +267,6 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
             </div>
           )}
         </div>
-
-        {/* BOTÓN VOLVER - MÁS VISIBLE */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={onCancel}
-            className="rounded-lg bg-[var(--cedar-brown)] px-8 py-3 text-white font-semibold transition-all hover:bg-[var(--cedar-brown)]/90 shadow-lg"
-          >
-            ← Volver al Menú Principal
-          </button>
-        </div>
       </div>
     </div>
   );
