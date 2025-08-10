@@ -1391,7 +1391,7 @@ app.get('/api/get_session/:sessionId', (req, res) => {
 
 app.post('/api/start_session', async (req, res) => {
   try {
-    const { sandboxConcept } = req.body; // Solo sandbox mode
+    const { sandboxConcept, character } = req.body; // 🆕 Incluir character data
     
     if (!sandboxConcept || !sandboxConcept.trim()) {
       return res.status(400).json({ error: 'Concepto de sandbox requerido' });
@@ -1403,13 +1403,64 @@ app.post('/api/start_session', async (req, res) => {
     // 🎨 INICIALIZAR SANDBOX MODE
     gameState.initializeSandboxFromConcept(sandboxConcept.trim());
     
+    // 🆕 AGREGAR CHARACTER DATA AL GAME STATE
+    if (character) {
+      gameState.character = character;
+      console.log(`🎭 Personaje creado: ${character.name} (${character.archetype})`);
+    }
+    
     // Registrar sesión
     gameSessions.set(sessionId, gameState);
     
-    // Crear narrativa inicial basada en concepto
-    const initialNarrative = `Bienvenido a tu aventura: "${sandboxConcept}". Tu historia comienza ahora... ¿Cuál es tu primera acción?`;
+    // 🆕 CREAR NARRATIVA INICIAL RICA CON CHARACTER CONTEXT
+    let initialNarrative;
     
-    // Generar acciones sugeridas
+    if (character && character.name) {
+      // Generar narrativa personalizada con IA
+      const narrativePrompt = `
+Crea una narrativa inicial inmersiva para un RPG con estos datos:
+
+MUNDO: ${sandboxConcept}
+PERSONAJE: ${character.name}
+ARQUETIPO: ${character.archetype}
+HISTORIA: ${character.background || 'Historia desconocida'}
+PERSONALIDAD: ${character.personality || 'Personalidad por descubrir'}
+APARIENCIA: ${character.appearance || 'Apariencia común'}
+
+INSTRUCCIONES:
+1. Crea una escena inicial inmersiva de 3-4 oraciones
+2. Menciona el nombre del personaje específicamente
+3. Usa su historia personal y personalidad para contexto
+4. Establece una situación específica que requiera acción
+5. Escribe en segunda persona ("Te encuentras...")
+6. Termina con una pregunta o situación que requiera decisión
+7. No uses frases genéricas como "Tu historia comienza"
+8. Hazlo específico al mundo y personaje
+
+Responde SOLO con la narrativa, sin explicaciones adicionales.
+`;
+
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: narrativePrompt }],
+          temperature: 0.8,
+          max_tokens: 250
+        });
+
+        initialNarrative = response.choices[0].message.content || 
+          `${character.name}, como ${character.archetype}, te encuentras en el mundo de ${sandboxConcept}. Tu aventura específica está a punto de comenzar...`;
+          
+      } catch (error) {
+        console.error('Error generando narrativa:', error);
+        initialNarrative = `${character.name}, tu aventura en ${sandboxConcept} comienza ahora. Como ${character.archetype}, tus habilidades serán esenciales para lo que está por venir...`;
+      }
+    } else {
+      // Fallback sin character data
+      initialNarrative = `Tu aventura en ${sandboxConcept} está a punto de comenzar. ¿Cómo quieres empezar esta historia?`;
+    }
+    
+    // Generar acciones sugeridas contextuales
     const suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
     
     // Guardar narrativa inicial
