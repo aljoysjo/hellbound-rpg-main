@@ -355,6 +355,7 @@ class GameState {
       
       // 🎨 SANDBOX
       sandboxConcept: this.sandboxConcept,
+      character: this.character, // 🆕 Datos del personaje
       
       // 💀 SISTEMA DE MUERTE
       isAlive: this.isAlive,
