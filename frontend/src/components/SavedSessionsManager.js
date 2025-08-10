@@ -70,6 +70,7 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
       return;
     }
     
+    setLoadingCode('BY_CODE'); // Usar un valor específico para cargar por código
     await handleLoadSession(sessionCode.trim().toUpperCase());
   };
 
