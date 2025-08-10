@@ -406,6 +406,7 @@ class GameState {
       gameState.majorDecisions = data.majorDecisions || [];
       gameState.questObjectives = data.questObjectives || [];
       gameState.sandboxConcept = data.sandboxConcept || null;
+      gameState.character = data.character || null; // 🆕 Restaurar character data
       gameState.isAlive = data.isAlive !== undefined ? data.isAlive : true;
       gameState.deathReason = data.deathReason || null;
       gameState.createdAt = data.createdAt ? new Date(data.createdAt) : new Date();
