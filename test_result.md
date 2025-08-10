@@ -68,6 +68,55 @@
 - Validar códigos de sesión únicos
 - Comprobar UI responsive en diferentes dispositivos
 
+## 🔧 BUGS REPORTADOS Y FIXES APLICADOS - 22/01/2025:
+
+**FEEDBACK DEL USUARIO - BUGS ENCONTRADOS**:
+1. ❌ **Botón "Volver al menú" no visible** en SavedSessionsManager
+2. ❌ **Botones duplicados** para guardar sesión (header + inventario)
+3. ❌ **Input de código bloqueado** - aparecía como "cargando" y no permitía escribir
+4. ✅ **Funcionalidad core funciona correctamente** - guardado, carga, auto-save
+
+**FIXES APLICADOS**:
+
+### Fix 1 - Botón "Volver al menú" más visible:
+```javascript
+// ANTES: bg-[var(--cedar-brown)]/20 text-[var(--cedar-brown)]
+// DESPUÉS: bg-[var(--cedar-brown)] text-white font-semibold shadow-lg
+```
+- ✅ Botón ahora es sólido, blanco sobre fondo café, más prominente
+
+### Fix 2 - Remover botón duplicado del inventario:
+```javascript
+// REMOVIDO: SaveSessionButton del modal de inventario en App.js
+// MANTENER: Solo el botón en header para desktop
+```
+- ✅ Solo 1 botón de guardar (en header desktop), como debe ser
+
+### Fix 3 - Input de código bloqueado (BUG CRÍTICO):
+**PROBLEMA**: 
+```javascript
+// MALO: disabled={loadingCode === sessionCode}
+// Cuando ambos son "" (iniciales), input queda disabled
+```
+
+**SOLUCIÓN**:
+```javascript
+// Cambiar lógica de loading states:
+setLoadingCode('BY_CODE') // Para cargar por código
+disabled={loadingCode === 'BY_CODE'} // Input habilitado por defecto
+// Button: {loadingCode === 'BY_CODE' ? '🔄 Cargando...' : 'Cargar'}
+```
+
+- ✅ Input de código ahora funciona desde el inicio
+- ✅ Loading states manejados correctamente
+- ✅ Botón "Cargar" muestra estado correcto
+
+**ESTADO DESPUÉS DE FIXES**: 
+- ✅ Input de código completamente funcional
+- ✅ Solo 1 botón guardar (posición correcta)  
+- ✅ Botón "Volver al menú" más visible
+- ✅ Todas las funcionalidades core siguen trabajando
+
 ---
 
 🚨 INVESTIGACIÓN CRÍTICA COMPLETADA - 21/01/2025:
