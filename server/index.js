@@ -327,8 +327,6 @@ class GameState {
       ignoredItems: this.ignoredItems || [], // 🚫 ITEMS IGNORADOS
       narrativeLog: this.narrativeLog,
       mode: this.mode,
-      campaignMeta: this.campaignMeta,
-      map: this.map,
       
       // 🆕 CHAPTER SYSTEM (solo incluir si existe)
       chapterData: this.chapterData || null,
