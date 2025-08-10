@@ -10,6 +10,7 @@ import RandomEventModal from './components/RandomEventModal';
 import InlineLootBlock from './components/InlineLootBlock';
 import SavedSessionsManager from './components/SavedSessionsManager';
 import SaveSessionButton from './components/SaveSessionButton';
+import NewOnboardingFlow from './components/NewOnboardingFlow';
 
 // this is test comment
 
