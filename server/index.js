@@ -771,53 +771,7 @@ ${recentActions}`;
     console.log(`👥 ${companionName}: ${relationship} = ${companion[relationship]}`);
   }
 
-  initializeCampaignObjectives() {
-    if (this.mode === 'campaign' && this.campaignMeta) {
-      // Objetivos iniciales del Acto I
-      this.questObjectives = [
-        {
-          id: 'investigate_figure',
-          description: 'Investigar la figura misteriosa',
-          keyword: 'figura',
-          progress: 0,
-          completed: false
-        },
-        {
-          id: 'find_companions',
-          description: 'Encontrar a los compañeros',
-          keyword: 'compañero',
-          progress: 0,
-          completed: false
-        },
-        {
-          id: 'explore_alicante',
-          description: 'Explorar Alicante nevada',
-          keyword: 'alicante',
-          progress: 0,
-          completed: false
-        }
-      ];
-
-      // Inicializar estado de compañeros
-      if (this.campaignMeta.companions) {
-        this.campaignMeta.companions.forEach(companion => {
-          this.companionStatus.set(companion, { trust: 50, met: false });
-          this.relationships.set(companion, 50);
-        });
-      }
-
-      // Habilidades iniciales basadas en la campaña
-      this.skills = [
-        { id: "exorcismo", level: 2, tags: ["luz", "espiritual"], description: "Purificar entidades demoníacas" },
-        { id: "percepcion_sobrenatural", level: 1, tags: ["detección", "mística"], description: "Detectar presencias sobrenaturales" }
-      ];
-      
-      // Ubicación inicial de campaña
-      this.location = "Alicante";
-
-      console.log(`📜 Objetivos de campaña inicializados: ${this.questObjectives.length} objetivos`);
-    }
-  }
+  // ⚠️ FUNCIÓN REMOVIDA: initializeCampaignObjectives() - Solo sandbox mode
 
   initializeSandboxFromConcept(concept) {
     this.sandboxConcept = concept;
