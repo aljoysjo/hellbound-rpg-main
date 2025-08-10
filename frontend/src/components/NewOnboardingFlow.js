@@ -30,9 +30,9 @@ const NewOnboardingFlow = ({ BACKEND_URL, onComplete }) => {
 
   // Templates predefinidos
   const worldTemplates = [
-    { id: 'scifi', icon: '🚀', name: 'Sci-Fi', description: 'Exploradores espaciales en galaxia peligrosa' },
-    { id: 'fantasy', icon: '🏰', name: 'Fantasy', description: 'Aventureros en reino mágico medieval' },
-    { id: 'modern', icon: '🕵️', name: 'Modern', description: 'Investigadores de casos paranormales' },
+    { id: 'scifi', icon: '🚀', name: 'Ciencia Ficción', description: 'Exploradores espaciales en galaxia peligrosa' },
+    { id: 'fantasy', icon: '🏰', name: 'Fantasía', description: 'Aventureros en reino mágico medieval' },
+    { id: 'modern', icon: '🕵️', name: 'Moderno', description: 'Investigadores de casos paranormales' },
     { id: 'postapoc', icon: '🏜️', name: 'Post-Apocalíptico', description: 'Supervivientes en mundo devastado' },
     { id: 'pirate', icon: '🌊', name: 'Piratas', description: 'Piratas buscando tesoros en mares míticos' },
     { id: 'custom', icon: '⚡', name: 'Personalizado', description: 'Crea tu propio mundo único' }
