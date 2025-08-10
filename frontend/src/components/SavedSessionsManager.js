@@ -60,7 +60,7 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
       console.error('Error cargando sesión:', err);
       setError(err.message);
     } finally {
-      setLoadingCode('');
+      setLoadingCode(''); // Resetear estado de loading
     }
   };
 
