@@ -91,7 +91,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Load game configuration
+// 🎮 GAME CONFIGURATION LOADER
 function loadJsonFile(filename) {
   try {
     const data = readFileSync(`/app/${filename}`, 'utf8');
@@ -100,85 +100,6 @@ function loadJsonFile(filename) {
     console.log(`Could not load ${filename}:`, error.message);
     return {};
   }
-}
-
-// Unified campaign loader
-function loadFullCampaign(name) {
-  const base = '/app/campaigns';
-  const campaignFile = path.join(base, 'campaign.json');
-  const mapFile = path.join(base, 'map.json');
-  const scenesFile = path.join(base, 'scenes', `${name}.ink`);
-  
-  console.log(`🔍 Loading full campaign: ${name}`);
-  
-  try {
-    // Load campaign.json
-    const json = existsSync(campaignFile) ? 
-      JSON.parse(readFileSync(campaignFile, 'utf8')) : 
-      { titulo: 'Campaña Predeterminada' };
-    
-    // Load map.json
-    const map = existsSync(mapFile) ? 
-      JSON.parse(readFileSync(mapFile, 'utf8')) : 
-      { nodes: [] };
-    
-    // Load and parse ink file (as text, not compiled)
-    let firstText = '';
-    
-    if (existsSync(scenesFile)) {
-      const inkText = readFileSync(scenesFile, 'utf8');
-      
-      // Parse ink text manually to get first narrative
-      const lines = inkText.split('\n');
-      for (let line of lines) {
-        line = line.trim();
-        if (line.startsWith('==') || line === '' || line.includes('suggestedActions')) continue;
-        if (line.length > 30) {
-          firstText = line;
-          break;
-        }
-      }
-      
-      console.log(`✅ Loaded campaign: "${json.titulo}"`);
-      console.log(`✅ Map with ${map.nodes?.length || 0} locations`);
-      console.log(`✅ Ink text parsed, first narrative: "${firstText.substring(0, 50)}..."`);
-    } else {
-      console.log(`❌ Ink file not found: ${scenesFile}`);
-    }
-    
-    // 🆕 EXTENSIÓN: Intentar cargar chapter JSON (opcional, no afecta sistema existente)
-    const chapterData = loadChapterSystem('ch01');
-    
-    return { 
-      json, 
-      map, 
-      firstText: firstText || json.titulo || 'Aventura épica te espera',
-      chapterData  // 🆕 Solo agregar, no modificar campos existentes
-    };
-    
-  } catch (error) {
-    console.log(`❌ Error loading campaign: ${error.message}`);
-    return null;
-  }
-}
-
-// 🆕 NUEVA FUNCIÓN - Chapter System Loader (sin tocar sistema existente)
-function loadChapterSystem(chapterId) {
-  const chapterFile = path.join('/app/campaigns/chapters', `${chapterId}.json`);
-  
-  if (existsSync(chapterFile)) {
-    try {
-      const chapterData = JSON.parse(readFileSync(chapterFile, 'utf8'));
-      console.log(`🔖 Loaded chapter system: ${chapterData.title} (${chapterId})`);
-      return chapterData;
-    } catch (error) {
-      console.log(`❌ Error loading chapter ${chapterId}:`, error.message);
-      return null;
-    }
-  }
-  
-  console.log(`🔍 No chapter JSON found for: ${chapterId}`);
-  return null;
 }
 
 // Generate suggested actions based on context using AI and emotional states
