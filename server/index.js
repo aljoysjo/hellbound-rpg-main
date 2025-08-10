@@ -1401,8 +1401,7 @@ Responde SOLO con la narrativa, sin explicaciones.
         console.log(`🔖 Using chapter system: ${camp.chapterData.title}`);
       }
       
-      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO
-      gameState.initializeCampaignObjectives();
+      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO - REMOVIDO (Solo sandbox mode)
       
       // Create immersive intro
       const bookTitle = "Hellbound: El infierno en la tierra";
