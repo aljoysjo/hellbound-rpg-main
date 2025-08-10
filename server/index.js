@@ -1339,134 +1339,54 @@ app.get('/api/get_session/:sessionId', (req, res) => {
 
 app.post('/api/start_session', async (req, res) => {
   try {
-    const { mode = 'sandbox', campaign, sandboxConcept } = req.body;
+    const { sandboxConcept } = req.body; // Solo sandbox mode
+    
+    if (!sandboxConcept || !sandboxConcept.trim()) {
+      return res.status(400).json({ error: 'Concepto de sandbox requerido' });
+    }
+    
     const sessionId = crypto.randomUUID();
     const gameState = new GameState(sessionId);
     
-    gameState.mode = mode;
+    // 🎨 INICIALIZAR SANDBOX MODE
+    gameState.initializeSandboxFromConcept(sandboxConcept.trim());
+    
+    // Registrar sesión
     gameSessions.set(sessionId, gameState);
     
-    let initialNarrative;
-    let suggestedActions = [];
+    // Crear narrativa inicial basada en concepto
+    const initialNarrative = `Bienvenido a tu aventura: "${sandboxConcept}". Tu historia comienza ahora... ¿Cuál es tu primera acción?`;
     
-    // 🎨 NUEVO FLUJO SANDBOX CONCEPT-FIRST
-    if (mode === 'sandbox') {
-      if (!sandboxConcept || !sandboxConcept.trim()) {
-        return res.status(400).json({ 
-          error: 'Para modo Sandbox, debes proporcionar un campo "sandboxConcept" con tu idea de historia' 
-        });
-      }
-      
-      gameState.initializeSandboxFromConcept(sandboxConcept);
-      
-      // Generar narrativa inicial basada en el concepto del usuario
-      const conceptPrompt = `
-El usuario quiere jugar una historia RPG con esta idea: "${sandboxConcept}"
-
-Crea una narrativa inicial inmersiva (máximo 4 oraciones) en segunda persona que:
-1. Establezca la situación inicial basada en su concepto
-2. Sea envolvente y específica 
-3. Termine con una situación que requiera una decisión
-4. Use un tono natural, no dramático
-5. En español
-
-Responde SOLO con la narrativa, sin explicaciones.
-`;
-
-      const conceptResponse = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: conceptPrompt }],
-        temperature: 0.8,
-        max_tokens: 200
-      });
-
-      initialNarrative = conceptResponse.choices[0].message.content || 
-        `Tu historia comienza con una idea fascinante: ${sandboxConcept}. Te encuentras en el punto de partida de esta aventura, con el mundo ante ti esperando a ser moldeado por tus decisiones. ¿Cómo quieres que comience tu historia?`;
-        
-    } else if (mode === 'campaign') {
-      // Handle campaign mode with full loading
-      const camp = loadFullCampaign(campaign || 'scenes_act1');
-      if (!camp) {
-        return res.status(404).json({ error: 'Campaña no encontrada' });
-      }
-      
-      // Set campaign data in game state
-      gameState.campaignMeta = camp.json;
-      gameState.map = camp.map;
-      
-      // 🆕 USAR CHAPTER SYSTEM si está disponible (tu JSON)
-      if (camp.chapterData) {
-        gameState.chapterData = camp.chapterData;
-        gameState.currentScene = camp.chapterData.scenes[0].id;
-        console.log(`🔖 Using chapter system: ${camp.chapterData.title}`);
-      }
-      
-      // 📖 INICIALIZAR GESTOR DE HISTORIA AVANZADO - REMOVIDO (Solo sandbox mode)
-      
-      // Create immersive intro
-      const bookTitle = "Hellbound: El infierno en la tierra";
-      const campaignTitle = camp.json.titulo || "Aventura Épica";
-      
-      if (camp.chapterData && camp.chapterData.scenes) {
-        // 🆕 PRIORIDAD: USAR NARRATIVA DE TU CHAPTER JSON
-        const firstScene = camp.chapterData.scenes[0];
-        initialNarrative = `📖 **${camp.chapterData.title}**
-
-${camp.chapterData.description}
-
----
-
-**${firstScene.title}**
-
-${firstScene.narrative}`;
-        console.log(`🎭 Using rich narrative from chapter: ${firstScene.title}`);
-      } else if (camp.firstText && camp.firstText.includes("La nieve cae sobre Alicante")) {
-        initialNarrative = `Despiertas en tu habitación en Alicante. Lo primero que notas es el frío que se filtra por las ventanas, y una extraña quietud en el aire. Algo en el ambiente te pone en alerta, como si una presencia invisible observara cada uno de tus movimientos.
-
-A través de la ventana, entre la niebla matutina, vislumbras una figura que no debería estar ahí. Tus instintos de exorcista se despiertan inmediatamente.
-
-Bienvenido a "${campaignTitle}", una historia basada en el universo de ${bookTitle}. Tu entrenamiento te ha preparado para enfrentar lo sobrenatural, pero esta situación parece diferente.`;
-      } else {
-        initialNarrative = `Bienvenido a "${campaignTitle}", una aventura épica basada en ${bookTitle}. 
-
-${camp.firstText || 'Tu historia comienza ahora.'}`;
-      }
-      
-    } else {
-      // Seasonal mode
-      initialNarrative = `¡Evento especial activo! Las energías cósmicas se alinean de manera inusual, alterando las reglas conocidas del mundo. Te encuentras en ${gameState.location} durante esta época de cambios místicos, donde nuevas oportunidades y peligros aguardan.`;
-      
-      // Habilidades especiales para modo temporal
-      gameState.skills.push({
-        id: "resonancia_temporal", 
-        level: 1, 
-        tags: ["temporal", "especial"], 
-        description: "Sincronizar con energías estacionales"
-      });
-    }
+    // Generar acciones sugeridas
+    const suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
     
-    // Generate initial suggested actions with AI
-    suggestedActions = await generateSuggestedActions(gameState, initialNarrative, openai);
+    // Guardar narrativa inicial
+    gameState.narrativeLog.push({
+      actionId: crypto.randomUUID(),
+      action: 'Inicio de aventura',
+      narrative: initialNarrative,
+      timestamp: new Date(),
+      stats: { ...gameState.vitals }
+    });
     
-    // Add to narrative log - SIN DUPLICACIÓN
-    gameState.narrativeLog = [{
-      timestamp: new Date().toISOString(),
-      player_action: `[Inicio de ${mode}]`,
-      narrative: initialNarrative
-    }];
-    
-    // Save to MongoDB
+    // Actualizar en MongoDB si disponible
     if (db) {
-      await db.collection('sessions').insertOne(gameState.toDict());
+      await db.collection('sessions').updateOne(
+        { sessionId },
+        { $set: gameState.toDict() },
+        { upsert: true }
+      );
     }
     
     res.json({
+      success: true,
       session_id: sessionId,
+      narrative: initialNarrative,
       game_state: gameState.toDict(),
-      initial_narrative: initialNarrative,
       suggested_actions: suggestedActions,
-      mode: mode
+      mode: 'sandbox'
     });
+    
   } catch (error) {
     console.error('Error starting session:', error);
     res.status(500).json({ error: error.message });
