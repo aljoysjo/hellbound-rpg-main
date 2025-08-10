@@ -241,6 +241,8 @@ function App() {
   const handleModeSelect = (selectedMode) => {
     if (selectedMode === 'load_session') {
       setShowSavedSessions(true);
+    } else if (selectedMode === 'sandbox') {
+      setShowNewOnboarding(true); // 🆕 Usar nuevo onboarding
     } else {
       setMode(selectedMode);
     }
