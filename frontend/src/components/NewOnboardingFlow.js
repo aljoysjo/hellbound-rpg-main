@@ -269,23 +269,59 @@ const NewOnboardingFlow = ({ BACKEND_URL, onComplete }) => {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setPlayerCount(1)}
-                  className={`px-4 py-2 rounded-lg ${
-                    playerCount === 1 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)]'
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    playerCount === 1 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
                   }`}
                 >
                   👤 Solo
                 </button>
-                <input
-                  type="range"
-                  min="2"
-                  max="6"
-                  value={playerCount > 1 ? playerCount : 2}
-                  onChange={(e) => setPlayerCount(Number(e.target.value))}
-                  className="flex-1"
-                  disabled={playerCount === 1}
-                />
-                <span className="text-[var(--cedar-brown)] font-semibold">
-                  {playerCount > 1 ? `${playerCount} jugadores` : ''}
+                
+                {/* Multi-player selector */}
+                <div className="flex items-center space-x-2 flex-1">
+                  <button
+                    onClick={() => setPlayerCount(2)}
+                    className={`px-3 py-2 rounded-lg transition-all ${
+                      playerCount === 2 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
+                    }`}
+                  >
+                    2
+                  </button>
+                  <button
+                    onClick={() => setPlayerCount(3)}
+                    className={`px-3 py-2 rounded-lg transition-all ${
+                      playerCount === 3 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
+                    }`}
+                  >
+                    3
+                  </button>
+                  <button
+                    onClick={() => setPlayerCount(4)}
+                    className={`px-3 py-2 rounded-lg transition-all ${
+                      playerCount === 4 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
+                    }`}
+                  >
+                    4
+                  </button>
+                  <button
+                    onClick={() => setPlayerCount(5)}
+                    className={`px-3 py-2 rounded-lg transition-all ${
+                      playerCount === 5 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
+                    }`}
+                  >
+                    5
+                  </button>
+                  <button
+                    onClick={() => setPlayerCount(6)}
+                    className={`px-3 py-2 rounded-lg transition-all ${
+                      playerCount === 6 ? 'bg-[var(--imperial-gold)] text-white' : 'bg-gray-200 text-[var(--cedar-brown)] hover:bg-gray-300'
+                    }`}
+                  >
+                    6
+                  </button>
+                </div>
+                
+                <span className="text-[var(--cedar-brown)] font-semibold min-w-[100px]">
+                  {playerCount === 1 ? 'Solo' : `${playerCount} jugadores`}
                 </span>
               </div>
             </div>
