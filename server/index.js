@@ -390,9 +390,6 @@ class GameState {
       gameState.ignoredItems = data.ignoredItems || [];
       gameState.narrativeLog = data.narrativeLog || [];
       gameState.mode = data.mode || gameState.mode;
-      gameState.campaignMeta = data.campaignMeta || null;
-      gameState.map = data.map || null;
-      gameState.chapterData = data.chapterData || null;
       gameState.currentScene = data.currentScene || null;
       gameState.toneBias = data.toneBias || 0;
       gameState.usedPhrases = data.usedPhrases || [];
