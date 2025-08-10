@@ -129,7 +129,7 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
               onChange={(e) => setSessionCode(e.target.value)}
               placeholder="Ej: RPG-ABC123"
               className="flex-1 rounded-lg border border-[var(--imperial-gold)]/30 bg-white/70 px-4 py-2 text-[var(--cedar-brown)] placeholder-[var(--cedar-brown)]/50 focus:border-[var(--imperial-gold)] focus:outline-none focus:ring-2 focus:ring-[var(--imperial-gold)]/20"
-              disabled={loadingCode === sessionCode}
+              disabled={loadingCode !== ''}
             />
             
             <button
