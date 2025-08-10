@@ -33,7 +33,7 @@ const WelcomeScreen = ({ onSelect }) => {
           Elige tu camino en una aventura épica...
         </p>
 
-        {/* BOTONES CON HOVER EFFECTS PROFESIONALES */}
+        {/* BOTONES CON HOVER EFFECTS PROFESIONALES - SOLO SANDBOX */}
         <div className="space-y-4">
           <button
             onClick={() => onSelect('sandbox')}
@@ -42,17 +42,7 @@ const WelcomeScreen = ({ onSelect }) => {
                        transition-all duration-300 ease-out transform active:scale-95"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            🎨 Sandbox
-          </button>
-          
-          <button
-            onClick={() => onSelect('campaign')}
-            className="w-full py-4 px-8 bg-[#B98746] text-[#F3E7C6] font-bold text-lg rounded-xl 
-                       shadow-lg hover:bg-[#A67B47] hover:shadow-xl hover:-translate-y-1 
-                       transition-all duration-300 ease-out transform active:scale-95"
-            style={{ fontFamily: 'Cinzel, serif' }}
-          >
-            📖 Campaña
+            🎨 Crear Aventura
           </button>
           
           {/* 🆕 BOTÓN CARGAR PARTIDA */}
