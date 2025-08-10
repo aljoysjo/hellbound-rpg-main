@@ -1311,8 +1311,18 @@ function App() {
   }
 
   // Mode selection screen - NUEVO DISEÑO PROFESIONAL EN ESPAÑOL
-  if (!mode && !showSavedSessions) {
+  if (!mode && !showSavedSessions && !showNewOnboarding) {
     return <WelcomeScreen onSelect={handleModeSelect} />;
+  }
+
+  // 🆕 PANTALLA DE NUEVO ONBOARDING
+  if (showNewOnboarding) {
+    return (
+      <NewOnboardingFlow
+        BACKEND_URL={BACKEND_URL}
+        onComplete={handleOnboardingComplete}
+      />
+    );
   }
 
   // 🆕 PANTALLA DE SESIONES GUARDADAS
