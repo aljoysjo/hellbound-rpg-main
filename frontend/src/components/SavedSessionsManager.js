@@ -135,10 +135,10 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
             
             <button
               onClick={handleLoadByCode}
-              disabled={!sessionCode.trim() || loadingCode !== ''}
+              disabled={!sessionCode.trim() || loadingCode === 'BY_CODE'}
               className="rounded-lg bg-[var(--imperial-gold)] px-6 py-2 font-semibold text-white transition-all hover:bg-[var(--imperial-gold)]/90 disabled:bg-gray-400"
             >
-              {loadingCode !== '' ? '🔄 Cargando...' : 'Cargar'}
+              {loadingCode === 'BY_CODE' ? '🔄 Cargando...' : 'Cargar'}
             </button>
           </div>
         </div>
