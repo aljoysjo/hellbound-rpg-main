@@ -1083,7 +1083,59 @@ async function initDatabase() {
   }
 }
 
-// Generate session code
+// 🎲 D20 ROLL LOGIC - Determinar cuándo hacer rolls dramáticos
+function shouldTriggerD20Roll(action, narrative) {
+  const d20Triggers = [
+    // Acciones de riesgo/suerte
+    /intento?\s+(saltar|escalar|trepar|equilibrar)/i,
+    /trato?\s+de\s+(convencer|persuadir|negociar|intimidar)/i,
+    /busco?\s+(tesoros?|objetos?|pistas|secretos?)/i,
+    
+    // Combat actions
+    /ataco?\s+al?/i,
+    /me\s+defiendo/i,
+    /esquivo/i,
+    /lanzo\s+un\s+hechizo/i,
+    
+    // Social interactions
+    /miento\s+a/i,
+    /engaño\s+a/i,
+    /seduzco\s+a/i,
+    
+    // Skill checks
+    /trato?\s+de\s+(abrir|forzar|hackear|descifrar)/i,
+    /intento?\s+(ocultar|esconder|sigilo)/i,
+    /examino\s+(cuidadosamente|detalladamente)/i
+  ];
+  
+  return d20Triggers.some(trigger => trigger.test(action));
+}
+
+// 🎲 GENERAR RESULTADO D20 con contexto
+function generateD20Result(action, roll, gameState) {
+  let outcome = '';
+  let success = false;
+  
+  // Determinar éxito basado en dificultad y roll
+  if (roll >= 15) {
+    success = true;
+    outcome = 'Éxito crítico';
+  } else if (roll >= 12) {
+    success = true;
+    outcome = 'Éxito';
+  } else if (roll >= 8) {
+    outcome = 'Éxito parcial';
+  } else {
+    outcome = 'Fallo';
+  }
+  
+  return {
+    roll,
+    outcome,
+    success,
+    description: `🎲 Resultado: ${roll}/20 - ${outcome}`
+  };
+}
 function generateSessionCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = 'RPG-';
