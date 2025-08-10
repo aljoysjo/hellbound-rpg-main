@@ -107,6 +107,16 @@ const SavedSessionsManager = ({ BACKEND_URL, onLoadSession, onCancel }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[var(--creamy-old)] to-[var(--light-caramel)] px-4 py-8">
       <div className="mx-auto max-w-4xl">
+        {/* 🔧 BOTÓN VOLVER - POSICIÓN UX CORRECTA (ARRIBA IZQUIERDA) */}
+        <div className="mb-6">
+          <button
+            onClick={onCancel}
+            className="rounded-lg bg-[var(--cedar-brown)] px-6 py-2 text-white font-semibold transition-all hover:bg-[var(--cedar-brown)]/90 shadow-lg flex items-center gap-2"
+          >
+            ← Volver al Menú Principal
+          </button>
+        </div>
+
         {/* HEADER */}
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold text-[var(--cedar-brown)]">
