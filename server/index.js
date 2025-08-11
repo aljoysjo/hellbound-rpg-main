@@ -1190,6 +1190,174 @@ async function generateUniqueSessionCode() {
   return code;
 }
 
+// ⚡ GENERAR QUICK ADVENTURE STRUCTURE
+async function generateQuickAdventure(sandboxConcept, character, openaiClient) {
+  const quickAdventurePrompt = `
+Crea una aventura rápida de 20-30 minutos para un RPG con estos datos:
+
+MUNDO: ${sandboxConcept}
+PERSONAJE: ${character?.name || 'Aventurero'} (${character?.archetype || 'Explorador'})
+TRASFONDO: ${character?.background || 'Trasfondo desconocido'}
+
+INSTRUCCIONES:
+1. Duración total: 20-30 minutos máximo
+2. Crea 3-4 escenas principales cortas
+3. Objetivo claro y específico
+4. Final definitivo (no abierto)
+5. NPCs mínimos pero memorables
+6. Items/recompensas apropiados al mundo
+
+FORMATO REQUERIDO (JSON válido):
+{
+  "title": "Título atractivo de la aventura",
+  "estimated_duration": "25 minutos",
+  "objective": "Objetivo claro que el jugador debe lograr",
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Escena inicial",
+      "description": "Descripción breve de qué ocurre",
+      "estimated_time": "5 minutos",
+      "key_elements": ["Elemento1", "Elemento2"]
+    },
+    {
+      "id": 2,
+      "title": "Desarrollo",
+      "description": "Desafío principal",
+      "estimated_time": "15 minutos",
+      "key_elements": ["Conflicto", "Decision"]
+    },
+    {
+      "id": 3,
+      "title": "Clímax y resolución",
+      "description": "Final de la aventura",
+      "estimated_time": "5 minutos", 
+      "key_elements": ["Resolution", "Reward"]
+    }
+  ],
+  "npcs": [
+    {"name": "Nombre", "role": "Rol", "personality": "Personalidad"}
+  ],
+  "key_items": ["Item1", "Item2"],
+  "success_condition": "Condición específica de éxito"
+}
+
+Responde SOLO con el JSON válido, sin explicaciones adicionales.
+`;
+
+  try {
+    const response = await openaiClient.chat.completions.create({
+      model: "gpt-4o-mini", 
+      messages: [{ role: "user", content: quickAdventurePrompt }],
+      temperature: 0.7,
+      max_tokens: 800
+    });
+
+    const adventureData = JSON.parse(response.choices[0].message.content);
+    console.log('⚡ Quick Adventure estructura generada:', adventureData.title);
+    return adventureData;
+
+  } catch (error) {
+    console.error('❌ Error generando Quick Adventure:', error);
+    // Fallback structure
+    return {
+      title: `Aventura en ${sandboxConcept}`,
+      estimated_duration: "25 minutos",
+      objective: "Explora y resuelve el misterio principal",
+      scenes: [
+        {
+          id: 1,
+          title: "Llegada",
+          description: "El aventurero llega al lugar de la aventura",
+          estimated_time: "5 minutos",
+          key_elements: ["Orientación", "Primera impresión"]
+        },
+        {
+          id: 2,
+          title: "Investigación",
+          description: "Descubre pistas y enfrenta desafíos",
+          estimated_time: "15 minutos", 
+          key_elements: ["Pistas", "Obstáculo principal"]
+        },
+        {
+          id: 3,
+          title: "Resolución",
+          description: "Confronta el desafío final y resuelve la aventura",
+          estimated_time: "5 minutos",
+          key_elements: ["Confrontación", "Recompensa"]
+        }
+      ],
+      npcs: [{"name": "Figura misteriosa", "role": "Guía", "personality": "Enigmático"}],
+      key_items: ["Pista clave"],
+      success_condition: "Resolver el misterio principal"
+    };
+  }
+}
+
+// 📝 CREAR PROMPT PARA SANDBOX REGULAR
+function createSandboxNarrativePrompt(sandboxConcept, character) {
+  return `
+Crea una narrativa inicial inmersiva para un RPG con estos datos:
+
+MUNDO: ${sandboxConcept}
+PERSONAJE: ${character.name}
+ARQUETIPO: ${character.archetype}
+HISTORIA: ${character.background || 'Historia desconocida'}
+PERSONALIDAD: ${character.personality || 'Personalidad por descubrir'}
+APARIENCIA: ${character.appearance || 'Apariencia común'}
+FORTALEZAS: ${character.strengths.join(', ') || 'Ninguna especificada'}
+DEBILIDADES: ${character.weaknesses.join(', ') || 'Ninguna especificada'}
+
+INSTRUCCIONES ESPECÍFICAS:
+1. OBLIGATORIO: Menciona el nombre "${character.name}" al menos 2 veces
+2. OBLIGATORIO: Usa su historia personal "${character.background}" para crear contexto específico
+3. OBLIGATORIO: Refleja su personalidad "${character.personality}" en la situación
+4. OBLIGATORIO: Crea una situación que use sus fortalezas: ${character.strengths.join(', ')}
+5. Describe la escena en 4-5 oraciones detalladas
+6. Escribe en segunda persona ("Te encuentras...")
+7. Crea una situación específica que requiera una decisión inmediata
+8. NO uses frases genéricas como "Tu aventura comienza"
+9. Hazlo muy específico al personaje y su trasfondo
+
+Responde SOLO con la narrativa, sin explicaciones adicionales.
+`;
+}
+
+// ⚡ CREAR PROMPT PARA QUICK ADVENTURE
+function createQuickAdventureNarrativePrompt(sandboxConcept, character, adventureStructure) {
+  return `
+Crea la narrativa inicial para una QUICK ADVENTURE específica:
+
+AVENTURA: ${adventureStructure.title}
+OBJETIVO: ${adventureStructure.objective}
+DURACIÓN: ${adventureStructure.estimated_duration}
+MUNDO: ${sandboxConcept}
+
+PERSONAJE: ${character.name}
+ARQUETIPO: ${character.archetype}
+HISTORIA: ${character.background || 'Historia desconocida'}
+PERSONALIDAD: ${character.personality || 'Personalidad por descubrir'}
+
+PRIMERA ESCENA: ${adventureStructure.scenes[0].title}
+DESCRIPCIÓN ESCENA: ${adventureStructure.scenes[0].description}
+
+INSTRUCCIONES ESPECÍFICAS:
+1. OBLIGATORIO: Menciona el nombre "${character.name}" y su arquetipo
+2. OBLIGATORIO: Usa su trasfondo "${character.background}" para justificar por qué está aquí
+3. OBLIGATORIO: Establece el objetivo "${adventureStructure.objective}" de forma natural
+4. OBLIGATORIO: Menciona que esta es una aventura con tiempo limitado (sin romper inmersión)
+5. Describe la situación inicial en 4-5 oraciones
+6. Escribe en segunda persona ("Te encuentras...")
+7. Crea urgencia apropiada para una aventura de ${adventureStructure.estimated_duration}
+8. Termina con una decisión inmediata relacionada con el objetivo
+
+EJEMPLO DE TONO:
+"${character.name}, tu experiencia como ${character.archetype} te ha llevado a una situación que requiere resolución rápida. El tiempo es esencial..."
+
+Responde SOLO con la narrativa, sin explicaciones adicionales.
+`;
+}
+
 // 🆕 NUEVOS ENDPOINTS PARA PERSISTENCIA (no afectan endpoints existentes)
 
 // Guardar sesión manualmente
