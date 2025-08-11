@@ -1004,6 +1004,20 @@ function App() {
           setShowRandomEventModal(true);
         }
         
+        // 🎲 MANEJAR D20 ROLL - NUEVO SISTEMA
+        if (data && data.d20_roll) {
+          console.log('🎲 D20 Roll recibido:', data.d20_roll);
+          // Crear evento para mostrar D20 dice animation
+          setRandomEvent({
+            type: 'd20_roll',
+            description: `Acción: ${actionText}`,
+            roll: data.d20_roll.roll,
+            outcome: data.d20_roll.outcome,
+            success: data.d20_roll.success
+          });
+          setShowRandomEventModal(true);
+        }
+        
         // 🖼️ ACTUALIZAR IMAGEN CONTEXTUAL
         const newImage = getContextualImage(data.game_state.location, data.game_state.narrativeLog?.[data.game_state.narrativeLog.length - 1]?.narrative);
         if (newImage !== sceneImage) {
