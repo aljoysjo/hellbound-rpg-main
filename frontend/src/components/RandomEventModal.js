@@ -73,7 +73,9 @@ const RandomEventModal = ({ event, isVisible, onComplete }) => {
         
         {/* Header */}
         <div className="bg-amber-600 text-white p-4 rounded-t-md">
-          <h2 className="text-xl font-bold text-center">🎲 Evento Aleatorio</h2>
+          <h2 className="text-xl font-bold text-center">
+            {isD20Roll ? '🎲 Resultado de Acción' : '🎲 Evento Aleatorio'}
+          </h2>
         </div>
 
         <div className="p-6 space-y-4">
