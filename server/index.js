@@ -1429,19 +1429,27 @@ ARQUETIPO: ${character.archetype}
 HISTORIA: ${character.background || 'Historia desconocida'}
 PERSONALIDAD: ${character.personality || 'Personalidad por descubrir'}
 APARIENCIA: ${character.appearance || 'Apariencia común'}
+FORTALEZAS: ${character.strengths.join(', ') || 'Ninguna especificada'}
+DEBILIDADES: ${character.weaknesses.join(', ') || 'Ninguna especificada'}
 
-INSTRUCCIONES:
-1. Crea una escena inicial inmersiva de 3-4 oraciones
-2. Menciona el nombre del personaje específicamente
-3. Usa su historia personal y personalidad para contexto
-4. Establece una situación específica que requiera acción
-5. Escribe en segunda persona ("Te encuentras...")
-6. Termina con una pregunta o situación que requiera decisión
-7. No uses frases genéricas como "Tu historia comienza"
-8. Hazlo específico al mundo y personaje
+INSTRUCCIONES ESPECÍFICAS:
+1. OBLIGATORIO: Menciona el nombre "${character.name}" al menos 2 veces
+2. OBLIGATORIO: Usa su historia personal "${character.background}" para crear contexto específico
+3. OBLIGATORIO: Refleja su personalidad "${character.personality}" en la situación
+4. OBLIGATORIO: Crea una situación que use sus fortalezas: ${character.strengths.join(', ')}
+5. Describe la escena en 4-5 oraciones detalladas
+6. Escribe en segunda persona ("Te encuentras...")
+7. Crea una situación específica que requiera una decisión inmediata
+8. NO uses frases genéricas como "Tu aventura comienza"
+9. Hazlo muy específico al personaje y su trasfondo
+
+EJEMPLO DE CALIDAD ESPERADA:
+"Detective Martínez, tus años como ex-policía especializado en casos extraños te han preparado para esto. Te encuentras en el apartamento donde ocurrió la última desaparición - las paredes tienen marcas que no aparecen en ningún manual forense. Tu experiencia investigativa te dice que hay algo oculto tras el espejo agrietado del baño, pero tu naturaleza escéptica te hace dudar de las explicaciones sobrenaturales. ¿Examinas el espejo más de cerca o buscas evidencia física más convencional?"
 
 Responde SOLO con la narrativa, sin explicaciones adicionales.
 `;
+
+      console.log('🎭 PROMPT ENVIADO A OPENAI:', narrativePrompt); // 🆕 DEBUG LOG
 
       try {
         const response = await openai.chat.completions.create({
