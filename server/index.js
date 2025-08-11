@@ -2075,12 +2075,21 @@ INSTRUCCIÓN: Refleja estos estados en la narrativa de manera sutil.
       });
     }
     
+    // 🎲 D20 ROLL SYSTEM - Detectar si la acción requiere dado
+    let d20Roll = null;
+    if (shouldTriggerD20Roll(action, narrative)) {
+      const roll = Math.floor(Math.random() * 20) + 1;
+      d20Roll = generateD20Result(action, roll, gameState);
+      console.log(`🎲 D20 TRIGGERED: ${action} → Roll: ${roll} (${d20Roll.outcome})`);
+    }
+    
     res.json({
       success: true,
       narrative: narrative,
       suggested_actions: suggestedActions,
       game_state: gameState.toDict(),
-      state_changes: stateChanges
+      state_changes: stateChanges,
+      d20_roll: d20Roll // 🆕 D20 data para frontend
     });
     
   } catch (error) {
