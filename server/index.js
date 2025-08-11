@@ -1456,15 +1456,17 @@ Responde SOLO con la narrativa, sin explicaciones adicionales.
           model: "gpt-4o-mini",
           messages: [{ role: "user", content: narrativePrompt }],
           temperature: 0.8,
-          max_tokens: 250
+          max_tokens: 300 // 🆕 Aumentado para narrativa más rica
         });
 
         initialNarrative = response.choices[0].message.content || 
-          `${character.name}, como ${character.archetype}, te encuentras en el mundo de ${sandboxConcept}. Tu aventura específica está a punto de comenzar...`;
+          generateFallbackNarrative(character, sandboxConcept);
+        
+        console.log('✅ Narrativa IA generada exitosamente:', initialNarrative.substring(0, 100) + '...');
           
       } catch (error) {
-        console.error('Error generando narrativa:', error);
-        initialNarrative = `${character.name}, tu aventura en ${sandboxConcept} comienza ahora. Como ${character.archetype}, tus habilidades serán esenciales para lo que está por venir...`;
+        console.error('❌ Error generando narrativa:', error);
+        initialNarrative = generateFallbackNarrative(character, sandboxConcept);
       }
     } else {
       // Fallback sin character data
