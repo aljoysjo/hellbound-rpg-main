@@ -298,6 +298,8 @@ class GameState {
     // 🎨 SANDBOX CONCEPT-FIRST
     this.sandboxConcept = null; // Para modo sandbox: idea inicial del usuario
     this.character = null; // 🆕 Datos del personaje creado
+    this.adventureType = 'sandbox'; // 🆕 Tipo: 'sandbox' o 'quick'
+    this.quickAdventure = null; // 🆕 Estructura de quick adventure
     
     // 💀 SISTEMA DE MUERTE
     this.isAlive = true;
