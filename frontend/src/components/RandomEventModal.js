@@ -28,6 +28,10 @@ const RandomEventModal = ({ event, isVisible, onComplete }) => {
 
   if (!isVisible || !event) return null;
 
+  // 🎲 DETECTAR TIPO DE EVENTO
+  const isD20Roll = event.type === 'd20_roll';
+  const eventData = isD20Roll ? event : event.event;
+
   const getDifficultyColor = (difficulty) => {
     if (difficulty <= 10) return 'text-green-600 bg-green-50';
     if (difficulty <= 14) return 'text-yellow-600 bg-yellow-50';
