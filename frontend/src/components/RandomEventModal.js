@@ -163,17 +163,35 @@ const RandomEventModal = ({ event, isVisible, onComplete }) => {
                     {event.success ? '🎉 ¡ÉXITO!' : '💥 FRACASO'}
                   </h3>
                   <p className="text-lg">
-                    Resultado: <strong>{event.roll}</strong> / {event.event.difficulty}+
+                    {isD20Roll ? (
+                      <>Resultado: <strong>{event.roll}</strong>/20 - {event.outcome}</>
+                    ) : (
+                      <>Resultado: <strong>{event.roll}</strong> / {eventData.difficulty}+</>
+                    )}
                   </p>
                 </div>
 
-                {/* Narrativa del resultado */}
-                <div className="bg-amber-100 border border-amber-300 rounded p-4">
-                  <p className="text-amber-900 italic">"{event.narrative}"</p>
-                </div>
+                {/* Narrativa del resultado para eventos aleatorios */}
+                {!isD20Roll && event.narrative && (
+                  <div className="bg-amber-100 border border-amber-300 rounded p-4">
+                    <p className="text-amber-900 italic">"{event.narrative}"</p>
+                  </div>
+                )}
+                
+                {/* Mensaje específico para D20 rolls */}
+                {isD20Roll && (
+                  <div className="bg-blue-100 border border-blue-300 rounded p-4">
+                    <p className="text-blue-900">
+                      <strong>"{event.description}"</strong> - {event.outcome}
+                    </p>
+                    <p className="text-sm text-blue-700 mt-2">
+                      El resultado de esta acción se reflejará en la narrativa.
+                    </p>
+                  </div>
+                )}
 
-                {/* Consecuencias aplicadas */}
-                {event.appliedConsequences && (
+                {/* Consecuencias aplicadas (solo para eventos aleatorios) */}
+                {!isD20Roll && event.appliedConsequences && (
                   <div className="bg-white border border-amber-200 rounded p-4">
                     <h4 className="font-bold text-amber-900 mb-2">📋 Consecuencias:</h4>
                     <ul className="space-y-1 text-amber-800">
@@ -189,7 +207,7 @@ const RandomEventModal = ({ event, isVisible, onComplete }) => {
                 onClick={handleContinue}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
               >
-                ✅ Continuar
+                Continuar
               </button>
             </>
           )}
