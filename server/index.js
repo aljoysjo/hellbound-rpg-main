@@ -1413,7 +1413,7 @@ app.get('/api/get_session/:sessionId', (req, res) => {
 
 app.post('/api/start_session', async (req, res) => {
   try {
-    const { sandboxConcept, character } = req.body; // 🆕 Incluir character data
+    const { sandboxConcept, character, adventureType = 'sandbox' } = req.body; // 🆕 Incluir adventureType
     
     if (!sandboxConcept || !sandboxConcept.trim()) {
       return res.status(400).json({ error: 'Concepto de sandbox requerido' });
@@ -1431,44 +1431,32 @@ app.post('/api/start_session', async (req, res) => {
       console.log(`🎭 Personaje creado: ${character.name} (${character.archetype})`);
     }
     
+    // 🆕 AGREGAR ADVENTURE TYPE
+    gameState.adventureType = adventureType;
+    
+    let initialNarrative;
+    let adventureStructure = null;
+    
+    // ⚡ GENERAR QUICK ADVENTURE SI ES NECESARIO
+    if (adventureType === 'quick') {
+      adventureStructure = await generateQuickAdventure(sandboxConcept, character, openai);
+      console.log(`⚡ Quick Adventure generada: ${adventureStructure.title}`);
+      
+      // Agregar estructura de aventura al gameState
+      gameState.quickAdventure = adventureStructure;
+    }
+    
     // Registrar sesión
     gameSessions.set(sessionId, gameState);
     
     // 🆕 CREAR NARRATIVA INICIAL RICA CON CHARACTER CONTEXT
-    let initialNarrative;
-    
     if (character && character.name) {
-      // Generar narrativa personalizada con IA
-      const narrativePrompt = `
-Crea una narrativa inicial inmersiva para un RPG con estos datos:
+      // Modificar prompt si es quick adventure
+      const narrativePrompt = adventureType === 'quick' ? 
+        createQuickAdventureNarrativePrompt(sandboxConcept, character, adventureStructure) :
+        createSandboxNarrativePrompt(sandboxConcept, character);
 
-MUNDO: ${sandboxConcept}
-PERSONAJE: ${character.name}
-ARQUETIPO: ${character.archetype}
-HISTORIA: ${character.background || 'Historia desconocida'}
-PERSONALIDAD: ${character.personality || 'Personalidad por descubrir'}
-APARIENCIA: ${character.appearance || 'Apariencia común'}
-FORTALEZAS: ${character.strengths.join(', ') || 'Ninguna especificada'}
-DEBILIDADES: ${character.weaknesses.join(', ') || 'Ninguna especificada'}
-
-INSTRUCCIONES ESPECÍFICAS:
-1. OBLIGATORIO: Menciona el nombre "${character.name}" al menos 2 veces
-2. OBLIGATORIO: Usa su historia personal "${character.background}" para crear contexto específico
-3. OBLIGATORIO: Refleja su personalidad "${character.personality}" en la situación
-4. OBLIGATORIO: Crea una situación que use sus fortalezas: ${character.strengths.join(', ')}
-5. Describe la escena en 4-5 oraciones detalladas
-6. Escribe en segunda persona ("Te encuentras...")
-7. Crea una situación específica que requiera una decisión inmediata
-8. NO uses frases genéricas como "Tu aventura comienza"
-9. Hazlo muy específico al personaje y su trasfondo
-
-EJEMPLO DE CALIDAD ESPERADA:
-"Detective Martínez, tus años como ex-policía especializado en casos extraños te han preparado para esto. Te encuentras en el apartamento donde ocurrió la última desaparición - las paredes tienen marcas que no aparecen en ningún manual forense. Tu experiencia investigativa te dice que hay algo oculto tras el espejo agrietado del baño, pero tu naturaleza escéptica te hace dudar de las explicaciones sobrenaturales. ¿Examinas el espejo más de cerca o buscas evidencia física más convencional?"
-
-Responde SOLO con la narrativa, sin explicaciones adicionales.
-`;
-
-      console.log('🎭 PROMPT ENVIADO A OPENAI:', narrativePrompt); // 🆕 DEBUG LOG
+      console.log('🎭 PROMPT ENVIADO A OPENAI:', narrativePrompt.substring(0, 200) + '...'); // 🆕 DEBUG LOG (truncado)
 
       try {
         const response = await openai.chat.completions.create({
@@ -1489,7 +1477,9 @@ Responde SOLO con la narrativa, sin explicaciones adicionales.
       }
     } else {
       // Fallback sin character data
-      initialNarrative = `Tu aventura en ${sandboxConcept} está a punto de comenzar. ¿Cómo quieres empezar esta historia?`;
+      initialNarrative = adventureType === 'quick' ?
+        `Tu aventura "${adventureStructure?.title || sandboxConcept}" está a punto de comenzar. Esta es una aventura estructurada de aproximadamente ${adventureStructure?.estimated_duration || '20-30 minutos'}. ¿Cómo quieres empezar?` :
+        `Tu aventura en ${sandboxConcept} está a punto de comenzar. ¿Cómo quieres empezar esta historia?`;
     }
     
     // Generar acciones sugeridas contextuales
@@ -1498,7 +1488,7 @@ Responde SOLO con la narrativa, sin explicaciones adicionales.
     // Guardar narrativa inicial
     gameState.narrativeLog.push({
       actionId: crypto.randomUUID(),
-      action: 'Inicio de aventura',
+      action: adventureType === 'quick' ? 'Inicio de Quick Adventure' : 'Inicio de aventura',
       narrative: initialNarrative,
       timestamp: new Date(),
       stats: { ...gameState.vitals }
@@ -1519,7 +1509,8 @@ Responde SOLO con la narrativa, sin explicaciones adicionales.
       narrative: initialNarrative,
       game_state: gameState.toDict(),
       suggested_actions: suggestedActions,
-      mode: 'sandbox'
+      mode: 'sandbox',
+      adventure_structure: adventureStructure // 🆕 Enviar estructura al frontend
     });
     
   } catch (error) {
