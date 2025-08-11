@@ -83,38 +83,52 @@ const RandomEventModal = ({ event, isVisible, onComplete }) => {
           {/* Fase Intro */}
           {phase === 'intro' && (
             <>
-              <div className="text-center space-y-4">
-                <h3 className="text-lg font-bold text-amber-900">{event.event.title}</h3>
-                <p className="text-amber-700">{event.event.description}</p>
-                
-                {/* Dificultad */}
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="text-amber-800 font-medium">Dificultad:</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getDifficultyColor(event.event.difficulty)}`}>
-                    {getDifficultyText(event.event.difficulty)} ({event.event.difficulty}+)
-                  </span>
+              {isD20Roll ? (
+                // 🎲 CONTENIDO PARA D20 ROLL
+                <div className="text-center space-y-4">
+                  <h3 className="text-lg font-bold text-amber-900">🎯 Acción Dramática</h3>
+                  <p className="text-amber-700">"{event.description}"</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p className="text-blue-800 font-medium">
+                      Esta acción requiere una tirada de dado para determinar el resultado
+                    </p>
+                  </div>
                 </div>
+              ) : (
+                // 📜 CONTENIDO PARA EVENTO ALEATORIO
+                <div className="text-center space-y-4">
+                  <h3 className="text-lg font-bold text-amber-900">{eventData.title}</h3>
+                  <p className="text-amber-700">{eventData.description}</p>
+                  
+                  {/* Dificultad */}
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="text-amber-800 font-medium">Dificultad:</span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getDifficultyColor(eventData.difficulty)}`}>
+                      {getDifficultyText(eventData.difficulty)} ({eventData.difficulty}+)
+                    </span>
+                  </div>
 
-                {/* Preview de consecuencias */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="bg-green-50 border border-green-200 rounded p-3">
-                    <h4 className="font-bold text-green-800 mb-2">✅ Si tienes éxito:</h4>
-                    <ul className="space-y-1 text-green-700">
-                      {getConsequencesList(event.event.success).map((item, i) => (
-                        <li key={i}>• {item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="bg-red-50 border border-red-200 rounded p-3">
-                    <h4 className="font-bold text-red-800 mb-2">❌ Si fallas:</h4>
-                    <ul className="space-y-1 text-red-700">
-                      {getConsequencesList(event.event.failure).map((item, i) => (
-                        <li key={i}>• {item}</li>
-                      ))}
-                    </ul>
+                  {/* Preview de consecuencias */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="bg-green-50 border border-green-200 rounded p-3">
+                      <h4 className="font-bold text-green-800 mb-2">✅ Si tienes éxito:</h4>
+                      <ul className="space-y-1 text-green-700">
+                        {getConsequencesList(eventData.success).map((item, i) => (
+                          <li key={i}>• {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded p-3">
+                      <h4 className="font-bold text-red-800 mb-2">❌ Si fallas:</h4>
+                      <ul className="space-y-1 text-red-700">
+                        {getConsequencesList(eventData.failure).map((item, i) => (
+                          <li key={i}>• {item}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               <button
                 onClick={handleStartRoll}
