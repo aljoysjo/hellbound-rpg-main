@@ -1139,6 +1139,25 @@ function generateD20Result(action, roll, gameState) {
     description: `🎲 Resultado: ${roll}/20 - ${outcome}`
   };
 }
+// 🎭 GENERAR NARRATIVA FALLBACK RICA POR ARQUETIPO
+function generateFallbackNarrative(character, sandboxConcept) {
+  const archetypeFallbacks = {
+    explorer: `${character.name}, tu curiosidad insaciable como explorador te ha llevado a ${sandboxConcept}. ${character.background ? `Tu experiencia como ${character.background} te dice que` : 'Tu instinto te dice que'} hay secretos por descubrir aquí. ${character.personality ? `Tu naturaleza ${character.personality} te impulsa a` : 'Te sientes impulsado a'} investigar más a fondo. ¿Qué decides explorar primero?`,
+    
+    warrior: `${character.name}, como guerrero experimentado, has llegado a ${sandboxConcept} preparado para cualquier confrontación. ${character.background ? `Tu trasfondo como ${character.background} te ha enseñado` : 'Has aprendido'} que la valentía debe combinarse con estrategia. ${character.personality ? `Tu personalidad ${character.personality} define` : 'Tu determinación define'} cómo enfrentas los desafíos. Una amenaza se cierne sobre ti. ¿Cómo respondes?`,
+    
+    scholar: `${character.name}, tu intelecto como erudito es tu mayor herramienta en ${sandboxConcept}. ${character.background ? `Tu conocimiento adquirido como ${character.background} revela` : 'Tu sabiduría revela'} patrones que otros no pueden ver. ${character.personality ? `Tu naturaleza ${character.personality} te lleva a` : 'Te sientes compelido a'} analizar la situación cuidadosamente. Hay un misterio que requiere tu expertise. ¿Cómo lo abordas?`,
+    
+    rogue: `${character.name}, tu astucia como pícaro es exactamente lo que necesitas en ${sandboxConcept}. ${character.background ? `Tu experiencia como ${character.background} te enseñó` : 'Has aprendido'} que las oportunidades surgen para quienes saben aprovecharlas. ${character.personality ? `Tu ${character.personality} personalidad te impulsa` : 'Tu instinto te impulsa'} a buscar ventajas donde otros no las ven. Una situación delicada requiere tu toque especial. ¿Cuál es tu movimiento?`,
+    
+    mystic: `${character.name}, las fuerzas místicas que fluyen a través de ${sandboxConcept} resuenan con tu naturaleza espiritual. ${character.background ? `Tu camino como ${character.background} te ha conectado` : 'Te has conectado'} con energías que van más allá del mundo físico. ${character.personality ? `Tu espíritu ${character.personality} te guía` : 'Tu intuición te guía'} hacia algo importante que se aproxima. Las energías místicas se agitan a tu alrededor. ¿Cómo canalizas este poder?`,
+    
+    leader: `${character.name}, tu carisma natural como líder será crucial en ${sandboxConcept}. ${character.background ? `Tu experiencia como ${character.background} te ha mostrado` : 'Has aprendido'} que las decisiones que tomes afectarán a otros. ${character.personality ? `Tu naturaleza ${character.personality} inspira` : 'Tu presencia inspira'} confianza en quienes te rodean. Una situación crítica requiere liderazgo. ¿Cómo guías el camino?`
+  };
+  
+  return archetypeFallbacks[character.archetype] || `${character.name}, tu aventura en ${sandboxConcept} está llena de posibilidades. ${character.background ? `Como ${character.background},` : ''} estás preparado para lo que venga. ¿Cuál será tu primera acción?`;
+}
+
 function generateSessionCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = 'RPG-';
